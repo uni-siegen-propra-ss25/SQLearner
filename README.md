@@ -7,7 +7,6 @@
 - [Commit-Konventionen](#commit-konventionen)
 - [Rollen](#rollen)
 - [Workflow](#workflow)
-- [Meetings](#meetings)
 
 ---
 
@@ -72,17 +71,13 @@ Kurze Präfixe am Zeilenanfang sorgen für Übersicht in der Historie:
 | `$`    | CI/CD oder Konfig-Änderung (ci/chore)               |
 
 **Beispiele:**
-+ Implement user registration endpoint
-
-- Removed legacy auth middleware
-
-^ Refactored error-handling in AuthService
-
-? Added README section for commit conventions
-
-* Added Jest smoke-tests for /auth routes
-
-$ Updated GitHub Actions workflow to include smoke-tests
+`+` Implement user registration endpoint
+`-` Removed legacy auth middleware
+`^` Refactored error-handling in AuthService
+`#` Fixed query
+`?` Added README section for commit conventions
+`*` Added Jest smoke-tests for /auth routes
+`$` Updated GitHub Actions workflow to include smoke-tests
 
 ---
 
@@ -90,7 +85,7 @@ $ Updated GitHub Actions workflow to include smoke-tests
 Wir unterscheiden drei Verantwortungsbereiche:
 
 - **PM** (Product Owner / Projektmanager)  
-  - Priorisierung der Backlog-Items  
+  - Priorisierung der Aufgaben  
   - Code Review für main
   - Sprint-Planung & Review
 
@@ -106,16 +101,15 @@ Wir unterscheiden drei Verantwortungsbereiche:
 
 ---
 
-## Workflow
-1. **Issue anlegen**: Beschreibe neue Features, Bugs, Docs oder Chores.  
-2. **Board-Status**: Ziehe das Issue ins Kanban-Board (Backlog → To Do).  
-3. **Branch erzeugen**:  
-   git checkout develop
-   git checkout -b feature/<kurz>
-4. **Arbeiten & Committen**: Nutze Commit-Präfixe, commite oft mit klaren Nachrichten.
-5. **Push & PR**:
-    git push -u origin feature/<kurz> Erstelle PR → feature/* → develop.
-6. **Review & Merge**: Mind. 1 Reviewer, alle CI-Checks müssen grün sein.
-7. **Automationen**: Issues wechseln automatisch Spalten im Projekt-Board.
+## Workflow 
+1. **Branch erzeugen**:  
+  `git checkout develop`
+  `git checkout -b feature/<kurz>` 
+2. **Arbeiten & Committen**: Nutze Commit-Präfixe, commite oft mit klaren Nachrichten.
+3. **Push & PR**: 
+  `git push -u origin feature/<kurz>`
+  Erstelle PR → feature/* → develop.
+4. **Review & Merge**: Mind. 1 Reviewer, alle CI-Checks müssen grün sein.
+5. **Automationen**: Issues wechseln automatisch Spalten im Projekt-Board.
 
 ---
