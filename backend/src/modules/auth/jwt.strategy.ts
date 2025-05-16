@@ -7,10 +7,7 @@ import { JwtPayload } from './models/jwt-payload.dto';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-    constructor(
-        config: ConfigService,
-        private usersService: UsersService,
-    ) {
+    constructor( config: ConfigService, private usersService: UsersService ) {
         const secret = config.getOrThrow<string>('JWT_SECRET');
 
         super({
@@ -26,7 +23,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         return {
             id: user.id,
             email: user.email,
-            username: user.username,
+            matriculationNumber: user.matriculationNumber,
+            firstName: user.firstName,
+            lastName: user.lastName,
             role: user.role,
         };
     }
