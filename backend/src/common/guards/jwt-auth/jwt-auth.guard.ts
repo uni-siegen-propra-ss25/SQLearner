@@ -6,4 +6,4 @@ import { AuthGuard } from '@nestjs/passport';
  * and attach the decoded user to `request.user`.
  */
 @Injectable()
-export class JwtAuthGuard extends AuthGuard('jwt') { }
+export class JwtAuthGuard extends AuthGuard('jwt') {}

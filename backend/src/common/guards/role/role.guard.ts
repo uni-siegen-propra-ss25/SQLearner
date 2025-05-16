@@ -7,17 +7,16 @@ import { Reflector } from '@nestjs/core';
  */
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+    constructor(private reflector: Reflector) {}
 
-  /**
-   * Determines whether the current request's user has the required roles.
-   * @param context ExecutionContext provided by Nest
-   * @returns boolean true if access is allowed
-   * @throws ForbiddenException if role is insufficient
-   */
+    /**
+     * Determines whether the current request's user has the required roles.
+     * @param context ExecutionContext provided by Nest
+     * @returns boolean true if access is allowed
+     * @throws ForbiddenException if role is insufficient
+     */
     canActivate(context: ExecutionContext): boolean {
         const requiredRoles = this.reflector.get<string[]>('roles', context.getHandler());
-
 
         // If no roles are required, allow access (route is public or unprotected)
         if (!requiredRoles || requiredRoles.length === 0) {

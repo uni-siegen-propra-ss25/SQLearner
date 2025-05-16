@@ -6,4 +6,4 @@ import { AuthGuard } from '@nestjs/passport';
  * and populate `request.user` for the login endpoint.
  */
 @Injectable()
-export class LocalAuthGuard extends AuthGuard('local') { }
+export class LocalAuthGuard extends AuthGuard('local') {}
