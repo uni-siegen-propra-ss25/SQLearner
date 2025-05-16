@@ -24,10 +24,15 @@ async function bootstrap() {
 
   // Swagger-config
   const config = new DocumentBuilder()
-      .setTitle('Buch-Shop API')
-      .setVersion('1.0')
-      .addBearerAuth()
-      .build();
+    .setTitle('SQL Practice Platform API')
+    .setDescription('API documentation for the interactive SQL-Übungsplattform')
+    .setVersion('1.0')
+    .addBearerAuth({            // wenn ihr JWT-Security haben wollt
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+    }, 'access-token')
+    .build();
   
   // Create the Swagger document 
   // using the app instance and the config defined above
