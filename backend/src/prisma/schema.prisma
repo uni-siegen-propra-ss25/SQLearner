@@ -13,4 +13,142 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// models 
+// Benutzermodell mit rollenbasierter Zugriffssteuerung
+model User {
+  id           Int           @id @default(autoincrement())
+  email        String        @unique
+  password     String        // Gehashtes Passwort
+  name         String?
+  role         Role          @default(STUDENT)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  // Relationen
+  submissions  Submission[]
+  createdTasks Task[]        @relation("TaskCreator")
+  databases    Database[]    @relation("DatabaseOwner")
+  copies       DbCopy[]
+}
+
+enum Role {
+  STUDENT
+  TUTOR
+  ADMIN
+}
+
+// Importierte oder erstellte Datenbanken
+model Database {
+  id             Int        @id @default(autoincrement())
+  name           String
+  sqlFilePath    String     // Pfad zur importierten .sql-Datei
+  isImported     Boolean    @default(true)
+  schemaData     Json?      // Informationen zum DB-Schema in JSON
+  owner          User       @relation("DatabaseOwner", fields: [ownerId], references: [id])
+  ownerId        Int
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  // Relationen
+  tasks          Task[]
+  copies         DbCopy[]
+  tableSchemas   TableSchema[]
+}
+
+// Tabellenstruktur zur Visualisierung
+model TableSchema {
+  id         Int      @id @default(autoincrement())
+  database   Database @relation(fields: [databaseId], references: [id], onDelete: Cascade)
+  databaseId Int
+  tableName  String
+  structure  Json     // Spaltendetails, Primärschlüssel, etc.
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([databaseId, tableName])
+}
+
+// Datenbankkopien für sicheres Ausführen
+model DbCopy {
+  id             Int         @id @default(autoincrement())
+  originalDb     Database    @relation(fields: [databaseId], references: [id])
+  databaseId     Int
+  student        User        @relation(fields: [studentId], references: [id])
+  studentId      Int
+  isActive       Boolean     @default(true)
+  lastReset      DateTime?
+  connectionInfo Json?       // Verbindungsdaten zur isolierten Kopie
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  // Relationen
+  executions   Execution[]
+  submissions  Submission[]
+
+  @@unique([databaseId, studentId])
+}
+
+// SQL-Übungsaufgaben
+model Task {
+  id              Int         @id @default(autoincrement())
+  title           String
+  description     String      @db.Text
+  difficulty      String?     // z.B. "leicht", "mittel", "schwer"
+  creator         User        @relation("TaskCreator", fields: [creatorId], references: [id])
+  creatorId       Int
+  database        Database    @relation(fields: [databaseId], references: [id])
+  databaseId      Int
+  sampleSolution  String      @db.Text   // Musterlösung
+  expectedResult  Json        // Erwartetes Ergebnis
+  relevantTables  String[]    // Liste der relevanten Tabellen
+  topic           String?     // Thema/Kategorie (z.B. "JOIN", "Aggregation")
+  generationConfig Json?      // Konfiguration für automatische Aufgabengenerierung (Phase 2)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  // Relationen
+  submissions Submission[]
+}
+
+// Ausführung von SQL-Queries (Ad-hoc und Prüfungen)
+model Execution {
+  id           Int       @id @default(autoincrement())
+  dbCopy       DbCopy    @relation(fields: [dbCopyId], references: [id])
+  dbCopyId     Int
+  query        String    @db.Text
+  result       Json?     // Ergebnistabelle oder Fehlermeldung
+  executedAt   DateTime  @default(now())
+}
+
+// Einreichungen von Studierenden
+model Submission {
+  id           Int          @id @default(autoincrement())
+  student      User         @relation(fields: [studentId], references: [id])
+  studentId    Int
+  task         Task         @relation(fields: [taskId], references: [id])
+  taskId       Int
+  queryText    String       @db.Text
+  isCorrect    Boolean?     // Automatische Bewertung
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  // Ausführungskontext
+  dbCopy       DbCopy       @relation(fields: [dbCopyId], references: [id])
+  dbCopyId     Int
+
+  // Optionale Verknüpfung zur Ausführung
+  execution    Execution?   @relation(fields: [executionId], references: [id])
+  executionId  Int?         @unique
+
+  // LLM-Feedback 
+  feedback     Feedback?    @relation("SubmissionFeedback")
+}
+
+// LLM-generiertes Feedback
+model Feedback {
+  id            Int         @id @default(autoincrement())
+  submission    Submission  @relation("SubmissionFeedback", fields: [submissionId], references: [id])
+  submissionId  Int         @unique
+  content       String      @db.Text
+  llmModel      String?     // Verwendetes Sprachmodell
+  createdAt     DateTime    @default(now())
+}
