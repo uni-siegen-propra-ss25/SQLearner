@@ -36,12 +36,12 @@ export class AuthService {
   async validateUser(email: string, password: string) {
     const user = await this.usersService.getUserByEmail(email);
     if (!user) {
-        throw new BadRequestException('Invalid credentials');
+        throw new UnauthorizedException('Invalid credentials');
     }
 
     const passwordValid = await bcrypt.compare(password, user.password);
     if (!passwordValid) {
-        throw new BadRequestException('Invalid credentials');
+        throw new UnauthorizedException('Invalid credentials');
     }
     
     // Exclude the password field from the returned user object

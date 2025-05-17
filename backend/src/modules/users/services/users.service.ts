@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { User } from '@prisma/client';
@@ -102,6 +102,18 @@ export class UsersService {
    * @returns The created user without the password field
    */
   async createUser(dto: CreateUserDto): Promise<number> {
+    // number is the id of the created user
+
+    // check if the email already exists
+    if (await this.checkEmailExists(dto.email)) {
+        throw new BadRequestException('This email is already taken');
+    }
+
+    // check if the matriculation number already exists
+    if (dto.matriculationNumber && await this.checkMatriculationNumberExists(dto.matriculationNumber)) {
+        throw new BadRequestException('This matriculation number is already taken');
+    }
+    
     const saltRounds = parseInt(
       this.configService.get<string>('BCRYPT_SALT_ROUNDS') || '10',
       10,

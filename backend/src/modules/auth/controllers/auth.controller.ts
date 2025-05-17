@@ -15,6 +15,8 @@ import {
     ApiUnauthorizedResponse,
     ApiBearerAuth,
     ApiBody,
+    ApiInternalServerErrorResponse,
+    ApiBadRequestResponse,
 } from '@nestjs/swagger';
 import { AuthService } from '../services/auth.service';
 import { LoginResponseDto } from '../models/login-response.dto';
@@ -39,6 +41,8 @@ export class AuthController {
     @HttpCode(HttpStatus.CREATED)
     @ApiOperation({ summary: 'Register a new user' })
     @ApiResponse({ status: 201, description: 'User successfully registered' })
+    @ApiBadRequestResponse({ description: 'Invalid input data' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error' })
     @ApiBody({ type: CreateUserDto })
     async register(@Body() dto: CreateUserDto): Promise<number> {
         return this.authService.signUp(dto);
@@ -60,6 +64,7 @@ export class AuthController {
         type: LoginResponseDto,
     })
     @ApiUnauthorizedResponse({ description: 'Invalid email or password' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error' })
     @ApiBody({ type: LoginCredentialsDto })
     async login(@Request() req): Promise<LoginResponseDto> {
         return this.authService.signIn(req.user);
@@ -76,6 +81,7 @@ export class AuthController {
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Get profile of the authenticated user' })
     @ApiResponse({ status: 200, description: 'Current user profile' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error' })
     getProfile(@GetUser() user) {
         return user;
     }
