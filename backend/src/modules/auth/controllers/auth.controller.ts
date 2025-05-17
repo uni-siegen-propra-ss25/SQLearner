@@ -24,7 +24,7 @@ import { JwtAuthGuard } from 'src/common/guards/jwt-auth/jwt-auth.guard';
 import { LocalAuthGuard } from 'src/common/guards/local-auth/local-auth.guard';
 import { RolesGuard } from 'src/common/guards/role/role.guard';
 import { LoginCredentialsDto } from '../models/login-credentials.dto';
-import { RegisterCredentialsDto } from '../models/register-credentials.dto';
+import { CreateUserDto } from 'src/modules/users/models/create-user.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -33,14 +33,14 @@ export class AuthController {
 
     /**
      * Registers a new user in the system.
-     * @param dto RegisterUserDto containing email, password, and optional name
+     * @param dto CreateUserDto containing email, password, and optional name
      */
     @Post('register')
     @HttpCode(HttpStatus.CREATED)
     @ApiOperation({ summary: 'Register a new user' })
     @ApiResponse({ status: 201, description: 'User successfully registered' })
-    @ApiBody({ type: RegisterCredentialsDto })
-    async register(@Body() dto: RegisterCredentialsDto): Promise<number> {
+    @ApiBody({ type: CreateUserDto })
+    async register(@Body() dto: CreateUserDto): Promise<number> {
         return this.authService.signUp(dto);
     }
 

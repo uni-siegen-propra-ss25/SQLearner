@@ -5,9 +5,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthController } from './controllers/auth.controller';
 import { AuthService } from './services/auth.service';
 import { JwtStrategy } from './jwt.strategy';
+import { UsersModule } from '../users/users.module';
+import { PrismaModule } from '../../prisma/prisma.module';
 
 @Module({
     imports: [
+        UsersModule,
         PassportModule,
         ConfigModule.forRoot({ isGlobal: true }), // .env can be used globally
         JwtModule.registerAsync({

@@ -5,7 +5,7 @@ import { UsersService } from 'src/modules/users/services/users.service';
 import { JwtPayload } from '../models/jwt-payload.dto';
 import { LoginResponseDto } from '../models/login-response.dto';
 import * as bcrypt from 'bcrypt';
-import { RegisterCredentialsDto } from '../models/register-credentials.dto';
+import { CreateUserDto } from 'src/modules/users/models/create-user.dto';
 
 /**
  * AuthService is responsible for user signup, signin and JWT token generation.
@@ -13,17 +13,17 @@ import { RegisterCredentialsDto } from '../models/register-credentials.dto';
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly usersService: UsersService,
+    private usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
 
   /**
    * Registers a new user by delegating creation logic to UsersService.
-   * @param dto RegisterCredentialsDto containing user registration data.
+   * @param dto CreateUserDto containing user registration data.
    * @returns Promise resolving to the created user (without password field).
    */
-  async signUp(dto: RegisterCredentialsDto): Promise<number> {
+  async signUp(dto: CreateUserDto): Promise<number> {
     return this.usersService.createUser(dto);
   }
 

@@ -2,8 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { User } from '@prisma/client';
-import { RegisterCredentialsDto } from 'src/modules/auth/models/register-credentials.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { CreateUserDto } from '../models/create-user.dto';
+import { PrismaService } from '../../../prisma/prisma.service';
 
 /**
  * UsersService handles database operations related to the User model.
@@ -11,8 +11,8 @@ import { PrismaService } from 'src/prisma/prisma.service';
 @Injectable()
 export class UsersService {
   constructor(
-    private readonly prisma: PrismaService,
-    private readonly configService: ConfigService,
+    private prisma: PrismaService,
+    private configService: ConfigService,
   ) {}
 
   /**
@@ -101,7 +101,7 @@ export class UsersService {
    * @param dto Data transfer object containing user registration fields
    * @returns The created user without the password field
    */
-  async createUser(dto: RegisterCredentialsDto): Promise<number> {
+  async createUser(dto: CreateUserDto): Promise<number> {
     const saltRounds = parseInt(
       this.configService.get<string>('BCRYPT_SALT_ROUNDS') || '10',
       10,
