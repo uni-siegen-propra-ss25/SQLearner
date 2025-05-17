@@ -190,6 +190,9 @@ model Progress {
   attempts      Int        @default(0)
   lastAttemptAt DateTime   @updatedAt
 
+  isPassed      Boolean   @default(false)
+  passedAt      DateTime? 
+
   user          User       @relation(fields: [userId], references: [id])
   exercise      Exercise   @relation(fields: [exerciseId], references: [id])
 
