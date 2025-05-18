@@ -7,14 +7,14 @@ import {
   HttpEvent,
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { AuthService } from '../auth/services/auth.service';
+import { AuthService } from '../../features/auth/services/auth.service';
 
 /**
- * AuthInterceptor is an HTTP interceptor that adds the JWT token to the request headers.
+ * JwtInterceptor is an HTTP interceptor that adds the JWT token to the request headers.
  * It checks if the user is authenticated and if the request URL is not in the excluded list.
  */
 @Injectable()
-export class AuthInterceptor implements HttpInterceptor {
+export class JwtInterceptor implements HttpInterceptor {
   constructor(private auth: AuthService) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {

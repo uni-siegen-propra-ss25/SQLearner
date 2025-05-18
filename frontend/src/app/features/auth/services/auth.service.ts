@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, tap, Observable } from 'rxjs';
 import { Router } from '@angular/router';
-import { RegisterCredentials } from '../models/register-credentials.model';
 import { LoginCredentials } from '../models/login-credentials.model';
+import { RegisterCredentials } from '../models/register-credentials.model';
+import { LoginResponse } from '../models/login-response.model';
 
 
 @Injectable({ providedIn: 'root' })
