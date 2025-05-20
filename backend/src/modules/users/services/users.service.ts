@@ -23,9 +23,11 @@ export class UsersService {
    */
   async getUserById(id: number): Promise<User> {
     const user = await this.prisma.user.findUnique({ where: { id } });
+    
     if (!user) {
       throw new NotFoundException('User not found');
     }
+
     return user;
   }
 
@@ -37,10 +39,12 @@ export class UsersService {
    */
   async getUserByEmail(email: string): Promise<User> {
     const user = await this.prisma.user.findUnique({ where: { email } });
+  
     if (!user) {
       throw new NotFoundException('User not found');
-    }
-    return user;
+    } 
+
+    return user as User;
   }
 
   /**
@@ -51,9 +55,11 @@ export class UsersService {
    */
   async getUserByMatriculationNumber(matriculationNumber: string): Promise<User> {
     const user = await this.prisma.user.findUnique({ where: { matriculationNumber } });
+    
     if (!user) {
       throw new NotFoundException('User not found');
     }
+    
     return user;
   }
 
@@ -84,11 +90,11 @@ export class UsersService {
     return this.prisma.user.findMany({
       select: {
         id: true,
-        matriculationNumber: true,
         email: true,
         firstName: true,
         lastName: true,
         role: true,
+        matriculationNumber: true,
       },
     });
   }
