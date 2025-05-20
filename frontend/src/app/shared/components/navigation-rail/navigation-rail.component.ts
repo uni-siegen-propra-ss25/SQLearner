@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Router } from '@angular/router';
 
 export type UserRole = 'student' | 'tutor' | 'admin';
 
@@ -28,6 +29,8 @@ export class NavigationRailComponent {
   @Output() logout = new EventEmitter<void>();
   
   isDarkMode = false;
+
+  constructor(private router: Router) {}
   
   get filteredItems(): NavigationItem[] {
     return this.items.filter(item => 
@@ -47,7 +50,11 @@ export class NavigationRailComponent {
   }
 
   onLogout(): void {
-    this.logout.emit(); 
+    if (this.userRole) {
+      this.logout.emit();
+    } else {
+      this.router.navigate(['/auth/login']);
+    }
   }
 
   onLanguageChange(language: string): void {
