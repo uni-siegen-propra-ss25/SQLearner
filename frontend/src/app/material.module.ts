@@ -3,6 +3,22 @@ import { MatButtonModule }     from '@angular/material/button';
 import { MatToolbarModule }    from '@angular/material/toolbar';
 import { MatIconModule }       from '@angular/material/icon';
 import { MatSidenavModule }    from '@angular/material/sidenav';
+import { MatListModule }       from '@angular/material/list';
+import { MatCardModule }       from '@angular/material/card';
+import { MatFormFieldModule }  from '@angular/material/form-field';
+import { MatInputModule }      from '@angular/material/input';
+import { MatSelectModule }     from '@angular/material/select';
+import { MatCheckboxModule }   from '@angular/material/checkbox';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatGridListModule }  from '@angular/material/grid-list';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialogModule }     from '@angular/material/dialog';
+import { MatSnackBarModule }   from '@angular/material/snack-bar';
+import { MatTooltipModule }    from '@angular/material/tooltip';
+import { MatDividerModule }    from '@angular/material/divider';
+import { MatTabsModule }       from '@angular/material/tabs';
+import { MatBadgeModule }      from '@angular/material/badge';
 
 /**
  * MaterialModule imports and exports Angular Material modules.
@@ -16,6 +32,22 @@ import { MatSidenavModule }    from '@angular/material/sidenav';
     MatToolbarModule,
     MatIconModule,
     MatSidenavModule,
+    MatListModule,
+    MatBadgeModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatCheckboxModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatGridListModule,
+    MatProgressSpinnerModule,
+    MatDialogModule,
+    MatSnackBarModule,
+    MatTooltipModule,
+    MatDividerModule,
+    MatTabsModule
   ]
 })
 export class MaterialModule { }

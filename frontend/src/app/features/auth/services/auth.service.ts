@@ -75,7 +75,7 @@ export class AuthService {
 
   /** Helper for your AuthGuard: */
   hasToken(): boolean {
-    return !!this.getToken();
+    return !!this.getToken(); 
   }
 
   /** Convenience getters: */

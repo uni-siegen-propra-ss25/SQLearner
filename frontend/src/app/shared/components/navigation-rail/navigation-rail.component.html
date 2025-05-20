@@ -1,0 +1,48 @@
+<nav class="navigation-rail">
+  <div class="menu-fab">
+    <a *ngIf="logoUrl"
+       [routerLink]="logoUrl"
+       routerLinkActive="active"
+       class="nav-brand-logo">
+      <img *ngIf="logoUrl" [src]="logoUrl" [alt]="logoAlt" class="nav-brand-logo">
+      <mat-icon *ngIf="!logoUrl" class="default-logo">school</mat-icon>
+    </a>
+  </div>
+
+  <div class="segment">
+    <a *ngFor="let item of items"
+       [routerLink]="item.route"
+       routerLinkActive="active"
+       class="nav-item"
+       (click)="onItemClick(item)">
+      <span class="icon-container">
+        <mat-icon>{{ item.icon }}</mat-icon>
+      </span>
+      <span class="label-text">{{ item.label }}</span>
+    </a>
+  </div>
+
+  <div class="nav-footer">
+    <button class="nav-item" (click)="onLanguageChange('de')">
+      <span class="icon-container">
+        <mat-icon>language</mat-icon>
+      </span>
+      <span class="label-text">Sprache</span>
+    </button>
+    
+    <button class="nav-item" (click)="toggleDarkMode()">
+      <span class="icon-container">
+        <mat-icon>{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
+      </span>
+      <span class="label-text">{{ isDarkMode ? 'Light' : 'Dark' }}</span>
+    </button>
+    
+    <button class="nav-item" (click)="onLogout()">
+      <span class="icon-container">
+        <mat-icon>{{ userRole ? 'logout' : 'login' }}</mat-icon>
+      </span>
+      <span class="label-text">{{ userRole ? 'Logout' : 'Login' }}</span>
+    </button>
+  </div>
+
+</nav>

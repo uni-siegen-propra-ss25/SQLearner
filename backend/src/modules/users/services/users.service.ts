@@ -77,6 +77,23 @@ export class UsersService {
   }
 
   /**
+   * Retrieves all users.
+   * @returns An array of user data objects.
+   */
+  async getAllUsers(): Promise<Partial<User>[]> {
+    return this.prisma.user.findMany({
+      select: {
+        id: true,
+        matriculationNumber: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+      },
+    });
+  }
+
+  /**
    * Checks whether a user with the given email exists.
    * @param email Email to check.
    * @returns True if a user exists, false otherwise.
