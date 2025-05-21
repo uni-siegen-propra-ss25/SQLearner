@@ -14,8 +14,8 @@ export class RegisterComponent {
   registerForm: FormGroup;
   hidePassword = true;
   hideConfirmPassword = true;
-  roles = Object.values(Role);
-  Role = Role; // for template access
+  roles = [Role.STUDENT, Role.TUTOR];
+  Role = Role;
 
   constructor(
     private fb: FormBuilder,

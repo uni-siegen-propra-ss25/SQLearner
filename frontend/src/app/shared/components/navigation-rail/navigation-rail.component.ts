@@ -1,14 +1,13 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
-
-export type UserRole = 'student' | 'tutor' | 'admin';
+import { Role } from '../../../features/users/models/role.model';
 
 export interface NavigationItem {
   icon: string;
   label: string;
   route: string;
   active?: boolean;
-  requiredRoles?: UserRole[];
+  requiredRoles?: Role[];
 }
 
 @Component({
@@ -21,7 +20,7 @@ export class NavigationRailComponent {
   @Input() items: NavigationItem[] = [];
   @Input() logoUrl: string = '';
   @Input() logoAlt: string = 'Logo';
-  @Input() userRole: UserRole | null = null;
+  @Input() userRole: Role | null = null;
 
   @Output() itemSelected = new EventEmitter<NavigationItem>();
   @Output() darkModeChanged = new EventEmitter<boolean>();

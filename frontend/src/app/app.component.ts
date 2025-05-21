@@ -1,37 +1,40 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-import { NavigationItem, UserRole } from './shared/components/navigation-rail/navigation-rail.component';
+import { NavigationItem } from './shared/components/navigation-rail/navigation-rail.component';
 import { AuthService } from './features/auth/services/auth.service';
+import { Subscription } from 'rxjs';
+import { Role } from './features/users/models/role.model';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   isDarkMode = false;
   logoUrl = 'assets/icons/logo_SQLearner.svg';
   logoAlt = 'SQLearner Logo';
-  currentUserRole: UserRole | null = null;
+  currentUserRole: Role | null = null;
+  private userSubscription: Subscription | null = null;
 
   private readonly studentItems: NavigationItem[] = [
-    { icon: 'school', label: 'Lernen', route: '/learn', requiredRoles: ['student'] },
-    { icon: 'assignment', label: 'Aufgaben', route: '/assignments', requiredRoles: ['student'] },
-    { icon: 'analytics', label: 'Fortschritt', route: '/progress', requiredRoles: ['student'] }
+    { icon: 'school', label: 'Lernen', route: '/learn', requiredRoles: [Role.STUDENT] },
+    { icon: 'assignment', label: 'Aufgaben', route: '/assignments', requiredRoles: [Role.STUDENT] },
+    { icon: 'analytics', label: 'Fortschritt', route: '/progress', requiredRoles: [Role.STUDENT] }
   ];
 
   private readonly tutorItems: NavigationItem[] = [
-    { icon: 'groups', label: 'Studenten', route: '/students', requiredRoles: ['tutor'] },
-    { icon: 'assignment_turned_in', label: 'Bewertungen', route: '/grading', requiredRoles: ['tutor'] }
+    { icon: 'groups', label: 'Studenten', route: '/students', requiredRoles: [Role.TUTOR] },
+    { icon: 'assignment_turned_in', label: 'Bewertungen', route: '/grading', requiredRoles: [Role.TUTOR] }
   ];
 
   private readonly adminItems: NavigationItem[] = [
-    { icon: 'admin_panel_settings', label: 'Administration', route: '/admin', requiredRoles: ['admin'] },
-    { icon: 'settings', label: 'Einstellungen', route: '/settings', requiredRoles: ['admin'] }
+    { icon: 'admin_panel_settings', label: 'Administration', route: '/admin', requiredRoles: [Role.ADMIN] },
+    { icon: 'settings', label: 'Einstellungen', route: '/settings', requiredRoles: [Role.ADMIN] }
   ];
 
   private readonly commonItems: NavigationItem[] = [
-    { icon: 'home', label: 'Willkommen', route: '/' }
+    { icon: 'home', label: 'Dashboard', route: '/' }
   ];
 
   constructor(
@@ -40,19 +43,17 @@ export class AppComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Subscribe to auth state changes
-    this.authService.isLoggedIn$.subscribe(() => {
-      this.updateUserRole();
+    // Subscribe to user changes
+    this.userSubscription = this.authService.user$.subscribe(user => {
+      this.currentUserRole = user?.role || null;
     });
+  }
 
-    // Initialize dark mode from localStorage if available
-    /*
-    const savedDarkMode = localStorage.getItem('darkMode');
-    if (savedDarkMode) {
-      this.isDarkMode = JSON.parse(savedDarkMode);
-      this.applyTheme();
+  ngOnDestroy(): void {
+    // Unsubscribe from user changes
+    if (this.userSubscription) {
+      this.userSubscription.unsubscribe();
     }
-    */
   }
 
   get currentUserNavigationItems(): NavigationItem[] {
@@ -63,13 +64,13 @@ export class AppComponent implements OnInit {
     let items = [...this.commonItems];
     
     switch (this.currentUserRole) {
-      case 'student':
+      case Role.STUDENT:
         items = [...items, ...this.studentItems];
         break;
-      case 'tutor':
+      case Role.TUTOR:
         items = [...items, ...this.tutorItems];
         break;
-      case 'admin':
+      case Role.ADMIN:
         items = [...items, ...this.adminItems];
         break;
     }
@@ -88,17 +89,13 @@ export class AppComponent implements OnInit {
   }
 
   onLanguageChanged(language: string): void {
-    localStorage.setItem('language', language);
+    localStorage.setItem('language', language); // TODO: Implement language change DE -> EN
     window.location.reload(); // Reload to apply language change
   }
 
   async onLogout(): Promise<void> {
     await this.authService.logout();
     this.router.navigate(['/login']);
-  }
-
-  private updateUserRole(): void {
-    this.currentUserRole = this.authService.getUserRole() as UserRole | null;
   }
 
   private applyTheme(): void {
