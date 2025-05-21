@@ -37,7 +37,7 @@
       <span class="label-text">{{ isDarkMode ? 'Light' : 'Dark' }}</span>
     </button>
     
-    <button class="nav-item" (click)="onLogout()">
+    <button class="nav-item" (click)="onLogStatusChanged()">
       <span class="icon-container">
         <mat-icon>{{ userRole ? 'logout' : 'login' }}</mat-icon>
       </span>

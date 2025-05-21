@@ -93,9 +93,8 @@ export class AppComponent implements OnInit, OnDestroy {
     window.location.reload(); // Reload to apply language change
   }
 
-  async onLogout(): Promise<void> {
-    await this.authService.logout();
-    this.router.navigate(['/login']);
+  async onLogStatusChanged(): Promise<void> {
+    this.authService.logout();
   }
 
   private applyTheme(): void {

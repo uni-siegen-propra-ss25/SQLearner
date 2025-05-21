@@ -25,7 +25,7 @@ export class NavigationRailComponent {
   @Output() itemSelected = new EventEmitter<NavigationItem>();
   @Output() darkModeChanged = new EventEmitter<boolean>();
   @Output() languageChanged = new EventEmitter<string>();
-  @Output() logout = new EventEmitter<void>();
+  @Output() logStatusChanged = new EventEmitter<void>();
   
   isDarkMode = false;
 
@@ -48,9 +48,9 @@ export class NavigationRailComponent {
     this.darkModeChanged.emit(this.isDarkMode);
   }
 
-  onLogout(): void {
+  onLogStatusChanged(): void {
     if (this.userRole) {
-      this.logout.emit();
+      this.logStatusChanged.emit();
     } else {
       this.router.navigate(['/auth/login']);
     }
