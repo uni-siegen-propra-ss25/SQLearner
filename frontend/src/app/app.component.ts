@@ -14,6 +14,7 @@ export class AppComponent implements OnInit, OnDestroy {
   isDarkMode = false;
   logoUrl = 'assets/icons/logo_SQLearner.svg';
   logoAlt = 'SQLearner Logo';
+  
   currentUserRole: Role | null = null;
   private userSubscription: Subscription | null = null;
 

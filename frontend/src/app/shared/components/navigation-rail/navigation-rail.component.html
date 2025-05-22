@@ -4,8 +4,8 @@
        [routerLink]="logoUrl"
        routerLinkActive="active"
        class="nav-brand-logo">
-      <img *ngIf="logoUrl" [src]="logoUrl" [alt]="logoAlt" class="nav-brand-logo">
       <mat-icon *ngIf="!logoUrl" class="default-logo">school</mat-icon>
+      <mat-icon *ngIf="logoUrl" class="brand-logo" svgIcon="logo_SQLearner"></mat-icon>
     </a>
   </div>
 
