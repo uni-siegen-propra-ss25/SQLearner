@@ -15,7 +15,7 @@ export class LoginResponseDto {
         example: 42,
         description: 'The authenticated user’s ID',
     })
-    userId: number;
+    id: number;
 
     @ApiProperty({
         example: 'student@example.com',
@@ -41,4 +41,11 @@ export class LoginResponseDto {
         description: 'The authenticated user’s role',
     })
     role: Role;
+
+    @ApiProperty({
+        example: '1234567890',
+        description: 'The authenticated user’s matriculation number',
+        required: false,
+    })
+    matriculationNumber?: string;
 }

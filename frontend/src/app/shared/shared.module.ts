@@ -1,12 +1,20 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-
+import { RouterModule } from '@angular/router';
+import { NavigationRailComponent } from './components/navigation-rail/navigation-rail.component';
+import { MaterialModule } from '../material.module';
 
 @NgModule({
-  declarations: [],
+  declarations: [
+    NavigationRailComponent
+  ],
   imports: [
-    CommonModule
+    CommonModule,
+    MaterialModule,
+    RouterModule
+  ],
+  exports: [
+    NavigationRailComponent
   ]
 })
 export class SharedModule { }

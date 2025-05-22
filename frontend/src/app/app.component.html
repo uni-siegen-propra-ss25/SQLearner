@@ -1,1 +1,20 @@
-<router-outlet />
+<mat-sidenav-container class="app-container">
+  <mat-sidenav fixedInViewport opened mode="side" class="sidenav">
+    <app-navigation-rail
+      [items]="currentUserNavigationItems" 
+      [logoUrl]="logoUrl"
+      [userRole]="currentUserRole"
+      logoAlt="SQLearner Logo"
+      (itemSelected)="onNavigationItemSelected($event)"
+      (darkModeChanged)="onDarkModeChanged($event)"
+      (languageChanged)="onLanguageChanged($event)"
+      (logStatusChanged)="onLogStatusChanged()">
+    </app-navigation-rail>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="sidenav-content">
+    <div class="sidenav-content-wrapper" [class.dark-theme]="isDarkMode">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

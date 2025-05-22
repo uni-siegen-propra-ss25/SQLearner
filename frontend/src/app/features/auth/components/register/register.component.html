@@ -1,1 +1,141 @@
-<p>register works!</p>
+<form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form">
+  <mat-card class="auth-card">
+    <mat-card-content>
+      <div class="auth-container">
+        <div class="auth-header">
+          <img
+            src="assets/icons/logo_SQLearner.svg"
+            alt="Logo"
+            class="auth-logo" />
+          <h1 class="auth-title">Create Account</h1>
+        </div>
+
+        <div class="auth-form-fields auth-form-grid">
+          <div class="auth-grid-row">
+            <mat-form-field appearance="outline" class="auth-field">
+              <mat-label>First Name</mat-label>
+              <input matInput type="text" formControlName="firstName" />
+              @if ((registerForm.get('firstName')?.touched || registerForm.get('firstName')?.dirty) && 
+                   registerForm.get('firstName')?.hasError('required')) {
+                <mat-error class="auth-error">
+                  <mat-icon>error_outline</mat-icon>
+                  First name is required
+                </mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="auth-field">
+              <mat-label>Last Name</mat-label>
+              <input matInput type="text" formControlName="lastName" />
+              @if ((registerForm.get('lastName')?.touched || registerForm.get('lastName')?.dirty) && 
+                   registerForm.get('lastName')?.hasError('required')) {
+                <mat-error class="auth-error">
+                  <mat-icon>error_outline</mat-icon>
+                  Last name is required
+                </mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="auth-grid-row">
+            <mat-form-field appearance="outline" class="auth-field">
+              <mat-label>Password</mat-label>
+              <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" />
+              <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
+                <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+              </button>
+              @if ((registerForm.get('password')?.touched || registerForm.get('password')?.dirty) && 
+                   registerForm.get('password')?.hasError('required')) {
+                <mat-error class="auth-error">
+                  <mat-icon>error_outline</mat-icon>
+                  Password is required
+                </mat-error>
+              }
+              @if ((registerForm.get('password')?.touched || registerForm.get('password')?.dirty) && 
+                   registerForm.get('password')?.hasError('minlength')) {
+                <mat-error class="auth-error">
+                  <mat-icon>error_outline</mat-icon>
+                  Password must be at least 8 characters
+                </mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="auth-field">
+              <mat-label>Confirm Password</mat-label>
+              <input matInput [type]="hideConfirmPassword ? 'password' : 'text'" formControlName="confirmPassword" />
+              <button mat-icon-button matSuffix (click)="hideConfirmPassword = !hideConfirmPassword" type="button">
+                <mat-icon>{{hideConfirmPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+              </button>
+              @if ((registerForm.get('confirmPassword')?.touched || registerForm.get('confirmPassword')?.dirty) && 
+                   registerForm.get('confirmPassword')?.hasError('required')) {
+                <mat-error class="auth-error">
+                  <mat-icon>error_outline</mat-icon>
+                  Please confirm your password
+                </mat-error>
+              }
+              @if (registerForm.hasError('passwordMismatch')) {
+                <mat-error class="auth-error">
+                  <mat-icon>error_outline</mat-icon>
+                  Passwords do not match
+                </mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline" class="auth-field auth-field-full">
+            <mat-label>Email</mat-label>
+            <input matInput type="email" formControlName="email" />
+            @if ((registerForm.get('email')?.touched || registerForm.get('email')?.dirty) && 
+                 registerForm.get('email')?.hasError('required')) {
+              <mat-error class="auth-error">
+                <mat-icon>error_outline</mat-icon>
+                Email is required
+              </mat-error>
+            }
+            @if ((registerForm.get('email')?.touched || registerForm.get('email')?.dirty) && 
+                 registerForm.get('email')?.hasError('email')) {
+              <mat-error class="auth-error">
+                <mat-icon>error_outline</mat-icon>
+                Please enter a valid email
+              </mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="auth-field auth-field-full">
+            <mat-label>Role</mat-label>
+            <mat-select formControlName="role">
+              <mat-option *ngFor="let role of roles" [value]="role">{{ role }}</mat-option>
+            </mat-select>
+            @if (registerForm.get('role')?.touched && registerForm.get('role')?.hasError('required')) {
+              <mat-error class="auth-error">
+                <mat-icon>error_outline</mat-icon>
+                Role is required
+              </mat-error>
+            }
+          </mat-form-field>
+
+          @if (isStudent) {
+            <mat-form-field appearance="outline" class="auth-field auth-field-full">
+              <mat-label>Matriculation Number</mat-label>
+              <input matInput type="text" formControlName="matriculationNumber" />
+              @if ((registerForm.get('matriculationNumber')?.touched || registerForm.get('matriculationNumber')?.dirty) && 
+                   registerForm.get('matriculationNumber')?.hasError('required')) {
+                <mat-error class="auth-error">
+                  <mat-icon>error_outline</mat-icon>
+                  Matriculation number is required
+                </mat-error>
+              }
+            </mat-form-field>
+          }
+        </div>
+      </div>
+    </mat-card-content>
+    
+    <mat-card-actions class="auth-actions">
+      <a mat-button routerLink="/auth/login" class="auth-secondary-button">
+        Already have an account?
+      </a>
+      <button mat-flat-button color="primary" type="submit" class="auth-primary-button">
+        Create Account
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</form>

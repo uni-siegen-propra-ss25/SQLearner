@@ -23,9 +23,11 @@ export class UsersService {
    */
   async getUserById(id: number): Promise<User> {
     const user = await this.prisma.user.findUnique({ where: { id } });
+    
     if (!user) {
       throw new NotFoundException('User not found');
     }
+
     return user;
   }
 
@@ -37,10 +39,12 @@ export class UsersService {
    */
   async getUserByEmail(email: string): Promise<User> {
     const user = await this.prisma.user.findUnique({ where: { email } });
+  
     if (!user) {
       throw new NotFoundException('User not found');
-    }
-    return user;
+    } 
+
+    return user as User;
   }
 
   /**
@@ -51,9 +55,11 @@ export class UsersService {
    */
   async getUserByMatriculationNumber(matriculationNumber: string): Promise<User> {
     const user = await this.prisma.user.findUnique({ where: { matriculationNumber } });
+    
     if (!user) {
       throw new NotFoundException('User not found');
     }
+    
     return user;
   }
 
@@ -72,6 +78,23 @@ export class UsersService {
         firstName: true,
         lastName: true,
         role: true,
+      },
+    });
+  }
+
+  /**
+   * Retrieves all users.
+   * @returns An array of user data objects.
+   */
+  async getAllUsers(): Promise<Partial<User>[]> {
+    return this.prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        matriculationNumber: true,
       },
     });
   }
