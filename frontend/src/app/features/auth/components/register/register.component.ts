@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { RegisterCredentials } from '../../models/register-credentials.model';
 import { Role } from '../../../users/models/role.model';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-register',
@@ -20,7 +21,8 @@ export class RegisterComponent {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private snackBar: MatSnackBar
   ) {
     this.registerForm = this.fb.group({
       firstName: ['', [Validators.required]],
@@ -82,11 +84,17 @@ export class RegisterComponent {
       this.authService.register(credentials).subscribe({
         next: (res) => {
           // TODO: Handle successful registration (e.g., navigate to login)
-          console.log('Registration successful:', res);
+          this.router.navigate(['/login']);
+          this.snackBar.open('Registration successful', 'Close', {
+            duration: 3000,
+            panelClass: ['mat-toolbar', 'mat-primary']
+          });
         },
         error: (err) => {
-          // TODO: Handle registration error
-          console.error('Registration error:', err);
+          this.snackBar.open('Registration failed', 'Close', {
+            duration: 3000,
+            panelClass: ['mat-toolbar', 'mat-warn']
+          });
         }
       });
     }

@@ -6,10 +6,11 @@ import { LoginCredentials } from '../models/login-credentials.model';
 import { RegisterCredentials } from '../models/register-credentials.model';
 import { LoginResponse } from '../models/login-response.model';
 import { User } from '../../users/models/user.model';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly baseUrl = 'http://localhost:3000/auth';
+  private readonly baseUrl = environment.apiUrl + '/auth';
   private readonly tokenKey = 'ACCESS_TOKEN';
 
   httpOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };

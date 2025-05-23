@@ -1,0 +1,99 @@
+.exercise-card {
+  margin: 8px 0;
+  border-radius: 8px;
+  background-color: white;
+
+  &:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.exercise-header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
+}
+
+.exercise-type {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.05);
+
+  mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.exercise-title {
+  flex: 1;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.exercise-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.exercise-description {
+  color: rgba(0, 0, 0, 0.7);
+  margin: 16px 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.exercise-metadata {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.difficulty-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: lowercase;
+}
+
+.exercise-type-info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.9rem;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+// Dark theme adjustments
+:host-context(.dark-theme) {
+  .exercise-card {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .exercise-type {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .exercise-description {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .exercise-type-info {
+    color: rgba(255, 255, 255, 0.6);
+  }
+} 

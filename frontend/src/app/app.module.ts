@@ -10,6 +10,9 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { MaterialModule } from './material.module';
 import { SharedModule } from './shared/shared.module';
 import { MatIconRegistry } from '@angular/material/icon';
+import { RouterModule } from '@angular/router';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { RoadmapModule } from './features/roadmap/roadmap.module';
 
 @NgModule({
   declarations: [
@@ -23,6 +26,9 @@ import { MatIconRegistry } from '@angular/material/icon';
     AppRoutingModule,
     ReactiveFormsModule,
     HttpClientModule,
+    RouterModule,
+    RoadmapModule,
+    DragDropModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },

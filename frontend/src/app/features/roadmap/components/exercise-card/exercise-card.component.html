@@ -1,0 +1,42 @@
+<mat-card class="exercise-card">
+  <mat-card-header>
+    <div class="exercise-header">
+      <div class="exercise-type">
+        <mat-icon [matTooltip]="exercise.type">
+          {{ getExerciseTypeIcon(exercise.type) }}
+        </mat-icon>
+      </div>
+      <div class="exercise-title">{{ exercise.title }}</div>
+      <div class="exercise-actions" *ngIf="isTutor">
+        <button mat-icon-button 
+                color="primary" 
+                (click)="edit.emit(exercise)"
+                matTooltip="Edit exercise">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button 
+                color="warn" 
+                (click)="delete.emit(exercise.id)"
+                matTooltip="Delete exercise">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </div>
+  </mat-card-header>
+
+  <mat-card-content>
+    <p class="exercise-description">{{ exercise.description }}</p>
+    
+    <div class="exercise-metadata">
+      <div class="difficulty-badge"
+           [style.background-color]="getDifficultyColor(exercise.difficulty)">
+        {{ exercise.difficulty }}
+      </div>
+      
+      <div class="exercise-type-info">
+        <mat-icon>{{ getExerciseTypeIcon(exercise.type) }}</mat-icon>
+        <span>{{ exercise.type }}</span>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card> 

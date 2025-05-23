@@ -19,14 +19,15 @@ export class AppComponent implements OnInit, OnDestroy {
   private userSubscription: Subscription | null = null;
 
   private readonly studentItems: NavigationItem[] = [
-    { icon: 'school', label: 'Lernen', route: '/learn', requiredRoles: [Role.STUDENT] },
-    { icon: 'assignment', label: 'Aufgaben', route: '/assignments', requiredRoles: [Role.STUDENT] },
+    { icon: 'timeline', label: 'Roadmap', route: '/roadmap', requiredRoles: [Role.STUDENT] },
     { icon: 'analytics', label: 'Fortschritt', route: '/progress', requiredRoles: [Role.STUDENT] }
   ];
 
   private readonly tutorItems: NavigationItem[] = [
-    { icon: 'groups', label: 'Studenten', route: '/students', requiredRoles: [Role.TUTOR] },
-    { icon: 'assignment_turned_in', label: 'Bewertungen', route: '/grading', requiredRoles: [Role.TUTOR] }
+    { icon: 'groups', label: 'Studenten', route: '/students', requiredRoles: [Role.TUTOR] }, 
+    { icon: 'timeline', label: 'Roadmap', route: '/roadmap', requiredRoles: [Role.TUTOR] },
+    { icon: 'database', label: 'Datenbanken', route: '/databases', requiredRoles: [Role.TUTOR] }, 
+    // { icon: 'assignment_turned_in', label: 'Bewertungen', route: '/grading', requiredRoles: [Role.TUTOR] } Should be a subset of /students 
   ];
 
   private readonly adminItems: NavigationItem[] = [
@@ -35,7 +36,7 @@ export class AppComponent implements OnInit, OnDestroy {
   ];
 
   private readonly commonItems: NavigationItem[] = [
-    { icon: 'home', label: 'Dashboard', route: '/' }
+    { icon: 'home', label: 'Dashboard', route: '/dashboard' },
   ];
 
   constructor(

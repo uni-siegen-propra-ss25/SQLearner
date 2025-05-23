@@ -6,6 +6,9 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
 
+    // Set global prefix for all routes
+    app.setGlobalPrefix('api');
+
     // Enable global validation pipe
     // This will automatically validate incoming requests based on the DTOs
     // defined in your controllers and services

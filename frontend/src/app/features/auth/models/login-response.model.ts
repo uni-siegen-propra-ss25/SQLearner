@@ -6,5 +6,5 @@ export interface LoginResponse {
   firstName: string;
   lastName: string;
   role: string;
-  matriculationNumber: string;
+  matriculationNumber?: string;
 }

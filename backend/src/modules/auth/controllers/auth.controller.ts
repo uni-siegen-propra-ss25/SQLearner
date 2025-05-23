@@ -29,6 +29,7 @@ import { LocalAuthGuard } from 'src/common/guards/local-auth/local-auth.guard';
 import { RolesGuard } from 'src/common/guards/role/role.guard';
 import { LoginCredentialsDto } from '../models/login-credentials.dto';
 import { CreateUserDto } from 'src/modules/users/models/create-user.dto';
+import { RegisterCredentialsDto } from '../models/register-credentials.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -46,7 +47,8 @@ export class AuthController {
     @ApiBadRequestResponse({ description: 'Invalid input data' })
     @ApiInternalServerErrorResponse({ description: 'Internal server error' })
     @ApiBody({ type: CreateUserDto })
-    async register(@Body() dto: CreateUserDto): Promise<number> {
+    async register(@Body() dto: RegisterCredentialsDto): Promise<number> {
+        console.log(dto);
         return this.authService.signUp(dto);
     }
 

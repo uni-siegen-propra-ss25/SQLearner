@@ -4,16 +4,6 @@ import { Role } from '@prisma/client';
 import { IsEmail, IsNotEmpty, MinLength, MaxLength, IsEnum, IsOptional } from 'class-validator';
 
 export class CreateUserDto {
-    @ApiProperty({
-        example: '20210001',
-        description: 'Matriculation number of the student',
-        required: false,
-    })
-    @IsOptional()
-    @MinLength(5, { message: 'Matriculation number must be at least 5 characters' })
-    @MaxLength(20, { message: 'Matriculation number can be at most 20 characters' })
-    matriculationNumber?: string;
-
     @ApiProperty({ example: 'max@example.com', description: 'Email of the student' })
     @IsEmail({}, { message: 'Invalid email address' })
     @IsNotEmpty({ message: 'Email cannot be empty' })
@@ -47,4 +37,12 @@ export class CreateUserDto {
     })
     @IsEnum(Role, { message: 'Role must be one of STUDENT, TUTOR' })
     role: Role;
+
+    @ApiProperty({
+        example: '20210001',
+        description: 'Matriculation number of the student',
+        required: false,
+    })
+    @IsOptional()
+    matriculationNumber?: string;
 }

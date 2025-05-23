@@ -6,6 +6,6 @@ export interface RegisterCredentials {
     password: string;
     firstName: string;
     lastName: string;
-    matriculationNumber?: string;
     role: Role;
+    matriculationNumber?: string;
 }

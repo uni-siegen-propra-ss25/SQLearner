@@ -1,0 +1,73 @@
+.topic-card {
+  margin: 8px 0;
+  border-radius: 8px;
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.topic-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+
+  span {
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+}
+
+.topic-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.topic-description {
+  color: rgba(0, 0, 0, 0.7);
+  margin: 16px 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.exercises-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.empty-exercises {
+  text-align: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 4px;
+  margin: 16px 0;
+
+  p {
+    margin: 0;
+    color: rgba(0, 0, 0, 0.6);
+  }
+}
+
+.add-exercise-button {
+  margin-top: 16px;
+  width: 100%;
+}
+
+// Dark theme adjustments
+:host-context(.dark-theme) {
+  .topic-card {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .topic-description {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .empty-exercises {
+    background: rgba(255, 255, 255, 0.05);
+
+    p {
+      color: rgba(255, 255, 255, 0.7);
+    }
+  }
+}

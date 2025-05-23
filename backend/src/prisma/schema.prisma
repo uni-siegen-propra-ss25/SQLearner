@@ -41,15 +41,13 @@ enum Difficulty {
 
 /// Application users
 model User {
-  id           Int       @id @default(autoincrement())
-  
-  matriculationNumber String? @unique
+  id           Int       @id @default(autoincrement())  
   email        String    @unique
   password     String
   firstName    String
   lastName     String
-
   role         Role   @default(STUDENT)
+  matriculationNumber String? @unique
 
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
@@ -80,36 +78,37 @@ model Database {
 }
 
 
-/// Top-level grouping of chapters (e.g. “Relational Algebra”, “Joins”)
-model TopicBlock {
+/// Top-level grouping of chapters (e.g. "Relational Algebra", "Joins")
+model Chapter{
   id          Int       @id @default(autoincrement())
   title       String
   description String?
   order       Int        @default(0)
 
-  chapters    Chapter[]
+  topics    Topic[]
 }
 
-/// Subdivision innerhalb eines TopicBlocks (z.B. “JOIN variants”)
-model Chapter {
+/// Subdivision innerhalb eines Chapters (z.B. "JOIN variants")
+model Topic {
   id           Int          @id @default(autoincrement())
-  topicBlockId Int  
+  chapterId    Int
   title        String
   description  String?
-  order        Int          @default(0)
+  order       Int          @default(0)
 
-  topicBlock   TopicBlock   @relation(fields: [topicBlockId], references: [id])
+  chapter      Chapter      @relation(fields: [chapterId], references: [id])
   exercises    Exercise[]
 }
 
 /// Core exercise entity
 model Exercise {
   id              Int             @id @default(autoincrement())
-  chapterId       Int
+  topicId         Int
   title           String
   description     String
   type            ExerciseType
   difficulty      Difficulty      @default(MEDIUM)
+  order           Int             @default(0)
 
   database        Database?       @relation(fields: [databaseId], references: [id])
   databaseId      Int?            // only for SQL_QUERY
@@ -121,8 +120,8 @@ model Exercise {
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
 
-  chapter         Chapter         @relation(fields: [chapterId], references: [id])
-  options         ChoiceOption[]
+  topic           Topic         @relation(fields: [topicId], references: [id])
+  answers         AnswerOption[]
   submissions     Submission[]
   bookmarks       Bookmark[]
 
@@ -130,16 +129,17 @@ model Exercise {
 }
 
 /// Single/Multiple-Choice options
-model ChoiceOption {
+model AnswerOption {
   id          Int    @id @default(autoincrement())
   exerciseId  Int
   text        String
   isCorrect   Boolean   @default(false)
+  order       Int       @default(0)
 
   exercise    Exercise  @relation(fields: [exerciseId], references: [id])
 }
 
-/// A student’s submission on an exercise
+/// A student's submission on an exercise
 model Submission {
   id             Int      @id @default(autoincrement())
 
@@ -162,7 +162,7 @@ model DbSession {
   id            Int      @id @default(autoincrement())
   submissionId  Int      @unique
   containerId   String      // e.g. Docker container name or ID
-  status        String      // “running” | “finished” | “failed”
+  status        String      // "running" | "finished" | "failed"
   startedAt     DateTime    @default(now())
   endedAt       DateTime?
 
@@ -182,7 +182,7 @@ model Bookmark {
   @@unique([userId, exerciseId])
 }
 
-/// Track each student’s progress per exercise
+/// Track each student's progress per exercise
 model Progress {
   id            Int       @id @default(autoincrement())
   userId        Int

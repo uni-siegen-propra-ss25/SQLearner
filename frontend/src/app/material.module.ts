@@ -19,6 +19,7 @@ import { MatTooltipModule }    from '@angular/material/tooltip';
 import { MatDividerModule }    from '@angular/material/divider';
 import { MatTabsModule }       from '@angular/material/tabs';
 import { MatBadgeModule }      from '@angular/material/badge';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 /**
  * MaterialModule imports and exports Angular Material modules.
@@ -47,7 +48,8 @@ import { MatBadgeModule }      from '@angular/material/badge';
     MatSnackBarModule,
     MatTooltipModule,
     MatDividerModule,
-    MatTabsModule
+    MatTabsModule,
+    MatExpansionModule
   ]
 })
 export class MaterialModule { }

@@ -1,0 +1,37 @@
+<div class="roadmap-container">
+  <div class="roadmap-header">
+    <h1>Learning Roadmap</h1>
+    <button *ngIf="isTutor" 
+            mat-raised-button 
+            color="primary" 
+            (click)="openNewChapterDialog()">
+      <mat-icon>add</mat-icon>
+      Add Chapter
+    </button>
+  </div>
+
+  <div class="chapters-container" 
+       cdkDropList 
+       (cdkDropListDropped)="onChapterDrop($event)">
+    <app-chapter-card
+      *ngFor="let chapter of chapters"
+      [chapter]="chapter"
+      [isTutor]="isTutor"
+      cdkDrag
+      [cdkDragDisabled]="!isTutor"
+      (edit)="onChapterEdit($event)"
+      (delete)="onChapterDelete($event)">
+    </app-chapter-card>
+  </div>
+
+  <div *ngIf="chapters.length === 0" class="empty-state">
+    <mat-icon>school</mat-icon>
+    <p>No chapters available yet.</p>
+    <button *ngIf="isTutor" 
+            mat-raised-button 
+            color="primary" 
+            (click)="openNewChapterDialog()">
+      Create First Chapter
+    </button>
+  </div>
+</div> 
