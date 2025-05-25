@@ -1,5 +1,6 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Topic } from '../../models/topic.model';
 import { Exercise } from '../../models/exercise.model';
 import { RoadmapService } from '../../services/roadmap.service';
@@ -11,7 +12,7 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
   templateUrl: './topic-card.component.html',
   styleUrls: ['./topic-card.component.scss']
 })
-export class TopicCardComponent {
+export class TopicCardComponent implements OnInit {
   @Input() topic!: Topic;
   @Input() isTutor = false;
   @Output() edit = new EventEmitter<Topic>();
@@ -19,18 +20,31 @@ export class TopicCardComponent {
 
   exercises: Exercise[] = [];
   isExpanded = false;
+  isLoading = false;
 
   constructor(
     private readonly roadmapService: RoadmapService,
-    private readonly dialog: MatDialog
+    private readonly dialog: MatDialog,
+    private readonly snackBar: MatSnackBar
   ) {}
 
-  loadExercises(): void {
-    if (this.isExpanded) {
-      this.roadmapService.getExercises(this.topic.id).subscribe(exercises => {
-        this.exercises = exercises.sort((a, b) => a.order - b.order);
-      });
-    }
+  ngOnInit() {
+    this.loadExercises();
+  }
+
+  loadExercises() {
+    this.isLoading = true;
+    this.roadmapService.getExercises(this.topic.id).subscribe({
+      next: (exercises) => {
+        this.exercises = exercises;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading exercises:', error);
+        this.snackBar.open('Failed to load exercises', 'Close', { duration: 3000 });
+        this.isLoading = false;
+      }
+    });
   }
 
   onExpand(): void {
@@ -53,7 +67,13 @@ export class TopicCardComponent {
     this.roadmapService.reorderExercises(
       this.topic.id,
       updatedExercises
-    ).subscribe();
+    ).subscribe({
+      error: (error) => {
+        console.error('Error reordering exercises:', error);
+        this.snackBar.open('Failed to reorder exercises', 'Close', { duration: 3000 });
+        this.loadExercises(); // Reload original order on error
+      }
+    });
   }
 
   openNewExerciseDialog(): void {
@@ -70,8 +90,15 @@ export class TopicCardComponent {
         this.roadmapService.createExercise(
           this.topic.id,
           result
-        ).subscribe(() => {
-          this.loadExercises();
+        ).subscribe({
+          next: () => {
+            this.loadExercises();
+            this.snackBar.open('Exercise created successfully', 'Close', { duration: 3000 });
+          },
+          error: (error) => {
+            console.error('Error creating exercise:', error);
+            this.snackBar.open('Failed to create exercise', 'Close', { duration: 3000 });
+          }
         });
       }
     });
@@ -86,10 +113,18 @@ export class TopicCardComponent {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.roadmapService.updateExercise(
+          this.topic.id,
           exercise.id,
           result
-        ).subscribe(() => {
-          this.loadExercises();
+        ).subscribe({
+          next: () => {
+            this.loadExercises();
+            this.snackBar.open('Exercise updated successfully', 'Close', { duration: 3000 });
+          },
+          error: (error) => {
+            console.error('Error updating exercise:', error);
+            this.snackBar.open('Failed to update exercise', 'Close', { duration: 3000 });
+          }
         });
       }
     });
@@ -98,9 +133,17 @@ export class TopicCardComponent {
   onExerciseDelete(exerciseId: number): void {
     if (confirm('Are you sure you want to delete this exercise?')) {
       this.roadmapService.deleteExercise(
+        this.topic.id,
         exerciseId
-      ).subscribe(() => {
-        this.loadExercises();
+      ).subscribe({
+        next: () => {
+          this.loadExercises();
+          this.snackBar.open('Exercise deleted successfully', 'Close', { duration: 3000 });
+        },
+        error: (error) => {
+          console.error('Error deleting exercise:', error);
+          this.snackBar.open('Failed to delete exercise', 'Close', { duration: 3000 });
+        }
       });
     }
   }

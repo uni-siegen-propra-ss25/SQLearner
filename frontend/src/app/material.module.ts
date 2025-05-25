@@ -13,6 +13,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatGridListModule }  from '@angular/material/grid-list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDialogModule }     from '@angular/material/dialog';
 import { MatSnackBarModule }   from '@angular/material/snack-bar';
 import { MatTooltipModule }    from '@angular/material/tooltip';
@@ -44,6 +45,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
     MatNativeDateModule,
     MatGridListModule,
     MatProgressSpinnerModule,
+    MatProgressBarModule,
     MatDialogModule,
     MatSnackBarModule,
     MatTooltipModule,

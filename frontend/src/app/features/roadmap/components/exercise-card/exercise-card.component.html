@@ -1,42 +1,56 @@
-<mat-card class="exercise-card">
+<mat-card class="exercise-card" [class.dragging]="isDragging">
   <mat-card-header>
-    <mat-card-title>{{ exercise.title }}</mat-card-title>
+    <div class="header-content">
+      <div class="title-section">
+        <mat-card-title>{{ exercise.title }}</mat-card-title>
+        <div class="badges">
+          <div class="difficulty-badge"
+               [style.background-color]="getDifficultyColor(exercise.difficulty)">
+            {{ exercise.difficulty }}
+          </div>
+          <div class="type-badge">
+            <mat-icon>{{ getExerciseTypeIcon(exercise.type) }}</mat-icon>
+            <span>{{ getExerciseTypeLabel(exercise.type) }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="action-buttons" *ngIf="isTutor">
+        <button mat-icon-button color="primary" (click)="edit.emit(exercise)" matTooltip="Edit exercise">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="delete.emit(exercise.id)" matTooltip="Delete exercise">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </div>
   </mat-card-header>
 
   <mat-card-content>
     <p class="exercise-description">{{ exercise.description }}</p>
     
     <div class="exercise-metadata">
-      <div class="difficulty-badge"
-           [style.background-color]="getDifficultyColor(exercise.difficulty)">
-        {{ exercise.difficulty }}
-      </div>
-      
-      <div class="exercise-type-info">
-        <mat-icon>{{ getExerciseTypeIcon(exercise.type) }}</mat-icon>
-        <span>{{ getExerciseTypeLabel(exercise.type) }}</span>
-      </div>
-
       <!-- Show database name for QUERY exercises -->
-      <div class="database-info" *ngIf="exercise.type === ExerciseType.QUERY && exercise.database">
+      <div class="metadata-item database-info" *ngIf="exercise.type === ExerciseType.QUERY && exercise.database">
         <mat-icon>database</mat-icon>
         <span>{{ exercise.database.name }}</span>
       </div>
 
       <!-- Show number of options for CHOICE exercises -->
-      <div class="options-info" *ngIf="exercise.type === ExerciseType.CHOICE && exercise.answers">
+      <div class="metadata-item options-info" *ngIf="exercise.type === ExerciseType.CHOICE && exercise.answers">
         <mat-icon>list</mat-icon>
         <span>{{ exercise.answers.length }} options</span>
+      </div>
+
+      <!-- Show creation date -->
+      <div class="metadata-item date-info">
+        <mat-icon>calendar_today</mat-icon>
+        <span>{{ exercise.createdAt | date:'mediumDate' }}</span>
       </div>
     </div>
   </mat-card-content>
 
-  <mat-card-actions *ngIf="isTutor">
-    <button mat-icon-button color="primary" (click)="edit.emit(exercise)">
-      <mat-icon>edit</mat-icon>
-    </button>
-    <button mat-icon-button color="warn" (click)="delete.emit(exercise.id)">
-      <mat-icon>delete</mat-icon>
-    </button>
-  </mat-card-actions>
+  <!-- Drag handle for tutors -->
+  <div class="drag-handle" *ngIf="isTutor">
+    <mat-icon>drag_indicator</mat-icon>
+  </div>
 </mat-card> 

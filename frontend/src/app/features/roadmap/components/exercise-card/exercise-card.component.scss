@@ -1,88 +1,117 @@
 .exercise-card {
   margin: 12px 0;
-  border-radius: 12px;
+  border-radius: 16px;
   background-color: white;
   transition: all 0.2s ease-in-out;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  padding: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
 
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 0, 0, 0.12);
+  }
+
+  &.dragging {
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+    transform: scale(1.02);
+    opacity: 0.9;
   }
 }
 
-.exercise-header {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  gap: 16px;
-}
+mat-card-header {
+  padding: 20px 20px 0;
+  margin-bottom: 0;
 
-.exercise-type {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background-color: rgba(0, 0, 0, 0.03);
-  transition: background-color 0.2s ease;
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+  }
 
-  mat-icon {
-    font-size: 24px;
-    width: 24px;
-    height: 24px;
-    color: rgba(0, 0, 0, 0.7);
+  .title-section {
+    flex: 1;
+    margin-right: 16px;
+  }
+
+  mat-card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: rgba(0, 0, 0, 0.87);
   }
 }
 
-.exercise-title {
-  flex: 1;
-  font-size: 1.1rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: rgba(0, 0, 0, 0.87);
-}
-
-.exercise-actions {
+.badges {
   display: flex;
   gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.difficulty-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: lowercase;
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+}
+
+.type-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background-color: rgba(0, 0, 0, 0.05);
+  color: rgba(0, 0, 0, 0.7);
+  font-size: 0.8rem;
+  font-weight: 500;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+mat-card-content {
+  padding: 20px;
+  padding-top: 16px;
 }
 
 .exercise-description {
-  color: rgba(0, 0, 0, 0.6);
-  margin: 20px 0;
+  color: rgba(0, 0, 0, 0.7);
   font-size: 0.95rem;
   line-height: 1.6;
+  margin-bottom: 24px;
 }
 
 .exercise-metadata {
   display: flex;
-  align-items: center;
-  gap: 20px;
-  margin-top: 20px;
+  flex-wrap: wrap;
+  gap: 16px;
   padding-top: 16px;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-.difficulty-badge {
-  padding: 6px 12px;
-  border-radius: 6px;
-  color: white;
-  font-size: 0.85rem;
-  font-weight: 500;
-  text-transform: lowercase;
-  letter-spacing: 0.02em;
-}
-
-.exercise-type-info {
+.metadata-item {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: rgba(0, 0, 0, 0.5);
-  font-size: 0.9rem;
-  font-weight: 500;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.85rem;
 
   mat-icon {
     font-size: 18px;
@@ -91,38 +120,64 @@
   }
 }
 
+.drag-handle {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  padding: 8px;
+  cursor: move;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  color: rgba(0, 0, 0, 0.3);
+
+  &:hover {
+    color: rgba(0, 0, 0, 0.6);
+  }
+}
+
+.exercise-card:hover .drag-handle {
+  opacity: 1;
+}
+
 // Dark theme adjustments
 :host-context(.dark-theme) {
   .exercise-card {
-    background-color: rgba(255, 255, 255, 0.03);
-    border-color: rgba(255, 255, 255, 0.08);
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
 
     &:hover {
+      border-color: rgba(255, 255, 255, 0.15);
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     }
   }
 
-  .exercise-type {
-    background-color: rgba(255, 255, 255, 0.06);
-
-    mat-icon {
-      color: rgba(255, 255, 255, 0.7);
-    }
-  }
-
-  .exercise-title {
+  mat-card-title {
     color: rgba(255, 255, 255, 0.87);
   }
 
+  .type-badge {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+  }
+
   .exercise-description {
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.7);
   }
 
   .exercise-metadata {
-    border-top-color: rgba(255, 255, 255, 0.08);
+    border-top-color: rgba(255, 255, 255, 0.1);
   }
 
-  .exercise-type-info {
-    color: rgba(255, 255, 255, 0.5);
+  .metadata-item {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .drag-handle {
+    color: rgba(255, 255, 255, 0.3);
+
+    &:hover {
+      color: rgba(255, 255, 255, 0.6);
+    }
   }
 } 

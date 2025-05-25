@@ -23,10 +23,12 @@
 
       <p class="topic-description">{{ topic.description }}</p>
 
-
       <div class="exercises-container"
            cdkDropList
            (cdkDropListDropped)="onExerciseDrop($event)">
+        
+        <mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
+
         <app-exercise-card
           *ngFor="let exercise of exercises"
           [exercise]="exercise"
@@ -37,7 +39,7 @@
           (delete)="onExerciseDelete($event)">
         </app-exercise-card>
 
-        <div *ngIf="exercises.length === 0" class="empty-exercises">
+        <div *ngIf="!isLoading && exercises.length === 0" class="empty-exercises">
           <mat-icon>assignment</mat-icon>
           <p>No exercises available in this topic.</p>
         </div>
@@ -46,6 +48,7 @@
                 mat-flat-button 
                 color="primary"
                 class="add-exercise-button"
+                [disabled]="isLoading"
                 (click)="openNewExerciseDialog()">
           <mat-icon>add</mat-icon>
           Add Exercise

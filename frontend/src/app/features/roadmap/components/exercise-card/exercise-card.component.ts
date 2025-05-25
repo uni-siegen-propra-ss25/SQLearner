@@ -9,6 +9,7 @@ import { Exercise, ExerciseType, Difficulty } from '../../models/exercise.model'
 export class ExerciseCardComponent {
   @Input() exercise!: Exercise;
   @Input() isTutor = false;
+  @Input() isDragging = false;
   @Output() edit = new EventEmitter<Exercise>();
   @Output() delete = new EventEmitter<number>();
 
