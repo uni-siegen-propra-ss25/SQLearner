@@ -5,6 +5,7 @@ import { UsersModule } from './modules/users/users.module';
 import { ChaptersModule } from './modules/chapters/chapters.module';
 import { TopicsModule } from './modules/topics/topics.module';
 import { ExercisesModule } from './modules/exercises/exercises.module';
+import { DatabasesModule } from './modules/databases/databases.module';
 
 @Module({
     imports: [
@@ -13,6 +14,7 @@ import { ExercisesModule } from './modules/exercises/exercises.module';
         }),
         AuthModule,
         UsersModule,
+        DatabasesModule,
         ChaptersModule,
         TopicsModule,
         ExercisesModule

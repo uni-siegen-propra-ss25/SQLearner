@@ -1,83 +1,124 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Exercise, ExerciseType, Difficulty } from '../../models/exercise.model';
+import { Exercise, ExerciseType, Difficulty, AnswerOption } from '../../models/exercise.model';
+import { Database } from '../../../database/models/database.model';
+import { DatabaseService } from '../../../database/services/database.service';
 
 @Component({
   selector: 'app-exercise-dialog',
   templateUrl: './exercise-dialog.component.html',
   styleUrls: ['./exercise-dialog.component.scss']
 })
-export class ExerciseDialogComponent {
-  exerciseForm: FormGroup;
+export class ExerciseDialogComponent implements OnInit {
+  exerciseForm!: FormGroup;
   isEditing: boolean;
   exerciseTypes = Object.values(ExerciseType);
   difficultyLevels = Object.values(Difficulty);
+  databases: Database[] = [];
 
   constructor(
     private readonly fb: FormBuilder,
     private readonly dialogRef: MatDialogRef<ExerciseDialogComponent>,
+    private readonly databaseService: DatabaseService,
     @Inject(MAT_DIALOG_DATA) private readonly data: Partial<Exercise>
   ) {
     this.isEditing = !!data.id;
+    this.initForm();
+  }
+
+  ngOnInit() {
+    this.loadDatabases();
+    this.setupTypeValidation();
+  }
+
+  private initForm() {
     this.exerciseForm = this.fb.group({
-      title: [data.title || '', Validators.required],
-      description: [data.description || '', Validators.required],
-      type: [data.type || ExerciseType.SQL, Validators.required],
-      difficulty: [data.difficulty || Difficulty.BEGINNER, Validators.required],
-      sqlSolution: [data.sqlSolution || ''],
-      llmPrompt: [data.llmPrompt || ''],
-      choices: this.fb.array([]),
-      topicId: [data.topicId],
-      order: [data.order || 0]
+      title: [this.data.title || '', Validators.required],
+      description: [this.data.description || '', Validators.required],
+      type: [this.data.type || ExerciseType.QUERY, Validators.required],
+      difficulty: [this.data.difficulty || Difficulty.EASY, Validators.required],
+      databaseId: [this.data.databaseId],
+      querySolution: [this.data.querySolution],
+      answers: this.fb.array([]),
+      topicId: [this.data.topicId],
+      order: [this.data.order || 0]
     });
 
-    // Initialize choices for multiple choice questions
-    if (data.choices?.length) {
-      data.choices.forEach(choice => this.addChoice(choice));
+    // Initialize answers for choice questions
+    if (this.data.answers?.length) {
+      this.data.answers.forEach(answer => this.addAnswer(answer));
     } else {
-      // Add two default empty choices
-      this.addChoice();
-      this.addChoice();
+      // Add two default empty answers
+      this.addAnswer();
+      this.addAnswer();
     }
+  }
 
-    // Add validators based on exercise type
-    this.exerciseForm.get('type')?.valueChanges.subscribe(type => {
-      const sqlSolutionControl = this.exerciseForm.get('sqlSolution');
-      if (type === ExerciseType.SQL) {
-        sqlSolutionControl?.setValidators(Validators.required);
-      } else {
-        sqlSolutionControl?.clearValidators();
+  private setupTypeValidation() {
+    this.exerciseForm.get('type')?.valueChanges.subscribe((type: ExerciseType) => {
+      const databaseIdControl = this.exerciseForm.get('databaseId');
+      const querySolutionControl = this.exerciseForm.get('querySolution');
+      const answersControl = this.exerciseForm.get('answers') as FormArray;
+
+      // Reset validations
+      databaseIdControl?.clearValidators();
+      querySolutionControl?.clearValidators();
+      answersControl?.controls.forEach(control => control.clearValidators());
+
+      if (type === ExerciseType.QUERY) {
+        databaseIdControl?.setValidators([Validators.required]);
+        querySolutionControl?.setValidators([Validators.required]);
+      } else if (type === ExerciseType.CHOICE) {
+        answersControl?.controls.forEach(control => {
+          control.get('text')?.setValidators([Validators.required]);
+        });
       }
-      sqlSolutionControl?.updateValueAndValidity();
+
+      // Update validation status
+      databaseIdControl?.updateValueAndValidity();
+      querySolutionControl?.updateValueAndValidity();
+      answersControl?.controls.forEach(control => control.updateValueAndValidity());
     });
   }
 
-  get choices() {
-    return this.exerciseForm.get('choices') as FormArray;
+  private loadDatabases() {
+    this.databaseService.getDatabases().subscribe(
+      databases => this.databases = databases
+    );
   }
 
-  addChoice(choice?: { text: string; isCorrect: boolean }) {
-    this.choices.push(this.fb.group({
-      text: [choice?.text || '', Validators.required],
-      isCorrect: [choice?.isCorrect || false]
+  get answers() {
+    return this.exerciseForm.get('answers') as FormArray;
+  }
+
+  addAnswer(answer?: AnswerOption) {
+    this.answers.push(this.fb.group({
+      text: [answer?.text || '', Validators.required],
+      isCorrect: [answer?.isCorrect || false],
+      order: [answer?.order || this.answers.length]
     }));
   }
 
-  removeChoice(index: number) {
-    this.choices.removeAt(index);
+  removeAnswer(index: number) {
+    this.answers.removeAt(index);
+    // Update order of remaining answers
+    this.answers.controls.forEach((control, idx) => {
+      control.get('order')?.setValue(idx);
+    });
   }
 
   onSubmit(): void {
     if (this.exerciseForm.valid) {
-      const formValue = this.exerciseForm.value;
+      const formValue = { ...this.exerciseForm.value };
       
       // Clean up the form value based on exercise type
-      if (formValue.type !== ExerciseType.SQL) {
-        delete formValue.sqlSolution;
+      if (formValue.type !== ExerciseType.QUERY) {
+        delete formValue.databaseId;
+        delete formValue.querySolution;
       }
-      if (formValue.type !== ExerciseType.MULTIPLE_CHOICE) {
-        delete formValue.choices;
+      if (formValue.type !== ExerciseType.CHOICE) {
+        delete formValue.answers;
       }
 
       this.dialogRef.close(formValue);

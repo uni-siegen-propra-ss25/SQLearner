@@ -19,15 +19,29 @@ export class TopicsService {
 
         return this.prisma.topic.findMany({
             where: { chapterId },
-            orderBy: { order: 'asc' },
-            include: { exercises: true }
+            include: {
+                exercises: {
+                    include: {
+                        database: true,
+                        answers: true
+                    }
+                }
+            },
+            orderBy: { order: 'asc' }
         });
     }
 
     async getTopicById(id: number): Promise<Topic> {
         const topic = await this.prisma.topic.findUnique({
             where: { id },
-            include: { exercises: true }
+            include: {
+                exercises: {
+                    include: {
+                        database: true,
+                        answers: true
+                    }
+                }
+            }
         });
 
         if (!topic) {
@@ -61,7 +75,15 @@ export class TopicsService {
         Object.assign(topic, updateTopicDto);
         return this.prisma.topic.update({
             where: { id },
-            data: updateTopicDto
+            data: updateTopicDto,
+            include: {
+                exercises: {
+                    include: {
+                        database: true,
+                        answers: true
+                    }
+                }
+            }
         });
     }
 

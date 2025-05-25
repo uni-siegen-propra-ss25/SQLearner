@@ -14,9 +14,17 @@ export class ChaptersService {
       include: {
         topics: {
           include: {
-            exercises: true
+            exercises: {
+              include: {
+                database: true,
+                answers: true
+              }
+            }
           }
         }
+      },
+      orderBy: {
+        order: 'asc'
       }
     });
   }
@@ -27,7 +35,12 @@ export class ChaptersService {
       include: {
         topics: {
           include: {
-            exercises: true
+            exercises: {
+              include: {
+                database: true,
+                answers: true
+              }
+            }
           }
         }
       }
@@ -40,20 +53,40 @@ export class ChaptersService {
 
   async createChapter(createChapterDto: CreateChapterDto): Promise<number> {
     const chapter = await this.prisma.chapter.create({
-      data: createChapterDto
+      data: createChapterDto,
+      include: {
+        topics: {
+          include: {
+            exercises: {
+              include: {
+                database: true,
+                answers: true
+              }
+            }
+          }
+        }
+      } 
     });
     return chapter.id;
   }
 
   async updateChapter(id: number, updateChapterDto: UpdateChapterDto): Promise<Chapter> {
-    const chapter = await this.prisma.chapter.update({
+    return this.prisma.chapter.update({
       where: { id },
-      data: updateChapterDto
+      data: updateChapterDto,
+      include: {
+        topics: {
+          include: {
+            exercises: {
+              include: {
+                database: true,
+                answers: true
+              }
+            }
+          }
+        }
+      }
     });
-    if (!chapter) {
-      throw new NotFoundException('Chapter not found');
-    }
-    return chapter;
   }
 
   async deleteChapter(id: number): Promise<void> {
@@ -102,7 +135,7 @@ export class ChaptersService {
       // Then update each chapter with its new order
       for (const [index, chapter] of reorderedChapters.entries()) {
         await tx.chapter.update({
-          where: { id: chapter.id },
+          where: { id: Number(chapter.id) },
           data: { order: index }
         });
       }

@@ -1,13 +1,6 @@
 <div class="roadmap-container">
   <div class="roadmap-header">
     <h1>Learning Roadmap</h1>
-    <button *ngIf="isTutor" 
-            mat-raised-button 
-            color="primary" 
-            (click)="openNewChapterDialog()">
-      <mat-icon>add</mat-icon>
-      Add Chapter
-    </button>
   </div>
 
   <div class="chapters-container" 
@@ -31,6 +24,7 @@
             mat-raised-button 
             color="primary" 
             (click)="openNewChapterDialog()">
+      <mat-icon class="add-icon">add</mat-icon>
       Create First Chapter
     </button>
   </div>

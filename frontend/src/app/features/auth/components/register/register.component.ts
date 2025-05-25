@@ -83,8 +83,7 @@ export class RegisterComponent {
       };
       this.authService.register(credentials).subscribe({
         next: (res) => {
-          // TODO: Handle successful registration (e.g., navigate to login)
-          this.router.navigate(['/login']);
+          this.router.navigate(['auth/login']);
           this.snackBar.open('Registration successful', 'Close', {
             duration: 3000,
             panelClass: ['mat-toolbar', 'mat-primary']

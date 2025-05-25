@@ -1,41 +1,28 @@
-<mat-card class="topic-card">
-  <mat-card-header>
-    <mat-card-title>
-      <div class="topic-title">
-        <span>{{ topic.title }}</span>
-        <div class="topic-actions" *ngIf="isTutor">
-          <button mat-icon-button 
-                  color="primary" 
-                  (click)="edit.emit(topic)"
-                  matTooltip="Edit topic">
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button mat-icon-button 
-                  color="warn" 
-                  (click)="delete.emit(topic.id)"
-                  matTooltip="Delete topic">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </div>
-      </div>
-    </mat-card-title>
-  </mat-card-header>
-
-  <mat-card-content>
-    <p class="topic-description">{{ topic.description }}</p>
-    
-    <mat-expansion-panel 
-      [expanded]="isExpanded"
-      (opened)="onExpand()"
-      (closed)="isExpanded = false">
+    <mat-expansion-panel class="topic-panel">
       <mat-expansion-panel-header>
         <mat-panel-title>
-          Exercises
+          <div class="topic-title">{{ topic.title }}</div>
         </mat-panel-title>
         <mat-panel-description>
-          {{ exercises.length }} exercise(s)
+          <div class="topic-actions" *ngIf="isTutor">
+            <button mat-icon-button 
+                    color="primary" 
+                    (click)="$event.stopPropagation(); edit.emit(topic)"
+                    matTooltip="Edit topic">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button 
+                    color="warn" 
+                    (click)="$event.stopPropagation(); delete.emit(topic.id)"
+                    matTooltip="Delete topic">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
         </mat-panel-description>
       </mat-expansion-panel-header>
+
+      <p class="topic-description">{{ topic.description }}</p>
+
 
       <div class="exercises-container"
            cdkDropList
@@ -49,20 +36,19 @@
           (edit)="onExerciseEdit($event)"
           (delete)="onExerciseDelete($event)">
         </app-exercise-card>
-      </div>
 
-      <div *ngIf="exercises.length === 0" class="empty-exercises">
-        <p>No exercises available in this topic.</p>
-      </div>
+        <div *ngIf="exercises.length === 0" class="empty-exercises">
+          <mat-icon>assignment</mat-icon>
+          <p>No exercises available in this topic.</p>
+        </div>
 
-      <button *ngIf="isTutor"
-              mat-stroked-button
-              color="primary"
-              class="add-exercise-button"
-              (click)="openNewExerciseDialog()">
-        <mat-icon>add</mat-icon>
-        Add Exercise
-      </button>
+        <button *ngIf="isTutor"
+                mat-flat-button 
+                color="primary"
+                class="add-exercise-button"
+                (click)="openNewExerciseDialog()">
+          <mat-icon>add</mat-icon>
+          Add Exercise
+        </button>
+      </div>
     </mat-expansion-panel>
-  </mat-card-content>
-</mat-card> 

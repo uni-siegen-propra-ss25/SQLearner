@@ -47,68 +47,74 @@
       </mat-form-field>
     </div>
 
-    <ng-container [ngSwitch]="exerciseForm.get('type')?.value">
-      <ng-container *ngSwitchCase="'SQL'">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>SQL Solution</mat-label>
-          <textarea matInput 
-                    formControlName="sqlSolution" 
-                    placeholder="Enter the correct SQL query"
-                    rows="4">
-          </textarea>
-          <mat-error *ngIf="exerciseForm.get('sqlSolution')?.hasError('required')">
-            SQL solution is required
-          </mat-error>
-        </mat-form-field>
-      </ng-container>
+    <!-- Query specific fields -->
+    <ng-container *ngIf="exerciseForm.get('type')?.value === 'QUERY'">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Database</mat-label>
+        <mat-select formControlName="databaseId">
+          <mat-option *ngFor="let db of databases" [value]="db.id">
+            {{ db.name }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="exerciseForm.get('databaseId')?.hasError('required')">
+          Database is required for SQL exercises
+        </mat-error>
+      </mat-form-field>
 
-      <ng-container *ngSwitchCase="'MULTIPLE_CHOICE'">
-        <div formArrayName="choices" class="choices-container">
-          <div *ngFor="let choice of choices.controls; let i = index" 
-               [formGroupName]="i" 
-               class="choice-row">
-            <mat-form-field appearance="outline" class="choice-text">
-              <mat-label>Choice {{ i + 1 }}</mat-label>
-              <input matInput formControlName="text" [placeholder]="'Enter choice ' + (i + 1)">
-            </mat-form-field>
-            <mat-checkbox formControlName="isCorrect">
-              Correct
-            </mat-checkbox>
-            <button mat-icon-button 
-                    color="warn" 
-                    type="button"
-                    (click)="removeChoice(i)"
-                    *ngIf="choices.length > 2">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
-          <button mat-stroked-button 
-                  type="button"
-                  (click)="addChoice()"
-                  class="add-choice-button">
-            <mat-icon>add</mat-icon>
-            Add Choice
-          </button>
-        </div>
-      </ng-container>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Solution Query</mat-label>
+        <textarea matInput 
+                  formControlName="querySolution"
+                  placeholder="Enter the solution SQL query"
+                  rows="4">
+        </textarea>
+        <mat-error *ngIf="exerciseForm.get('querySolution')?.hasError('required')">
+          Solution query is required
+        </mat-error>
+      </mat-form-field>
     </ng-container>
 
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>LLM Prompt</mat-label>
-      <textarea matInput 
-                formControlName="llmPrompt" 
-                placeholder="Enter LLM prompt for generating hints and feedback"
-                rows="4">
-      </textarea>
-    </mat-form-field>
+    <!-- Choice specific fields -->
+    <ng-container *ngIf="exerciseForm.get('type')?.value === 'CHOICE'">
+      <div formArrayName="answers" class="answers-container">
+        <h3>Answer Options</h3>
+        <div *ngFor="let answer of answers.controls; let i=index" [formGroupName]="i" class="answer-row">
+          <mat-form-field appearance="outline" class="answer-text">
+            <mat-label>Answer {{ i + 1 }}</mat-label>
+            <input matInput formControlName="text" [placeholder]="'Enter answer option ' + (i + 1)">
+          </mat-form-field>
+          
+          <mat-checkbox formControlName="isCorrect">
+            Correct
+          </mat-checkbox>
+
+          <button type="button" 
+                  mat-icon-button 
+                  color="warn" 
+                  (click)="removeAnswer(i)"
+                  [disabled]="answers.length <= 2">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+
+        <button type="button" 
+                mat-button 
+                color="primary" 
+                (click)="addAnswer()"
+                class="add-answer-button">
+          <mat-icon>add</mat-icon>
+          Add Answer Option
+        </button>
+      </div>
+    </ng-container>
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">
     <button mat-button (click)="onCancel()">Cancel</button>
-    <button mat-raised-button 
+    <button mat-flat-button 
             color="primary" 
             type="submit"
-            [disabled]="exerciseForm.invalid">
+            [disabled]="!exerciseForm.valid">
       {{ isEditing ? 'Save' : 'Create' }}
     </button>
   </mat-dialog-actions>

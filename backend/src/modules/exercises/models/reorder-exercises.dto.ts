@@ -1,9 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, ValidateNested } from 'class-validator';
+import { IsArray, IsNumber, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
 class ExerciseOrderItem {
     @ApiProperty({ description: 'The exercise ID' })
+    @IsNumber()
     id: number;
 
     @ApiProperty({ description: 'The new order position' })

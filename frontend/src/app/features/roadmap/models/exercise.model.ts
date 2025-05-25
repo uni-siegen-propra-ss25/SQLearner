@@ -1,30 +1,60 @@
 export enum ExerciseType {
-  SQL = 'SQL',
-  MULTIPLE_CHOICE = 'MULTIPLE_CHOICE',
-  TEXT = 'TEXT'
+  CHOICE = 'CHOICE',
+  QUERY = 'QUERY',
+  FREETEXT = 'FREETEXT'
 }
 
 export enum Difficulty {
-  BEGINNER = 'BEGINNER',
-  INTERMEDIATE = 'INTERMEDIATE',
-  ADVANCED = 'ADVANCED',
-  EXPERT = 'EXPERT'
+  EASY = 'EASY',
+  MEDIUM = 'MEDIUM',
+  HARD = 'HARD'
 }
 
 export interface Exercise {
   id: number;
   topicId: number;
-  type: ExerciseType;
   title: string;
   description: string;
+  type: ExerciseType;
   difficulty: Difficulty;
   order: number;
-  llmPrompt?: string;
-  sqlSolution?: string;
-  choices?: {
-    text: string;
-    isCorrect: boolean;
-  }[];
+  
+  // Query specific fields
+  database?: {
+    id: number;
+    name: string;
+  };
+  databaseId?: number;
+  querySolution?: string;
+
+  // Choice specific fields
+  answers?: AnswerOption[];
+  
   createdAt: Date;
   updatedAt: Date;
-} 
+}
+
+export interface AnswerOption {
+  id?: number;
+  exerciseId: number;
+  text: string;
+  isCorrect: boolean;
+  order: number;
+}
+
+export interface Submission {
+  id: number;
+  exerciseId: number;
+  userId: number;
+  answerText: string;  // SQL query, chosen option IDs, or free text
+  isCorrect: boolean;
+  feedback?: string;   // LLM-generated feedback
+  createdAt: Date;
+}
+
+export interface Bookmark {
+  id: number;
+  exerciseId: number;
+  userId: number;
+  createdAt: Date;
+}

@@ -39,8 +39,6 @@ export class ExercisesController {
         return exercise;
     }
 
-    
-
     @Post()
     @Roles(Role.TUTOR, Role.ADMIN)
     @HttpCode(HttpStatus.CREATED)

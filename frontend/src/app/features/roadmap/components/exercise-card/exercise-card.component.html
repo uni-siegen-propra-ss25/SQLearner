@@ -1,27 +1,6 @@
 <mat-card class="exercise-card">
   <mat-card-header>
-    <div class="exercise-header">
-      <div class="exercise-type">
-        <mat-icon [matTooltip]="exercise.type">
-          {{ getExerciseTypeIcon(exercise.type) }}
-        </mat-icon>
-      </div>
-      <div class="exercise-title">{{ exercise.title }}</div>
-      <div class="exercise-actions" *ngIf="isTutor">
-        <button mat-icon-button 
-                color="primary" 
-                (click)="edit.emit(exercise)"
-                matTooltip="Edit exercise">
-          <mat-icon>edit</mat-icon>
-        </button>
-        <button mat-icon-button 
-                color="warn" 
-                (click)="delete.emit(exercise.id)"
-                matTooltip="Delete exercise">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </div>
-    </div>
+    <mat-card-title>{{ exercise.title }}</mat-card-title>
   </mat-card-header>
 
   <mat-card-content>
@@ -35,8 +14,29 @@
       
       <div class="exercise-type-info">
         <mat-icon>{{ getExerciseTypeIcon(exercise.type) }}</mat-icon>
-        <span>{{ exercise.type }}</span>
+        <span>{{ getExerciseTypeLabel(exercise.type) }}</span>
+      </div>
+
+      <!-- Show database name for QUERY exercises -->
+      <div class="database-info" *ngIf="exercise.type === ExerciseType.QUERY && exercise.database">
+        <mat-icon>database</mat-icon>
+        <span>{{ exercise.database.name }}</span>
+      </div>
+
+      <!-- Show number of options for CHOICE exercises -->
+      <div class="options-info" *ngIf="exercise.type === ExerciseType.CHOICE && exercise.answers">
+        <mat-icon>list</mat-icon>
+        <span>{{ exercise.answers.length }} options</span>
       </div>
     </div>
   </mat-card-content>
+
+  <mat-card-actions *ngIf="isTutor">
+    <button mat-icon-button color="primary" (click)="edit.emit(exercise)">
+      <mat-icon>edit</mat-icon>
+    </button>
+    <button mat-icon-button color="warn" (click)="delete.emit(exercise.id)">
+      <mat-icon>delete</mat-icon>
+    </button>
+  </mat-card-actions>
 </mat-card> 

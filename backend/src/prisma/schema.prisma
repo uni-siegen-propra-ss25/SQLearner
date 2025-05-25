@@ -24,9 +24,8 @@ enum Role {
 
 /// Types of exercises supported
 enum ExerciseType {
-  SINGLE_CHOICE
-  MULTIPLE_CHOICE
-  SQL_QUERY
+  CHOICE
+  QUERY
   FREETEXT
 }
 
@@ -112,31 +111,27 @@ model Exercise {
 
   database        Database?       @relation(fields: [databaseId], references: [id])
   databaseId      Int?            // only for SQL_QUERY
+  querySolution     String?         // Direct SQL solution for SQL_QUERY type
 
-  isGenerated     Boolean         @default(false)
-  generationPrompt String?        // prompt used if auto-generated
-  llmPrompt       String?         // fixed prompt to send for feedback
-  
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
 
-  topic           Topic         @relation(fields: [topicId], references: [id])
-  answers         AnswerOption[]
+  topic           Topic           @relation(fields: [topicId], references: [id])
+  answers         AnswerOption[]  @relation("ExerciseAnswers")
   submissions     Submission[]
   bookmarks       Bookmark[]
-
-  Progress Progress[]
+  Progress        Progress[]
 }
 
 /// Single/Multiple-Choice options
 model AnswerOption {
-  id          Int    @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   exerciseId  Int
   text        String
   isCorrect   Boolean   @default(false)
   order       Int       @default(0)
 
-  exercise    Exercise  @relation(fields: [exerciseId], references: [id])
+  exercise    Exercise  @relation("ExerciseAnswers", fields: [exerciseId], references: [id])
 }
 
 /// A student's submission on an exercise

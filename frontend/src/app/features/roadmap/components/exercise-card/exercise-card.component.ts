@@ -17,29 +17,40 @@ export class ExerciseCardComponent {
 
   getDifficultyColor(difficulty: Difficulty): string {
     switch (difficulty) {
-      case Difficulty.BEGINNER:
-        return 'green';
-      case Difficulty.INTERMEDIATE:
-        return 'orange';
-      case Difficulty.ADVANCED:
-        return 'red';
-      case Difficulty.EXPERT:
-        return 'purple';
+      case Difficulty.EASY:
+        return '#4CAF50';  // Green
+      case Difficulty.MEDIUM:
+        return '#FF9800';  // Orange
+      case Difficulty.HARD:
+        return '#F44336';  // Red
       default:
-        return 'gray';
+        return '#9E9E9E';  // Gray
     }
   }
 
   getExerciseTypeIcon(type: ExerciseType): string {
     switch (type) {
-      case ExerciseType.SQL:
+      case ExerciseType.QUERY:
         return 'code';
-      case ExerciseType.MULTIPLE_CHOICE:
+      case ExerciseType.CHOICE:
         return 'check_box';
-      case ExerciseType.TEXT:
+      case ExerciseType.FREETEXT:
         return 'subject';
       default:
         return 'help';
+    }
+  }
+
+  getExerciseTypeLabel(type: ExerciseType): string {
+    switch (type) {
+      case ExerciseType.QUERY:
+        return 'SQL Query';
+      case ExerciseType.CHOICE:
+        return 'Multiple Choice';
+      case ExerciseType.FREETEXT:
+        return 'Free Text';
+      default:
+        return type;
     }
   }
 } 

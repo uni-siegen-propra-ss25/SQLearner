@@ -1,49 +1,98 @@
-.chapter-card {
+:host {
+  display: block;
   margin-bottom: 16px;
-  border-radius: 8px;
 }
 
-.chapter-title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
+::ng-deep {
+  .mat-expansion-panel {
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 
-  span {
-    font-size: 1.2rem;
+    &:hover {
+      background: rgba(0, 0, 0, 0.01) !important;
+    }
+  }
+
+  .mat-expansion-panel-header {
+    padding: 0;
+    font-size: 1.25rem;
+    height: auto !important;
+
+    &:hover {
+      background: transparent !important;
+    }
+  }
+
+  .mat-expansion-panel-header-title {
+    color: var(--md-sys-color-on-surface);
     font-weight: 500;
+    margin-right: 16px;
+  }
+
+  .mat-expansion-panel-body {
+    padding: 0 0 8px 8px !important;
+  }
+
+  .mat-expansion-indicator::after {
+    border-width: 0 2px 2px 0 !important;
+    padding: 3px !important;
+    color: var(--md-sys-color-on-surface);
   }
 }
 
-.chapter-actions {
-  display: flex;
-  gap: 8px;
-}
+.chapter-panel {
+  margin-bottom: 16px;
+  border-radius: 16px;
+  background-color: transparent;
 
-.chapter-description {
-  color: rgba(0, 0, 0, 0.7);
-  margin: 16px 0;
-  font-size: 1rem;
-  line-height: 1.5;
+  .mat-expansion-panel-header {
+    padding: 24px;
+    height: auto;
+    
+    &:hover {
+      background-color: var(--mat-surface-hover);
+    }
+  }
+
+  .chapter-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--mat-primary-text);
+  }
+
+  .chapter-actions {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+  }
+
+  .topic-description {
+    color: var(--mat-secondary-text);
+    margin: 0 20px 20px;
+    line-height: 1.6;
+  }
 }
 
 .topics-container {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin: 16px 0;
+  padding: 0 24px 24px;
 }
 
 .empty-topics {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px;
+  color: var(--mat-secondary-text);
   text-align: center;
-  padding: 24px;
-  background: rgba(0, 0, 0, 0.03);
-  border-radius: 4px;
-  margin: 16px 0;
 
-  p {
-    margin: 0;
-    color: rgba(0, 0, 0, 0.6);
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+    opacity: 0.7;
   }
 }
 
@@ -54,15 +103,33 @@
 
 // Dark theme adjustments
 :host-context(.dark-theme) {
+  ::ng-deep {
+    .mat-expansion-panel {
+      border-bottom-color: rgba(255, 255, 255, 0.08);
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.03) !important;
+      }
+    }
+
+    .mat-expansion-panel-header-title {
+      color: var(--md-sys-color-on-surface);
+    }
+
+    .mat-expansion-indicator::after {
+      color: var(--md-sys-color-on-surface);
+    }
+  }
+
   .chapter-description {
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--md-sys-color-on-surface-variant);
+  }
+
+  .topics-container::before {
+    background: var(--md-sys-color-outline-variant);
   }
 
   .empty-topics {
-    background: rgba(255, 255, 255, 0.05);
-
-    p {
-      color: rgba(255, 255, 255, 0.6);
-    }
+    color: var(--md-sys-color-on-surface-variant);
   }
 } 

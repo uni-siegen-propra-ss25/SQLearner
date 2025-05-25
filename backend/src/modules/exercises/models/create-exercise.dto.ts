@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsOptional, IsInt, Min, IsUUID, IsEnum, ValidateNested, IsArray, IsBoolean } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsInt, Min, IsEnum, ValidateNested, IsArray, IsBoolean, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
 import { Difficulty, ExerciseType } from '@prisma/client';
 
@@ -12,11 +12,17 @@ class AnswerOptionDto {
     @ApiProperty({ description: 'Whether this choice is correct' })
     @IsBoolean()
     isCorrect: boolean;
+
+    @ApiProperty({ description: 'The order of this answer option', required: false })
+    @IsInt()
+    @Min(0)
+    @IsOptional()
+    order?: number;
 }
 
 export class CreateExerciseDto {
     @ApiProperty({ description: 'The topic ID this exercise belongs to' })
-    @IsUUID()
+    @IsNumber()
     @IsNotEmpty()
     topicId: number;
 
@@ -44,20 +50,20 @@ export class CreateExerciseDto {
     @IsOptional()
     order?: number;
 
-    @ApiProperty({ description: 'The SQL solution for SQL exercises', required: false })
+    @ApiProperty({ description: 'The database ID for SQL exercises', required: false })
+    @IsNumber()
+    @IsOptional()
+    databaseId?: number;
+
+    @ApiProperty({ description: 'The SQL solution query', required: false })
     @IsString()
     @IsOptional()
-    sqlSolution?: string;
+    querySolution?: string;
 
-    @ApiProperty({ description: 'The answers for multiple choice exercises', required: false, type: [AnswerOptionDto] })
+    @ApiProperty({ description: 'The answers for choice exercises', required: false, type: [AnswerOptionDto] })
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => AnswerOptionDto)
     @IsOptional()
     answers?: AnswerOptionDto[];
-
-    @ApiProperty({ description: 'The LLM prompt for generating hints and feedback', required: false })
-    @IsString()
-    @IsOptional()
-    llmPrompt?: string;
 } 

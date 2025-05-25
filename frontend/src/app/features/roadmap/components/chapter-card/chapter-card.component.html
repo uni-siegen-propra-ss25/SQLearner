@@ -1,68 +1,51 @@
-<mat-card class="chapter-card">
-  <mat-card-header>
-    <mat-card-title>
-      <div class="chapter-title">
-        <span>{{ chapter.title }}</span>
-        <div class="chapter-actions" *ngIf="isTutor">
-          <button mat-icon-button 
-                  color="primary" 
-                  (click)="edit.emit(chapter)"
-                  matTooltip="Edit chapter">
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button mat-icon-button 
-                  color="warn" 
-                  (click)="delete.emit(chapter.id)"
-                  matTooltip="Delete chapter">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </div>
-      </div>
-    </mat-card-title>
-  </mat-card-header>
 
-  <mat-card-content>
-    <p class="chapter-description">{{ chapter.description }}</p>
-    
-    <mat-expansion-panel 
-      [expanded]="isExpanded"
-      (opened)="onExpand()"
-      (closed)="isExpanded = false">
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          Topics
-        </mat-panel-title>
-        <mat-panel-description>
-          {{ topics.length }} topic(s)
-        </mat-panel-description>
-      </mat-expansion-panel-header>
-
-      <div class="topics-container"
-           cdkDropList
-           (cdkDropListDropped)="onTopicDrop($event)">
-        <app-topic-card
-          *ngFor="let topic of topics"
-          [topic]="topic"
-          [isTutor]="isTutor"
-          cdkDrag
-          [cdkDragDisabled]="!isTutor"
-          (edit)="onTopicEdit($event)"
-          (delete)="onTopicDelete($event)">
-        </app-topic-card>
-      </div>
-
-      <div *ngIf="topics.length === 0" class="empty-topics">
-        <p>No topics available in this chapter.</p>
-      </div>
-
-      <button *ngIf="isTutor"
-              mat-stroked-button
-              color="primary"
-              class="add-topic-button"
-              (click)="openNewTopicDialog()">
-        <mat-icon>add</mat-icon>
-        Add Topic
+<mat-expansion-panel class="chapter-panel" [expanded]="isExpanded" (opened)="onExpand()" (closed)="isExpanded = false">
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      <div class="chapter-title">{{ chapter.title }}</div>
+      
+    </mat-panel-title>
+      <mat-panel-description>
+      <div class="chapter-actions" *ngIf="isTutor">
+        <button mat-icon-button 
+        color="primary" 
+        (click)="$event.stopPropagation(); edit.emit(chapter)"
+        matTooltip="Edit chapter">
+        <mat-icon>edit</mat-icon>
       </button>
-    </mat-expansion-panel>
-  </mat-card-content>
-</mat-card> 
+      <button mat-icon-button 
+      color="warn" 
+      (click)="$event.stopPropagation(); delete.emit(chapter.id)"
+      matTooltip="Delete chapter">
+      <mat-icon>delete</mat-icon>
+    </button>
+  </div>
+  </mat-panel-description>
+</mat-expansion-panel-header>
+
+  <div class="chapter-description">{{ chapter.description }}</div>
+
+  <div class="topics-container">
+    <app-topic-card
+      *ngFor="let topic of topics"
+      [topic]="topic"
+      [isTutor]="isTutor"
+      (edit)="onTopicEdit($event)"
+      (delete)="onTopicDelete($event)">
+    </app-topic-card>
+
+    <div *ngIf="topics.length === 0" class="empty-topics">
+      <mat-icon>subject</mat-icon>
+      <p>No topics available in this chapter.</p>
+    </div>
+
+    <button *ngIf="isTutor" 
+            mat-flat-button 
+            color="primary" 
+            class="add-topic-button"
+            (click)="openNewTopicDialog()">
+      <mat-icon>add</mat-icon>
+      Add Topic
+    </button>
+  </div>
+</mat-expansion-panel>
