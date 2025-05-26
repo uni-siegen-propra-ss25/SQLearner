@@ -36,7 +36,7 @@ export class AppComponent implements OnInit, OnDestroy {
   ];
 
   private readonly commonItems: NavigationItem[] = [
-    { icon: 'home', label: 'Dashboard', route: '/dashboard' },
+    { icon: 'home', label: 'Dashboard', route: '/' },
   ];
 
   constructor(
