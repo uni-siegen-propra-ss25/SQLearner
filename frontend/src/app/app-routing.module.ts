@@ -16,7 +16,6 @@ const routes: Routes = [
       allowedRoles: [Role.STUDENT, Role.TUTOR, Role.ADMIN]
     }
   },
-  { path: '**', redirectTo: 'welcome' }
 ];
 
 @NgModule({

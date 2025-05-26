@@ -14,9 +14,11 @@ import { RouterModule } from '@angular/router';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { RoadmapModule } from './features/roadmap/roadmap.module';
 
+
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    AppComponent,
   ],
   imports: [
     BrowserModule,
@@ -28,7 +30,7 @@ import { RoadmapModule } from './features/roadmap/roadmap.module';
     HttpClientModule,
     RouterModule,
     RoadmapModule,
-    DragDropModule
+    DragDropModule,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
