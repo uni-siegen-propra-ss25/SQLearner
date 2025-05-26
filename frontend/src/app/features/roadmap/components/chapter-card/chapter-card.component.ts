@@ -4,7 +4,6 @@ import { Chapter } from '../../models/chapter.model';
 import { Topic } from '../../models/topic.model';
 import { RoadmapService } from '../../services/roadmap.service';
 import { TopicDialogComponent } from '../../dialogs/topic-dialog/topic-dialog.component';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-chapter-card',
@@ -60,19 +59,6 @@ export class ChapterCardComponent implements OnInit {
     }
   }
 
-  onTopicDrop(event: CdkDragDrop<Topic[]>): void {
-    if (!this.isTutor) return;
-    
-    moveItemInArray(this.topics, event.previousIndex, event.currentIndex);
-    
-    const updatedTopics = this.topics.map((topic, index) => ({
-      id: topic.id,
-      order: index
-    }));
-    
-    this.roadmapService.reorderTopics(this.chapter!.id, updatedTopics).subscribe();
-  }
-
   openNewTopicDialog(): void {
     const dialogRef = this.dialog.open(TopicDialogComponent, {
       width: '600px',
@@ -114,4 +100,4 @@ export class ChapterCardComponent implements OnInit {
       });
     }
   }
-} 
+}

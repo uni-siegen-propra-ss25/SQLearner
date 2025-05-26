@@ -3,15 +3,11 @@
     <h1>Learning Roadmap</h1>
   </div>
 
-  <div class="chapters-container" 
-       cdkDropList 
-       (cdkDropListDropped)="onChapterDrop($event)">
+  <div class="chapters-container">
     <app-chapter-card
       *ngFor="let chapter of chapters"
       [chapter]="chapter"
       [isTutor]="isTutor"
-      cdkDrag
-      [cdkDragDisabled]="!isTutor"
       (edit)="onChapterEdit($event)"
       (delete)="onChapterDelete($event)">
     </app-chapter-card>
@@ -28,4 +24,15 @@
       Create First Chapter
     </button>
   </div>
-</div> 
+
+  <!-- Add Chapter Button for existing chapters -->
+  <div *ngIf="chapters.length > 0 && isTutor" class="add-chapter-container">
+    <button mat-raised-button 
+            color="primary" 
+            (click)="openNewChapterDialog()">
+      <mat-icon class="add-icon">add</mat-icon>
+      Add New Chapter
+    </button>
+  </div>
+
+</div>

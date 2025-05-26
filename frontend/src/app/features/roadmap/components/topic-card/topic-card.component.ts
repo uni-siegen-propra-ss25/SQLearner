@@ -5,7 +5,6 @@ import { Topic } from '../../models/topic.model';
 import { Exercise } from '../../models/exercise.model';
 import { RoadmapService } from '../../services/roadmap.service';
 import { ExerciseDialogComponent } from '../../dialogs/exercise-dialog/exercise-dialog.component';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-topic-card',
@@ -52,28 +51,6 @@ export class TopicCardComponent implements OnInit {
     if (this.isExpanded) {
       this.loadExercises();
     }
-  }
-
-  onExerciseDrop(event: CdkDragDrop<Exercise[]>): void {
-    if (!this.isTutor) return;
-    
-    moveItemInArray(this.exercises, event.previousIndex, event.currentIndex);
-    
-    const updatedExercises = this.exercises.map((exercise, index) => ({
-      id: exercise.id,
-      order: index
-    }));
-    
-    this.roadmapService.reorderExercises(
-      this.topic.id,
-      updatedExercises
-    ).subscribe({
-      error: (error) => {
-        console.error('Error reordering exercises:', error);
-        this.snackBar.open('Failed to reorder exercises', 'Close', { duration: 3000 });
-        this.loadExercises(); // Reload original order on error
-      }
-    });
   }
 
   openNewExerciseDialog(): void {
@@ -147,4 +124,4 @@ export class TopicCardComponent implements OnInit {
       });
     }
   }
-} 
+}

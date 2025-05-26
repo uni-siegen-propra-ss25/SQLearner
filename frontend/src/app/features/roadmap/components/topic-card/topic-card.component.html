@@ -1,4 +1,4 @@
-    <mat-expansion-panel class="topic-panel">
+<mat-expansion-panel class="topic-panel">
       <mat-expansion-panel-header>
         <mat-panel-title>
           <div class="topic-title">{{ topic.title }}</div>
@@ -23,27 +23,19 @@
 
       <p class="topic-description">{{ topic.description }}</p>
 
-      <div class="exercises-container"
-           cdkDropList
-           (cdkDropListDropped)="onExerciseDrop($event)">
-        
+      <div class="exercises-container">
         <mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
-
         <app-exercise-card
           *ngFor="let exercise of exercises"
           [exercise]="exercise"
           [isTutor]="isTutor"
-          cdkDrag
-          [cdkDragDisabled]="!isTutor"
           (edit)="onExerciseEdit($event)"
           (delete)="onExerciseDelete($event)">
         </app-exercise-card>
-
         <div *ngIf="!isLoading && exercises.length === 0" class="empty-exercises">
           <mat-icon>assignment</mat-icon>
           <p>No exercises available in this topic.</p>
         </div>
-
         <button *ngIf="isTutor"
                 mat-flat-button 
                 color="primary"

@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { RoadmapService } from '../../services/roadmap.service';
 import { AuthService } from '../../../auth/services/auth.service';
 import { Chapter } from '../../models/chapter.model';
@@ -51,30 +50,6 @@ export class RoadmapViewComponent implements OnInit, OnDestroy {
     });
   }
 
-  onChapterDrop(event: CdkDragDrop<Chapter[]>): void {
-    if (!this.isTutor) return;
-    
-    // Store the previous state
-    this.previousChaptersState = [...this.chapters];
-    
-    // Optimistically update the UI
-    moveItemInArray(this.chapters, event.previousIndex, event.currentIndex);
-    
-    const updatedChapters = this.chapters.map((chapter, index) => ({
-      id: chapter.id,
-      order: index
-    }));
-    
-    this.roadmapService.reorderChapters(updatedChapters).subscribe({
-      error: (error) => {
-        console.error('Failed to reorder chapters:', error);
-        // Revert to the previous state on error
-        this.chapters = [...this.previousChaptersState];
-        // You might want to show a user-friendly error message here
-      }
-    });
-  }
-
   openNewChapterDialog(): void {
     const dialogRef = this.dialog.open(ChapterDialogComponent, {
       width: '600px',
@@ -112,4 +87,4 @@ export class RoadmapViewComponent implements OnInit, OnDestroy {
       });
     }
   }
-} 
+}

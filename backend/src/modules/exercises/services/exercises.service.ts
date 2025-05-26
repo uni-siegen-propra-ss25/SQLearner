@@ -75,7 +75,7 @@ export class ExercisesService {
     const { answers, ...exerciseData } = updateExerciseDto;
 
     const existingExercise = await this.prisma.exercise.findUnique({
-      where: { id },
+      where: { id: Number(id) },
       include: { answers: true }
     });
 
@@ -103,12 +103,12 @@ export class ExercisesService {
     // Handle answer options update if provided
     if (answers) {
       await this.prisma.answerOption.deleteMany({
-        where: { exerciseId: id }
+        where: { exerciseId: Number(id) }
       });
     }
 
     const exercise = await this.prisma.exercise.update({
-      where: { id },
+      where: { id: Number(id) },
       data: {
         ...exerciseData,
         // Only include answers for CHOICE type
@@ -131,11 +131,11 @@ export class ExercisesService {
   async removeExercise(id: number): Promise<void> {
     // First delete related answer options to avoid foreign key constraints
     await this.prisma.answerOption.deleteMany({
-      where: { exerciseId: id }
+      where: { exerciseId: Number(id) }
     });
 
     const exercise = await this.prisma.exercise.delete({
-      where: { id }
+      where: { id: Number(id) }
     });
     
     if (!exercise) {
@@ -147,7 +147,7 @@ export class ExercisesService {
     const { exercises: reorderedExercises } = reorderExercisesDto;
     
     const currentExercises = await this.prisma.exercise.findMany({
-      where: { topicId },
+      where: { topicId: Number(topicId) },
       select: { id: true }
     });
 
@@ -159,16 +159,16 @@ export class ExercisesService {
 
     await this.prisma.$transaction(async (tx) => {
       await tx.exercise.updateMany({
-        where: { topicId },
+        where: { topicId: Number(topicId) },
         data: { order: -1 }
       });
 
-      for (const [index, exercise] of reorderedExercises.entries()) {
+      for (const exercise of reorderedExercises) {
         await tx.exercise.update({
           where: { id: Number(exercise.id) },
-          data: { order: index }
+          data: { order: Number(exercise.order) }
         });
       }
     });
   }
-} 
+}
