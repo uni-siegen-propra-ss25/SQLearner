@@ -48,7 +48,6 @@ export class AuthController {
     @ApiInternalServerErrorResponse({ description: 'Internal server error' })
     @ApiBody({ type: CreateUserDto })
     async register(@Body() dto: RegisterCredentialsDto): Promise<number> {
-        console.log(dto);
         return this.authService.signUp(dto);
     }
 

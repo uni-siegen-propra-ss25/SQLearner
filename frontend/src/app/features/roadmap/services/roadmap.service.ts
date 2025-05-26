@@ -54,11 +54,6 @@ export class RoadmapService {
       .pipe(catchError(error => this.handleError(error)));
   }
 
-  reorderChapters(chapters: { id: number; order: number }[]): Observable<void> {
-    return this.http.put<void>(`${this.baseUrl}/chapters/reorder`, { chapters })
-      .pipe(catchError(error => this.handleError(error)));
-  }
-
   // Topic endpoints
   getTopics(chapterId: number): Observable<Topic[]> {
     return this.http.get<Topic[]>(`${this.baseUrl}/chapters/${chapterId}/topics`)
@@ -120,4 +115,4 @@ export class RoadmapService {
     return this.http.put<void>(`${this.baseUrl}/topics/${topicId}/exercises/reorder`, { exercises })
       .pipe(catchError(error => this.handleError(error)));
   }
-} 
+}

@@ -94,4 +94,4 @@ export class ExercisesController {
         await this.exercisesService.reorderExercises(topicId, reorderExercisesDto);
         return;
     }
-} 
+}

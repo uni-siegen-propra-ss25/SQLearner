@@ -100,4 +100,4 @@ export class TopicsController {
         await this.topicsService.reorderTopics(chapterId, reorderTopicsDto);
         return;
     }
-} 
+}

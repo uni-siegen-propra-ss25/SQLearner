@@ -15,10 +15,10 @@ export class TopicsService {
 
     async getTopics(chapterId: number): Promise<Topic[]> {
         // Verify chapter exists
-        await this.chaptersService.getChapterById(chapterId);
+        await this.chaptersService.getChapterById(Number(chapterId));
 
         return this.prisma.topic.findMany({
-            where: { chapterId },
+            where: { chapterId: Number(chapterId) },
             include: {
                 exercises: {
                     include: {
@@ -33,7 +33,7 @@ export class TopicsService {
 
     async getTopicById(id: number): Promise<Topic> {
         const topic = await this.prisma.topic.findUnique({
-            where: { id },
+            where: { id: Number(id) },
             include: {
                 exercises: {
                     include: {
@@ -71,10 +71,10 @@ export class TopicsService {
     }
 
     async updateTopic(id: number, updateTopicDto: UpdateTopicDto): Promise<Topic> {
-        const topic = await this.getTopicById(id);
+        const topic = await this.getTopicById(Number(id));
         Object.assign(topic, updateTopicDto);
         return this.prisma.topic.update({
-            where: { id },
+            where: { id: Number(id) },
             data: updateTopicDto,
             include: {
                 exercises: {
@@ -88,43 +88,38 @@ export class TopicsService {
     }
 
     async removeTopic(id: number): Promise<void> {
-        const topic = await this.getTopicById(id);
+        const topic = await this.getTopicById(Number(id));
         await this.prisma.topic.delete({
-            where: { id }
+            where: { id: Number(id) }
         });
     }
 
     async reorderTopics(chapterId: number, reorderTopicsDto: ReorderTopicsDto): Promise<void> {
         const { topics: reorderedTopics } = reorderTopicsDto;
 
-        // Get current topics to verify they belong to the chapter
         const currentTopics = await this.prisma.topic.findMany({
-            where: { chapterId },
+            where: { chapterId: Number(chapterId) },
             select: { id: true }
         });
 
         const currentIds = new Set(currentTopics.map(t => t.id));
         
-        // Verify all topics belong to the chapter
         if (!reorderedTopics.every(t => currentIds.has(Number(t.id)))) {
             throw new NotFoundException('One or more topics not found in this chapter');
         }
 
-        // Update all topics in a single transaction
         await this.prisma.$transaction(async (tx) => {
-            // First, set all topics to a temporary negative order to avoid unique constraint conflicts
             await tx.topic.updateMany({
-                where: { chapterId },
+                where: { chapterId: Number(chapterId) },
                 data: { order: -1 }
             });
 
-            // Then update each topic with its new order
-            for (const [index, topic] of reorderedTopics.entries()) {
+            for (const topic of reorderedTopics) {
                 await tx.topic.update({
                     where: { id: Number(topic.id) },
-                    data: { order: index }
+                    data: { order: Number(topic.order) }
                 });
             }
         });
     }
-} 
+}

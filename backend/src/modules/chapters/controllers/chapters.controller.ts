@@ -3,7 +3,6 @@ import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { ChaptersService } from '../services/chapters.service';
 import { CreateChapterDto } from '../models/create-chapter.dto';
 import { UpdateChapterDto } from '../models/update-chapter.dto';
-import { ReorderChaptersDto } from '../models/reorder-chapters.dto';
 import { Chapter } from '@prisma/client';
 import { Role } from '@prisma/client';
 import { Roles } from 'src/common/decorators/role.decorator';
@@ -67,14 +66,4 @@ export class ChaptersController {
         await this.chaptersService.deleteChapter(id);
         return;
     }
-
-    @Put('reorder')
-    @Roles(Role.TUTOR, Role.ADMIN)
-    @HttpCode(HttpStatus.NO_CONTENT)
-    @ApiOperation({ summary: 'Reorder chapters' })
-    @ApiResponse({ status: 204, description: 'Chapters have been reordered' })
-    async reorderChapters(@Body() reorderChaptersDto: ReorderChaptersDto): Promise<void> {
-        await this.chaptersService.reorderChapters(reorderChaptersDto);
-        return;
-    }
-} 
+}
