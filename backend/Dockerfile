@@ -17,6 +17,7 @@ COPY . .
 # Set environment variables
 ENV NODE_ENV=development
 ENV JWT_SECRET=your_jwt_secret_key_here
+ENV JWT_EXPIRES_IN=1h
 ENV DATABASE_URL="postgresql://postgres:postgres@db:5432/sqlearner?schema=public"
 
 # Generate Prisma client
@@ -29,9 +30,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
 
-# Create startup script
-COPY start.sh /start.sh
-RUN chmod +x /start.sh
-
 # Start the application
-CMD ["/start.sh"] 
+CMD ["sh", "-c", "while ! nc -z db 5432; do sleep 1; done && npx prisma migrate deploy && npm run start:dev"] 
