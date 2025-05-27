@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { Exercise } from '../../../roadmap/models/exercise.model';
 
 @Component({
   selector: 'app-query-exercise',
@@ -6,5 +7,5 @@ import { Component, Input } from '@angular/core';
   styleUrls: ['./query-exercise.component.scss']
 })
 export class QueryExerciseComponent {
-  @Input() exercise: any;
+  @Input() exercise!: Exercise;
 }

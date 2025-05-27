@@ -1,7 +1,7 @@
 <div class="choice-exercise">
-  <h2>{{ exercise?.title }}</h2>
-  <p>{{ exercise?.description }}</p>
-  <div *ngFor="let option of exercise?.options">
+  <h2>{{ exercise.title }}</h2>
+  <p>{{ exercise.description }}</p>
+  <div *ngFor="let option of exercise.answers" class="option">
     <mat-radio-group>
       <mat-radio-button>{{ option }}</mat-radio-button>
     </mat-radio-group>
