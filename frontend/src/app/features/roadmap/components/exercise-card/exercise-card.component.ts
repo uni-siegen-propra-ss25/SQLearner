@@ -36,7 +36,9 @@ export class ExerciseCardComponent {
     switch (type) {
       case ExerciseType.QUERY:
         return 'code';
-      case ExerciseType.CHOICE:
+      case ExerciseType.SINGLE_CHOICE:
+        return 'radio_button_checked';
+      case ExerciseType.MULTIPLE_CHOICE:
         return 'check_box';
       case ExerciseType.FREETEXT:
         return 'subject';
@@ -49,7 +51,9 @@ export class ExerciseCardComponent {
     switch (type) {
       case ExerciseType.QUERY:
         return 'SQL Query';
-      case ExerciseType.CHOICE:
+      case ExerciseType.SINGLE_CHOICE:
+        return 'Single Choice';
+      case ExerciseType.MULTIPLE_CHOICE:
         return 'Multiple Choice';
       case ExerciseType.FREETEXT:
         return 'Free Text';

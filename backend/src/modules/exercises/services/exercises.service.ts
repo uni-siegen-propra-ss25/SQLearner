@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { CreateExerciseDto } from '../models/create-exercise.dto';
+import { CreateExerciseDto, AnswerOptionDto } from '../models/create-exercise.dto';
 import { UpdateExerciseDto } from '../models/update-exercise.dto';
 import { ReorderExercisesDto } from '../models/reorder-exercises.dto';
 import { Exercise, ExerciseType } from '@prisma/client';
@@ -34,10 +34,26 @@ export class ExercisesService {
     return exercise;
   }
 
+  private validateAnswers(type: ExerciseType, answers?: AnswerOptionDto[]): void {
+    if (!answers || answers.length === 0) return;
+
+    if (type === ExerciseType.SINGLE_CHOICE) {
+      const correctCount = answers.filter(a => a.isCorrect).length;
+      if (correctCount !== 1) {
+        throw new Error('Single choice exercises must have exactly one correct answer');
+      }
+    } else if (type === ExerciseType.MULTIPLE_CHOICE) {
+      const correctCount = answers.filter(a => a.isCorrect).length;
+      if (correctCount === 0) {
+        throw new Error('Multiple choice exercises must have at least one correct answer');
+      }
+    }
+  }
+
   async createExercise(createExerciseDto: CreateExerciseDto): Promise<number> {
     const { answers, ...exerciseData } = createExerciseDto;
 
-    // Validate that QUERY exercises have a solution and database
+    // Validate answers    // Validate that QUERY exercises have a solution and database
     if (exerciseData.type === ExerciseType.QUERY) {
       if (!exerciseData.querySolution) {
         throw new Error('SQL exercises must have a solution query');
@@ -46,17 +62,20 @@ export class ExercisesService {
         throw new Error('SQL exercises must be associated with a database');
       }
     }
-
-    // Validate that CHOICE exercises have answers
-    if (exerciseData.type === ExerciseType.CHOICE && (!answers || answers.length === 0)) {
-      throw new Error('Choice exercises must have answer options');
+    
+    // Validate choice exercises
+    if (exerciseData.type === ExerciseType.SINGLE_CHOICE || exerciseData.type === ExerciseType.MULTIPLE_CHOICE) {
+      if (!answers || answers.length === 0) {
+        throw new Error('Choice exercises must have answer options');
+      }
+      this.validateAnswers(exerciseData.type, answers);
     }
 
     const exercise = await this.prisma.exercise.create({
       data: {
         ...exerciseData,
-        // Only include answers for CHOICE type
-        answers: exerciseData.type === ExerciseType.CHOICE ? {
+        // Include answers for choice exercises
+        answers: (exerciseData.type === ExerciseType.SINGLE_CHOICE || exerciseData.type === ExerciseType.MULTIPLE_CHOICE) ? {
           create: answers?.map((answer, index) => ({
             ...answer,
             order: index
@@ -94,9 +113,16 @@ export class ExercisesService {
         }
       }
       
-      if (exerciseData.type === ExerciseType.CHOICE && 
+      if ((exerciseData.type === ExerciseType.SINGLE_CHOICE || exerciseData.type === ExerciseType.MULTIPLE_CHOICE) && 
           (!answers && !existingExercise.answers.length)) {
         throw new Error('Choice exercises must have answer options');
+      }
+
+      // Validate choice answers
+      if (exerciseData.type === ExerciseType.SINGLE_CHOICE || exerciseData.type === ExerciseType.MULTIPLE_CHOICE) {
+        if (answers) {
+          this.validateAnswers(exerciseData.type, answers);
+        }
       }
     }
 
@@ -112,7 +138,9 @@ export class ExercisesService {
       data: {
         ...exerciseData,
         // Only include answers for CHOICE type
-        answers: (exerciseData.type || existingExercise.type) === ExerciseType.CHOICE && answers ? {
+        answers: ((exerciseData.type === ExerciseType.SINGLE_CHOICE || exerciseData.type === ExerciseType.MULTIPLE_CHOICE) || 
+                 (existingExercise.type === ExerciseType.SINGLE_CHOICE || existingExercise.type === ExerciseType.MULTIPLE_CHOICE)) && 
+                answers ? {
           create: answers.map((answer, index) => ({
             ...answer,
             order: index

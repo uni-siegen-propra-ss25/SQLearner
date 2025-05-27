@@ -55,6 +55,17 @@ export class ExerciseDialogComponent implements OnInit {
     }
   }
 
+  isCorrectDisabled(index: number): boolean {
+    const type = this.exerciseForm.get('type')?.value;
+    if (type !== ExerciseType.SINGLE_CHOICE) return false;
+    
+    if (index === 0) return false; // First option can always be correct
+
+    // For single choice, disable if any other option is already correct
+    return this.answers.controls.some((control, idx) => 
+      idx !== index && control.get('isCorrect')?.value);
+  }
+
   private setupTypeValidation() {
     this.exerciseForm.get('type')?.valueChanges.subscribe((type: ExerciseType) => {
       const databaseIdControl = this.exerciseForm.get('databaseId');
@@ -69,10 +80,19 @@ export class ExerciseDialogComponent implements OnInit {
       if (type === ExerciseType.QUERY) {
         databaseIdControl?.setValidators([Validators.required]);
         querySolutionControl?.setValidators([Validators.required]);
-      } else if (type === ExerciseType.CHOICE) {
+      } else if (type === ExerciseType.SINGLE_CHOICE || type === ExerciseType.MULTIPLE_CHOICE) {
         answersControl?.controls.forEach(control => {
           control.get('text')?.setValidators([Validators.required]);
         });
+
+        // For single choice, ensure exactly one answer is correct
+        if (type === ExerciseType.SINGLE_CHOICE) {
+          const correctAnswers = answersControl?.controls.filter(c => c.get('isCorrect')?.value);
+          if (correctAnswers.length > 1) {
+            // Keep only the first correct answer
+            correctAnswers.slice(1).forEach(c => c.get('isCorrect')?.setValue(false));
+          }
+        }
       }
 
       // Update validation status
@@ -117,8 +137,17 @@ export class ExerciseDialogComponent implements OnInit {
         delete formValue.databaseId;
         delete formValue.querySolution;
       }
-      if (formValue.type !== ExerciseType.CHOICE) {
+      if (formValue.type !== ExerciseType.SINGLE_CHOICE && formValue.type !== ExerciseType.MULTIPLE_CHOICE) {
         delete formValue.answers;
+      } else if (formValue.type === ExerciseType.SINGLE_CHOICE) {
+        // Ensure only one answer is marked as correct
+        const correctAnswers = formValue.answers.filter((a: any) => a.isCorrect);
+        if (correctAnswers.length > 1) {
+          formValue.answers = formValue.answers.map((a: any, i: number) => ({
+            ...a,
+            isCorrect: i === correctAnswers[0].order
+          }));
+        }
       }
 
       this.dialogRef.close(formValue);
@@ -128,4 +157,4 @@ export class ExerciseDialogComponent implements OnInit {
   onCancel(): void {
     this.dialogRef.close();
   }
-} 
+}

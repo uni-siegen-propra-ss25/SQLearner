@@ -3,7 +3,7 @@ import { IsString, IsNotEmpty, IsOptional, IsInt, Min, IsEnum, ValidateNested, I
 import { Type } from 'class-transformer';
 import { Difficulty, ExerciseType } from '@prisma/client';
 
-class AnswerOptionDto {
+export class AnswerOptionDto {
     @ApiProperty({ description: 'The text of the choice' })
     @IsString()
     @IsNotEmpty()

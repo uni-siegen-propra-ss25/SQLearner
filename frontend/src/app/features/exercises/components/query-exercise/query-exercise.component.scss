@@ -1,9 +1,86 @@
 .query-exercise {
-  padding: 1rem;
+  .editor-section {
+    margin-bottom: 20px;
+  }
+
+  .sql-editor {
+    width: 100%;
+
+    textarea {
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+  }
+
+  .actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-bottom: 24px;
+
+    button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+
+  .results-section {
+    margin-top: 24px;
+
+    h3 {
+      margin-bottom: 16px;
+      color: rgba(0, 0, 0, 0.87);
+    }
+  }
+
+  .results-table {
+    margin-top: 16px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    .mat-mdc-table {
+      width: 100%;
+    }
+
+    .mat-mdc-header-row {
+      background: rgba(0, 0, 0, 0.02);
+    }
+
+    .mat-mdc-header-cell {
+      font-weight: 600;
+      color: rgba(0, 0, 0, 0.87);
+    }
+
+    .mat-mdc-cell {
+      color: rgba(0, 0, 0, 0.87);
+    }
+  }
+
+  .feedback-section {
+    margin-top: 24px;
+  }
 }
-.query-exercise h2 {
-  margin-bottom: 0.5rem;
-}
-.query-exercise p {
-  margin-bottom: 1rem;
+
+// Dark theme
+:host-context(.dark-theme) {
+  .results-section h3 {
+    color: rgba(255, 255, 255, 0.87);
+  }
+
+  .results-table {
+    .mat-mdc-header-row {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .mat-mdc-header-cell {
+      color: rgba(255, 255, 255, 0.87);
+    }
+
+    .mat-mdc-cell {
+      color: rgba(255, 255, 255, 0.87);
+    }
+  }
 }

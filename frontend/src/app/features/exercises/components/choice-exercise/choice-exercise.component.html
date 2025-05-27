@@ -1,9 +1,52 @@
 <div class="choice-exercise">
-  <h2>{{ exercise.title }}</h2>
-  <p>{{ exercise.description }}</p>
-  <div *ngFor="let option of exercise.answers" class="option">
-    <mat-radio-group>
-      <mat-radio-button>{{ option }}</mat-radio-button>
-    </mat-radio-group>
-  </div>
+  <mat-card-content>
+    <h2 class="exercise-title">{{ exercise.title }}</h2>
+    <p class="exercise-description">{{ exercise.description }}</p>
+    
+    <div class="options-container">
+      <!-- Single Choice -->
+      <mat-radio-group *ngIf="exercise.type === ExerciseType.SINGLE_CHOICE" 
+          [(ngModel)]="selectedOptions" 
+          (ngModelChange)="selectedOptions = [$event]"
+          required 
+          aria-label="Select an answer option">
+        <mat-radio-button *ngFor="let option of exercise.answers" [value]="option.id" class="option">
+          {{ option.text }}
+        </mat-radio-button>
+      </mat-radio-group>
+
+      <!-- Multiple Choice -->
+      <div *ngIf="exercise.type === ExerciseType.MULTIPLE_CHOICE" class="multiple-choice">
+        <mat-checkbox *ngFor="let option of exercise.answers" 
+            [checked]="selectedOptions.includes(option.id!)" 
+            (change)="toggleOption(option.id!)"
+            class="option">
+          {{ option.text }}
+        </mat-checkbox>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button 
+        mat-flat-button 
+        color="primary" 
+        [disabled]="selectedOptions.length === 0 || isSubmitting"
+        (click)="submitAnswer()"
+      >
+        <mat-icon>{{ isSubmitting ? 'hourglass_empty' : 'check' }}</mat-icon>
+        {{ isSubmitting ? 'Submitting...' : 'Submit Answer' }}
+      </button>
+    </div>
+
+    <!-- Feedback Section -->
+    <mat-expansion-panel *ngIf="showFeedback" class="feedback-section">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <mat-icon>chat</mat-icon>
+          AI Feedback
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <p>{{ feedback || 'Loading feedback...' }}</p>
+    </mat-expansion-panel>
+  </mat-card-content>
 </div>

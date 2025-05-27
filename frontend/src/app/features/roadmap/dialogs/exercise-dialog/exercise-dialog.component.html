@@ -75,7 +75,7 @@
     </ng-container>
 
     <!-- Choice specific fields -->
-    <ng-container *ngIf="exerciseForm.get('type')?.value === 'CHOICE'">
+    <ng-container *ngIf="exerciseForm.get('type')?.value === 'SINGLE_CHOICE' || exerciseForm.get('type')?.value === 'MULTIPLE_CHOICE'">
       <div formArrayName="answers" class="answers-container">
         <h3>Answer Options</h3>
         <div *ngFor="let answer of answers.controls; let i=index" [formGroupName]="i" class="answer-row">
@@ -84,7 +84,8 @@
             <input matInput formControlName="text" [placeholder]="'Enter answer option ' + (i + 1)">
           </mat-form-field>
           
-          <mat-checkbox formControlName="isCorrect">
+          <mat-checkbox formControlName="isCorrect" 
+                      [disabled]="isCorrectDisabled(i)">
             Correct
           </mat-checkbox>
 

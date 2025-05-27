@@ -35,8 +35,8 @@
         <span>{{ exercise.database.name }}</span>
       </div>
 
-      <!-- Show number of options for CHOICE exercises -->
-      <div class="metadata-item options-info" *ngIf="exercise.type === ExerciseType.CHOICE && exercise.answers">
+      <!-- Show number of options for Choice exercises -->
+      <div class="metadata-item options-info" *ngIf="(exercise.type === ExerciseType.SINGLE_CHOICE || exercise.type === ExerciseType.MULTIPLE_CHOICE) && exercise.answers">
         <mat-icon>list</mat-icon>
         <span>{{ exercise.answers.length }} options</span>
       </div>

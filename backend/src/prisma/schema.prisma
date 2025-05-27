@@ -24,7 +24,8 @@ enum Role {
 
 /// Types of exercises supported
 enum ExerciseType {
-  CHOICE
+  SINGLE_CHOICE
+  MULTIPLE_CHOICE
   QUERY
   FREETEXT
 }
