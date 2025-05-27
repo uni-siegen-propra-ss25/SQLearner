@@ -13,12 +13,12 @@ import { MatIconRegistry } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { RoadmapModule } from './features/roadmap/roadmap.module';
+import { ExercisesModule } from './features/exercises/exercises.module';
 
 
 @NgModule({
   declarations: [
-    AppComponent,
-    AppComponent,
+    AppComponent
   ],
   imports: [
     BrowserModule,
@@ -29,8 +29,9 @@ import { RoadmapModule } from './features/roadmap/roadmap.module';
     ReactiveFormsModule,
     HttpClientModule,
     RouterModule,
-    RoadmapModule,
     DragDropModule,
+    RoadmapModule,
+    ExercisesModule,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },

@@ -18,6 +18,16 @@
     transform: scale(1.02);
     opacity: 0.9;
   }
+
+  &.clickable {
+    cursor: pointer;
+    transition: box-shadow 0.2s;
+
+    &:hover {
+      box-shadow: 0 4px 16px rgba(33, 150, 243, 0.12);
+      border-color: #2196f3;
+    }
+  }
 }
 
 mat-card-header {
@@ -180,4 +190,4 @@ mat-card-content {
       color: rgba(255, 255, 255, 0.6);
     }
   }
-} 
+}

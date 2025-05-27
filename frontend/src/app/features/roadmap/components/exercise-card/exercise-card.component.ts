@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Exercise, ExerciseType, Difficulty } from '../../models/exercise.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-exercise-card',
@@ -15,6 +16,8 @@ export class ExerciseCardComponent {
 
   ExerciseType = ExerciseType;
   Difficulty = Difficulty;
+
+  constructor(private router: Router) {}
 
   getDifficultyColor(difficulty: Difficulty): string {
     switch (difficulty) {
@@ -54,4 +57,17 @@ export class ExerciseCardComponent {
         return type;
     }
   }
-} 
+
+  onCardClick() {
+    if (!this.isTutor && this.exercise) {
+      // Navigiere explizit zur DynamicExerciseComponent-Route
+      this.router.navigate([
+        '/roadmap',
+        'topics',
+        this.exercise.topicId,
+        'exercises',
+        this.exercise.id
+      ]);
+    }
+  }
+}
