@@ -1,0 +1,79 @@
+<div class="header">
+  <div class="title-section">
+    <h1>Goals</h1>
+    <p>Mein Profil</p>
+  </div>
+
+  <div class="settings-link">
+    <a (click)="toggleSettings()">Einstellungen</a>
+  </div>
+</div>
+
+<div class="setting-popup" [class.show]="settingsVisible">
+  <h3>Meine Einstellungen</h3>
+  <a routerLink="/fragen">Feedback anzeigen</a>
+  <a href="#">Aufgaben zurücksetzen</a>
+  <a href="#">Sprache ändern</a>
+  <a routerLink="/kursmitglieder">Kursmitglieder ansehen</a>
+  <a href="#">Abmelden</a>
+</div>
+
+<div class="container">
+  <div class="left">
+    <div class="card">
+      <div *ngIf="!editMode" id="profileView">
+        <strong>{{ name }}</strong><br>
+        {{ title }}<br>
+        {{ fach }}<br>
+        {{ fakultaet }}<br>
+        Email: {{ email }}<br>
+        Passwort: *****<br>
+      </div>
+
+      <div class="edit-link" (click)="toggleEdit()">✎ Bearbeiten</div>
+
+      <div *ngIf="editMode" id="editProfile">
+        <input class="editable" [(ngModel)]="name" />
+        <input class="editable" [(ngModel)]="title" />
+        <input class="editable" [(ngModel)]="fach" />
+        <input class="editable" [(ngModel)]="fakultaet" />
+        <input class="editable" [(ngModel)]="email" />
+        <input class="editable" [(ngModel)]="password" type="password" />
+        <button (click)="saveProfile()">Speichern</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Letzte hochgeladenen Aufgaben:</h3>
+      <a href="#">SQL Select Grundlagen</a> – 25.05.2025<br>
+      <a href="#">Joins</a>                 – 12.05.2025<br>
+      <a href="#">Relationale Algebra 1</a> – 10.05.2025<br>
+      <a href="#">XML Zeichnen</a>          – 08.05.2025<br>
+      <div class="show-all">Alle anzeigen</div>
+    </div>
+
+    <div class="card">
+      <h3>Zuletzt hochgeladene Hinweise:</h3>
+      <div class="warning">Liebe Studenten, die B Bäume sind klausurrelevant</div>
+      <div class="warning">Kein Übungsbetrieb am Freitag</div>
+      <div class="show-all">Alle anzeigen</div>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="card">
+      <h3>Fortschritt - Diagramm</h3>
+      SQL 50%<div class="bar sql"></div>
+      Relationale Datenbankmodelle 45%<div class="bar relational"></div>
+      XML 95%<div class="bar xml"></div>
+    </div>
+
+    <div class="card">
+      <h3>Feedback / Fragen der Studierenden :</h3>
+      Gelesen<div class="feedback-bar read"></div>
+      Ungelesen<div class="feedback-bar unread"></div>
+      Beantwortet<div class="feedback-bar answered"></div>
+      Archiviert<div class="feedback-bar archived"></div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,171 @@
+.welcome-container {
+  padding: 2rem;
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.welcome-container h1 {
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+.welcome-container p {
+  color: var(--text-color);
+  font-size: 1.2rem;
+}
+
+/* Layout */
+.main-content {
+  display: flex;
+  justify-content: space-between;
+  margin: 24px;
+  gap: 24px;
+}
+
+.left-column {
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.right-column {
+  width: 35%;
+}
+
+/* Gemeinsamer Stil für alle Boxen */
+.box,
+.hinweise-box,
+.aufgaben-box {
+  background-color: #e7e7e9; /* hellblauer Hintergrund */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 16px;
+}
+
+/* Buttons */
+.button-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+/* Hinweise */
+.hinweis-input {
+  width: 100%;
+}
+
+.hinweis-button-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.hinweis-liste {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.einzelner-hinweis {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Fortschritt */
+.fortschritt-box {
+  font-size: 14px;
+}
+
+.fortschritt-daten {
+  margin: 12px 0;
+}
+
+.tendenz {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Aufgaben */
+.aufgaben-box {
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Fragenliste */
+.fragenliste {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.frage-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  color: var(--text-color);
+}
+
+.frage-item .icon {
+  font-size: 18px;
+  color: #3f51b5;
+}
+
+.frage-text .datum {
+  color: black;
+  font-style: normal;
+  margin-left: 4px;
+}
+
+.frage-text .inhalt {
+  margin-left: 4px;
+}
+
+/* Blaue Buttons */
+.flach-button {
+  color: #1e88e5;
+  font-weight: normal;
+  text-transform: none;
+  background: none;
+  border: none;
+  padding: 6px 12px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.flach-button:hover {
+  text-decoration: underline;
+  background: transparent;
+  color: #1565c0;
+}
+.bar {
+  height: 10px;
+  border-radius: 5px;
+  margin: 4px 0 12px 0;
+}
+
+.bar.average {
+  background-color: #64b5f6; // Hellblau
+}
+
+.bar.correct {
+  background-color: #81c784; // Grün
+}
+
+.bar.medium {
+  background-color: #fff176; // Gelb
+}
+
+.bar.wrong {
+  background-color: #e57373; // Rot
+}
+

@@ -1,0 +1,106 @@
+<!-- Willkommensnachricht -->
+<div class="welcome-container">
+  <h1>Willkommen bei SQLearner</h1>
+  <p>Ihre Plattform zum Lernen und Üben von SQL</p>
+</div>
+
+<!-- Hauptlayout -->
+<div class="main-content">
+  <!-- Linke Spalte -->
+  <div class="left-column">
+
+<!-- Fortschritt -->
+<mat-card class="box fortschritt-box">
+  <h3>Fortschritt der Studierenden</h3>
+
+  <mat-form-field appearance="fill" class="dropdown">
+    <mat-label>Kurs wählen</mat-label>
+    <mat-select>
+      <mat-option value="sql">SQL</mat-option>
+      <mat-option value="xml">XML</mat-option>
+      <mat-option value="rd">Rationale Datenbank</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <div class="fortschritt-daten">
+    <p><strong>Durchschnitt:</strong> 75%</p>
+    <div class="bar average" style="width: 75%"></div>
+
+    <p><strong>Korrekt beantwortet:</strong> 60%</p>
+    <div class="bar correct" style="width: 60%"></div>
+
+    <p><strong>Unvollständig beantwortet:</strong> 10%</p>
+    <div class="bar medium" style="width: 10%"></div>
+
+    <p><strong>Falsch beantwortet:</strong> 5%</p>
+    <div class="bar wrong" style="width: 5%"></div>
+
+    <div class="tendenz">
+      <span>Leistung: [ steigend ]</span>
+      <mat-icon>trending_up</mat-icon>
+    </div>
+  </div>
+
+  <div class="button-row">
+    <button mat-button class="flach-button" routerLink="/fortschritt">Details ansehen</button>
+  </div>
+</mat-card>
+
+
+    <!-- Fragen -->
+    <div class="box">
+      <h3>Fragen der Studierenden</h3>
+      <div class="fragenliste">
+        <div class="frage-item" *ngFor="let frage of fragen">
+          <i class="fas fa-envelope icon"></i>
+          <span class="frage-text">
+            <strong>{{ frage.name }}</strong>
+            <span class="datum">({{ frage.datum }})</span>:
+            <span class="inhalt">„{{ frage.text }}“</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="button-row fragen-buttons">
+        <button mat-button class="flach-button">Beantworten</button>
+        <button mat-button class="flach-button">Alle anzeigen</button>
+      </div>
+    </div>
+
+    <!-- Aufgaben -->
+    <mat-card class="box aufgaben-box">
+      <h3>Aufgaben erstellen und hochladen</h3>
+      <div class="button-row">
+        <button mat-icon-button color="primary" (click)="goToAufgaben()">
+          <mat-icon style="color: black;">add</mat-icon>
+        </button>
+      </div>
+    </mat-card>
+  </div>
+
+  <!-- Rechte Spalte -->
+  <div class="right-column">
+    
+    <mat-card class="hinweise-box">
+      <h3>Hinweise</h3>
+
+      <mat-form-field appearance="fill" class="hinweis-input">
+        <mat-label>Neuer Hinweis</mat-label>
+        <input matInput [(ngModel)]="newHinweis" name="hinweis">
+      </mat-form-field>
+
+      <div class="hinweis-button-container">
+        <button mat-button class="flach-button" (click)="addHinweis()">Hinzufügen</button>
+      </div>
+
+      <div class="hinweis-liste">
+        <mat-card *ngFor="let hinweis of hinweise; let i = index" class="einzelner-hinweis">
+          {{ hinweis }}
+          <button mat-icon-button color="warn" (click)="removeHinweis(i)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-card>
+      </div>
+    </mat-card>
+  </div>
+</div>
