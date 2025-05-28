@@ -1,0 +1,18 @@
+<div class="profile-dialog-container" *ngIf="user">
+  <mat-card class="profile-card">
+    <mat-card-header>
+      <div mat-card-avatar class="profile-avatar">
+        <mat-icon>person</mat-icon>
+      </div>
+      <mat-card-title>{{ user.firstName }} {{ user.lastName }}</mat-card-title>
+      <mat-card-subtitle>{{ user.role }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="profile-info-row"><mat-icon>email</mat-icon><span>{{ user.email }}</span></div>
+      <div class="profile-info-row"><mat-icon>badge</mat-icon><span>Matrikelnummer: {{ user.matriculationNumber || '-' }}</span></div>
+    </mat-card-content>
+    <mat-card-actions align="end">
+      <button mat-stroked-button color="warn" (click)="logout()">Logout</button>
+    </mat-card-actions>
+  </mat-card>
+</div>

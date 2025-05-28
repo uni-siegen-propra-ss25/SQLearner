@@ -52,7 +52,10 @@ export class AuthService {
       sub: user.id,
       email: user.email,
       username: `${user.firstName} ${user.lastName}`,
+      firstName: user.firstName,
+      lastName: user.lastName,
       role: user.role,
+      matriculationNumber: user.matriculationNumber ?? '',
     };
 
     const accessToken = this.jwtService.sign(

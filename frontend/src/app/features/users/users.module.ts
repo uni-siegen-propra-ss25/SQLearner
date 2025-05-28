@@ -6,18 +6,23 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { UserCreateDialogComponent } from './dialogs/user-create-dialog/user-create-dialog.component';
 import { UserUpdateDialogComponent } from './dialogs/user-update-dialog/user-update-dialog.component';
 import { UserListComponent } from './components/user-list/user-list.component';
+import { ProfileComponent } from './components/profile/profile.component';
 
 @NgModule({
   declarations: [
     UserCreateDialogComponent,
     UserUpdateDialogComponent,
-    UserListComponent
+    UserListComponent,
+    ProfileComponent
   ],
   imports: [
     CommonModule,
     UsersRoutingModule,
     MaterialModule,
     ReactiveFormsModule
+  ],
+  exports: [
+    ProfileComponent
   ]
 })
 export class UsersModule {}

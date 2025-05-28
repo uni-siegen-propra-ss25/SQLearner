@@ -1,5 +1,8 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { AuthService } from '../../../features/auth/services/auth.service';
+import { ProfileComponent } from '../../../features/users/components/profile/profile.component';
 import { Role } from '../../../features/users/models/role.model';
 
 export interface NavigationItem {
@@ -29,7 +32,19 @@ export class NavigationRailComponent {
   
   isDarkMode = false;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private dialog: MatDialog,
+    private authService: AuthService
+  ) {}
+  openProfile(): void {
+    const user = this.authService.getUserFromToken();
+    this.dialog.open(ProfileComponent, {
+      data: { user },
+      width: '400px',
+      autoFocus: false
+    });
+  }
   
   get filteredItems(): NavigationItem[] {
     return this.items.filter(item => 
