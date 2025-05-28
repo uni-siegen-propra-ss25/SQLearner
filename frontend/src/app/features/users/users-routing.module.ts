@@ -1,19 +1,23 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DashboardComponent } from 'app/features/users/tutor/dashboard/dashboard.component.';
-import { AufgabeComponent } from './tutor/aufgaben/aufgaben.component';
-import { FortschrittComponent } from './tutor/fortschritt/fortschritt.component';
 import { FragenComponent } from './tutor/fragen/fragen.component';
 import { ProfilComponent } from './tutor/profil/profil.component';
-import { KursmitgliederComponent } from './tutor/profil/kursmitglieder/kursmitglieder.component';
+import { UserListComponent } from './components/user-list/user-list.component';
+import { RoleGuard } from '../../core/guards/role.guard';
+import { Role } from './models/role.model';
 
 const routes: Routes = [
+  { path: '', redirectTo: 'list', pathMatch: 'full' },
   { path: 'dashboard', component: DashboardComponent },
-  { path: 'aufgaben', component: AufgabeComponent },
-  { path: 'fortschritt', component: FortschrittComponent },
   { path: 'fragen', component: FragenComponent },
   { path: 'profil', component: ProfilComponent },
-  { path: 'kursmitglieder', component: KursmitgliederComponent }
+  { 
+    path: 'list', 
+    component: UserListComponent,
+    canActivate: [RoleGuard],
+    data: { allowedRoles: [Role.TUTOR, Role.ADMIN] }
+  }
 ];
 
 @NgModule({

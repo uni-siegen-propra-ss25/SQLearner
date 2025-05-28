@@ -16,6 +16,14 @@ const routes: Routes = [
       allowedRoles: [Role.STUDENT, Role.TUTOR, Role.ADMIN]
     }
   },
+  {
+    path: 'users',
+    loadChildren: () => import('./features/users/users.module').then(m => m.UsersModule),
+    canActivate: [RoleGuard],
+    data: {
+      allowedRoles: [Role.TUTOR, Role.ADMIN]
+    }
+  }
 ];
 
 @NgModule({

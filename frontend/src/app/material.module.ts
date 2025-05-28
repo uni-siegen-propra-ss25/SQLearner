@@ -5,7 +5,7 @@ import { MatIconModule }       from '@angular/material/icon';
 import { MatSidenavModule }    from '@angular/material/sidenav';
 import { MatListModule }       from '@angular/material/list';
 import { MatCardModule }       from '@angular/material/card';
-import { MatFormFieldModule, MatLabel }  from '@angular/material/form-field';
+import { MatFormFieldModule }  from '@angular/material/form-field';
 import { MatInputModule }      from '@angular/material/input';
 import { MatSelectModule }     from '@angular/material/select';
 import { MatCheckboxModule }   from '@angular/material/checkbox';
@@ -22,6 +22,8 @@ import { MatTabsModule }       from '@angular/material/tabs';
 import { MatBadgeModule }      from '@angular/material/badge';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatTableModule } from '@angular/material/table';
+import { MatMenuModule } from '@angular/material/menu';
 
 /**
  * MaterialModule imports and exports Angular Material modules.
@@ -54,6 +56,8 @@ import { MatRadioModule } from '@angular/material/radio';
     MatTabsModule,
     MatExpansionModule,
     MatRadioModule,
+    MatTableModule,
+    MatMenuModule
   ]
 })
 export class MaterialModule { }

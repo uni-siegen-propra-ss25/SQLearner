@@ -1,0 +1,73 @@
+<div class="user-list-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Nutzerverwaltung</mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="actions-toolbar">
+        <button mat-raised-button color="primary" (click)="openCreateDialog()">
+          <mat-icon>add</mat-icon>
+          Neuen Nutzer anlegen
+        </button>
+      </div>
+
+      <mat-table [dataSource]="users">
+        <ng-container matColumnDef="name">
+          <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+          <mat-cell *matCellDef="let user"> {{user.firstName}} {{user.lastName}} </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="email">
+          <mat-header-cell *matHeaderCellDef> Email </mat-header-cell>
+          <mat-cell *matCellDef="let user"> {{user.email}} </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="role">
+          <mat-header-cell *matHeaderCellDef> Rolle </mat-header-cell>
+          <mat-cell *matCellDef="let user">
+            <mat-form-field *ngIf="isAdmin" class="role-select">
+              <mat-select [value]="user.role" (selectionChange)="onRoleChange(user.id, $event.value)">
+                <mat-option *ngFor="let role of roleOptions" [value]="role">
+                  {{role}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <span *ngIf="!isAdmin">{{user.role}}</span>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="matriculationNumber">
+          <mat-header-cell *matHeaderCellDef> Matrikelnummer </mat-header-cell>
+          <mat-cell *matCellDef="let user"> {{user.matriculationNumber || '-'}} </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <mat-header-cell *matHeaderCellDef></mat-header-cell>
+          <mat-cell *matCellDef="let user" class="actions-cell">
+            <button mat-icon-button [matMenuTriggerFor]="menu" *ngIf="isAdmin">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item (click)="openUpdateDialog(user)">
+                <mat-icon>edit</mat-icon>
+                <span>Bearbeiten</span>
+              </button>
+              <button mat-menu-item (click)="deleteUser(user.id)">
+                <mat-icon color="warn">delete</mat-icon>
+                <span>Löschen</span>
+              </button>
+            </mat-menu>
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+      </mat-table>
+
+      <div *ngIf="users.length === 0" class="no-data">
+        <p>Keine Nutzer gefunden</p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

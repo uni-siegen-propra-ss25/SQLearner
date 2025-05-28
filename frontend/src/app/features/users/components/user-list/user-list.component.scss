@@ -1,0 +1,56 @@
+.user-list-container {
+  padding: 24px;
+
+  .mat-mdc-card {
+    .actions-toolbar {
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: flex-end;
+      padding: 16px;
+    }
+
+    .mat-mdc-table {
+      width: 100%;
+    }
+
+    .mat-mdc-header-cell, .mat-mdc-cell {
+      padding: 0 16px;
+    }
+
+    .mat-mdc-row:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+
+    .role-select {
+      width: 120px;
+      margin: -16px 0;
+      
+      ::ng-deep .mat-mdc-select {
+        margin: 0;
+      }
+    }
+
+    .actions-cell {
+      width: 96px;
+      .mat-mdc-icon-button {
+        width: 36px;
+        height: 36px;
+        line-height: 36px;
+
+        &.edit {
+          color: #1976d2;
+        }
+
+        &.delete {
+          color: #dc3545;
+        }
+      }
+    }
+
+    .no-data {
+      padding: 16px;
+      text-align: center;
+      color: rgba(0, 0, 0, 0.6);
+    }
+  }
+}
