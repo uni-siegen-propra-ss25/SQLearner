@@ -7,27 +7,27 @@ import { DynamicExerciseComponent } from '../exercises/components/dynamic-exerci
 import { ExerciseResolver } from '../exercises/resolvers/exercise.resolver';
 
 const routes: Routes = [
-  {
-    path: '',
-    component: RoadmapViewComponent,
-    canActivate: [RoleGuard],
-    data: {
-      allowedRoles: [Role.STUDENT, Role.TUTOR, Role.ADMIN]
-    }
-  },
-  {
-    path: 'topics/:topicId/exercises/:exerciseId',
-    component: DynamicExerciseComponent,
-    resolve: { exercise: ExerciseResolver },
-    canActivate: [RoleGuard],
-    data: {
-      allowedRoles: [Role.STUDENT, Role.TUTOR, Role.ADMIN]
-    }
-  }
+    {
+        path: '',
+        component: RoadmapViewComponent,
+        canActivate: [RoleGuard],
+        data: {
+            allowedRoles: [Role.STUDENT, Role.TUTOR, Role.ADMIN],
+        },
+    },
+    {
+        path: 'topics/:topicId/exercises/:exerciseId',
+        component: DynamicExerciseComponent,
+        resolve: { exercise: ExerciseResolver },
+        canActivate: [RoleGuard],
+        data: {
+            allowedRoles: [Role.STUDENT, Role.TUTOR, Role.ADMIN],
+        },
+    },
 ];
 
 @NgModule({
-  imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+    imports: [RouterModule.forChild(routes)],
+    exports: [RouterModule],
 })
-export class RoadmapRoutingModule { }
+export class RoadmapRoutingModule {}

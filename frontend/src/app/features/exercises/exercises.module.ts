@@ -10,25 +10,25 @@ import { QueryExerciseComponent } from './components/query-exercise/query-exerci
 import { DynamicExerciseComponent } from './components/dynamic-exercise.component';
 
 @NgModule({
-  declarations: [
-    ChoiceExerciseComponent,
-    QueryExerciseComponent,
-    FreetextExerciseComponent,
-    DynamicExerciseComponent
-  ],
-  imports: [
-    CommonModule,
-    MaterialModule,
-    ReactiveFormsModule,
-    FormsModule,
-    MatTableModule,
-    ExercisesRoutingModule
-  ],
-  exports: [
-    ChoiceExerciseComponent,
-    QueryExerciseComponent,
-    FreetextExerciseComponent,
-    DynamicExerciseComponent
-  ]
+    declarations: [
+        ChoiceExerciseComponent,
+        QueryExerciseComponent,
+        FreetextExerciseComponent,
+        DynamicExerciseComponent,
+    ],
+    imports: [
+        CommonModule,
+        MaterialModule,
+        ReactiveFormsModule,
+        FormsModule,
+        MatTableModule,
+        ExercisesRoutingModule,
+    ],
+    exports: [
+        ChoiceExerciseComponent,
+        QueryExerciseComponent,
+        FreetextExerciseComponent,
+        DynamicExerciseComponent,
+    ],
 })
 export class ExercisesModule {}

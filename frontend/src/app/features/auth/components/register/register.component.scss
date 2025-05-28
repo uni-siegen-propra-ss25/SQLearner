@@ -7,7 +7,7 @@
     max-width: 800px;
     width: 100%;
     margin: auto;
-    
+
     .auth-container {
       display: grid;
       grid-template-columns: 1fr;
@@ -25,9 +25,9 @@
       gap: 1rem;
       padding: 1rem;
 
-        .auth-logo {
-            width: 100px;
-            height: 100px;
+      .auth-logo {
+        width: 100px;
+        height: 100px;
       }
 
       .auth-title {

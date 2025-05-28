@@ -2,16 +2,20 @@
   <mat-card-content>
     <h2 class="exercise-title">{{ exercise.title }}</h2>
     <p class="exercise-description">{{ exercise.description }}</p>
-    
+
     <div class="options-container">
       <!-- Single Choice -->
-      <mat-radio-group *ngIf="exercise.type === ExerciseType.SINGLE_CHOICE" 
-          [(ngModel)]="selectedOptions[0]" 
-          required 
-          aria-label="Select an answer option">
-        <div *ngFor="let option of exercise.answers" 
-             class="option" 
-             (click)="option.id && (selectedOptions[0] = option.id)">
+      <mat-radio-group
+        *ngIf="exercise.type === ExerciseType.SINGLE_CHOICE"
+        [(ngModel)]="selectedOptions[0]"
+        required
+        aria-label="Select an answer option"
+      >
+        <div
+          *ngFor="let option of exercise.answers"
+          class="option"
+          (click)="option.id && (selectedOptions[0] = option.id)"
+        >
           <mat-radio-button [value]="option.id">
             {{ option.text }}
           </mat-radio-button>
@@ -20,12 +24,15 @@
 
       <!-- Multiple Choice -->
       <div *ngIf="exercise.type === ExerciseType.MULTIPLE_CHOICE" class="multiple-choice">
-        <div *ngFor="let option of exercise.answers" 
-             class="option"
-             (click)="option.id && toggleOption(option.id)">
-          <mat-checkbox 
-              [checked]="selectedOptions.includes(option.id!)" 
-              (change)="toggleOption(option.id!)">
+        <div
+          *ngFor="let option of exercise.answers"
+          class="option"
+          (click)="option.id && toggleOption(option.id)"
+        >
+          <mat-checkbox
+            [checked]="selectedOptions.includes(option.id!)"
+            (change)="toggleOption(option.id!)"
+          >
             {{ option.text }}
           </mat-checkbox>
         </div>
@@ -33,9 +40,9 @@
     </div>
 
     <div class="actions">
-      <button 
-        mat-flat-button 
-        color="primary" 
+      <button
+        mat-flat-button
+        color="primary"
         [disabled]="selectedOptions.length === 0 || isSubmitting"
         (click)="submitAnswer()"
       >

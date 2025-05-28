@@ -5,16 +5,8 @@ import { NavigationRailComponent } from './components/navigation-rail/navigation
 import { MaterialModule } from '../material.module';
 
 @NgModule({
-  declarations: [
-    NavigationRailComponent
-  ],
-  imports: [
-    CommonModule,
-    MaterialModule,
-    RouterModule
-  ],
-  exports: [
-    NavigationRailComponent
-  ]
+    declarations: [NavigationRailComponent],
+    imports: [CommonModule, MaterialModule, RouterModule],
+    exports: [NavigationRailComponent],
 })
-export class SharedModule { }
+export class SharedModule {}

@@ -6,73 +6,73 @@ import { Chapter } from '@prisma/client';
 
 @Injectable()
 export class ChaptersService {
-  constructor(private readonly prisma: PrismaService) {}
+    constructor(private readonly prisma: PrismaService) {}
 
-  async getChapters(): Promise<Chapter[]> {
-    return this.prisma.chapter.findMany({
-      include: {
-        topics: {
-          include: {
-            exercises: true
-          }
-        }
-      }
-    });
-  }
-
-  async getChapterById(id: number): Promise<Chapter> {
-    const chapter = await this.prisma.chapter.findUnique({
-      where: { id },
-      include: {
-        topics: {
-          include: {
-            exercises: true
-          }
-        }
-      }
-    });
-    if (!chapter) {
-      throw new NotFoundException('Chapter not found');
+    async getChapters(): Promise<Chapter[]> {
+        return this.prisma.chapter.findMany({
+            include: {
+                topics: {
+                    include: {
+                        exercises: true,
+                    },
+                },
+            },
+        });
     }
-    return chapter;
-  }
 
-  async createChapter(createChapterDto: CreateChapterDto): Promise<number> {
-    const chapter = await this.prisma.chapter.create({
-      data: createChapterDto
-    });
-    return chapter.id;
-  }
-
-  async updateChapter(id: number, updateChapterDto: UpdateChapterDto): Promise<Chapter> {
-    const chapter = await this.prisma.chapter.update({
-      where: { id },
-      data: updateChapterDto
-    });
-    if (!chapter) {
-      throw new NotFoundException('Chapter not found');
-    }
-    return chapter;
-  }
-
-  async deleteChapter(id: number): Promise<void> {
-    // First delete all related topics and exercises
-    await this.prisma.exercise.deleteMany({
-      where: {
-        topic: {
-          chapterId: id
+    async getChapterById(id: number): Promise<Chapter> {
+        const chapter = await this.prisma.chapter.findUnique({
+            where: { id },
+            include: {
+                topics: {
+                    include: {
+                        exercises: true,
+                    },
+                },
+            },
+        });
+        if (!chapter) {
+            throw new NotFoundException('Chapter not found');
         }
-      }
-    });
+        return chapter;
+    }
 
-    await this.prisma.topic.deleteMany({
-      where: {
-        chapterId: id
-      }
-    });
+    async createChapter(createChapterDto: CreateChapterDto): Promise<number> {
+        const chapter = await this.prisma.chapter.create({
+            data: createChapterDto,
+        });
+        return chapter.id;
+    }
 
-    await this.prisma.chapter.delete({
-      where: { id }
-    });
-  }
+    async updateChapter(id: number, updateChapterDto: UpdateChapterDto): Promise<Chapter> {
+        const chapter = await this.prisma.chapter.update({
+            where: { id },
+            data: updateChapterDto,
+        });
+        if (!chapter) {
+            throw new NotFoundException('Chapter not found');
+        }
+        return chapter;
+    }
+
+    async deleteChapter(id: number): Promise<void> {
+        // First delete all related topics and exercises
+        await this.prisma.exercise.deleteMany({
+            where: {
+                topic: {
+                    chapterId: id,
+                },
+            },
+        });
+
+        await this.prisma.topic.deleteMany({
+            where: {
+                chapterId: id,
+            },
+        });
+
+        await this.prisma.chapter.delete({
+            where: { id },
+        });
+    }
 }

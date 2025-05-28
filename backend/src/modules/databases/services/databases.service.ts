@@ -14,17 +14,17 @@ export class DatabasesService {
                 OR: [
                     { ownerId: userId },
                     // Add public databases or other conditions here if needed
-                ]
+                ],
             },
             include: {
                 owner: {
                     select: {
                         id: true,
                         firstName: true,
-                        lastName: true
-                    }
-                }
-            }
+                        lastName: true,
+                    },
+                },
+            },
         });
     }
 
@@ -36,17 +36,17 @@ export class DatabasesService {
                     select: {
                         id: true,
                         firstName: true,
-                        lastName: true
-                    }
+                        lastName: true,
+                    },
                 },
                 exercises: {
                     select: {
                         id: true,
                         title: true,
-                        type: true
-                    }
-                }
-            }
+                        type: true,
+                    },
+                },
+            },
         });
 
         if (!database) {
@@ -66,24 +66,28 @@ export class DatabasesService {
         return this.prisma.database.create({
             data: {
                 ...createDatabaseDto,
-                ownerId: userId
+                ownerId: userId,
             },
             include: {
                 owner: {
                     select: {
                         id: true,
                         firstName: true,
-                        lastName: true
-                    }
-                }
-            }
+                        lastName: true,
+                    },
+                },
+            },
         });
     }
 
-    async updateDatabase(id: number, updateDatabaseDto: UpdateDatabaseDto, userId: number): Promise<Database> {
+    async updateDatabase(
+        id: number,
+        updateDatabaseDto: UpdateDatabaseDto,
+        userId: number,
+    ): Promise<Database> {
         // Check if database exists and user owns it
         const database = await this.prisma.database.findUnique({
-            where: { id }
+            where: { id },
         });
 
         if (!database) {
@@ -102,17 +106,17 @@ export class DatabasesService {
                     select: {
                         id: true,
                         firstName: true,
-                        lastName: true
-                    }
-                }
-            }
+                        lastName: true,
+                    },
+                },
+            },
         });
     }
 
     async deleteDatabase(id: number, userId: number): Promise<void> {
         // Check if database exists and user owns it
         const database = await this.prisma.database.findUnique({
-            where: { id }
+            where: { id },
         });
 
         if (!database) {
@@ -125,7 +129,7 @@ export class DatabasesService {
 
         // Check if database is used in any exercises
         const exercisesUsingDatabase = await this.prisma.exercise.count({
-            where: { databaseId: id }
+            where: { databaseId: id },
         });
 
         if (exercisesUsingDatabase > 0) {
@@ -133,7 +137,7 @@ export class DatabasesService {
         }
 
         await this.prisma.database.delete({
-            where: { id }
+            where: { id },
         });
     }
-} 
+}

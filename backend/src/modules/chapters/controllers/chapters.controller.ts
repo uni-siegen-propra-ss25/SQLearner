@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Post,
+    Put,
+    Delete,
+    Body,
+    Param,
+    HttpCode,
+    HttpStatus,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { ChaptersService } from '../services/chapters.service';
 import { CreateChapterDto } from '../models/create-chapter.dto';
@@ -6,7 +16,6 @@ import { UpdateChapterDto } from '../models/update-chapter.dto';
 import { Chapter } from '@prisma/client';
 import { Role } from '@prisma/client';
 import { Roles } from 'src/common/decorators/role.decorator';
-
 
 @ApiTags('Chapters')
 @Controller('chapters')
@@ -24,7 +33,7 @@ export class ChaptersController {
     @Get(':id')
     @ApiOperation({ summary: 'Get a chapter by ID' })
     @ApiParam({ name: 'id', description: 'Chapter ID' })
-    @ApiResponse({ status: 200, description: 'The found chapter',  })
+    @ApiResponse({ status: 200, description: 'The found chapter' })
     @ApiResponse({ status: 404, description: 'Chapter not found' })
     async getChapterById(@Param('id') id: number): Promise<Chapter> {
         const chapter = await this.chaptersService.getChapterById(id);
@@ -49,7 +58,7 @@ export class ChaptersController {
     @ApiResponse({ status: 404, description: 'Chapter not found' })
     async updateChapter(
         @Param('id') id: number,
-        @Body() updateChapterDto: UpdateChapterDto
+        @Body() updateChapterDto: UpdateChapterDto,
     ): Promise<Chapter> {
         const chapter = await this.chaptersService.updateChapter(id, updateChapterDto);
         return chapter;

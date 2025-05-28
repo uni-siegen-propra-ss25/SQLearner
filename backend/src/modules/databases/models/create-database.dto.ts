@@ -16,4 +16,4 @@ export class CreateDatabaseDto {
     @IsString()
     @IsOptional()
     schemaSql?: string;
-} 
+}

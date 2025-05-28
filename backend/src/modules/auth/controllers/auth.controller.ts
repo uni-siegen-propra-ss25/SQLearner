@@ -30,6 +30,7 @@ import { RolesGuard } from 'src/common/guards/role/role.guard';
 import { LoginCredentialsDto } from '../models/login-credentials.dto';
 import { CreateUserDto } from 'src/modules/users/models/create-user.dto';
 import { RegisterCredentialsDto } from '../models/register-credentials.dto';
+import { User } from '@prisma/client';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -83,7 +84,7 @@ export class AuthController {
     @ApiOperation({ summary: 'Get profile of the authenticated user' })
     @ApiOkResponse({ description: 'Current user profile' })
     @ApiInternalServerErrorResponse({ description: 'Internal server error' })
-    getProfile(@GetUser() user) {
+    getProfile(@GetUser() user): Promise<User> {
         return user;
     }
 }

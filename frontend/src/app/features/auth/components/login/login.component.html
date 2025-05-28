@@ -3,10 +3,7 @@
     <mat-card-content>
       <div class="auth-container">
         <div class="auth-header">
-        <img
-            src="assets/icons/logo_SQLearner.svg"
-            alt="Logo"
-            class="auth-logo" />
+          <img src="assets/icons/logo_SQLearner.svg" alt="Logo" class="auth-logo" />
           <h1 class="auth-title">Sign in</h1>
         </div>
 
@@ -14,15 +11,19 @@
           <mat-form-field appearance="outline" class="auth-field">
             <mat-label>Email</mat-label>
             <input matInput type="email" formControlName="email" />
-            @if ((loginForm.get('email')?.touched || loginForm.get('email')?.dirty) && 
-                 loginForm.get('email')?.hasError('required')) {
+            @if (
+              (loginForm.get('email')?.touched || loginForm.get('email')?.dirty) &&
+              loginForm.get('email')?.hasError('required')
+            ) {
               <mat-error class="auth-error">
                 <mat-icon>error_outline</mat-icon>
                 Email is required
               </mat-error>
             }
-            @if ((loginForm.get('email')?.touched || loginForm.get('email')?.dirty) && 
-                 loginForm.get('email')?.hasError('email')) {
+            @if (
+              (loginForm.get('email')?.touched || loginForm.get('email')?.dirty) &&
+              loginForm.get('email')?.hasError('email')
+            ) {
               <mat-error class="auth-error">
                 <mat-icon>error_outline</mat-icon>
                 Please enter a valid email
@@ -32,19 +33,27 @@
 
           <mat-form-field appearance="outline" class="auth-field">
             <mat-label>Password</mat-label>
-            <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" />
+            <input
+              matInput
+              [type]="hidePassword ? 'password' : 'text'"
+              formControlName="password"
+            />
             <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
-              <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+              <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
-            @if ((loginForm.get('password')?.touched || loginForm.get('password')?.dirty) && 
-                 loginForm.get('password')?.hasError('required')) {
+            @if (
+              (loginForm.get('password')?.touched || loginForm.get('password')?.dirty) &&
+              loginForm.get('password')?.hasError('required')
+            ) {
               <mat-error class="auth-error">
                 <mat-icon>error_outline</mat-icon>
                 Password is required
               </mat-error>
             }
-            @if ((loginForm.get('password')?.touched || loginForm.get('password')?.dirty) && 
-                 loginForm.get('password')?.hasError('minlength')) {
+            @if (
+              (loginForm.get('password')?.touched || loginForm.get('password')?.dirty) &&
+              loginForm.get('password')?.hasError('minlength')
+            ) {
               <mat-error class="auth-error">
                 <mat-icon>error_outline</mat-icon>
                 Password must be at least 8 characters
@@ -58,15 +67,12 @@
         </div>
       </div>
     </mat-card-content>
-    
+
     <mat-card-actions class="auth-actions">
-      <a mat-button routerLink="/auth/register" class="auth-secondary-button">
-        Create account
-      </a>
+      <a mat-button routerLink="/auth/register" class="auth-secondary-button"> Create account </a>
       <button mat-flat-button color="primary" type="submit" class="auth-primary-button">
         Sign in
       </button>
     </mat-card-actions>
   </mat-card>
 </form>
-  

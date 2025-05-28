@@ -4,8 +4,10 @@
       <div class="title-section">
         <mat-card-title>{{ exercise.title }}</mat-card-title>
         <div class="badges">
-          <div class="difficulty-badge"
-               [style.background-color]="getDifficultyColor(exercise.difficulty)">
+          <div
+            class="difficulty-badge"
+            [style.background-color]="getDifficultyColor(exercise.difficulty)"
+          >
             {{ exercise.difficulty }}
           </div>
           <div class="type-badge">
@@ -15,10 +17,20 @@
         </div>
       </div>
       <div class="action-buttons" *ngIf="isTutor">
-        <button mat-icon-button color="primary" (click)="edit.emit(exercise)" matTooltip="Edit exercise">
+        <button
+          mat-icon-button
+          color="primary"
+          (click)="edit.emit(exercise)"
+          matTooltip="Edit exercise"
+        >
           <mat-icon>edit</mat-icon>
         </button>
-        <button mat-icon-button color="warn" (click)="delete.emit(exercise.id)" matTooltip="Delete exercise">
+        <button
+          mat-icon-button
+          color="warn"
+          (click)="delete.emit(exercise.id)"
+          matTooltip="Delete exercise"
+        >
           <mat-icon>delete</mat-icon>
         </button>
       </div>
@@ -27,16 +39,26 @@
 
   <mat-card-content>
     <p class="exercise-description">{{ exercise.description }}</p>
-    
+
     <div class="exercise-metadata">
       <!-- Show database name for QUERY exercises -->
-      <div class="metadata-item database-info" *ngIf="exercise.type === ExerciseType.QUERY && exercise.database">
+      <div
+        class="metadata-item database-info"
+        *ngIf="exercise.type === ExerciseType.QUERY && exercise.database"
+      >
         <mat-icon>database</mat-icon>
         <span>{{ exercise.database.name }}</span>
       </div>
 
       <!-- Show number of options for Choice exercises -->
-      <div class="metadata-item options-info" *ngIf="(exercise.type === ExerciseType.SINGLE_CHOICE || exercise.type === ExerciseType.MULTIPLE_CHOICE) && exercise.answers">
+      <div
+        class="metadata-item options-info"
+        *ngIf="
+          (exercise.type === ExerciseType.SINGLE_CHOICE ||
+            exercise.type === ExerciseType.MULTIPLE_CHOICE) &&
+          exercise.answers
+        "
+      >
         <mat-icon>list</mat-icon>
         <span>{{ exercise.answers.length }} options</span>
       </div>
@@ -44,7 +66,7 @@
       <!-- Show creation date -->
       <div class="metadata-item date-info">
         <mat-icon>calendar_today</mat-icon>
-        <span>{{ exercise.createdAt | date:'mediumDate' }}</span>
+        <span>{{ exercise.createdAt | date: 'mediumDate' }}</span>
       </div>
     </div>
   </mat-card-content>

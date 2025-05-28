@@ -1,8 +1,19 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Request, ForbiddenException } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Post,
+    Put,
+    Delete,
+    Body,
+    Param,
+    UseGuards,
+    Request,
+    ForbiddenException,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { DatabasesService } from '../services/databases.service';
 import { CreateDatabaseDto } from '../models/create-database.dto';
-import { UpdateDatabaseDto } from '../models/update-database.dto';  
+import { UpdateDatabaseDto } from '../models/update-database.dto';
 import { Role, Database } from '@prisma/client';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth/jwt-auth.guard';
 import { RolesGuard } from 'src/common/guards/role/role.guard';
@@ -36,7 +47,7 @@ export class DatabasesController {
     @ApiResponse({ status: 201, description: 'The database has been created' })
     async createDatabase(
         @Body() createDatabaseDto: CreateDatabaseDto,
-        @Request() req
+        @Request() req,
     ): Promise<Database> {
         return this.databasesService.createDatabase(createDatabaseDto, req.user.id);
     }
@@ -49,7 +60,7 @@ export class DatabasesController {
     async updateDatabase(
         @Param('id') id: number,
         @Body() updateDatabaseDto: UpdateDatabaseDto,
-        @Request() req
+        @Request() req,
     ): Promise<Database> {
         return this.databasesService.updateDatabase(id, updateDatabaseDto, req.user.id);
     }
@@ -62,4 +73,4 @@ export class DatabasesController {
     async deleteDatabase(@Param('id') id: number, @Request() req): Promise<void> {
         return this.databasesService.deleteDatabase(id, req.user.id);
     }
-} 
+}

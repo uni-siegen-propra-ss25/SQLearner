@@ -21,4 +21,4 @@ export class CreateTopicDto {
     @IsInt()
     @IsOptional()
     order?: number;
-} 
+}

@@ -5,9 +5,9 @@ import { PrismaModule } from '../../prisma/prisma.module';
 import { ChaptersModule } from '../chapters/chapters.module';
 
 @Module({
-  imports: [PrismaModule, ChaptersModule],
-  controllers: [TopicsController],
-  providers: [TopicsService],
-  exports: [TopicsService]
+    imports: [PrismaModule, ChaptersModule],
+    controllers: [TopicsController],
+    providers: [TopicsService],
+    exports: [TopicsService],
 })
-export class TopicsModule {} 
+export class TopicsModule {}

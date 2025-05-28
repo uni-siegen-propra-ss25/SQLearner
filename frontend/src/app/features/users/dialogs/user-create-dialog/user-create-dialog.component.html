@@ -5,7 +5,7 @@
     <div class="form-row">
       <mat-form-field appearance="outline">
         <mat-label>Vorname</mat-label>
-        <input matInput formControlName="firstName" required>
+        <input matInput formControlName="firstName" required />
         <mat-error *ngIf="userForm.get('firstName')?.hasError('required')">
           Vorname ist erforderlich
         </mat-error>
@@ -13,7 +13,7 @@
 
       <mat-form-field appearance="outline">
         <mat-label>Nachname</mat-label>
-        <input matInput formControlName="lastName" required>
+        <input matInput formControlName="lastName" required />
         <mat-error *ngIf="userForm.get('lastName')?.hasError('required')">
           Nachname ist erforderlich
         </mat-error>
@@ -22,7 +22,7 @@
 
     <mat-form-field appearance="outline">
       <mat-label>E-Mail</mat-label>
-      <input matInput formControlName="email" required type="email">
+      <input matInput formControlName="email" required type="email" />
       <mat-error *ngIf="userForm.get('email')?.hasError('required')">
         E-Mail ist erforderlich
       </mat-error>
@@ -35,7 +35,7 @@
       <mat-label>Rolle</mat-label>
       <mat-select formControlName="role" required>
         <mat-option *ngFor="let role of data.availableRoles" [value]="role">
-          {{role}}
+          {{ role }}
         </mat-option>
       </mat-select>
       <mat-error *ngIf="userForm.get('role')?.hasError('required')">
@@ -45,12 +45,12 @@
 
     <mat-form-field appearance="outline">
       <mat-label>Matrikelnummer</mat-label>
-      <input matInput formControlName="matriculationNumber">
+      <input matInput formControlName="matriculationNumber" />
     </mat-form-field>
 
     <mat-form-field appearance="outline">
       <mat-label>Passwort</mat-label>
-      <input matInput formControlName="password" type="password" required>
+      <input matInput formControlName="password" type="password" required />
       <mat-error *ngIf="userForm.get('password')?.hasError('required')">
         Passwort ist erforderlich
       </mat-error>

@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, HttpCode, HttpStatus, NotFoundException } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Post,
+    Put,
+    Delete,
+    Body,
+    Param,
+    HttpCode,
+    HttpStatus,
+    NotFoundException,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { TopicsService } from '../services/topics.service';
 import { Topic } from '@prisma/client';
@@ -30,7 +41,7 @@ export class TopicsController {
     @ApiResponse({ status: 404, description: 'Topic not found' })
     async getTopicById(
         @Param('chapterId') chapterId: number,
-        @Param('id') id: number
+        @Param('id') id: number,
     ): Promise<Topic> {
         const topic = await this.topicsService.getTopicById(id);
         if (!topic) {
@@ -47,7 +58,7 @@ export class TopicsController {
     @ApiResponse({ status: 201, description: 'The topic has been created' })
     async createTopic(
         @Param('chapterId') chapterId: number,
-        @Body() createTopicDto: CreateTopicDto
+        @Body() createTopicDto: CreateTopicDto,
     ): Promise<number> {
         createTopicDto.chapterId = chapterId;
         const topicId = await this.topicsService.createTopic(createTopicDto);
@@ -64,12 +75,12 @@ export class TopicsController {
     async updateTopic(
         @Param('chapterId') chapterId: number,
         @Param('id') id: number,
-        @Body() updateTopicDto: UpdateTopicDto
+        @Body() updateTopicDto: UpdateTopicDto,
     ): Promise<Topic> {
         updateTopicDto.chapterId = chapterId;
-        const topic = await this.topicsService.updateTopic( id, updateTopicDto);
+        const topic = await this.topicsService.updateTopic(id, updateTopicDto);
         return topic;
-    }       
+    }
 
     @Delete(':id')
     @Roles(Role.TUTOR, Role.ADMIN)
@@ -81,7 +92,7 @@ export class TopicsController {
     @ApiResponse({ status: 404, description: 'Topic not found' })
     async removeTopic(
         @Param('chapterId') chapterId: number,
-        @Param('id') id: number
+        @Param('id') id: number,
     ): Promise<void> {
         await this.topicsService.removeTopic(id);
         return;
@@ -95,7 +106,7 @@ export class TopicsController {
     @ApiResponse({ status: 204, description: 'Topics have been reordered' })
     async reorderTopics(
         @Param('chapterId') chapterId: number,
-        @Body() reorderTopicsDto: ReorderTopicsDto
+        @Body() reorderTopicsDto: ReorderTopicsDto,
     ): Promise<void> {
         await this.topicsService.reorderTopics(chapterId, reorderTopicsDto);
         return;

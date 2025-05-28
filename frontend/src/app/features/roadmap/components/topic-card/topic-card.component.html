@@ -1,49 +1,56 @@
 <mat-expansion-panel class="topic-panel">
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          <div class="topic-title">{{ topic.title }}</div>
-        </mat-panel-title>
-        <mat-panel-description>
-          <div class="topic-actions" *ngIf="isTutor">
-            <button mat-icon-button 
-                    color="primary" 
-                    (click)="$event.stopPropagation(); edit.emit(topic)"
-                    matTooltip="Edit topic">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button mat-icon-button 
-                    color="warn" 
-                    (click)="$event.stopPropagation(); delete.emit(topic.id)"
-                    matTooltip="Delete topic">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
-        </mat-panel-description>
-      </mat-expansion-panel-header>
-
-      <p class="topic-description">{{ topic.description }}</p>
-
-      <div class="exercises-container">
-        <mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
-        <app-exercise-card
-          *ngFor="let exercise of exercises"
-          [exercise]="exercise"
-          [isTutor]="isTutor"
-          (edit)="onExerciseEdit($event)"
-          (delete)="onExerciseDelete($event)">
-        </app-exercise-card>
-        <div *ngIf="!isLoading && exercises.length === 0" class="empty-exercises">
-          <mat-icon>assignment</mat-icon>
-          <p>No exercises available in this topic.</p>
-        </div>
-        <button *ngIf="isTutor"
-                mat-flat-button 
-                color="primary"
-                class="add-exercise-button"
-                [disabled]="isLoading"
-                (click)="openNewExerciseDialog()">
-          <mat-icon>add</mat-icon>
-          Add Exercise
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      <div class="topic-title">{{ topic.title }}</div>
+    </mat-panel-title>
+    <mat-panel-description>
+      <div class="topic-actions" *ngIf="isTutor">
+        <button
+          mat-icon-button
+          color="primary"
+          (click)="$event.stopPropagation(); edit.emit(topic)"
+          matTooltip="Edit topic"
+        >
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          color="warn"
+          (click)="$event.stopPropagation(); delete.emit(topic.id)"
+          matTooltip="Delete topic"
+        >
+          <mat-icon>delete</mat-icon>
         </button>
       </div>
-    </mat-expansion-panel>
+    </mat-panel-description>
+  </mat-expansion-panel-header>
+
+  <p class="topic-description">{{ topic.description }}</p>
+
+  <div class="exercises-container">
+    <mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
+    <app-exercise-card
+      *ngFor="let exercise of exercises"
+      [exercise]="exercise"
+      [isTutor]="isTutor"
+      (edit)="onExerciseEdit($event)"
+      (delete)="onExerciseDelete($event)"
+    >
+    </app-exercise-card>
+    <div *ngIf="!isLoading && exercises.length === 0" class="empty-exercises">
+      <mat-icon>assignment</mat-icon>
+      <p>No exercises available in this topic.</p>
+    </div>
+    <button
+      *ngIf="isTutor"
+      mat-flat-button
+      color="primary"
+      class="add-exercise-button"
+      [disabled]="isLoading"
+      (click)="openNewExerciseDialog()"
+    >
+      <mat-icon>add</mat-icon>
+      Add Exercise
+    </button>
+  </div>
+</mat-expansion-panel>

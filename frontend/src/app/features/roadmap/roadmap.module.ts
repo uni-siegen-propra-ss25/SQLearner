@@ -13,24 +13,23 @@ import { TopicDialogComponent } from './dialogs/topic-dialog/topic-dialog.compon
 import { ExerciseDialogComponent } from './dialogs/exercise-dialog/exercise-dialog.component';
 import { ExercisesModule } from '../exercises/exercises.module';
 
-
 @NgModule({
-  declarations: [
-    RoadmapViewComponent,
-    ChapterCardComponent,
-    TopicCardComponent,
-    ExerciseCardComponent,
-    ChapterDialogComponent,
-    TopicDialogComponent,
-    ExerciseDialogComponent
-  ],
-  imports: [
-    CommonModule,
-    RoadmapRoutingModule,
-    ReactiveFormsModule,
-    DragDropModule,
-    MaterialModule,
-    ExercisesModule
-  ]
+    declarations: [
+        RoadmapViewComponent,
+        ChapterCardComponent,
+        TopicCardComponent,
+        ExerciseCardComponent,
+        ChapterDialogComponent,
+        TopicDialogComponent,
+        ExerciseDialogComponent,
+    ],
+    imports: [
+        CommonModule,
+        RoadmapRoutingModule,
+        ReactiveFormsModule,
+        DragDropModule,
+        MaterialModule,
+        ExercisesModule,
+    ],
 })
-export class RoadmapModule { }
+export class RoadmapModule {}

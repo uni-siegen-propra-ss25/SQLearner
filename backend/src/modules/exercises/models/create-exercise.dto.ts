@@ -1,5 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsOptional, IsInt, Min, IsEnum, ValidateNested, IsArray, IsBoolean, IsNumber } from 'class-validator';
+import {
+    IsString,
+    IsNotEmpty,
+    IsOptional,
+    IsInt,
+    Min,
+    IsEnum,
+    ValidateNested,
+    IsArray,
+    IsBoolean,
+    IsNumber,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { Difficulty, ExerciseType } from '@prisma/client';
 
@@ -60,10 +71,14 @@ export class CreateExerciseDto {
     @IsOptional()
     querySolution?: string;
 
-    @ApiProperty({ description: 'The answers for choice exercises', required: false, type: [AnswerOptionDto] })
+    @ApiProperty({
+        description: 'The answers for choice exercises',
+        required: false,
+        type: [AnswerOptionDto],
+    })
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => AnswerOptionDto)
     @IsOptional()
     answers?: AnswerOptionDto[];
-} 
+}

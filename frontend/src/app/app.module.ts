@@ -15,39 +15,35 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { RoadmapModule } from './features/roadmap/roadmap.module';
 import { ExercisesModule } from './features/exercises/exercises.module';
 
-
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
-  imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    MaterialModule,
-    SharedModule,
-    AppRoutingModule,
-    ReactiveFormsModule,
-    HttpClientModule,
-    RouterModule,
-    DragDropModule,
-    RoadmapModule,
-    ExercisesModule,
-  ],
-  providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
-    provideAnimationsAsync(),
-  ],
-  bootstrap: [AppComponent]
+    declarations: [AppComponent],
+    imports: [
+        BrowserModule,
+        BrowserAnimationsModule,
+        MaterialModule,
+        SharedModule,
+        AppRoutingModule,
+        ReactiveFormsModule,
+        HttpClientModule,
+        RouterModule,
+        DragDropModule,
+        RoadmapModule,
+        ExercisesModule,
+    ],
+    providers: [
+        { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+        provideAnimationsAsync(),
+    ],
+    bootstrap: [AppComponent],
 })
-export class AppModule { 
-
-  constructor(
-    private iconRegistry: MatIconRegistry,
-    private sanitizer: DomSanitizer,
-  ) {
-    this.iconRegistry.addSvgIcon(
-      'logo_SQLearner',
-      this.sanitizer.bypassSecurityTrustResourceUrl('assets/icons/logo_SQLearner.svg')
-    );
-  }
+export class AppModule {
+    constructor(
+        private iconRegistry: MatIconRegistry,
+        private sanitizer: DomSanitizer,
+    ) {
+        this.iconRegistry.addSvgIcon(
+            'logo_SQLearner',
+            this.sanitizer.bypassSecurityTrustResourceUrl('assets/icons/logo_SQLearner.svg'),
+        );
+    }
 }
