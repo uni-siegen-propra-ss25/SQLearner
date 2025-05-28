@@ -72,33 +72,59 @@ export class ExerciseDialogComponent implements OnInit {
       const querySolutionControl = this.exerciseForm.get('querySolution');
       const answersControl = this.exerciseForm.get('answers') as FormArray;
 
-      // Reset validations
+      // Reset all controls and their validators
       databaseIdControl?.clearValidators();
+      databaseIdControl?.setValue(null);
       querySolutionControl?.clearValidators();
-      answersControl?.controls.forEach(control => control.clearValidators());
+      querySolutionControl?.setValue(null);
+      
+      // Clear answers array for non-choice exercises
+      if (type !== ExerciseType.SINGLE_CHOICE && type !== ExerciseType.MULTIPLE_CHOICE) {
+        while (answersControl.length) {
+          answersControl.removeAt(0);
+        }
+      }
 
+      // Set up validators based on type
       if (type === ExerciseType.QUERY) {
         databaseIdControl?.setValidators([Validators.required]);
         querySolutionControl?.setValidators([Validators.required]);
+        
+        // Initialize answers array for choice types
+        if (answersControl.length === 0) {
+          this.addAnswer();
+          this.addAnswer();
+        }
       } else if (type === ExerciseType.SINGLE_CHOICE || type === ExerciseType.MULTIPLE_CHOICE) {
-        answersControl?.controls.forEach(control => {
+        // Ensure we have at least two answers for choice exercises
+        if (answersControl.length === 0) {
+          this.addAnswer();
+          this.addAnswer();
+        }
+        
+        answersControl.controls.forEach(control => {
           control.get('text')?.setValidators([Validators.required]);
         });
 
         // For single choice, ensure exactly one answer is correct
         if (type === ExerciseType.SINGLE_CHOICE) {
-          const correctAnswers = answersControl?.controls.filter(c => c.get('isCorrect')?.value);
+          const correctAnswers = answersControl.controls.filter(c => c.get('isCorrect')?.value);
           if (correctAnswers.length > 1) {
             // Keep only the first correct answer
             correctAnswers.slice(1).forEach(c => c.get('isCorrect')?.setValue(false));
           }
         }
       }
+      // No additional validation for FREETEXT type
 
       // Update validation status
       databaseIdControl?.updateValueAndValidity();
       querySolutionControl?.updateValueAndValidity();
-      answersControl?.controls.forEach(control => control.updateValueAndValidity());
+      if (answersControl.length > 0) {
+        answersControl.controls.forEach(control => {
+          control.get('text')?.updateValueAndValidity();
+        });
+      }
     });
   }
 

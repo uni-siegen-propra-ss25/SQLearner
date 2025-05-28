@@ -6,23 +6,29 @@
     <div class="options-container">
       <!-- Single Choice -->
       <mat-radio-group *ngIf="exercise.type === ExerciseType.SINGLE_CHOICE" 
-          [(ngModel)]="selectedOptions" 
-          (ngModelChange)="selectedOptions = [$event]"
+          [(ngModel)]="selectedOptions[0]" 
           required 
           aria-label="Select an answer option">
-        <mat-radio-button *ngFor="let option of exercise.answers" [value]="option.id" class="option">
-          {{ option.text }}
-        </mat-radio-button>
+        <div *ngFor="let option of exercise.answers" 
+             class="option" 
+             (click)="option.id && (selectedOptions[0] = option.id)">
+          <mat-radio-button [value]="option.id">
+            {{ option.text }}
+          </mat-radio-button>
+        </div>
       </mat-radio-group>
 
       <!-- Multiple Choice -->
       <div *ngIf="exercise.type === ExerciseType.MULTIPLE_CHOICE" class="multiple-choice">
-        <mat-checkbox *ngFor="let option of exercise.answers" 
-            [checked]="selectedOptions.includes(option.id!)" 
-            (change)="toggleOption(option.id!)"
-            class="option">
-          {{ option.text }}
-        </mat-checkbox>
+        <div *ngFor="let option of exercise.answers" 
+             class="option"
+             (click)="option.id && toggleOption(option.id)">
+          <mat-checkbox 
+              [checked]="selectedOptions.includes(option.id!)" 
+              (change)="toggleOption(option.id!)">
+            {{ option.text }}
+          </mat-checkbox>
+        </div>
       </div>
     </div>
 
