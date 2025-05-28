@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DashboardComponent } from 'app/features/users/tutor/dashboard/dashboard.component.';
-import { AufgabeComponent } from './tutor/aufgaben/aufgaben.component';
+import { AufgabeComponent } from '../welcome/aufgaben/aufgaben.component';
 import { FortschrittComponent } from './tutor/fortschritt/fortschritt.component';
-import { FragenComponent } from './tutor/fragen/fragen.component';
-import { ProfilComponent } from './tutor/profil/profil.component';
-import { KursmitgliederComponent } from './tutor/profil/kursmitglieder/kursmitglieder.component';
+import { FragenComponent } from '../welcome/fragen/fragen.component';
+import { ProfilComponent } from '../profil/profil.component';
+import { KursmitgliederComponent } from '../profil/kursmitglieder/kursmitglieder.component';
 
 const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },

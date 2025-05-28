@@ -54,14 +54,16 @@ export class AuthService {
       username: `${user.firstName} ${user.lastName}`,
       role: user.role,
     };
+    const expiresIn = this.configService.get<string>('JWT_EXPIRES_IN')?.trim() || '1h';
 
     const accessToken = this.jwtService.sign(
-      payload,
+       payload,
       {
         secret: this.configService.get<string>('JWT_SECRET'),
-        expiresIn: this.configService.get<string>('JWT_EXPIRES_IN'),
+        expiresIn: expiresIn, 
       }
     );
+
 
     return {
       accessToken,
