@@ -10,6 +10,18 @@ export class WelcomeComponent {
   newHinweis: string = '';
   hinweise: string[] = [];
 
+  fragen = [
+    { name: 'Max M.', datum: '12.05', text: 'Könnte man ein Beispiel zu Aggregatfunktionen machen?' },
+    { name: 'Lisa S.', datum: '11.05', text: 'Ist der NATURAL JOIN prüfungsrelevant?' },
+    { name: 'Jonas T.', datum: '10.05', text: 'Wie genau funktioniert Relationale Division?' }
+  ];
+
+    aufgaben = [
+    { typ: 'SQL', kategorie: 'SQL-Query', titel: 'Bibliothek' },
+    { typ: 'XML', kategorie: 'XML-Dokument', titel: 'Katalog' },
+    { typ: 'RD', kategorie: 'Relationale Algebra', titel: 'Studentenliste' }
+  ];
+
   constructor(private router: Router, private route: ActivatedRoute) {}
 
   goToAufgaben() {
@@ -31,5 +43,6 @@ export class WelcomeComponent {
     this.hinweise.splice(index, 1);
   }
 }
+
 
 

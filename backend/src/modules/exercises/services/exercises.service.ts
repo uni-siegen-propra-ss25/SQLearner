@@ -54,21 +54,28 @@ export class ExercisesService {
     const { answers, ...exerciseData } = createExerciseDto;
 
     // Validate answers    // Validate that QUERY exercises have a solution and database
-    if (exerciseData.type === ExerciseType.QUERY) {
-      if (!exerciseData.querySolution) {
-        throw new Error('SQL exercises must have a solution query');
-      }
-      if (!exerciseData.databaseId) {
-        throw new Error('SQL exercises must be associated with a database');
-      }
-    }
-    
-    // Validate choice exercises
-    if (exerciseData.type === ExerciseType.SINGLE_CHOICE || exerciseData.type === ExerciseType.MULTIPLE_CHOICE) {
-      if (!answers || answers.length === 0) {
-        throw new Error('Choice exercises must have answer options');
-      }
-      this.validateAnswers(exerciseData.type, answers);
+    // Validate based on exercise type
+    switch (exerciseData.type) {
+      case ExerciseType.QUERY:
+        if (!exerciseData.querySolution) {
+          throw new Error('SQL exercises must have a solution query');
+        }
+        if (!exerciseData.databaseId) {
+          throw new Error('SQL exercises must be associated with a database');
+        }
+        break;
+      
+      case ExerciseType.SINGLE_CHOICE:
+      case ExerciseType.MULTIPLE_CHOICE:
+        if (!answers || answers.length === 0) {
+          throw new Error('Choice exercises must have answer options');
+        }
+        this.validateAnswers(exerciseData.type, answers);
+        break;
+      
+      case ExerciseType.FREETEXT:
+        // No validation needed for freetext exercises
+        break;
     }
 
     const exercise = await this.prisma.exercise.create({

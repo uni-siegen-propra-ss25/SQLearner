@@ -1,0 +1,43 @@
+// Action Buttons Global Styles
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+
+  .mat-mdc-icon-button {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+
+    &[color="primary"] {
+      background-color: rgba(25, 118, 210, 0.12);
+      color: #1976d2;
+      
+      &:hover {
+        background-color: rgba(25, 118, 210, 0.18);
+      }
+    }
+
+    &[color="warn"] {
+      background-color: rgba(220, 53, 69, 0.12);
+      color: #dc3545;
+      
+      &:hover {
+        background-color: rgba(220, 53, 69, 0.18);
+      }
+    }
+
+    mat-icon {
+      width: 24px;
+      height: 24px;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}

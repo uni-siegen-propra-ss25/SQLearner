@@ -24,14 +24,13 @@ export class AppComponent implements OnInit, OnDestroy {
   ];
 
   private readonly tutorItems: NavigationItem[] = [
-    { icon: 'groups', label: 'Studenten', route: '/students', requiredRoles: [Role.TUTOR] }, 
+    { icon: 'groups', label: 'Nutzerverwaltung', route: '/users', requiredRoles: [Role.TUTOR] },
     { icon: 'timeline', label: 'Roadmap', route: '/roadmap', requiredRoles: [Role.TUTOR] },
-    { icon: 'database', label: 'Datenbanken', route: '/databases', requiredRoles: [Role.TUTOR] }, 
-    // { icon: 'assignment_turned_in', label: 'Bewertungen', route: '/grading', requiredRoles: [Role.TUTOR] } Should be a subset of /students 
+    { icon: 'database', label: 'Datenbanken', route: '/databases', requiredRoles: [Role.TUTOR] }
   ];
 
   private readonly adminItems: NavigationItem[] = [
-    { icon: 'admin_panel_settings', label: 'Administration', route: '/admin', requiredRoles: [Role.ADMIN] },
+    { icon: 'manage_accounts', label: 'Nutzerverwaltung', route: '/users', requiredRoles: [Role.ADMIN] },
     { icon: 'settings', label: 'Einstellungen', route: '/settings', requiredRoles: [Role.ADMIN] }
   ];
 
