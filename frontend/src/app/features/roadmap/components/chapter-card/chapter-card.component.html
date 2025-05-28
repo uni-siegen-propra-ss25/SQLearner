@@ -1,26 +1,34 @@
-<mat-expansion-panel class="chapter-panel" [expanded]="isExpanded" (opened)="onExpand()" (closed)="isExpanded = false">
+<mat-expansion-panel
+  class="chapter-panel"
+  [expanded]="isExpanded"
+  (opened)="onExpand()"
+  (closed)="isExpanded = false"
+>
   <mat-expansion-panel-header>
     <mat-panel-title>
       <div class="chapter-title">{{ chapter.title }}</div>
-      
     </mat-panel-title>
-      <mat-panel-description>
+    <mat-panel-description>
       <div class="chapter-actions" *ngIf="isTutor">
-        <button mat-icon-button 
-        color="primary" 
-        (click)="$event.stopPropagation(); edit.emit(chapter)"
-        matTooltip="Edit chapter">
-        <mat-icon>edit</mat-icon>
-      </button>
-      <button mat-icon-button 
-      color="warn" 
-      (click)="$event.stopPropagation(); delete.emit(chapter.id)"
-      matTooltip="Delete chapter">
-      <mat-icon>delete</mat-icon>
-    </button>
-  </div>
-  </mat-panel-description>
-</mat-expansion-panel-header>
+        <button
+          mat-icon-button
+          color="primary"
+          (click)="$event.stopPropagation(); edit.emit(chapter)"
+          matTooltip="Edit chapter"
+        >
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          color="warn"
+          (click)="$event.stopPropagation(); delete.emit(chapter.id)"
+          matTooltip="Delete chapter"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </mat-panel-description>
+  </mat-expansion-panel-header>
 
   <div class="chapter-description">{{ chapter.description }}</div>
 
@@ -30,7 +38,8 @@
       [topic]="topic"
       [isTutor]="isTutor"
       (edit)="onTopicEdit($event)"
-      (delete)="onTopicDelete($event)">
+      (delete)="onTopicDelete($event)"
+    >
     </app-topic-card>
 
     <div *ngIf="topics.length === 0" class="empty-topics">
@@ -38,11 +47,13 @@
       <p>No topics available in this chapter.</p>
     </div>
 
-    <button *ngIf="isTutor" 
-            mat-flat-button 
-            color="primary" 
-            class="add-topic-button"
-            (click)="openNewTopicDialog()">
+    <button
+      *ngIf="isTutor"
+      mat-flat-button
+      color="primary"
+      class="add-topic-button"
+      (click)="openNewTopicDialog()"
+    >
       <mat-icon>add</mat-icon>
       Add Topic
     </button>

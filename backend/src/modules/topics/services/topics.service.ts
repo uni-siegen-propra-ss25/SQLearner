@@ -10,7 +10,7 @@ import { Topic } from '@prisma/client';
 export class TopicsService {
     constructor(
         private prisma: PrismaService,
-        private readonly chaptersService: ChaptersService
+        private readonly chaptersService: ChaptersService,
     ) {}
 
     async getTopics(chapterId: number): Promise<Topic[]> {
@@ -23,11 +23,11 @@ export class TopicsService {
                 exercises: {
                     include: {
                         database: true,
-                        answers: true
-                    }
-                }
+                        answers: true,
+                    },
+                },
             },
-            orderBy: { order: 'asc' }
+            orderBy: { order: 'asc' },
         });
     }
 
@@ -38,10 +38,10 @@ export class TopicsService {
                 exercises: {
                     include: {
                         database: true,
-                        answers: true
-                    }
-                }
-            }
+                        answers: true,
+                    },
+                },
+            },
         });
 
         if (!topic) {
@@ -52,20 +52,20 @@ export class TopicsService {
     }
 
     async createTopic(createTopicDto: CreateTopicDto): Promise<number> {
-        // Verify chapter exists    
+        // Verify chapter exists
         await this.chaptersService.getChapterById(createTopicDto.chapterId);
 
         if (!createTopicDto.order) {
             const lastTopic = await this.prisma.topic.findFirst({
                 where: { chapterId: createTopicDto.chapterId },
                 orderBy: { order: 'desc' },
-                take: 1
+                take: 1,
             });
             createTopicDto.order = lastTopic ? lastTopic.order + 1 : 0;
         }
 
         const topic = await this.prisma.topic.create({
-            data: createTopicDto
+            data: createTopicDto,
         });
         return topic.id;
     }
@@ -80,17 +80,17 @@ export class TopicsService {
                 exercises: {
                     include: {
                         database: true,
-                        answers: true
-                    }
-                }
-            }
+                        answers: true,
+                    },
+                },
+            },
         });
     }
 
     async removeTopic(id: number): Promise<void> {
         const topic = await this.getTopicById(Number(id));
         await this.prisma.topic.delete({
-            where: { id: Number(id) }
+            where: { id: Number(id) },
         });
     }
 
@@ -99,25 +99,25 @@ export class TopicsService {
 
         const currentTopics = await this.prisma.topic.findMany({
             where: { chapterId: Number(chapterId) },
-            select: { id: true }
+            select: { id: true },
         });
 
-        const currentIds = new Set(currentTopics.map(t => t.id));
-        
-        if (!reorderedTopics.every(t => currentIds.has(Number(t.id)))) {
+        const currentIds = new Set(currentTopics.map((t) => t.id));
+
+        if (!reorderedTopics.every((t) => currentIds.has(Number(t.id)))) {
             throw new NotFoundException('One or more topics not found in this chapter');
         }
 
         await this.prisma.$transaction(async (tx) => {
             await tx.topic.updateMany({
                 where: { chapterId: Number(chapterId) },
-                data: { order: -1 }
+                data: { order: -1 },
             });
 
             for (const topic of reorderedTopics) {
                 await tx.topic.update({
                     where: { id: Number(topic.id) },
-                    data: { order: Number(topic.order) }
+                    data: { order: Number(topic.order) },
                 });
             }
         });

@@ -6,11 +6,11 @@ import { ExerciseService } from '../services/exercise.service';
 
 @Injectable({ providedIn: 'root' })
 export class ExerciseResolver implements Resolve<Exercise> {
-  constructor(private exerciseService: ExerciseService) {}
+    constructor(private exerciseService: ExerciseService) {}
 
-  resolve(route: ActivatedRouteSnapshot): Observable<Exercise> {
-    const topicId = Number(route.paramMap.get('topicId'));
-    const exerciseId = Number(route.paramMap.get('exerciseId'));
-    return this.exerciseService.getExercise(topicId, exerciseId);
-  }
+    resolve(route: ActivatedRouteSnapshot): Observable<Exercise> {
+        const topicId = Number(route.paramMap.get('topicId'));
+        const exerciseId = Number(route.paramMap.get('exerciseId'));
+        return this.exerciseService.getExercise(topicId, exerciseId);
+    }
 }

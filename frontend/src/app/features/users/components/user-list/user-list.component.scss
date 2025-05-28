@@ -108,7 +108,7 @@ $color-bg-hover: #f8f9fa;
 // Action Buttons
 .actions-cell {
   width: 100px;
-  
+
   .action-buttons {
     display: flex;
     gap: 8px;
@@ -122,19 +122,19 @@ $color-bg-hover: #f8f9fa;
       justify-content: center;
       transition: background-color 0.2s;
 
-      &[color="primary"] {
+      &[color='primary'] {
         background-color: rgba($color-primary, 0.12);
         color: $color-primary;
-        
+
         &:hover {
           background-color: rgba($color-primary, 0.18);
         }
       }
 
-      &[color="warn"] {
+      &[color='warn'] {
         background-color: rgba($color-warn, 0.12);
         color: $color-warn;
-        
+
         &:hover {
           background-color: rgba($color-warn, 0.18);
         }

@@ -3,7 +3,7 @@
   <mat-dialog-content>
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Title</mat-label>
-      <input matInput formControlName="title" placeholder="Enter exercise title">
+      <input matInput formControlName="title" placeholder="Enter exercise title" />
       <mat-error *ngIf="exerciseForm.get('title')?.hasError('required')">
         Title is required
       </mat-error>
@@ -11,10 +11,12 @@
 
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Description</mat-label>
-      <textarea matInput 
-                formControlName="description" 
-                placeholder="Enter exercise description"
-                rows="4">
+      <textarea
+        matInput
+        formControlName="description"
+        placeholder="Enter exercise description"
+        rows="4"
+      >
       </textarea>
       <mat-error *ngIf="exerciseForm.get('description')?.hasError('required')">
         Description is required
@@ -63,10 +65,12 @@
 
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Solution Query</mat-label>
-        <textarea matInput 
-                  formControlName="querySolution"
-                  placeholder="Enter the solution SQL query"
-                  rows="4">
+        <textarea
+          matInput
+          formControlName="querySolution"
+          placeholder="Enter the solution SQL query"
+          rows="4"
+        >
         </textarea>
         <mat-error *ngIf="exerciseForm.get('querySolution')?.hasError('required')">
           Solution query is required
@@ -75,34 +79,50 @@
     </ng-container>
 
     <!-- Choice specific fields -->
-    <ng-container *ngIf="exerciseForm.get('type')?.value === 'SINGLE_CHOICE' || exerciseForm.get('type')?.value === 'MULTIPLE_CHOICE'">
+    <ng-container
+      *ngIf="
+        exerciseForm.get('type')?.value === 'SINGLE_CHOICE' ||
+        exerciseForm.get('type')?.value === 'MULTIPLE_CHOICE'
+      "
+    >
       <div formArrayName="answers" class="answers-container">
         <h3>Answer Options</h3>
-        <div *ngFor="let answer of answers.controls; let i=index" [formGroupName]="i" class="answer-row">
+        <div
+          *ngFor="let answer of answers.controls; let i = index"
+          [formGroupName]="i"
+          class="answer-row"
+        >
           <mat-form-field appearance="outline" class="answer-text">
             <mat-label>Answer {{ i + 1 }}</mat-label>
-            <input matInput formControlName="text" [placeholder]="'Enter answer option ' + (i + 1)">
+            <input
+              matInput
+              formControlName="text"
+              [placeholder]="'Enter answer option ' + (i + 1)"
+            />
           </mat-form-field>
-          
-          <mat-checkbox formControlName="isCorrect" 
-                      [disabled]="isCorrectDisabled(i)">
+
+          <mat-checkbox formControlName="isCorrect" [disabled]="isCorrectDisabled(i)">
             Correct
           </mat-checkbox>
 
-          <button type="button" 
-                  mat-icon-button 
-                  color="warn" 
-                  (click)="removeAnswer(i)"
-                  [disabled]="answers.length <= 2">
+          <button
+            type="button"
+            mat-icon-button
+            color="warn"
+            (click)="removeAnswer(i)"
+            [disabled]="answers.length <= 2"
+          >
             <mat-icon>delete</mat-icon>
           </button>
         </div>
 
-        <button type="button" 
-                mat-button 
-                color="primary" 
-                (click)="addAnswer()"
-                class="add-answer-button">
+        <button
+          type="button"
+          mat-button
+          color="primary"
+          (click)="addAnswer()"
+          class="add-answer-button"
+        >
           <mat-icon>add</mat-icon>
           Add Answer Option
         </button>
@@ -112,11 +132,8 @@
 
   <mat-dialog-actions align="end">
     <button mat-button (click)="onCancel()">Cancel</button>
-    <button mat-flat-button 
-            color="primary" 
-            type="submit"
-            [disabled]="!exerciseForm.valid">
+    <button mat-flat-button color="primary" type="submit" [disabled]="!exerciseForm.valid">
       {{ isEditing ? 'Save' : 'Create' }}
     </button>
   </mat-dialog-actions>
-</form> 
+</form>

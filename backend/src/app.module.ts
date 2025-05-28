@@ -10,14 +10,14 @@ import { DatabasesModule } from './modules/databases/databases.module';
 @Module({
     imports: [
         ConfigModule.forRoot({
-            isGlobal: true
+            isGlobal: true,
         }),
         AuthModule,
         UsersModule,
         DatabasesModule,
         ChaptersModule,
         TopicsModule,
-        ExercisesModule
-    ]
+        ExercisesModule,
+    ],
 })
 export class AppModule {}

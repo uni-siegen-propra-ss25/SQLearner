@@ -9,20 +9,13 @@ import { UserListComponent } from './components/user-list/user-list.component';
 import { ProfileComponent } from './components/profile/profile.component';
 
 @NgModule({
-  declarations: [
-    UserCreateDialogComponent,
-    UserUpdateDialogComponent,
-    UserListComponent,
-    ProfileComponent
-  ],
-  imports: [
-    CommonModule,
-    UsersRoutingModule,
-    MaterialModule,
-    ReactiveFormsModule
-  ],
-  exports: [
-    ProfileComponent
-  ]
+    declarations: [
+        UserCreateDialogComponent,
+        UserUpdateDialogComponent,
+        UserListComponent,
+        ProfileComponent,
+    ],
+    imports: [CommonModule, UsersRoutingModule, MaterialModule, ReactiveFormsModule],
+    exports: [ProfileComponent],
 })
 export class UsersModule {}

@@ -17,4 +17,4 @@ export class CreateChapterDto {
     @Min(0)
     @IsOptional()
     order?: number;
-} 
+}

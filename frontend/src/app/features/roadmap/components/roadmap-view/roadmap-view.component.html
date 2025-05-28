@@ -9,17 +9,15 @@
       [chapter]="chapter"
       [isTutor]="isTutor"
       (edit)="onChapterEdit($event)"
-      (delete)="onChapterDelete($event)">
+      (delete)="onChapterDelete($event)"
+    >
     </app-chapter-card>
   </div>
 
   <div *ngIf="chapters.length === 0" class="empty-state">
     <mat-icon>school</mat-icon>
     <p>No chapters available yet.</p>
-    <button *ngIf="isTutor" 
-            mat-raised-button 
-            color="primary" 
-            (click)="openNewChapterDialog()">
+    <button *ngIf="isTutor" mat-raised-button color="primary" (click)="openNewChapterDialog()">
       <mat-icon class="add-icon">add</mat-icon>
       Create First Chapter
     </button>
@@ -27,12 +25,9 @@
 
   <!-- Add Chapter Button for existing chapters -->
   <div *ngIf="chapters.length > 0 && isTutor" class="add-chapter-container">
-    <button mat-raised-button 
-            color="primary" 
-            (click)="openNewChapterDialog()">
+    <button mat-raised-button color="primary" (click)="openNewChapterDialog()">
       <mat-icon class="add-icon">add</mat-icon>
       Add New Chapter
     </button>
   </div>
-
 </div>

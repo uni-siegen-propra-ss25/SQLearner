@@ -5,29 +5,37 @@ import { Role } from './features/users/models/role.model';
 import { RoleGuard } from './core/guards/role.guard';
 
 const routes: Routes = [
-  { path: '', redirectTo: 'welcome', pathMatch: 'full' },
-  { path: 'welcome', loadChildren: () => import('./features/welcome/welcome.module').then(m => m.WelcomeModule) },
-  { path: 'auth', loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule) },
-  {
-    path: 'roadmap',
-    loadChildren: () => import('./features/roadmap/roadmap.module').then(m => m.RoadmapModule),
-    canActivate: [RoleGuard],
-    data: {
-      allowedRoles: [Role.STUDENT, Role.TUTOR, Role.ADMIN]
-    }
-  },
-  {
-    path: 'users',
-    loadChildren: () => import('./features/users/users.module').then(m => m.UsersModule),
-    canActivate: [RoleGuard],
-    data: {
-      allowedRoles: [Role.TUTOR, Role.ADMIN]
-    }
-  }
+    { path: '', redirectTo: 'welcome', pathMatch: 'full' },
+    {
+        path: 'welcome',
+        loadChildren: () =>
+            import('./features/welcome/welcome.module').then((m) => m.WelcomeModule),
+    },
+    {
+        path: 'auth',
+        loadChildren: () => import('./features/auth/auth.module').then((m) => m.AuthModule),
+    },
+    {
+        path: 'roadmap',
+        loadChildren: () =>
+            import('./features/roadmap/roadmap.module').then((m) => m.RoadmapModule),
+        canActivate: [RoleGuard],
+        data: {
+            allowedRoles: [Role.STUDENT, Role.TUTOR, Role.ADMIN],
+        },
+    },
+    {
+        path: 'users',
+        loadChildren: () => import('./features/users/users.module').then((m) => m.UsersModule),
+        canActivate: [RoleGuard],
+        data: {
+            allowedRoles: [Role.TUTOR, Role.ADMIN],
+        },
+    },
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+    imports: [RouterModule.forRoot(routes)],
+    exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

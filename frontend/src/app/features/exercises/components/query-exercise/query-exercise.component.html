@@ -4,10 +4,10 @@
     <div class="editor-section">
       <mat-form-field appearance="fill" class="sql-editor">
         <mat-label>SQL Query</mat-label>
-        <textarea 
-          matInput 
+        <textarea
+          matInput
           [(ngModel)]="sqlQuery"
-          rows="6" 
+          rows="6"
           placeholder="SELECT * FROM..."
         ></textarea>
         <mat-icon matSuffix>code</mat-icon>
@@ -20,17 +20,13 @@
         <mat-icon>chat</mat-icon>
         {{ showFeedback ? 'Hide Feedback' : 'Show Feedback' }}
       </button>
-      <button 
-        mat-stroked-button
-        [disabled]="!sqlQuery.trim() || isLoading" 
-        (click)="runQuery()"
-      >
+      <button mat-stroked-button [disabled]="!sqlQuery.trim() || isLoading" (click)="runQuery()">
         <mat-icon>play_arrow</mat-icon>
         Run Query
       </button>
-      <button 
-        mat-flat-button 
-        color="primary" 
+      <button
+        mat-flat-button
+        color="primary"
         [disabled]="!sqlQuery.trim() || isLoading"
         (click)="submitQuery()"
       >
@@ -42,21 +38,21 @@
     <!-- Results -->
     <div class="results-section" *ngIf="queryResult || isLoading">
       <h3>Results</h3>
-      <mat-progress-bar 
-        *ngIf="isLoading" 
-        mode="indeterminate"
-      ></mat-progress-bar>
+      <mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
 
       <div class="results-table" *ngIf="!isLoading && queryResult">
         <div class="table-container mat-elevation-z1">
           <table mat-table [dataSource]="queryResult.rows">
-            <ng-container [matColumnDef]="col" *ngFor="let col of queryResult.columns; let i = index">
+            <ng-container
+              [matColumnDef]="col"
+              *ngFor="let col of queryResult.columns; let i = index"
+            >
               <th mat-header-cell *matHeaderCellDef>{{ col }}</th>
               <td mat-cell *matCellDef="let row">{{ row[i] }}</td>
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="queryResult.columns"></tr>
-            <tr mat-row *matRowDef="let row; columns: queryResult.columns;"></tr>
+            <tr mat-row *matRowDef="let row; columns: queryResult.columns"></tr>
           </table>
         </div>
       </div>
@@ -74,4 +70,3 @@
     </mat-expansion-panel>
   </mat-card-content>
 </div>
-

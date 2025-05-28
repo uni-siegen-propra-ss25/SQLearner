@@ -1,4 +1,4 @@
-import { Role } from "../../../features/users/models/role.model";
+import { Role } from '../../../features/users/models/role.model';
 
 // A model for the register credentials of a user
 export interface RegisterCredentials {

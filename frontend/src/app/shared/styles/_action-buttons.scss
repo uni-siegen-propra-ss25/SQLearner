@@ -13,19 +13,19 @@
     justify-content: center;
     transition: background-color 0.2s;
 
-    &[color="primary"] {
+    &[color='primary'] {
       background-color: rgba(25, 118, 210, 0.12);
       color: #1976d2;
-      
+
       &:hover {
         background-color: rgba(25, 118, 210, 0.18);
       }
     }
 
-    &[color="warn"] {
+    &[color='warn'] {
       background-color: rgba(220, 53, 69, 0.12);
       color: #dc3545;
-      
+
       &:hover {
         background-color: rgba(220, 53, 69, 0.18);
       }

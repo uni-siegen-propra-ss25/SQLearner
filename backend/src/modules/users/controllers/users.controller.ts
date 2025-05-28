@@ -1,4 +1,13 @@
-import { Controller, Get, UseGuards, Patch, Param, Body, Delete, ParseIntPipe } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    UseGuards,
+    Patch,
+    Param,
+    Body,
+    Delete,
+    ParseIntPipe,
+} from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { UsersService } from '../services/users.service';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth/jwt-auth.guard';
@@ -15,8 +24,7 @@ import { User } from '@prisma/client';
 @ApiBearerAuth()
 @Controller('users')
 export class UsersController {
-
-    constructor(private readonly usersService: UsersService) { }
+    constructor(private readonly usersService: UsersService) {}
 
     /**
      * Retrieves all users from the database.
@@ -50,7 +58,7 @@ export class UsersController {
     @ApiResponse({ status: 200, description: 'User updated successfully' })
     async updateUser(
         @Param('id', ParseIntPipe) id: number,
-        @Body() updateData: Partial<User>
+        @Body() updateData: Partial<User>,
     ): Promise<User> {
         return this.usersService.updateUser(id, updateData);
     }
@@ -64,7 +72,7 @@ export class UsersController {
     @ApiResponse({ status: 200, description: 'User role updated successfully' })
     async updateUserRole(
         @Param('id', ParseIntPipe) id: number,
-        @Body('role') role: string
+        @Body('role') role: string,
     ): Promise<User> {
         return this.usersService.updateUserRole(id, role);
     }
@@ -78,7 +86,7 @@ export class UsersController {
     @ApiResponse({ status: 200, description: 'User password updated successfully' })
     async updateUserPassword(
         @Param('id', ParseIntPipe) id: number,
-        @Body('password') password: string
+        @Body('password') password: string,
     ): Promise<User> {
         return this.usersService.updateUserPassword(id, password);
     }

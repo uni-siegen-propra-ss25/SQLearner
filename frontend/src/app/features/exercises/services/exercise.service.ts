@@ -6,11 +6,11 @@ import { environment } from '../../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ExerciseService {
-  private readonly baseUrl = environment.apiUrl;
+    private readonly baseUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+    constructor(private http: HttpClient) {}
 
-  getExercise(topicId: number, exerciseId: number): Observable<Exercise> {
-    return this.http.get<Exercise>(`${this.baseUrl}/topics/${topicId}/exercises/${exerciseId}`);
-  }
+    getExercise(topicId: number, exerciseId: number): Observable<Exercise> {
+        return this.http.get<Exercise>(`${this.baseUrl}/topics/${topicId}/exercises/${exerciseId}`);
+    }
 }

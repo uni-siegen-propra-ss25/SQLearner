@@ -2,22 +2,22 @@
   <mat-card-content>
     <h2 class="exercise-title">{{ exercise.title }}</h2>
     <p class="exercise-description">{{ exercise.description }}</p>
-    
+
     <mat-form-field appearance="fill" class="answer-field">
       <mat-label>Your Answer</mat-label>
-      <textarea 
-        matInput 
+      <textarea
+        matInput
         [(ngModel)]="answer"
-        rows="8" 
+        rows="8"
         placeholder="Type your answer here..."
       ></textarea>
       <mat-hint>Write your answer in the text area above</mat-hint>
     </mat-form-field>
 
     <div class="actions">
-      <button 
-        mat-flat-button 
-        color="primary" 
+      <button
+        mat-flat-button
+        color="primary"
         [disabled]="!answer.trim() || isSubmitting"
         (click)="submitAnswer()"
       >

@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, HttpCode, HttpStatus, NotFoundException } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Post,
+    Put,
+    Delete,
+    Body,
+    Param,
+    HttpCode,
+    HttpStatus,
+    NotFoundException,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { ExercisesService } from '../services/exercises.service';
 import { Exercise } from '@prisma/client';
@@ -7,7 +18,6 @@ import { UpdateExerciseDto } from '../models/update-exercise.dto';
 import { ReorderExercisesDto } from '../models/reorder-exercises.dto';
 import { Role } from '@prisma/client';
 import { Roles } from 'src/common/decorators/role.decorator';
-
 
 @ApiTags('Exercises')
 @Controller('topics/:topicId/exercises')
@@ -29,9 +39,7 @@ export class ExercisesController {
     @ApiParam({ name: 'id', description: 'Exercise ID' })
     @ApiResponse({ status: 200, description: 'The found exercise' })
     @ApiResponse({ status: 404, description: 'Exercise not found' })
-    async getExerciseById(
-        @Param('id') id: number
-    ): Promise<Exercise> {
+    async getExerciseById(@Param('id') id: number): Promise<Exercise> {
         const exercise = await this.exercisesService.getExerciseById(id);
         if (!exercise) {
             throw new NotFoundException('Exercise not found');
@@ -47,7 +55,7 @@ export class ExercisesController {
     @ApiResponse({ status: 201, description: 'The exercise has been created' })
     async createExercise(
         @Param('topicId') topicId: number,
-        @Body() createExerciseDto: CreateExerciseDto
+        @Body() createExerciseDto: CreateExerciseDto,
     ): Promise<number> {
         createExerciseDto.topicId = topicId;
         const exerciseId = await this.exercisesService.createExercise(createExerciseDto);
@@ -62,7 +70,7 @@ export class ExercisesController {
     @ApiResponse({ status: 404, description: 'Exercise not found' })
     async updateExercise(
         @Param('id') id: number,
-        @Body() updateExerciseDto: UpdateExerciseDto
+        @Body() updateExerciseDto: UpdateExerciseDto,
     ): Promise<Exercise> {
         const exercise = await this.exercisesService.updateExercise(id, updateExerciseDto);
         return exercise;
@@ -75,9 +83,7 @@ export class ExercisesController {
     @ApiParam({ name: 'id', description: 'Exercise ID' })
     @ApiResponse({ status: 204, description: 'The exercise has been deleted' })
     @ApiResponse({ status: 404, description: 'Exercise not found' })
-    async removeExercise(
-        @Param('id') id: number
-    ): Promise<void> {
+    async removeExercise(@Param('id') id: number): Promise<void> {
         await this.exercisesService.removeExercise(id);
         return;
     }
@@ -89,7 +95,7 @@ export class ExercisesController {
     @ApiResponse({ status: 204, description: 'Exercises have been reordered' })
     async reorderExercises(
         @Param('topicId') topicId: number,
-        @Body() reorderExercisesDto: ReorderExercisesDto
+        @Body() reorderExercisesDto: ReorderExercisesDto,
     ): Promise<void> {
         await this.exercisesService.reorderExercises(topicId, reorderExercisesDto);
         return;

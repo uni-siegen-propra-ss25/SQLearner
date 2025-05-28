@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';  // <-- Hier importieren
+import { FormsModule } from '@angular/forms'; // <-- Hier importieren
 
 import { WelcomeRoutingModule } from './welcome-routing.module';
 import { WelcomeComponent } from './welcome.component';
@@ -13,23 +13,19 @@ import { MatOptionModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input'; // falls du ein <input> verwendest
 
-
 @NgModule({
-  declarations: [
-    WelcomeComponent,
-    AufgabeComponent
-  ],
-  imports: [
-    CommonModule,
-    FormsModule,               // <-- Hier hinzufügen
-    WelcomeRoutingModule,
-    CommonModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatSelectModule,
-    MatOptionModule,
-    MatIconModule,
-    MatInputModule
-  ]
+    declarations: [WelcomeComponent, AufgabeComponent],
+    imports: [
+        CommonModule,
+        FormsModule, // <-- Hier hinzufügen
+        WelcomeRoutingModule,
+        CommonModule,
+        MatCardModule,
+        MatFormFieldModule,
+        MatSelectModule,
+        MatOptionModule,
+        MatIconModule,
+        MatInputModule,
+    ],
 })
-export class WelcomeModule { }
+export class WelcomeModule {}
