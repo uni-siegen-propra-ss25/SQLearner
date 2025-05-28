@@ -58,8 +58,8 @@ export class UserListComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.userService.createUser(result).subscribe({
-          next: (newUser) => {
-            this.users = [...this.users, newUser];
+          next: (newUserId) => {
+            this.users = [...this.users, { id: newUserId, ...result }];
             this.snackBar.open('Nutzer erfolgreich erstellt', 'Schließen', {
               duration: 3000
             });

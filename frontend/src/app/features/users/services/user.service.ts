@@ -6,11 +6,16 @@ import { Role } from '../models/role.model';
 import { RegisterCredentials } from '../../auth/models/register-credentials.model';
 import { environment } from '../../../../environments/environment';
 
+
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
   private readonly apiUrl = `${environment.apiUrl}/users`;
+
+  private readonly httpOptions = {
+    headers: { 'Content-Type': 'application/json' }
+  };
 
   constructor(private http: HttpClient) {}
 
@@ -22,8 +27,8 @@ export class UserService {
     return this.http.get<User[]>(`${this.apiUrl}/byRole/${role}`);
   }
 
-  createUser(user: RegisterCredentials): Observable<User> {
-    return this.http.post<User>(`${this.apiUrl}/create`, user);
+  createUser(user: RegisterCredentials): Observable<number> {
+    return this.http.post<number>(`${environment.apiUrl}/auth/register`, user, this.httpOptions);
   }
 
   updateUserRole(userId: number, role: Role): Observable<User> {

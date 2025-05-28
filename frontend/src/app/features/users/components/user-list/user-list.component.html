@@ -2,20 +2,23 @@
   <mat-card>
     <mat-card-header>
       <mat-card-title>Nutzerverwaltung</mat-card-title>
-    </mat-card-header>
-    
-    <mat-card-content>
-      <div class="actions-toolbar">
+      <div class="header-actions">
         <button mat-raised-button color="primary" (click)="openCreateDialog()">
           <mat-icon>add</mat-icon>
           Neuen Nutzer anlegen
         </button>
       </div>
-
-      <mat-table [dataSource]="users">
+    </mat-card-header>
+    
+    <mat-card-content>
+      <mat-table [dataSource]="users" class="user-table">
         <ng-container matColumnDef="name">
           <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
-          <mat-cell *matCellDef="let user"> {{user.firstName}} {{user.lastName}} </mat-cell>
+          <mat-cell *matCellDef="let user"> 
+            <div class="user-info">
+              <span class="full-name">{{user.firstName}} {{user.lastName}}</span>
+            </div>
+          </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="email">
@@ -26,38 +29,37 @@
         <ng-container matColumnDef="role">
           <mat-header-cell *matHeaderCellDef> Rolle </mat-header-cell>
           <mat-cell *matCellDef="let user">
-            <mat-form-field *ngIf="isAdmin" class="role-select">
-              <mat-select [value]="user.role" (selectionChange)="onRoleChange(user.id, $event.value)">
+            <mat-form-field *ngIf="isAdmin" class="role-select" appearance="outline">
+              <mat-select [value]="user.role" (selectionChange)="onRoleChange(user.id, $event.value)" panelClass="role-select-panel">
                 <mat-option *ngFor="let role of roleOptions" [value]="role">
-                  {{role}}
+                  <span class="role-option">{{role}}</span>
                 </mat-option>
               </mat-select>
             </mat-form-field>
-            <span *ngIf="!isAdmin">{{user.role}}</span>
+            <span *ngIf="!isAdmin" class="role-badge" [class]="user.role.toLowerCase()">{{user.role}}</span>
           </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="matriculationNumber">
           <mat-header-cell *matHeaderCellDef> Matrikelnummer </mat-header-cell>
-          <mat-cell *matCellDef="let user"> {{user.matriculationNumber || '-'}} </mat-cell>
+          <mat-cell *matCellDef="let user"> 
+            <span [class.no-value]="!user.matriculationNumber">
+              {{user.matriculationNumber || '-'}}
+            </span>
+          </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="actions">
           <mat-header-cell *matHeaderCellDef></mat-header-cell>
           <mat-cell *matCellDef="let user" class="actions-cell">
-            <button mat-icon-button [matMenuTriggerFor]="menu" *ngIf="isAdmin">
-              <mat-icon>more_vert</mat-icon>
-            </button>
-            <mat-menu #menu="matMenu">
-              <button mat-menu-item (click)="openUpdateDialog(user)">
+            <div class="action-buttons" *ngIf="isAdmin">
+              <button mat-icon-button color="primary" (click)="openUpdateDialog(user)" matTooltip="Bearbeiten">
                 <mat-icon>edit</mat-icon>
-                <span>Bearbeiten</span>
               </button>
-              <button mat-menu-item (click)="deleteUser(user.id)">
-                <mat-icon color="warn">delete</mat-icon>
-                <span>Löschen</span>
+              <button mat-icon-button color="warn" (click)="deleteUser(user.id)" matTooltip="Löschen">
+                <mat-icon>delete</mat-icon>
               </button>
-            </mat-menu>
+            </div>
           </mat-cell>
         </ng-container>
 
@@ -66,6 +68,7 @@
       </mat-table>
 
       <div *ngIf="users.length === 0" class="no-data">
+        <mat-icon>group</mat-icon>
         <p>Keine Nutzer gefunden</p>
       </div>
     </mat-card-content>
