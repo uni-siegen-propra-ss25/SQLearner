@@ -29,10 +29,13 @@ export class UserListComponent implements OnInit {
     private snackBar: MatSnackBar
   ) {}
 
+  isTutorOrAdmin = false;
+
   ngOnInit() {
     this.loadUsers();
     this.authService.user$.subscribe(user => {
       this.isAdmin = user?.role === Role.ADMIN;
+      this.isTutorOrAdmin = user?.role === Role.ADMIN || user?.role === Role.TUTOR;
     });
   }
 
@@ -105,9 +108,12 @@ export class UserListComponent implements OnInit {
   }
 
   getAvailableRoles(): Role[] {
-    return this.isAdmin ? 
-      [Role.ADMIN, Role.TUTOR, Role.STUDENT] : 
-      [Role.TUTOR, Role.STUDENT];
+    if (this.isAdmin) {
+      return [Role.ADMIN, Role.TUTOR, Role.STUDENT];
+    } else if (this.isTutorOrAdmin) {
+      return [Role.STUDENT];
+    }
+    return [];
   }
 
   onRoleChange(userId: number, newRole: Role) {

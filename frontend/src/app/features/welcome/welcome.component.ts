@@ -1,28 +1,48 @@
 import { Component } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-welcome',
-  template: `
-    <div class="welcome-container">
-      <h1>Willkommen bei SQLearner</h1>
-      <p>Ihre Plattform zum Lernen und Üben von SQL</p>
-    </div>
-  `,
-  styles: [`
-    .welcome-container {
-      padding: 2rem;
-      text-align: center;
-      max-width: 800px;
-      margin: 0 auto;
-    }
-    h1 {
-      margin-bottom: 1rem;
-      color: var(--text-color);
-    }
-    p {
-      color: var(--text-color);
-      font-size: 1.2rem;
-    }
-  `]
+  templateUrl: './welcome.component.html',
+  styleUrls: ['./welcome.component.scss']
 })
-export class WelcomeComponent {} 
+export class WelcomeComponent {
+  newHinweis: string = '';
+  hinweise: string[] = [];
+
+  fragen = [
+    { name: 'Max M.', datum: '12.05', text: 'Könnte man ein Beispiel zu Aggregatfunktionen machen?' },
+    { name: 'Lisa S.', datum: '11.05', text: 'Ist der NATURAL JOIN prüfungsrelevant?' },
+    { name: 'Jonas T.', datum: '10.05', text: 'Wie genau funktioniert Relationale Division?' }
+  ];
+
+    aufgaben = [
+    { typ: 'SQL', kategorie: 'SQL-Query', titel: 'Bibliothek' },
+    { typ: 'XML', kategorie: 'XML-Dokument', titel: 'Katalog' },
+    { typ: 'RD', kategorie: 'Relationale Algebra', titel: 'Studentenliste' }
+  ];
+
+  constructor(private router: Router, private route: ActivatedRoute) {}
+
+  goToAufgaben() {
+    this.router.navigate(['aufgaben'], { relativeTo: this.route });
+  }
+
+  goToFragen() {
+    this.router.navigate(['fragen'], { relativeTo: this.route });
+  }
+
+  addHinweis() {
+    if (this.newHinweis.trim()) {
+      this.hinweise.push(this.newHinweis.trim());
+      this.newHinweis = '';
+    }
+  }
+
+  removeHinweis(index: number) {
+    this.hinweise.splice(index, 1);
+  }
+}
+
+
+

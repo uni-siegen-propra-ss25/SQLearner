@@ -32,11 +32,15 @@ export class UserService {
   }
 
   updateUserRole(userId: number, role: Role): Observable<User> {
-    return this.http.patch<User>(`${this.apiUrl}/${userId}/role`, { role });
+    return this.http.patch<User>(`${this.apiUrl}/${userId}/role`, { role }, this.httpOptions);
   }
 
   updateUser(userId: number, updates: Partial<User>): Observable<User> {
-    return this.http.patch<User>(`${this.apiUrl}/${userId}`, updates);
+    return this.http.patch<User>(`${this.apiUrl}/${userId}`, updates, this.httpOptions);
+  }
+
+  updateUserPassword(userId: number, password: string): Observable<User> {
+    return this.http.patch<User>(`${this.apiUrl}/${userId}/password`, { password }, this.httpOptions);
   }
 
   deleteUser(userId: number): Observable<void> {

@@ -57,14 +57,16 @@ export class AuthService {
       role: user.role,
       matriculationNumber: user.matriculationNumber ?? '',
     };
+    const expiresIn = this.configService.get<string>('JWT_EXPIRES_IN')?.trim() || '1h';
 
     const accessToken = this.jwtService.sign(
-      payload,
+       payload,
       {
         secret: this.configService.get<string>('JWT_SECRET'),
-        expiresIn: this.configService.get<string>('JWT_EXPIRES_IN'),
+        expiresIn: expiresIn, 
       }
     );
+
 
     return {
       accessToken,
