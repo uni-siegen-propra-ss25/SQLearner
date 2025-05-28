@@ -125,22 +125,21 @@ export class UsersService {
    * @returns The created user without the password field
    */
   async createUser(dto: CreateUserDto): Promise<number> {
-    // number is the id of the created user
-
-    // check if the email already exists
+    // Check if the email already exists
     if (await this.checkEmailExists(dto.email)) {
         throw new BadRequestException('This email is already taken');
     }
 
-    // check if the matriculation number already exists
+    // Check if the matriculation number already exists
     if (dto.matriculationNumber && await this.checkMatriculationNumberExists(dto.matriculationNumber)) {
         throw new BadRequestException('This matriculation number is already taken');
     }
     
     const saltRounds = parseInt(
-      this.configService.get<string>('BCRYPT_SALT_ROUNDS') || '10',
-      10,
+      this.configService.get<string>('SALT_ROUNDS') || '10',
+      10
     );
+
     const hashed = await bcrypt.hash(dto.password, saltRounds);
     const user = await this.prisma.user.create({
       data: {
@@ -157,5 +156,99 @@ export class UsersService {
     });
 
     return user.id;
+  }
+
+  /**
+   * Updates a user's information.
+   * @param id The user's ID
+   * @param data The data to update
+   * @returns The updated user
+   */
+  async updateUser(id: number, data: Partial<User>): Promise<User> {
+    await this.getUserById(id);
+
+    // Remove sensitive fields that shouldn't be updated directly
+    delete data.password;
+    delete data.role;
+
+    // Check if email is being updated and if it's already taken
+    if (data.email && await this.prisma.user.findFirst({
+      where: { 
+        email: data.email,
+        id: { not: id }
+      }
+    })) {
+      throw new BadRequestException('This email is already taken');
+    }
+
+    // Check if matriculation number is being updated and if it's already taken
+    if (data.matriculationNumber && await this.prisma.user.findFirst({
+      where: {
+        matriculationNumber: data.matriculationNumber,
+        id: { not: id }
+      }
+    })) {
+      throw new BadRequestException('This matriculation number is already taken');
+    }
+
+    return this.prisma.user.update({
+      where: { id },
+      data: {
+        ...data,
+        updatedAt: new Date(),
+      },
+    });
+  }
+
+  /**
+   * Updates a user's role.
+   * @param id The user's ID
+   * @param role The new role
+   * @returns The updated user
+   */
+  async updateUserRole(id: number, role: string): Promise<User> {
+    await this.getUserById(id);
+
+    return this.prisma.user.update({
+      where: { id },
+      data: {
+        role: role.toUpperCase() as any,
+        updatedAt: new Date(),
+      },
+    });
+  }
+
+  /**
+   * Updates a user's password.
+   * @param id The user's ID
+   * @param password The new password
+   * @returns The updated user
+   */
+  async updateUserPassword(id: number, password: string): Promise<User> {
+    await this.getUserById(id);
+    
+    const saltRounds = parseInt(
+      this.configService.get<string>('SALT_ROUNDS') || '10',
+      10
+    );
+
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    return this.prisma.user.update({
+      where: { id },
+      data: {
+        password: hashedPassword,
+        updatedAt: new Date(),
+      },
+    });
+  }
+
+  /**
+   * Deletes a user.
+   * @param id The user's ID
+   */
+  async deleteUser(id: number): Promise<void> {
+    await this.getUserById(id);
+    await this.prisma.user.delete({ where: { id } });
   }
 }

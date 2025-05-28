@@ -3,9 +3,10 @@
     <mat-card-header>
       <mat-card-title>Nutzerverwaltung</mat-card-title>
       <div class="header-actions">
-        <button mat-raised-button color="primary" (click)="openCreateDialog()">
+        <button mat-raised-button color="primary" (click)="openCreateDialog()" *ngIf="isTutorOrAdmin">
           <mat-icon>add</mat-icon>
-          Neuen Nutzer anlegen
+          <span *ngIf="isAdmin">Neuen Nutzer anlegen</span>
+          <span *ngIf="!isAdmin">Neuen Studenten anlegen</span>
         </button>
       </div>
     </mat-card-header>
@@ -52,11 +53,11 @@
         <ng-container matColumnDef="actions">
           <mat-header-cell *matHeaderCellDef></mat-header-cell>
           <mat-cell *matCellDef="let user" class="actions-cell">
-            <div class="action-buttons" *ngIf="isAdmin">
+            <div class="action-buttons" *ngIf="(isAdmin || (isTutorOrAdmin && user.role === 'STUDENT'))">
               <button mat-icon-button color="primary" (click)="openUpdateDialog(user)" matTooltip="Bearbeiten">
                 <mat-icon>edit</mat-icon>
               </button>
-              <button mat-icon-button color="warn" (click)="deleteUser(user.id)" matTooltip="Löschen">
+              <button mat-icon-button color="warn" (click)="deleteUser(user.id)" matTooltip="Löschen" *ngIf="isAdmin">
                 <mat-icon>delete</mat-icon>
               </button>
             </div>
