@@ -4,38 +4,112 @@
   align-items: center;
   min-height: 400px;
   padding: 2rem;
-  background: linear-gradient(135deg, #e3f0ff 0%, #f9f9f9 100%);
+  background: var(--background-gradient, linear-gradient(135deg, #e3f0ff 0%, #f9f9f9 100%));
 }
 
 .profile-card {
   min-width: 400px;
   max-width: 500px;
-  padding: 2rem 1.5rem 1.5rem 1.5rem;
-  border-radius: 18px;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-  background: #fff;
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+  background: var(--surface-color, #fff);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(31, 38, 135, 0.2);
+  }
+
+  mat-card-header {
+    margin-bottom: 2rem;
+  }
+
+  mat-card-title {
+    color: var(--mat-primary-text-color);
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+
+  mat-card-subtitle {
+    color: var(--mat-secondary-text-color);
+    font-size: 1rem;
+    text-transform: capitalize;
+  }
 }
 
 .profile-avatar {
-  background: linear-gradient(135deg, #7b68ee 0%, #a6bcd5 100%);
-  color: #fff;
+  background: linear-gradient(135deg, #7b68ee 0%, #6352ce 100%);
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.5rem;
+  width: 64px !important;
+  height: 64px !important;
+  border-radius: 50%;
+  margin-right: 1.5rem;
+
+  mat-icon {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+  }
 }
 
 .profile-info-row {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
-  font-size: 1.1rem;
-  margin: 1.2rem 0 0.5rem 0;
-  color: #333;
+  gap: 1rem;
+  padding: 1rem;
+  margin: 0.5rem 0;
+  border-radius: 12px;
+  background: var(--info-row-background, rgba(0, 0, 0, 0.02));
+  transition: background-color 0.2s ease;
+
+  mat-icon {
+    color: var(--mat-secondary-text-color);
+  }
+
+  span {
+    color: var(--mat-primary-text-color);
+    font-size: 1rem;
+  }
+
+  &:hover {
+    background: var(--info-row-hover-background, rgba(0, 0, 0, 0.04));
+  }
 }
 
 mat-card-actions {
   display: flex;
   justify-content: flex-end;
-  margin-top: 2rem;
+  padding: 1rem 1rem 0;
+  margin: 2rem -1rem 0;
+  border-top: 1px solid var(--border-color, rgba(0, 0, 0, 0.12));
+
+  button {
+    transition: all 0.2s ease;
+    margin-left: 1rem;
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+}
+
+// Dark theme adjustments
+:host-context(.dark-theme) {
+  .profile-dialog-container {
+    --background-gradient: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  }
+
+  .profile-card {
+    --surface-color: #2d2d2d;
+    --border-color: rgba(255, 255, 255, 0.12);
+  }
+
+  .profile-info-row {
+    --info-row-background: rgba(255, 255, 255, 0.05);
+    --info-row-hover-background: rgba(255, 255, 255, 0.08);
+  }
 }

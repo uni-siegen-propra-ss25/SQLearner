@@ -77,8 +77,11 @@ export class AuthService {
 
     /** Decodes the token payload into an object or null. */
     getUserFromToken(): User | null {
+        if (!this.hasToken()) return null;
+
         const token = this.getToken();
         if (!token) return null;
+        // Decode the JWT payload
         try {
             const payload = JSON.parse(atob(token.split('.')[1]));
             return {
@@ -87,6 +90,9 @@ export class AuthService {
                 role: payload.role,
                 firstName: payload.firstName,
                 lastName: payload.lastName,
+                matriculationNumber: payload.matriculationNumber,
+                createdAt: payload.createdAt ? new Date(payload.createdAt) : undefined,
+                updatedAt: payload.updatedAt ? new Date(payload.updatedAt) : undefined,
             };
         } catch {
             return null;
