@@ -16,13 +16,12 @@ export class WelcomeComponent {
         { name: 'Jonas T.', datum: '10.05', text: 'Wie genau funktioniert Relationale Division?' },
     ];
 
-// Spalten die in der Tabelle angezeigt werden sollen
     displayedColumns: string[] = ['titel', 'typ', 'kategorie', 'datum'];
 
 // Beispielhafte Aufgaben-Daten, falls noch nicht vorhanden
     aufgaben = [
     { titel: 'GartenCenter', typ: 'SQL-Abfrage', kategorie: 'SQL', datum: '2025-05-01' },
-    { titel: 'XML Basics', typ: 'Single Chioce', kategorie: 'XML', datum: '2025-05-05' },
+    { titel: 'XML Basics', typ: 'Einzel-Abfrage ', kategorie: 'XML', datum: '2025-05-05' },
     { titel: 'KinoBesuch', typ: 'SQL-Abfrage', kategorie: 'SQL', datum: '2025-05-10' },
     ];
 
