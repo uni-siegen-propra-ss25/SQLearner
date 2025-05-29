@@ -2,15 +2,28 @@ import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
 /**
  * GetUser decorator provides `request.user` to controller methods.
+ * If a property key is provided, returns that specific property.
  */
 export const GetUser = createParamDecorator(
     /**
-     * @param _data any data passed to the decorator (unused)
+     * @param data property key to extract from user object (optional)
      * @param ctx ExecutionContext from Nest
-     * @returns the `user` object attached by an AuthGuard
+     * @returns the user object or specific property if key provided
      */
-    (_data: unknown, ctx: ExecutionContext) => {
+    (data: string | undefined, ctx: ExecutionContext) => {
         const req = ctx.switchToHttp().getRequest();
-        return req.user;
+        const user = req.user;
+
+        if (!user) {
+            return undefined;
+        }
+
+        // If a property key is provided, return that specific property
+        if (data) {
+            return user[data];
+        }
+
+        // Otherwise return the whole user object
+        return user;
     },
 );

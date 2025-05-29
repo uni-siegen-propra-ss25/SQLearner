@@ -4,6 +4,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from '../users/services/users.service';
 import { JwtPayload } from './models/jwt-payload.dto';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -23,12 +24,21 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     async validate(payload: JwtPayload) {
         const user = await this.usersService.getUserById(payload.sub);
 
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        // Ensure role is properly converted to Role enum
+        const role = user.role as Role;
+        console.log('JWT Strategy - User role from DB:', user.role);
+        console.log('JWT Strategy - Converted role:', role);
+
         return {
             id: user.id,
             email: user.email,
             firstName: user.firstName,
             lastName: user.lastName,
-            role: user.role,
+            role: role,
             matriculationNumber: user.matriculationNumber,
         };
     }

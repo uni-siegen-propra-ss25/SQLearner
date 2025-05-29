@@ -1,5 +1,6 @@
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { Role } from '@prisma/client';
 
 /**
  * RolesGuard checks for @Roles() metadata on route handlers
@@ -16,7 +17,7 @@ export class RolesGuard implements CanActivate {
      * @throws ForbiddenException if role is insufficient
      */
     canActivate(context: ExecutionContext): boolean {
-        const requiredRoles = this.reflector.get<string[]>('roles', context.getHandler());
+        const requiredRoles = this.reflector.get<Role[]>('roles', context.getHandler());
 
         // If no roles are required, allow access (route is public or unprotected)
         if (!requiredRoles || requiredRoles.length === 0) {
@@ -26,8 +27,7 @@ export class RolesGuard implements CanActivate {
         const { user } = context.switchToHttp().getRequest(); // Get the user object from the request (injected by JwtStrategy)
 
         // If the user is not present or has no matching role, deny access
-        if (!user || (!requiredRoles.includes(user.role) && user.role !== 'ADMIN')) {
-            // easier then checking for all roles @Roles('SELLER', 'ADMIN')
+        if (!user || (!requiredRoles.includes(user.role) && user.role !== Role.ADMIN)) {
             throw new ForbiddenException('Access denied: insufficient role');
         }
 

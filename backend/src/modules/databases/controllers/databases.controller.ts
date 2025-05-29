@@ -7,17 +7,27 @@ import {
     Body,
     Param,
     UseGuards,
-    Request,
-    ForbiddenException,
+    UseInterceptors,
+    UploadedFile,
+    ParseIntPipe,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import {
+    ApiTags,
+    ApiOperation,
+    ApiResponse,
+    ApiBearerAuth,
+    ApiConsumes,
+} from '@nestjs/swagger';
 import { DatabasesService } from '../services/databases.service';
+import { Database } from '../models/database.model';
 import { CreateDatabaseDto } from '../models/create-database.dto';
 import { UpdateDatabaseDto } from '../models/update-database.dto';
-import { Role, Database } from '@prisma/client';
-import { JwtAuthGuard } from 'src/common/guards/jwt-auth/jwt-auth.guard';
-import { RolesGuard } from 'src/common/guards/role/role.guard';
-import { Roles } from 'src/common/decorators/role.decorator';
+import { JwtAuthGuard } from '../../../common/guards/jwt-auth/jwt-auth.guard';
+import { RolesGuard } from '../../../common/guards/role/role.guard';
+import { Roles } from '../../../common/decorators/role.decorator';
+import { GetUser } from '../../../common/decorators/get-user.decorator';
+import { Role } from '@prisma/client';
 
 @ApiTags('Databases')
 @Controller('databases')
@@ -26,51 +36,70 @@ import { Roles } from 'src/common/decorators/role.decorator';
 export class DatabasesController {
     constructor(private readonly databasesService: DatabasesService) {}
 
+    @Post()
+    @Roles(Role.TUTOR)
+    @ApiOperation({ summary: 'Create a new database' })
+    @ApiResponse({ status: 201, description: 'Database created successfully' })
+    async createDatabase(
+        @Body() dto: CreateDatabaseDto,
+        @GetUser('id') userId: number,
+        @GetUser('role') userRole: string,
+    ) {
+        console.log('Controller - User ID:', userId);
+        console.log('Controller - User Role:', userRole);
+        return this.databasesService.createDatabase(dto, userId, userRole);
+    }
+
     @Get()
-    @ApiOperation({ summary: 'Get all databases accessible to the user' })
-    @ApiResponse({ status: 200, description: 'List of databases' })
-    async getDatabases(@Request() req): Promise<Database[]> {
-        return this.databasesService.getDatabases(req.user.id);
+    @ApiOperation({ summary: 'Get all databases' })
+    @ApiResponse({ status: 200, description: 'Return all databases' })
+    async getAllDatabases() {
+        return this.databasesService.getAllDatabases();
     }
 
     @Get(':id')
-    @ApiOperation({ summary: 'Get a database by ID' })
-    @ApiResponse({ status: 200, description: 'The database' })
-    @ApiResponse({ status: 404, description: 'Database not found' })
-    async getDatabaseById(@Param('id') id: number, @Request() req): Promise<Database> {
-        return this.databasesService.getDatabaseById(id, req.user.id);
-    }
-
-    @Post()
-    @Roles(Role.TUTOR, Role.ADMIN)
-    @ApiOperation({ summary: 'Create a new database' })
-    @ApiResponse({ status: 201, description: 'The database has been created' })
-    async createDatabase(
-        @Body() createDatabaseDto: CreateDatabaseDto,
-        @Request() req,
-    ): Promise<Database> {
-        return this.databasesService.createDatabase(createDatabaseDto, req.user.id);
+    @ApiOperation({ summary: 'Get database by ID' })
+    @ApiResponse({ status: 200, description: 'Return database by ID' })
+    async getDatabaseById(@Param('id', ParseIntPipe) id: number) {
+        return this.databasesService.getDatabaseById(id);
     }
 
     @Put(':id')
-    @Roles(Role.TUTOR, Role.ADMIN)
-    @ApiOperation({ summary: 'Update a database' })
-    @ApiResponse({ status: 200, description: 'The database has been updated' })
-    @ApiResponse({ status: 404, description: 'Database not found' })
+    @Roles(Role.TUTOR)
+    @ApiOperation({ summary: 'Update database' })
+    @ApiResponse({ status: 200, description: 'Database updated successfully' })
     async updateDatabase(
-        @Param('id') id: number,
-        @Body() updateDatabaseDto: UpdateDatabaseDto,
-        @Request() req,
-    ): Promise<Database> {
-        return this.databasesService.updateDatabase(id, updateDatabaseDto, req.user.id);
+        @Param('id', ParseIntPipe) id: number,
+        @Body() dto: UpdateDatabaseDto,
+        @GetUser('id') userId: number,
+        @GetUser('role') userRole: string,
+    ) {
+        return this.databasesService.updateDatabase(id, dto, userId, userRole);
     }
 
     @Delete(':id')
-    @Roles(Role.TUTOR, Role.ADMIN)
-    @ApiOperation({ summary: 'Delete a database' })
-    @ApiResponse({ status: 200, description: 'The database has been deleted' })
-    @ApiResponse({ status: 404, description: 'Database not found' })
-    async deleteDatabase(@Param('id') id: number, @Request() req): Promise<void> {
-        return this.databasesService.deleteDatabase(id, req.user.id);
+    @Roles(Role.TUTOR)
+    @ApiOperation({ summary: 'Delete database' })
+    @ApiResponse({ status: 200, description: 'Database deleted successfully' })
+    async deleteDatabase(
+        @Param('id', ParseIntPipe) id: number,
+        @GetUser('id') userId: number,
+        @GetUser('role') userRole: string,
+    ) {
+        return this.databasesService.deleteDatabase(id, userId, userRole);
+    }
+
+    @Post('upload')
+    @Roles(Role.TUTOR)
+    @UseInterceptors(FileInterceptor('file'))
+    @ApiConsumes('multipart/form-data')
+    @ApiOperation({ summary: 'Upload SQL file' })
+    @ApiResponse({ status: 201, description: 'SQL file uploaded successfully' })
+    async uploadSqlFile(
+        @UploadedFile() file: Express.Multer.File,
+        @GetUser('id') userId: number,
+        @GetUser('role') userRole: string,
+    ) {
+        return this.databasesService.uploadSqlFile(file, userId, userRole);
     }
 }

@@ -6,6 +6,7 @@ import { LoginCredentials } from '../models/login-credentials.model';
 import { RegisterCredentials } from '../models/register-credentials.model';
 import { LoginResponse } from '../models/login-response.model';
 import { User } from '../../users/models/user.model';
+import { Role } from 'app/features/users/models/role.model';
 import { environment } from '../../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -43,8 +44,10 @@ export class AuthService {
 
     /** Logs in and stores token + updates login status. */
     login(data: LoginCredentials): Observable<LoginResponse> {
+        console.log('Attempting login with:', data);
         return this.http.post<LoginResponse>(`${this.baseUrl}/login`, data, this.httpOptions).pipe(
             tap((res) => {
+                console.log('Login response:', res);
                 this.saveToken(res.accessToken);
                 this._logStatusSubject$.next(true);
                 this._userSubject$.next(this.getUserFromToken());
@@ -62,12 +65,15 @@ export class AuthService {
 
     /** Saves the JWT to local storage. */
     private saveToken(token: string): void {
+        console.log('Saving token:', token);
         localStorage.setItem(this.tokenKey, token);
     }
 
     /** Returns the raw JWT or null. */
     getToken(): string | null {
-        return localStorage.getItem(this.tokenKey);
+        const token = localStorage.getItem(this.tokenKey);
+        console.log('Getting token:', token);
+        return token;
     }
 
     /** Helper for your AuthGuard: */
@@ -106,5 +112,18 @@ export class AuthService {
 
     getUserId(): number | null {
         return this.getUserFromToken()?.id ?? null;
+    }
+
+    hasRole(role: Role): boolean {
+        const user = this.getUserFromToken();
+        return user?.role === role;
+    }
+
+    isTutor(): boolean {
+        return this.hasRole(Role.TUTOR);
+    }
+
+    isAdmin(): boolean {
+        return this.hasRole(Role.ADMIN);
     }
 }
