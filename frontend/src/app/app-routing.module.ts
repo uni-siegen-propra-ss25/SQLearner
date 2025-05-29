@@ -32,6 +32,14 @@ const routes: Routes = [
             allowedRoles: [Role.TUTOR, Role.ADMIN],
         },
     },
+    {
+        path: 'databases',
+        loadChildren: () => import('./features/database/database.module').then((m) => m.DatabaseModule),
+        canActivate: [RoleGuard],
+        data: {
+            allowedRoles: [Role.TUTOR],
+        },
+    },
 ];
 
 @NgModule({

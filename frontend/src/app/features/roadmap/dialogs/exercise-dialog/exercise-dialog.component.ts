@@ -135,7 +135,7 @@ export class ExerciseDialogComponent implements OnInit {
     }
 
     private loadDatabases() {
-        this.databaseService.getDatabases().subscribe((databases) => (this.databases = databases));
+        this.databaseService.getAllDatabases().subscribe((databases: Database[]) => (this.databases = databases));
     }
 
     get answers() {
