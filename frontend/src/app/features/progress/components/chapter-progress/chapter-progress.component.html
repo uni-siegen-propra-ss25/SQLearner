@@ -1,0 +1,24 @@
+<div class="chapter-progress">
+    <h3>Fortschritt nach Kapiteln</h3>
+    
+    <div class="chapters-list">        <div *ngFor="let chapter of chapterProgress" class="chapter-item" 
+             [class.completed]="chapter.completionPercentage === 100">
+            <div class="chapter-info">
+                <h4>{{chapter.chapterTitle}}</h4>
+                <span class="completion">
+                    {{chapter.completedExercises}} / {{chapter.totalExercises}} Übungen abgeschlossen
+                </span>
+            </div>            <p>{{chapter.completionPercentage | number:'1.0-0'}}%</p>
+            <div class="bar" 
+                 [ngClass]="{'average': chapter.completionPercentage < 50, 'correct': chapter.completionPercentage >= 50}"
+                 [style.width.%]="chapter.completionPercentage">
+            </div>
+        </div>
+    </div>
+    
+    <div *ngIf="chapterProgress.length === 0" class="no-progress">
+        <mat-icon>school</mat-icon>
+        <p>Noch kein Fortschritt vorhanden.</p>
+        <p class="hint">Beginne mit der ersten Übung, um deinen Lernfortschritt zu verfolgen.</p>
+    </div>
+</div>

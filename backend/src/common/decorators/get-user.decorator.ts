@@ -5,12 +5,20 @@ import { createParamDecorator, ExecutionContext } from '@nestjs/common';
  */
 export const GetUser = createParamDecorator(
     /**
-     * @param _data any data passed to the decorator (unused)
+     * @param data any data passed to the decorator - can be used to extract specific user properties
      * @param ctx ExecutionContext from Nest
-     * @returns the `user` object attached by an AuthGuard
+     * @returns the `user` object attached by an AuthGuard, or a specific property if data is provided
      */
-    (_data: unknown, ctx: ExecutionContext) => {
+    (data: string | undefined, ctx: ExecutionContext) => {
         const req = ctx.switchToHttp().getRequest();
-        return req.user;
+        const user = req.user;
+        
+        // If a property name is specified, return that property
+        if (data) {
+            return user[data];
+        }
+        
+        // Otherwise return the entire user object
+        return user;
     },
 );

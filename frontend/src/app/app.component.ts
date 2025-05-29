@@ -26,9 +26,7 @@ export class AppComponent implements OnInit, OnDestroy {
             route: '/progress',
             requiredRoles: [Role.STUDENT],
         },
-    ];
-
-    private readonly tutorItems: NavigationItem[] = [
+    ];    private readonly tutorItems: NavigationItem[] = [
         { icon: 'groups', label: 'Nutzerverwaltung', route: '/users', requiredRoles: [Role.TUTOR] },
         { icon: 'timeline', label: 'Roadmap', route: '/roadmap', requiredRoles: [Role.TUTOR] },
         {
@@ -37,9 +35,7 @@ export class AppComponent implements OnInit, OnDestroy {
             route: '/databases',
             requiredRoles: [Role.TUTOR],
         },
-    ];
-
-    private readonly adminItems: NavigationItem[] = [
+    ];    private readonly adminItems: NavigationItem[] = [
         {
             icon: 'manage_accounts',
             label: 'Nutzerverwaltung',

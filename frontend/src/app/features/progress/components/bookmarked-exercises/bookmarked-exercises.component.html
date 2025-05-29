@@ -1,0 +1,43 @@
+<div class="bookmarked-exercises">
+    <div *ngIf="bookmarks.length === 0" class="no-bookmarks">
+        <mat-icon>bookmark_border</mat-icon>
+        <p>Keine gemerkten Aufgaben vorhanden.</p>
+        <p class="hint">Du kannst während des Lernens Aufgaben mit einem Lesezeichen markieren, um später darauf zurückzukommen.</p>
+    </div>
+    
+    <div *ngIf="bookmarks.length > 0" class="bookmarks-list">
+        <div *ngFor="let bookmark of bookmarks" class="bookmark-item">
+            <div class="bookmark-header">
+                <div class="exercise-type">
+                    <mat-icon [attr.aria-label]="bookmark.exercise.type">{{ getExerciseTypeIcon(bookmark.exercise.type) }}</mat-icon>
+                    <span class="exercise-title">{{ bookmark.exercise.title }}</span>
+                </div>
+                <div class="actions">
+                    <button mat-icon-button (click)="removeBookmark.emit(bookmark.id)" matTooltip="Lesezeichen entfernen">
+                        <mat-icon>bookmark_remove</mat-icon>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="bookmark-content">
+                <div class="path-info">
+                    <span class="chapter">{{ bookmark.exercise.topic.chapter.title }}</span>
+                    <mat-icon>chevron_right</mat-icon>
+                    <span class="topic">{{ bookmark.exercise.topic.title }}</span>
+                </div>
+                
+                <div class="bookmark-footer">
+                    <div class="difficulty" [ngStyle]="{'color': getDifficultyColor(bookmark.exercise.difficulty)}">
+                        <mat-icon>circle</mat-icon>
+                        <span>{{ bookmark.exercise.difficulty }}</span>
+                    </div>
+                    
+                    <button mat-button color="primary" (click)="navigateToExercise(bookmark.exercise.topic.id, bookmark.exercise.id)">
+                        <mat-icon>launch</mat-icon>
+                        Zur Aufgabe
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
