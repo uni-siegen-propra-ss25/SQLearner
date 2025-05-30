@@ -11,7 +11,7 @@ export class DatabasesService {
     private pool: Pool;
 
     constructor(private prisma: PrismaService) {
-        // Инициализируем пул соединений с PostgreSQL
+        // Initialise connection pool with PostgreSQL
         this.pool = new Pool({
             connectionString: process.env.DATABASE_URL,
         });
@@ -33,7 +33,7 @@ export class DatabasesService {
             throw new ForbiddenException('Only tutors can create databases');
         }
 
-        // Создаем запись в таблице Database
+        // Create a record in the Database table
         const database = await this.prisma.database.create({
             data: {
                 name: dto.name,
@@ -44,14 +44,14 @@ export class DatabasesService {
         });
 
         try {
-            // Выполняем SQL схему
+            // Execute SQL schema
             if (dto.schemaSql) {
                 await this.pool.query(dto.schemaSql);
                 console.log('SQL schema executed successfully');
             }
         } catch (error) {
             console.error('Error executing SQL schema:', error);
-            // Можно добавить дополнительную обработку ошибок здесь
+            // You can add additional error handling here
         }
 
         return database;
@@ -123,7 +123,7 @@ export class DatabasesService {
         });
 
         try {
-            // Выполняем SQL схему из файла
+            // Execute SQL schema from file
             if (schema) {
                 await this.pool.query(schema);
                 console.log('SQL schema from file executed successfully');
