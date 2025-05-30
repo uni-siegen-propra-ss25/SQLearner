@@ -1,3 +1,4 @@
+/* Main container with top margin */
 .chapter-progress {
     margin-top: 24px;
     
@@ -8,6 +9,7 @@
     }
 }
 
+/* Scrollable list container for multiple chapters */
 .chapters-list {
     display: flex;
     flex-direction: column;
@@ -16,6 +18,7 @@
     overflow-y: auto;
 }
 
+/* Individual chapter card with hover effects and completion styling */
 .chapter-item {
     background-color: rgba(0, 0, 0, 0.03);
     border-radius: 8px;
@@ -27,12 +30,14 @@
         background-color: rgba(0, 0, 0, 0.06);
     }
     
+    /* Green border for 100% completed chapters */
     &.completed {
         border-left: 4px solid #4caf50;
         background-color: rgba(76, 175, 80, 0.05);
     }
 }
 
+/* Chapter title and exercise count layout */
 .chapter-info {
     display: flex;
     justify-content: space-between;
@@ -51,16 +56,13 @@
     }
 }
 
+/* Percentage text styling */
 p {
     font-size: 1rem;
     margin: 4px 0;
 }
 
-.progress-container {
-    display: flex;
-    align-items: center;
-}
-
+/* Empty state centered layout */
 .no-progress {
     display: flex;
     flex-direction: column;
@@ -89,7 +91,7 @@ p {
     }
 }
 
-// Scrollbar styling
+/* Custom scrollbar styling */
 .chapters-list::-webkit-scrollbar {
     width: 6px;
 }
@@ -104,7 +106,7 @@ p {
     border-radius: 10px;
 }
 
-/* Bar styles aus der Willkommensseite übernommen */
+/* Progress bar base styling */
 .bar {
     height: 10px;
     border-radius: 5px;
@@ -113,18 +115,19 @@ p {
     position: relative;
 }
 
+/* Progress bar color variants based on completion percentage */
 .bar.average {
-    background-color: #64b5f6; /* Hellblau */
+    background-color: #64b5f6; /* Light blue for < 50% progress */
 }
 
 .bar.correct {
-    background-color: #81c784; /* Grün */
+    background-color: #81c784; /* Green for >= 50% progress */
 }
 
 .bar.medium {
-    background-color: #fff176; /* Gelb */
+    background-color: #fff176; /* Yellow (unused in this component) */
 }
 
 .bar.wrong {
-    background-color: #e57373; /* Rot */
+    background-color: #e57373; /* Red (unused in this component) */
 }

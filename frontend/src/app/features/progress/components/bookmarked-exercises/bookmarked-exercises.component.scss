@@ -1,7 +1,9 @@
+/* Main container with minimal padding */
 .bookmarked-exercises {
     padding: 8px 0;
 }
 
+/* Empty state centered with large icon and helpful text */
 .no-bookmarks {
     display: flex;
     flex-direction: column;
@@ -30,6 +32,7 @@
     }
 }
 
+/* Scrollable list container for bookmark cards */
 .bookmarks-list {
     display: flex;
     flex-direction: column;
@@ -38,11 +41,12 @@
     overflow-y: auto;
 }
 
+/* Individual bookmark card with blue accent border and hover effect */
 .bookmark-item {
     background-color: rgba(0, 0, 0, 0.03);
     border-radius: 8px;
     padding: 16px;
-    border-left: 4px solid #3f51b5;
+    border-left: 4px solid #3f51b5; /* Blue accent border */
     transition: all 0.2s ease;
     
     &:hover {
@@ -50,6 +54,7 @@
     }
 }
 
+/* Header layout: exercise info on left, actions on right */
 .bookmark-header {
     display: flex;
     justify-content: space-between;
@@ -57,13 +62,14 @@
     margin-bottom: 12px;
 }
 
+/* Exercise type icon and title display */
 .exercise-type {
     display: flex;
     align-items: center;
     
     mat-icon {
         margin-right: 8px;
-        color: #3f51b5;
+        color: #3f51b5; /* Blue icon color */
     }
     
     .exercise-title {
@@ -71,10 +77,12 @@
     }
 }
 
+/* Indented content area below header */
 .bookmark-content {
     margin-left: 32px;
 }
 
+/* Breadcrumb navigation path styling */
 .path-info {
     display: flex;
     align-items: center;
@@ -90,12 +98,14 @@
     }
 }
 
+/* Footer layout: difficulty on left, action button on right */
 .bookmark-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
+/* Difficulty indicator with colored circle */
 .difficulty {
     display: flex;
     align-items: center;
@@ -109,7 +119,7 @@
     }
 }
 
-// Scrollbar styling
+/* Custom scrollbar styling for bookmark list */
 .bookmarks-list::-webkit-scrollbar {
     width: 6px;
 }

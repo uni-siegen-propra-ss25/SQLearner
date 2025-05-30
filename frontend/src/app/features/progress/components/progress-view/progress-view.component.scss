@@ -4,6 +4,7 @@
     padding: 24px;
 }
 
+/* Page header styling */
 .header {
     text-align: center;
     margin-bottom: 32px;
@@ -20,25 +21,29 @@
     }
 }
 
+/* Two-column grid layout for main content */
 .content {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 24px;
     
+    /* Single column on mobile */
     @media (max-width: 768px) {
         grid-template-columns: 1fr;
     }
 }
 
+/* Card styling for both progress and bookmarks */
 .progress-card,
 .bookmarks-card {
     height: 100%;
     min-height: 400px;
-    background-color: #e7e7e9; /* Wie auf der Willkommensseite */
+    background-color: #e7e7e9; /* Consistent with welcome page */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     padding: 16px;
 }
 
+/* Centered loading and error states */
 .loading-container,
 .error-container {
     display: flex;
@@ -52,6 +57,7 @@
     }
 }
 
+/* Overall progress section styling */
 .total-progress {
     margin-bottom: 24px;
     
@@ -67,21 +73,7 @@
     }
 }
 
-.progress-container {
-    display: flex;
-    align-items: center;
-    
-    mat-progress-bar {
-        flex: 1;
-    }
-    
-    .progress-label {
-        margin-left: 16px;
-        font-weight: 500;
-        min-width: 48px;
-    }
-}
-
+/* Empty state styling */
 .no-data {
     display: flex;
     align-items: center;
@@ -92,7 +84,7 @@
     color: rgba(0, 0, 0, 0.6);
 }
 
-/* Bar styles aus der Willkommensseite übernommen */
+/* Custom progress bar styling */
 .bar {
     height: 10px;
     border-radius: 5px;
@@ -102,18 +94,19 @@
     overflow: hidden;
 }
 
+/* Progress bar color variants */
 .bar.average {
-    background-color: #64b5f6; /* Hellblau */
+    background-color: #64b5f6; /* Light blue for general progress */
 }
 
 .bar.correct {
-    background-color: #81c784; /* Grün */
+    background-color: #81c784; /* Green for correct answers */
 }
 
 .bar.medium {
-    background-color: #fff176; /* Gelb */
+    background-color: #fff176; /* Yellow for medium difficulty */
 }
 
 .bar.wrong {
-    background-color: #e57373; /* Rot */
+    background-color: #e57373; /* Red for incorrect answers */
 }
