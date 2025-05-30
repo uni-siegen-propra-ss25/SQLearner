@@ -1,0 +1,16 @@
+.api-key-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  min-width: 350px;
+}
+
+.api-key-field {
+  width: 100%;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
