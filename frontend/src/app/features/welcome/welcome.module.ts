@@ -8,6 +8,7 @@ import { WelcomeRoutingModule } from './welcome-routing.module';
 import { FragenComponent } from './fragen/fragen.component';
 import { PapierkorbComponent } from './fragen/papierkorb/papierkorb.component';
 import { ArchivComponent } from './fragen/archiv/archiv.component';
+import { BeantwortetComponent } from './fragen/beantwortet/beantwortet.component';
 
 @NgModule({
   declarations: [
@@ -16,6 +17,7 @@ import { ArchivComponent } from './fragen/archiv/archiv.component';
     FragenComponent,
     PapierkorbComponent,
     ArchivComponent,
+    BeantwortetComponent
   ],
   imports: [
     CommonModule,

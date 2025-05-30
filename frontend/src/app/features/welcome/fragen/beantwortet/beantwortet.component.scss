@@ -1,0 +1,64 @@
+@import '../archiv/archiv.component.scss';
+
+.beantwortet-header {
+  background-color: #b3cbbf; // sanftes Grün für "erledigt"
+  padding: 1rem;
+  text-align: center;
+  border-radius: 8px 8px 0 0;
+}
+
+.archiv-liste {
+  padding: 1rem;
+  background-color: #f7faf3;
+  border-radius: 0 0 8px 8px;
+}
+
+.archiv-item {
+  background-color: white;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  margin-bottom: 1rem;
+  padding: 1rem;
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.aktionen {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.icon-button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+}
+
+.icon-button img {
+  width: 24px;
+  height: 24px;
+}
+
+.frage {
+  margin-top: 0.5rem;
+  font-weight: 600;
+}
+
+.antwort {
+  margin-top: 0.5rem;
+  font-style: italic;
+  color: #444;
+}
+
+.zeitstempel {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #666;
+}

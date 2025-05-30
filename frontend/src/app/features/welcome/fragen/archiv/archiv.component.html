@@ -9,8 +9,9 @@
   <div class="archiv-liste" *ngIf="fragen.length > 0; else leer">
     <div class="archiv-item" *ngFor="let frage of fragen">
       <div class="frage-info">
-        <strong>{{ frage.name }}</strong> ({{ frage.datum }})
-        <p>„{{ frage.text }}“</p>
+        <strong>{{ frage.student }}</strong> ({{ frage.datum }} {{ frage.uhrzeit }})
+        <p class="frage-text">„{{ frage.frageText }}“</p>
+        <p class="antwort-text"><strong>Antwort:</strong> {{ frage.antwort }}</p>
       </div>
       <div class="frage-aktionen">
         <button mat-icon-button color="primary" (click)="wiederherstellen(frage)">

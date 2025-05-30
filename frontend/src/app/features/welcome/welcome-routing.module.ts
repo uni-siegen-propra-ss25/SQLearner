@@ -6,6 +6,7 @@ import { AufgabeComponent } from './aufgaben/aufgaben.component';
 import { FragenComponent } from './fragen/fragen.component';
 import { PapierkorbComponent } from './fragen/papierkorb/papierkorb.component';
 import { ArchivComponent } from './fragen/archiv/archiv.component';
+import { BeantwortetComponent } from './fragen/beantwortet/beantwortet.component';
 
 const routes: Routes = [
   { path: '', component: WelcomeComponent },          
@@ -13,6 +14,8 @@ const routes: Routes = [
   { path: 'fragen', component: FragenComponent },   
   { path: 'papierkorb', component: PapierkorbComponent },
   { path: 'archiv', component: ArchivComponent },
+  { path: 'beantwortet', component: BeantwortetComponent },
+ 
 ];
 
 @NgModule({
