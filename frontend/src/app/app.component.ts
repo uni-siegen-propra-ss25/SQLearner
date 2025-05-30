@@ -32,7 +32,7 @@ export class AppComponent implements OnInit, OnDestroy {
         { icon: 'groups', label: 'Nutzerverwaltung', route: '/users', requiredRoles: [Role.TUTOR] },
         { icon: 'timeline', label: 'Roadmap', route: '/roadmap', requiredRoles: [Role.TUTOR] },
         {
-            icon: 'database',
+            icon: 'storage',
             label: 'Datenbanken',
             route: '/databases',
             requiredRoles: [Role.TUTOR],
