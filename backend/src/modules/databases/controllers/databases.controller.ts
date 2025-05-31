@@ -29,6 +29,14 @@ import { Roles } from '../../../common/decorators/role.decorator';
 import { GetUser } from '../../../common/decorators/get-user.decorator';
 import { Role } from '@prisma/client';
 
+/**
+ * Controller managing database operations for the SQL learning system.
+ * Handles creation, modification, and deletion of practice databases.
+ * Includes functionality for uploading SQL files and managing database access.
+ * Protected by JWT authentication and role-based access control.
+ *
+ * @class DatabasesController
+ */
 @ApiTags('Databases')
 @Controller('databases')
 @UseGuards(JwtAuthGuard, RolesGuard)

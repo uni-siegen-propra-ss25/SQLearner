@@ -32,6 +32,13 @@ import { CreateUserDto } from 'src/modules/users/models/create-user.dto';
 import { RegisterCredentialsDto } from '../models/register-credentials.dto';
 import { User } from '@prisma/client';
 
+/**
+ * Controller responsible for authentication-related operations.
+ * Handles user registration, login, and profile management.
+ * Uses JWT tokens for authentication and supports different user roles.
+ *
+ * @class AuthController
+ */
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {

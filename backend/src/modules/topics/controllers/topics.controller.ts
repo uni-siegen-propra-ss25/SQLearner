@@ -19,11 +19,28 @@ import { CreateTopicDto } from '../models/create-topic.dto';
 import { ReorderTopicsDto } from '../models/reorder-topics.dto';
 import { UpdateTopicDto } from '../models/update-topic.dto';
 
+/**
+ * Controller managing topic-related operations within chapters.
+ * Handles CRUD operations for topics and their ordering within chapters.
+ * Topics are organizational units that contain exercises and serve as
+ * learning units within the chapter structure.
+ *
+ * Protected by role-based access control for modifications.
+ *
+ * @class TopicsController
+ */
 @ApiTags('Topics')
 @Controller('chapters/:chapterId/topics')
 export class TopicsController {
     constructor(private readonly topicsService: TopicsService) {}
 
+    /**
+     * Retrieves all topics for a specific chapter.
+     *
+     * @param chapterId - The ID of the chapter whose topics to retrieve
+     * @returns Promise resolving to an array of Topic objects
+     * @throws NotFoundException if the chapter does not exist
+     */
     @Get()
     @ApiOperation({ summary: 'Get all topics in a chapter' })
     @ApiParam({ name: 'chapterId', description: 'Chapter ID' })
@@ -33,6 +50,14 @@ export class TopicsController {
         return topics;
     }
 
+    /**
+     * Retrieves a specific topic by ID.
+     *
+     * @param chapterId - The ID of the chapter containing the topic
+     * @param id - The ID of the topic to retrieve
+     * @returns Promise resolving to a Topic object
+     * @throws NotFoundException if the topic does not exist
+     */
     @Get(':id')
     @ApiOperation({ summary: 'Get a topic by ID' })
     @ApiParam({ name: 'chapterId', description: 'Chapter ID' })
@@ -50,6 +75,14 @@ export class TopicsController {
         return topic;
     }
 
+    /**
+     * Creates a new topic in a chapter.
+     *
+     * @param chapterId - The ID of the chapter to create the topic in
+     * @param createTopicDto - The data for creating the new topic
+     * @returns Promise resolving to the ID of the created topic
+     * @throws NotFoundException if the chapter does not exist
+     */
     @Post()
     @Roles(Role.TUTOR, Role.ADMIN)
     @HttpCode(HttpStatus.CREATED)
@@ -65,13 +98,21 @@ export class TopicsController {
         return topicId;
     }
 
+    /**
+     * Updates an existing topic.
+     *
+     * @param chapterId - The ID of the chapter containing the topic
+     * @param id - The ID of the topic to update
+     * @param updateTopicDto - The data to update the topic with
+     * @returns Promise resolving to the updated Topic object
+     * @throws NotFoundException if the topic does not exist
+     */
     @Put(':id')
     @Roles(Role.TUTOR, Role.ADMIN)
     @ApiOperation({ summary: 'Update a topic' })
     @ApiParam({ name: 'chapterId', description: 'Chapter ID' })
     @ApiParam({ name: 'id', description: 'Topic ID' })
     @ApiResponse({ status: 200, description: 'The topic has been updated' })
-    @ApiResponse({ status: 404, description: 'Topic not found' })
     async updateTopic(
         @Param('chapterId') chapterId: number,
         @Param('id') id: number,
@@ -82,6 +123,13 @@ export class TopicsController {
         return topic;
     }
 
+    /**
+     * Removes a topic and all its associated exercises.
+     *
+     * @param chapterId - The ID of the chapter containing the topic
+     * @param id - The ID of the topic to remove
+     * @throws NotFoundException if the topic does not exist
+     */
     @Delete(':id')
     @Roles(Role.TUTOR, Role.ADMIN)
     @HttpCode(HttpStatus.NO_CONTENT)
@@ -89,7 +137,6 @@ export class TopicsController {
     @ApiParam({ name: 'chapterId', description: 'Chapter ID' })
     @ApiParam({ name: 'id', description: 'Topic ID' })
     @ApiResponse({ status: 204, description: 'The topic has been deleted' })
-    @ApiResponse({ status: 404, description: 'Topic not found' })
     async removeTopic(
         @Param('chapterId') chapterId: number,
         @Param('id') id: number,
@@ -98,6 +145,13 @@ export class TopicsController {
         return;
     }
 
+    /**
+     * Updates the order of topics within a chapter.
+     *
+     * @param chapterId - The ID of the chapter containing the topics
+     * @param reorderTopicsDto - The new order of topics
+     * @throws NotFoundException if any topic does not exist
+     */
     @Put('reorder')
     @Roles(Role.TUTOR, Role.ADMIN)
     @HttpCode(HttpStatus.NO_CONTENT)
