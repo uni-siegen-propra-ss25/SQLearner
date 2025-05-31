@@ -42,6 +42,36 @@ export class UsersController {
     }
 
     /**
+     * Retrieves a user by their ID.
+     * Accessible only by administrators and tutors.
+     * 
+     * @param id - The ID of the user to retrieve
+     * @returns Promise resolving to a User object
+     */
+    @Get(':id')
+    @Roles('ADMIN', 'TUTOR')
+    @ApiOperation({ summary: 'Get user by ID' })
+    @ApiResponse({ status: 200, description: 'User found successfully' })
+    async getUserById(@Param('id', ParseIntPipe) id: number): Promise<Partial<User>> {
+        return await this.usersService.getUserById(id);
+    }
+
+    /**
+     * Retrieves a user by their email.
+     * Accessible only by administrators and tutors.
+     * 
+     * @param email - The email of the user to retrieve
+     * @returns Promise resolving to a User object
+     */
+    @Get('byEmail/:email')
+    @Roles('ADMIN', 'TUTOR')
+    @ApiOperation({ summary: 'Get user by email' })
+    @ApiResponse({ status: 200, description: 'User found successfully' })
+    async getUserByEmail(@Param('email') email: string): Promise<Partial<User>> {
+        return this.usersService.getUserByEmail(email);
+    }
+
+    /**
      * Retrieves users by their role.
      * Accessible only by administrators and tutors.
      * 

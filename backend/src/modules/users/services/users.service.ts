@@ -75,6 +75,65 @@ export class UsersService {
     }
 
     /**
+     * Retrieves a user by their ID.
+     * Password field is excluded from the results.
+     * 
+     * @param id - The ID of the user to retrieve
+     * @returns Promise resolving to a User object
+     * @throws NotFoundException if the user does not exist
+     */
+    async getUserById(id: number): Promise<Partial<User>> {
+        const user = await this.prisma.user.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                matriculationNumber: true,
+                role: true,
+                progress: true,
+                createdAt: true,
+                updatedAt: true,
+                password: false,
+            },
+        });
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+        return user;
+    }
+
+    /**
+     * Retrieves a user by their email.
+     * Accessible only by administrators and tutors.
+     * 
+     * @param email - The email of the user to retrieve
+     * @returns Promise resolving to a User object
+     */
+    async getUserByEmail(email: string): Promise<User> {
+        const user = await this.prisma.user.findUnique({
+            where: { email },
+            select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                matriculationNumber: true,
+                role: true,
+                progress: true,
+                createdAt: true,
+                updatedAt: true,
+                password: true, // Include password for authentication purposes
+            },
+        });
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+        return user;
+    }
+
+    /**
      * Retrieves users by their role.
      * Password field is excluded from the results.
      * 
