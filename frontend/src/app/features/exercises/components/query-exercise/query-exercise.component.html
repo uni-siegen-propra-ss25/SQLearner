@@ -1,16 +1,29 @@
 <div class="query-exercise">
   <mat-card-content>
+    <h2 class="exercise-title">{{ exercise.title }}</h2>
+    <p class="exercise-description">{{ exercise.description }}</p>
+
+    <!-- Database Info -->
+    <div class="database-info" *ngIf="exercise.database">
+      <mat-chip-listbox>
+        <mat-chip color="primary">
+          <mat-icon>database</mat-icon>
+          {{ exercise.database.name }}
+        </mat-chip>
+      </mat-chip-listbox>
+    </div>
+
     <!-- SQL Editor -->
     <div class="editor-section">
-      <mat-form-field appearance="fill" class="sql-editor">
-        <mat-label>SQL Query</mat-label>
+      <mat-form-field appearance="outline" class="sql-editor">
+        <mat-label>Deine SQL Query</mat-label>
         <textarea
           matInput
           [(ngModel)]="sqlQuery"
           rows="6"
           placeholder="SELECT * FROM..."
         ></textarea>
-        <mat-icon matSuffix>code</mat-icon>
+        <mat-hint>Schreibe deine SQL-Abfrage hier</mat-hint>
       </mat-form-field>
     </div>
 
