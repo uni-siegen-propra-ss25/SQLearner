@@ -1,0 +1,34 @@
+<h2 mat-dialog-title>Neue Datenbank erstellen</h2>
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <mat-dialog-content>
+        <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Name</mat-label>
+            <input matInput formControlName="name" required>
+            <mat-error *ngIf="form.get('name')?.hasError('required')">
+                Name ist erforderlich
+            </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Beschreibung</mat-label>
+            <textarea matInput formControlName="description" rows="3"></textarea>
+        </mat-form-field>
+
+        <div class="sql-schema-field">
+                    <mat-form-field appearance="fill" class="full-width">
+                        <mat-label>SQL-Schema</mat-label>
+                        <textarea matInput formControlName="schemaSql" rows="10" required></textarea>
+                        <mat-error *ngIf="form.get('schemaSql')?.hasError('required')">
+                            SQL-Schema ist erforderlich
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+        <button mat-button type="button" (click)="onCancel()">Abbrechen</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="!form.valid">
+            Erstellen
+        </button>
+    </mat-dialog-actions>
+</form>

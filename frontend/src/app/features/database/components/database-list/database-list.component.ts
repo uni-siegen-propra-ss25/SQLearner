@@ -1,19 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { DatabaseService } from '../services/database.service';
-import { Database } from '../models/database.model';
 import { AuthService } from 'app/features/auth/services/auth.service';
-import { Role } from 'app/features/users/models/role.model';
-import { UploadDatabaseDialogComponent } from './upload-database-dialog/upload-database-dialog.component';
-import { CreateDatabaseDialogComponent } from './create-database-dialog/create-database-dialog.component';
-import { EditDatabaseDialogComponent } from './edit-database-dialog/edit-database-dialog.component';
+import { CreateDatabaseDialogComponent } from '../../dialogs/create-database-dialog/create-database-dialog.component';
+import { EditDatabaseDialogComponent } from '../../dialogs/edit-database-dialog/edit-database-dialog.component';
+import { UploadDatabaseDialogComponent } from '../../dialogs/upload-database-dialog/upload-database-dialog.component';
+import { Database } from '../../models/database.model';
+import { DatabaseService } from '../../services/database.service';
 
 @Component({
-    selector: 'app-database',
-    templateUrl: './database.component.html',
-    styleUrls: ['./database.component.scss']
+    selector: 'app-database-list',
+    templateUrl: './database-list.component.html',
+    styleUrls: ['./database-list.component.scss']
 })
-export class DatabaseComponent implements OnInit {
+export class DatabaseListComponent implements OnInit {
     databases: Database[] = [];
     isTutor = false;
     displayedColumns: string[] = ['name', 'description', 'createdAt', 'actions'];
