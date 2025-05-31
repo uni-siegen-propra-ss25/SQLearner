@@ -16,10 +16,6 @@
   background: var(--surface-color, #fff);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(31, 38, 135, 0.2);
-  }
 
   mat-card-header {
     margin-bottom: 2rem;
@@ -91,25 +87,5 @@ mat-card-actions {
   button {
     transition: all 0.2s ease;
     margin-left: 1rem;
-    &:hover {
-      transform: translateY(-2px);
-    }
-  }
-}
-
-// Dark theme adjustments
-:host-context(.dark-theme) {
-  .profile-dialog-container {
-    --background-gradient: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-  }
-
-  .profile-card {
-    --surface-color: #2d2d2d;
-    --border-color: rgba(255, 255, 255, 0.12);
-  }
-
-  .profile-info-row {
-    --info-row-background: rgba(255, 255, 255, 0.05);
-    --info-row-hover-background: rgba(255, 255, 255, 0.08);
   }
 }
