@@ -34,8 +34,7 @@ export class ExerciseDialogComponent implements OnInit {
 
     private initForm() {
         const type = this.data.type || ExerciseType.QUERY;
-        const validators =
-            type === ExerciseType.QUERY ? [Validators.required] : [];
+        const validators = type === ExerciseType.QUERY ? [Validators.required] : [];
 
         this.exerciseForm = this.fb.group({
             title: [this.data.title || '', Validators.required],
@@ -129,7 +128,9 @@ export class ExerciseDialogComponent implements OnInit {
     }
 
     private loadDatabases() {
-        this.databaseService.getAllDatabases().subscribe((databases: Database[]) => (this.databases = databases));
+        this.databaseService
+            .getAllDatabases()
+            .subscribe((databases: Database[]) => (this.databases = databases));
     }
 
     get answers() {

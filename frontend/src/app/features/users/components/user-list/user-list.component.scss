@@ -7,193 +7,193 @@ $color-text: rgba(0, 0, 0, 0.87);
 $color-text-light: rgba(0, 0, 0, 0.6);
 
 .user-list-container {
-    padding: 24px;
+  padding: 24px;
 
-    .header {
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+
+    h1 {
+      margin: 0;
+      font-size: 1.5rem;
+      color: $color-text;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+
+      button {
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        margin-bottom: 24px;
+        gap: 8px;
+      }
+    }
+  }
 
-        h1 {
-            margin: 0;
-            font-size: 1.5rem;
-            color: $color-text;
-        }
+  mat-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
 
-        .actions {
-            display: flex;
-            gap: 12px;
+    mat-card-content {
+      padding: 0;
+    }
+  }
 
-            button {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-        }
+  .user-table {
+    width: 100%;
+    background: white;
+
+    .mat-mdc-header-cell {
+      font-weight: 500;
+      color: $color-text;
+      font-size: 0.875rem;
+      padding: 20px 16px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
     }
 
-    mat-card {
-        background: white;
-        border-radius: 12px;
-        overflow: hidden;
-
-        mat-card-content {
-            padding: 0;
-        }
+    .mat-mdc-cell {
+      padding: 16px;
+      font-size: 0.9375rem;
+      color: $color-text;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
     }
 
-    .user-table {
-        width: 100%;
-        background: white;
+    .mat-mdc-row {
+      position: relative;
+      transition: background-color 0.2s;
 
-        .mat-mdc-header-cell {
-            font-weight: 500;
-            color: $color-text;
-            font-size: 0.875rem;
-            padding: 20px 16px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-        }
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.02);
+      }
 
+      &:last-child {
         .mat-mdc-cell {
-            padding: 16px;
-            font-size: 0.9375rem;
-            color: $color-text;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+          border-bottom: none;
+        }
+      }
+    }
+
+    // User Info Column
+    .mat-column-name {
+      min-width: 200px;
+
+      .full-name {
+        font-weight: 500;
+        color: $color-text;
+      }
+    }
+
+    // Role Column
+    .mat-column-role {
+      width: 150px;
+
+      .role-badge {
+        padding: 4px 12px;
+        border-radius: 16px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-align: center;
+        display: inline-block;
+        min-width: 100px;
+
+        &.admin {
+          background-color: rgba($color-primary, 0.12);
+          color: $color-primary;
         }
 
-        .mat-mdc-row {
-            position: relative;
-            transition: background-color 0.2s;
+        &.tutor {
+          background-color: rgba($color-purple, 0.12);
+          color: $color-purple;
+        }
+
+        &.student {
+          background-color: rgba($color-success, 0.12);
+          color: $color-success;
+        }
+      }
+    }
+
+    // Matrikelnummer Column
+    .mat-column-matriculationNumber {
+      width: 150px;
+      color: $color-text-light;
+
+      .no-value {
+        color: rgba(0, 0, 0, 0.38);
+      }
+    }
+
+    // Actions Column
+    .actions-cell {
+      width: auto;
+      white-space: nowrap;
+      padding-right: 24px;
+
+      .action-buttons {
+        display: flex;
+        gap: 8px;
+
+        button {
+          width: 36px;
+          height: 36px;
+          padding: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: background-color 0.2s;
+
+          &[color='primary'] {
+            background-color: rgba($color-primary, 0.12);
+            color: $color-primary;
 
             &:hover {
-                background-color: rgba(0, 0, 0, 0.02);
+              background-color: rgba($color-primary, 0.18);
             }
+          }
 
-            &:last-child {
-                .mat-mdc-cell {
-                    border-bottom: none;
-                }
+          &[color='warn'] {
+            background-color: rgba($color-warn, 0.12);
+            color: $color-warn;
+
+            &:hover {
+              background-color: rgba($color-warn, 0.18);
             }
+          }
+
+          mat-icon {
+            width: 24px;
+            height: 24px;
+            font-size: 24px;
+          }
         }
+      }
+    }
+  }
 
-        // User Info Column
-        .mat-column-name {
-            min-width: 200px;
-            
-            .full-name {
-                font-weight: 500;
-                color: $color-text;
-            }
-        }
+  // Empty State
+  .no-data {
+    padding: 48px;
+    text-align: center;
+    color: $color-text-light;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
 
-        // Role Column
-        .mat-column-role {
-            width: 150px;
-
-            .role-badge {
-                padding: 4px 12px;
-                border-radius: 16px;
-                font-size: 0.875rem;
-                font-weight: 500;
-                text-align: center;
-                display: inline-block;
-                min-width: 100px;
-
-                &.admin {
-                    background-color: rgba($color-primary, 0.12);
-                    color: $color-primary;
-                }
-
-                &.tutor {
-                    background-color: rgba($color-purple, 0.12);
-                    color: $color-purple;
-                }
-
-                &.student {
-                    background-color: rgba($color-success, 0.12);
-                    color: $color-success;
-                }
-            }
-        }
-
-        // Matrikelnummer Column
-        .mat-column-matriculationNumber {
-            width: 150px;
-            color: $color-text-light;
-
-            .no-value {
-                color: rgba(0, 0, 0, 0.38);
-            }
-        }
-
-        // Actions Column
-        .actions-cell {
-            width: auto;
-            white-space: nowrap;
-            padding-right: 24px;
-
-            .action-buttons {
-                display: flex;
-                gap: 8px;
-
-                button {
-                    width: 36px;
-                    height: 36px;
-                    padding: 0;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    transition: background-color 0.2s;
-
-                    &[color='primary'] {
-                        background-color: rgba($color-primary, 0.12);
-                        color: $color-primary;
-
-                        &:hover {
-                            background-color: rgba($color-primary, 0.18);
-                        }
-                    }
-
-                    &[color='warn'] {
-                        background-color: rgba($color-warn, 0.12);
-                        color: $color-warn;
-
-                        &:hover {
-                            background-color: rgba($color-warn, 0.18);
-                        }
-                    }
-
-                    mat-icon {
-                        width: 24px;
-                        height: 24px;
-                        font-size: 24px;
-                    }
-                }
-            }
-        }
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      opacity: 0.6;
     }
 
-    // Empty State
-    .no-data {
-        padding: 48px;
-        text-align: center;
-        color: $color-text-light;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 16px;
-
-        mat-icon {
-            font-size: 48px;
-            width: 48px;
-            height: 48px;
-            opacity: 0.6;
-        }
-
-        p {
-            margin: 0;
-            font-size: 1rem;
-        }
+    p {
+      margin: 0;
+      font-size: 1rem;
     }
+  }
 }

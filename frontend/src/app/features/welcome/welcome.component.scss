@@ -24,7 +24,6 @@
   gap: 24px;
 }
 
-
 .left-column {
   width: 60%;
   display: flex;
@@ -38,7 +37,6 @@
   flex-direction: column;
   justify-content: flex-start; /* Inhalt oben ausrichten */
 }
-
 
 /* Gemeinsamer Stil für alle Boxen */
 .box,
@@ -196,9 +194,9 @@
 }
 
 .transparent-table {
-  background-color: transparent !important;  /* Hintergrund weg */
-  box-shadow: none !important;                /* Schatten entfernen */
-  color: inherit;                             /* Textfarbe übernehmen */
+  background-color: transparent !important; /* Hintergrund weg */
+  box-shadow: none !important; /* Schatten entfernen */
+  color: inherit; /* Textfarbe übernehmen */
 }
 
 .transparent-table th.mat-header-cell {

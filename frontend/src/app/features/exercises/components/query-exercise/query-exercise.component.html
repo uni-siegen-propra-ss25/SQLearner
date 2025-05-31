@@ -3,14 +3,13 @@
     <div class="exercise-header">
       <h2 class="exercise-title">{{ exercise.title }}</h2>
       <div class="database-info" *ngIf="exercise.database">
-          <mat-icon>storage</mat-icon>
-          <span>
-            {{ exercise.database.name }}
-          </span>
+        <mat-icon>storage</mat-icon>
+        <span>
+          {{ exercise.database.name }}
+        </span>
       </div>
     </div>
     <p class="exercise-description">{{ exercise.description }}</p>
-
 
     <!-- SQL Editor -->
     <div class="editor-section">
@@ -26,7 +25,7 @@
       </mat-form-field>
     </div>
 
-        <!-- Actions -->
+    <!-- Actions -->
     <div class="actions">
       <div class="toggle-view">
         <mat-button-toggle-group [(ngModel)]="currentView">
@@ -40,9 +39,9 @@
       </div>
 
       <div class="query-actions">
-        <button 
-          mat-stroked-button 
-          [disabled]="!sqlQuery.trim() || isLoading" 
+        <button
+          mat-stroked-button
+          [disabled]="!sqlQuery.trim() || isLoading"
           (click)="runQuery()"
           matTooltip="Testet deine Query direkt in der Datenbank. Das Ergebnis wird dir sofort angezeigt."
         >
@@ -84,12 +83,15 @@
             <mat-icon>table_chart</mat-icon>
             {{ isLoading ? 'Query wird ausgeführt...' : 'Ergebnis deiner Query' }}
           </h3>
-          
+
           <mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
 
           <div class="results-table" *ngIf="!isLoading && queryResult">
             <div class="table-stats">
-              {{ queryResult.rows.length }} Zeile{{ queryResult.rows.length !== 1 ? 'n' : '' }} gefunden
+              {{ queryResult.rows.length }} Zeile{{
+                queryResult.rows.length !== 1 ? 'n' : ''
+              }}
+              gefunden
             </div>
             <div class="table-container mat-elevation-z1">
               <table mat-table [dataSource]="queryResult.rows">
@@ -107,7 +109,7 @@
             </div>
           </div>
         </div>
-        
+
         <div class="empty-state" *ngIf="!queryResult && !isLoading">
           <mat-icon>table_chart</mat-icon>
           <p>Führe eine Query aus, um das Ergebnis zu sehen.</p>

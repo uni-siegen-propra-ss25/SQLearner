@@ -20,33 +20,27 @@ export class ChatController {
 
     /**
      * Processes and sends a user message to the AI assistant.
-     * 
+     *
      * @param userId - The ID of the user sending the message
      * @param message - The message data containing content and context
      * @returns Promise resolving to the created Message object including the AI response
      */
     @Post()
     @ApiOperation({ summary: 'Send a message to the AI assistant' })
-    async sendMessage(
-        @GetUser('id') userId: number,
-        @Body() message: MessageDto
-    ) {
+    async sendMessage(@GetUser('id') userId: number, @Body() message: MessageDto) {
         return this.chatService.sendMessage(userId, message);
     }
 
     /**
      * Retrieves chat messages for a specific user and context.
-     * 
+     *
      * @param userId - The ID of the user whose messages to retrieve
      * @param context - Optional context identifier to filter messages
      * @returns Promise resolving to an array of Message objects
      */
     @Get()
     @ApiOperation({ summary: 'Get chat messages for a context' })
-    async getMessages(
-        @GetUser('id') userId: number,
-        @Query('context') context?: string
-    ) {
+    async getMessages(@GetUser('id') userId: number, @Query('context') context?: string) {
         return this.chatService.getMessages(userId, context);
     }
 }

@@ -8,44 +8,42 @@
 <div class="main-content">
   <!-- Linke Spalte -->
   <div class="left-column">
+    <!-- Fortschritt -->
+    <mat-card class="box fortschritt-box">
+      <h3>Fortschritt der Studierenden</h3>
 
-<!-- Fortschritt -->
-<mat-card class="box fortschritt-box">
-  <h3>Fortschritt der Studierenden</h3>
+      <mat-form-field appearance="fill" class="dropdown">
+        <mat-label>Kurs wählen</mat-label>
+        <mat-select>
+          <mat-option value="sql">SQL</mat-option>
+          <mat-option value="xml">XML</mat-option>
+          <mat-option value="rd">Rationale Datenbank</mat-option>
+        </mat-select>
+      </mat-form-field>
 
-  <mat-form-field appearance="fill" class="dropdown">
-    <mat-label>Kurs wählen</mat-label>
-    <mat-select>
-      <mat-option value="sql">SQL</mat-option>
-      <mat-option value="xml">XML</mat-option>
-      <mat-option value="rd">Rationale Datenbank</mat-option>
-    </mat-select>
-  </mat-form-field>
+      <div class="fortschritt-daten">
+        <p><strong>Durchschnitt:</strong> 75%</p>
+        <div class="bar average" style="width: 75%"></div>
 
-  <div class="fortschritt-daten">
-    <p><strong>Durchschnitt:</strong> 75%</p>
-    <div class="bar average" style="width: 75%"></div>
+        <p><strong>Korrekt beantwortet:</strong> 60%</p>
+        <div class="bar correct" style="width: 60%"></div>
 
-    <p><strong>Korrekt beantwortet:</strong> 60%</p>
-    <div class="bar correct" style="width: 60%"></div>
+        <p><strong>Unvollständig beantwortet:</strong> 10%</p>
+        <div class="bar medium" style="width: 10%"></div>
 
-    <p><strong>Unvollständig beantwortet:</strong> 10%</p>
-    <div class="bar medium" style="width: 10%"></div>
+        <p><strong>Falsch beantwortet:</strong> 5%</p>
+        <div class="bar wrong" style="width: 5%"></div>
 
-    <p><strong>Falsch beantwortet:</strong> 5%</p>
-    <div class="bar wrong" style="width: 5%"></div>
+        <div class="tendenz">
+          <span>Leistung: [ steigend ]</span>
+          <mat-icon>trending_up</mat-icon>
+        </div>
+      </div>
 
-    <div class="tendenz">
-      <span>Leistung: [ steigend ]</span>
-      <mat-icon>trending_up</mat-icon>
-    </div>
-  </div>
-
-  <div class="button-row">
-    <button mat-button class="flach-button" routerLink="/fortschritt">Details ansehen</button>
-  </div>
-</mat-card>
-
+      <div class="button-row">
+        <button mat-button class="flach-button" routerLink="/fortschritt">Details ansehen</button>
+      </div>
+    </mat-card>
 
     <!-- Fragen -->
     <div class="box">
@@ -68,57 +66,59 @@
 
     <!-- Aufgaben -->
     <mat-card class="box aufgaben-box">
-   <h3>Aufgaben erstellen und hochladen</h3>
+      <h3>Aufgaben erstellen und hochladen</h3>
 
-    <table mat-table [dataSource]="aufgaben" class="mat-elevation-z8 transparent-table" style="width: 100%;">
-    <!-- Titel Spalte -->
-    <ng-container matColumnDef="titel">
-      <th mat-header-cell *matHeaderCellDef>Titel</th>
-      <td mat-cell *matCellDef="let aufgabe">{{ aufgabe.titel }}</td>
-    </ng-container>
+      <table
+        mat-table
+        [dataSource]="aufgaben"
+        class="mat-elevation-z8 transparent-table"
+        style="width: 100%"
+      >
+        <!-- Titel Spalte -->
+        <ng-container matColumnDef="titel">
+          <th mat-header-cell *matHeaderCellDef>Titel</th>
+          <td mat-cell *matCellDef="let aufgabe">{{ aufgabe.titel }}</td>
+        </ng-container>
 
-    <!-- Typ Spalte -->
-    <ng-container matColumnDef="typ">
-      <th mat-header-cell *matHeaderCellDef>Typ</th>
-      <td mat-cell *matCellDef="let aufgabe">{{ aufgabe.typ }}</td>
-    </ng-container>
+        <!-- Typ Spalte -->
+        <ng-container matColumnDef="typ">
+          <th mat-header-cell *matHeaderCellDef>Typ</th>
+          <td mat-cell *matCellDef="let aufgabe">{{ aufgabe.typ }}</td>
+        </ng-container>
 
-    <!-- Kategorie Spalte -->
-    <ng-container matColumnDef="kategorie">
-      <th mat-header-cell *matHeaderCellDef>Kategorie</th>
-      <td mat-cell *matCellDef="let aufgabe">{{ aufgabe.kategorie }}</td>
-    </ng-container>
+        <!-- Kategorie Spalte -->
+        <ng-container matColumnDef="kategorie">
+          <th mat-header-cell *matHeaderCellDef>Kategorie</th>
+          <td mat-cell *matCellDef="let aufgabe">{{ aufgabe.kategorie }}</td>
+        </ng-container>
 
-    <!-- Erstelldatum Spalte -->
-    <ng-container matColumnDef="datum">
-      <th mat-header-cell *matHeaderCellDef>Erstelldatum</th>
-      <td mat-cell *matCellDef="let aufgabe">{{ aufgabe.datum }}</td>
-    </ng-container>
+        <!-- Erstelldatum Spalte -->
+        <ng-container matColumnDef="datum">
+          <th mat-header-cell *matHeaderCellDef>Erstelldatum</th>
+          <td mat-cell *matCellDef="let aufgabe">{{ aufgabe.datum }}</td>
+        </ng-container>
 
-    <!-- Header und Row Definition -->
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        <!-- Header und Row Definition -->
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
 
-  </table>
-
-  <div class="button-row">
-    <button mat-icon-button color="primary" (click)="goToAufgaben()">
-      <mat-icon style="color: rgb(61, 104, 150);">add</mat-icon>
-    </button>
+      <div class="button-row">
+        <button mat-icon-button color="primary" (click)="goToAufgaben()">
+          <mat-icon style="color: rgb(61, 104, 150)">add</mat-icon>
+        </button>
+      </div>
+    </mat-card>
   </div>
-</mat-card>
-
-</div>
 
   <!-- Rechte Spalte -->
   <div class="right-column">
-    
     <mat-card class="hinweise-box">
       <h3>Hinweise</h3>
 
       <mat-form-field appearance="fill" class="hinweis-input">
         <mat-label>Neuer Hinweis</mat-label>
-        <input matInput [(ngModel)]="newHinweis" name="hinweis">
+        <input matInput [(ngModel)]="newHinweis" name="hinweis" />
       </mat-form-field>
 
       <div class="hinweis-button-container">

@@ -8,22 +8,15 @@ import { DatabaseCreateDialogComponent } from './dialogs/database-create-dialog/
 import { DatabaseEditDialogComponent } from './dialogs/database-edit-dialog/database-edit-dialog.component';
 import { DatabaseUploadDialogComponent } from './dialogs/database-upload-dialog/database-upload-dialog.component';
 
-const routes: Routes = [
-    { path: '', component: DatabaseListComponent }
-];
+const routes: Routes = [{ path: '', component: DatabaseListComponent }];
 
 @NgModule({
     declarations: [
         DatabaseListComponent,
         DatabaseCreateDialogComponent,
         DatabaseEditDialogComponent,
-        DatabaseUploadDialogComponent
+        DatabaseUploadDialogComponent,
     ],
-    imports: [
-        CommonModule,
-        MaterialModule,
-        ReactiveFormsModule,
-        RouterModule.forChild(routes)
-    ]
+    imports: [CommonModule, MaterialModule, ReactiveFormsModule, RouterModule.forChild(routes)],
 })
-export class DatabaseModule { }
+export class DatabaseModule {}

@@ -24,9 +24,18 @@
     </select>
 
     <div class="difficulty">
-      <label><input type="radio" name="level" value="leicht" [(ngModel)]="schwierigkeit" /> Leicht</label>
-      <label><input type="radio" name="level" value="mittel" [(ngModel)]="schwierigkeit" /> Mittel</label>
-      <label><input type="radio" name="level" value="schwer" [(ngModel)]="schwierigkeit" /> Schwer</label>
+      <label
+        ><input type="radio" name="level" value="leicht" [(ngModel)]="schwierigkeit" />
+        Leicht</label
+      >
+      <label
+        ><input type="radio" name="level" value="mittel" [(ngModel)]="schwierigkeit" />
+        Mittel</label
+      >
+      <label
+        ><input type="radio" name="level" value="schwer" [(ngModel)]="schwierigkeit" />
+        Schwer</label
+      >
     </div>
 
     <div class="card card-body bg-light border border-primary">
@@ -36,14 +45,16 @@
           placeholder="Aufgabenstellung"
           [(ngModel)]="beschreibung"
           rows="5"
-          class="form-control">
+          class="form-control"
+        >
         </textarea>
         <br />
         <textarea
           placeholder="Musterlösung"
           [(ngModel)]="musterloesung"
           rows="3"
-          class="form-control">
+          class="form-control"
+        >
         </textarea>
       </div>
 
@@ -102,8 +113,11 @@
       </ul>
     </div>
     <p><strong>Kommentar:</strong> {{ hochgeladeneAufgabe.notiz }}</p>
-    <p><strong>Datei:</strong>
-      <a [href]="hochgeladeneAufgabe.dateiUrl" target="_blank">{{ hochgeladeneAufgabe.dateiName }}</a>
+    <p>
+      <strong>Datei:</strong>
+      <a [href]="hochgeladeneAufgabe.dateiUrl" target="_blank">{{
+        hochgeladeneAufgabe.dateiName
+      }}</a>
     </p>
   </div>
 </div>

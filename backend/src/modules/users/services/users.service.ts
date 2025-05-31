@@ -13,13 +13,13 @@ import { PrismaService } from '../../../prisma/prisma.service';
 export class UsersService {
     constructor(
         private readonly configService: ConfigService,
-        private readonly prisma: PrismaService
+        private readonly prisma: PrismaService,
     ) {}
 
     /**
      * Creates a new user account.
      * Hashes the password before storing.
-     * 
+     *
      * @param dto - The data for creating the new user
      * @returns Promise resolving to the ID of the created user
      * @throws BadRequestException if the email is already taken
@@ -54,7 +54,7 @@ export class UsersService {
     /**
      * Retrieves all users from the database.
      * Password field is excluded from the results.
-     * 
+     *
      * @returns Promise resolving to an array of partial User objects
      */
     async getAllUsers(): Promise<Partial<User>[]> {
@@ -77,7 +77,7 @@ export class UsersService {
     /**
      * Retrieves a user by their ID.
      * Password field is excluded from the results.
-     * 
+     *
      * @param id - The ID of the user to retrieve
      * @returns Promise resolving to a User object
      * @throws NotFoundException if the user does not exist
@@ -107,7 +107,7 @@ export class UsersService {
     /**
      * Retrieves a user by their email.
      * Accessible only by administrators and tutors.
-     * 
+     *
      * @param email - The email of the user to retrieve
      * @returns Promise resolving to a User object
      */
@@ -136,7 +136,7 @@ export class UsersService {
     /**
      * Retrieves users by their role.
      * Password field is excluded from the results.
-     * 
+     *
      * @param role - The role to filter users by
      * @returns Promise resolving to an array of partial User objects
      */
@@ -160,7 +160,7 @@ export class UsersService {
 
     /**
      * Updates a user's information.
-     * 
+     *
      * @param id - The ID of the user to update
      * @param updateData - The data to update the user with
      * @returns Promise resolving to the updated User object
@@ -196,7 +196,7 @@ export class UsersService {
 
     /**
      * Updates a user's role.
-     * 
+     *
      * @param id - The ID of the user whose role to update
      * @param role - The new role to assign
      * @returns Promise resolving to the updated User object
@@ -216,7 +216,7 @@ export class UsersService {
     /**
      * Updates a user's password.
      * Hashes the new password before storing.
-     * 
+     *
      * @param id - The ID of the user whose password to update
      * @param password - The new password
      * @returns Promise resolving to the updated User object
@@ -239,7 +239,7 @@ export class UsersService {
     /**
      * Finds a user by their email address.
      * Used primarily for authentication purposes.
-     * 
+     *
      * @param email - The email address to search for
      * @returns Promise resolving to the User object if found
      */
@@ -251,7 +251,7 @@ export class UsersService {
 
     /**
      * Removes a user and their associated data.
-     * 
+     *
      * @param id - The ID of the user to remove
      * @throws NotFoundException if the user does not exist
      */

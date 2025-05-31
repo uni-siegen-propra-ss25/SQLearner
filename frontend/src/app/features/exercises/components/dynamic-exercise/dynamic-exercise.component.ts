@@ -12,13 +12,13 @@ import { trigger, transition, style, animate } from '@angular/animations';
         trigger('slideInOut', [
             transition(':enter', [
                 style({ transform: 'translateX(100%)' }),
-                animate('200ms ease-out', style({ transform: 'translateX(0%)' }))
+                animate('200ms ease-out', style({ transform: 'translateX(0%)' })),
             ]),
             transition(':leave', [
-                animate('200ms ease-in', style({ transform: 'translateX(100%)' }))
-            ])
-        ])
-    ]
+                animate('200ms ease-in', style({ transform: 'translateX(100%)' })),
+            ]),
+        ]),
+    ],
 })
 export class DynamicExerciseComponent implements OnInit {
     exercise: Exercise | null = null;
@@ -80,13 +80,13 @@ export class DynamicExerciseComponent implements OnInit {
         if (!this.exercise) return '#9E9E9E';
         switch (this.exercise.difficulty) {
             case Difficulty.EASY:
-                return '#4CAF50';  // Green
+                return '#4CAF50'; // Green
             case Difficulty.MEDIUM:
-                return '#FF9800';  // Orange
+                return '#FF9800'; // Orange
             case Difficulty.HARD:
-                return '#F44336';  // Red
+                return '#F44336'; // Red
             default:
-                return '#9E9E9E';  // Gray
+                return '#9E9E9E'; // Gray
         }
     }
 }

@@ -21,4 +21,4 @@ export class Database {
 
     @ApiProperty({ description: 'ID of the tutor who created the database' })
     ownerId: number;
-} 
+}

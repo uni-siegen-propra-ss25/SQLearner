@@ -11,21 +11,23 @@ export class WelcomeComponent {
     hinweise: string[] = [];
 
     fragen = [
-        {name: 'Max M.', datum: '12.05', text: 'Könnte man ein Beispiel zu Aggregatfunktionen machen?'},  
+        {
+            name: 'Max M.',
+            datum: '12.05',
+            text: 'Könnte man ein Beispiel zu Aggregatfunktionen machen?',
+        },
         { name: 'Lisa S.', datum: '11.05', text: 'Ist der NATURAL JOIN prüfungsrelevant?' },
         { name: 'Jonas T.', datum: '10.05', text: 'Wie genau funktioniert Relationale Division?' },
     ];
 
     displayedColumns: string[] = ['titel', 'typ', 'kategorie', 'datum'];
 
-// Beispielhafte Aufgaben-Daten, falls noch nicht vorhanden
+    // Beispielhafte Aufgaben-Daten, falls noch nicht vorhanden
     aufgaben = [
-    { titel: 'GartenCenter', typ: 'SQL-Abfrage', kategorie: 'SQL', datum: '2025-05-01' },
-    { titel: 'XML Basics', typ: 'Einzel-Abfrage ', kategorie: 'XML', datum: '2025-05-05' },
-    { titel: 'KinoBesuch', typ: 'SQL-Abfrage', kategorie: 'SQL', datum: '2025-05-10' },
+        { titel: 'GartenCenter', typ: 'SQL-Abfrage', kategorie: 'SQL', datum: '2025-05-01' },
+        { titel: 'XML Basics', typ: 'Einzel-Abfrage ', kategorie: 'XML', datum: '2025-05-05' },
+        { titel: 'KinoBesuch', typ: 'SQL-Abfrage', kategorie: 'SQL', datum: '2025-05-10' },
     ];
-
-
 
     constructor(
         private router: Router,

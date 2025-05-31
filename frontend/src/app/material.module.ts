@@ -27,7 +27,6 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
-
 /**
  * MaterialModule imports and exports Angular Material modules.
  * This allows for easy access to commonly used Material components throughout the application.

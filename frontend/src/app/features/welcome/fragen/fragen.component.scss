@@ -24,65 +24,65 @@
     }
   }
 
-.nav-links {
-  display: flex;
-  gap: 1rem;
-  position: absolute;
-  bottom: 1rem;
-  right: 2rem;
-
-  a {
+  .nav-links {
     display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    background-color: #f5f7fa;
-    color: #195aa9;
-    font-size: 0.9rem;
-    font-weight: 500;
-    padding: 0.5rem 1rem;
-    border-radius: 999px;
-    text-decoration: none;
-    border: 1px solid #cfd8dc;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    transition: all 0.2s ease;
+    gap: 1rem;
+    position: absolute;
+    bottom: 1rem;
+    right: 2rem;
 
-    .material-icons {
+    a {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      background-color: #f5f7fa;
+      color: #195aa9;
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      text-decoration: none;
+      border: 1px solid #cfd8dc;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s ease;
+
+      .material-icons {
+        font-size: 18px;
+      }
+
+      &:hover {
+        background-color: #e3eaf2;
+        border-color: #90a4ae;
+        color: #0d3a75;
+        text-decoration: none;
+      }
+    }
+
+    /* Icons je Link individuell zuweisen */
+    a[routerLink='/welcome/beantwortet']::before {
+      content: 'send';
+      font-family: 'Material Icons';
       font-size: 18px;
     }
 
-    &:hover {
-      background-color: #e3eaf2;
-      border-color: #90a4ae;
-      color: #0d3a75;
-      text-decoration: none;
+    a[routerLink='/welcome/archiv']::before {
+      content: 'archive';
+      font-family: 'Material Icons';
+      font-size: 18px;
+    }
+
+    a[routerLink='/welcome/papierkorb']::before {
+      content: 'delete';
+      font-family: 'Material Icons';
+      font-size: 18px;
+    }
+
+    a::before {
+      display: inline-block;
+      margin-right: 0.3rem;
+      color: #195aa9;
     }
   }
-
-  /* Icons je Link individuell zuweisen */
-  a[routerLink="/welcome/beantwortet"]::before {
-    content: "send";
-    font-family: "Material Icons";
-    font-size: 18px;
-  }
-
-  a[routerLink="/welcome/archiv"]::before {
-    content: "archive";
-    font-family: "Material Icons";
-    font-size: 18px;
-  }
-
-  a[routerLink="/welcome/papierkorb"]::before {
-    content: "delete";
-    font-family: "Material Icons";
-    font-size: 18px;
-  }
-
-  a::before {
-    display: inline-block;
-    margin-right: 0.3rem;
-    color: #195aa9;
-  }
-}
 }
 
 .main-content {
@@ -201,7 +201,7 @@
       font-family: inherit;
     }
 
-    input[type="file"] {
+    input[type='file'] {
       margin-top: 1rem;
     }
 
@@ -237,4 +237,3 @@
     }
   }
 }
-

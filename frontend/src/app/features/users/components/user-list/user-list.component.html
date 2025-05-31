@@ -1,17 +1,16 @@
 <div class="user-list-container">
-    <div class="header">
-        <h1>Nutzerverwaltung</h1>
-        <div class="actions" *ngIf="isTutorOrAdmin">
-            <button mat-raised-button color="primary" (click)="openCreateDialog()">
-                <mat-icon>person_add</mat-icon>
-                <span *ngIf="isAdmin">Neuen Nutzer anlegen</span>
-                <span *ngIf="!isAdmin">Neuen Studenten anlegen</span>
-            </button>
-        </div>
+  <div class="header">
+    <h1>Nutzerverwaltung</h1>
+    <div class="actions" *ngIf="isTutorOrAdmin">
+      <button mat-raised-button color="primary" (click)="openCreateDialog()">
+        <mat-icon>person_add</mat-icon>
+        <span *ngIf="isAdmin">Neuen Nutzer anlegen</span>
+        <span *ngIf="!isAdmin">Neuen Studenten anlegen</span>
+      </button>
     </div>
+  </div>
 
-    <mat-card>
-
+  <mat-card>
     <mat-card-content>
       <mat-table [dataSource]="users" class="user-table">
         <ng-container matColumnDef="name">
@@ -31,10 +30,7 @@
         <ng-container matColumnDef="role">
           <mat-header-cell *matHeaderCellDef> Rolle </mat-header-cell>
           <mat-cell *matCellDef="let user">
-            
-            <span class="role-badge" [class]="user.role.toLowerCase()">{{
-              user.role
-            }}</span>
+            <span class="role-badge" [class]="user.role.toLowerCase()">{{ user.role }}</span>
           </mat-cell>
         </ng-container>
 

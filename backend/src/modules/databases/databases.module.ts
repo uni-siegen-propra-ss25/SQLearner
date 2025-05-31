@@ -5,12 +5,12 @@ import { PrismaModule } from '../../prisma/prisma.module';
 
 /**
  * Databases Module manages the SQL databases used for learning exercises.
- * 
+ *
  * This module handles the creation, management, and manipulation of SQL databases
  * that students use for practice. It provides functionality for tutors to create
  * and manage database schemas, and for students to execute queries against these
  * databases in a safe, isolated environment.
- * 
+ *
  * @module DatabasesModule
  */
 @Module({

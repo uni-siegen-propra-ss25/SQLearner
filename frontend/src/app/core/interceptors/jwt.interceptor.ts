@@ -17,7 +17,7 @@ export class JwtInterceptor implements HttpInterceptor {
         console.log('JwtInterceptor - Request URL:', req.url);
         console.log('JwtInterceptor - Token:', token);
         console.log('JwtInterceptor - User role:', this.auth.getUserRole());
-        
+
         if (!token) {
             console.log('JwtInterceptor - No token found, passing request through');
             return next.handle(req);
@@ -36,10 +36,10 @@ export class JwtInterceptor implements HttpInterceptor {
             // clone the request to add the new header (requests are immutable)
             headers: req.headers.set('Authorization', `Bearer ${token}`), // add the token to the request headers
         });
-        
+
         console.log('JwtInterceptor - Request headers:', cloned.headers.keys());
         console.log('JwtInterceptor - Authorization header:', cloned.headers.get('Authorization'));
-        
+
         return next.handle(cloned); // pass the cloned request instead of the original to the next handler
     }
 }

@@ -9,14 +9,12 @@ import { Prisma } from '@prisma/client';
  */
 @Injectable()
 export class ChatService {
-    constructor(
-        private prisma: PrismaService,
-    ) {}
+    constructor(private prisma: PrismaService) {}
 
     /**
      * Processes and stores a user message, generating an AI response.
      * Creates both the user message and AI response in the database.
-     * 
+     *
      * @param userId - The ID of the user sending the message
      * @param message - The message data containing content and context
      * @returns Promise resolving to the AI response message
@@ -38,12 +36,15 @@ export class ChatService {
                     context: message.context || null,
                 },
                 include: {
-                    replyTo: true
-                }
+                    replyTo: true,
+                },
             });
 
             // TODO: Implement actual LLM integration
-            const llmResponse = await this.generateLLMResponse(message.content, message.context || null);
+            const llmResponse = await this.generateLLMResponse(
+                message.content,
+                message.context || null,
+            );
 
             // Save assistant's response
             const assistantMessage = await this.prisma.chatMessage.create({
@@ -52,11 +53,11 @@ export class ChatService {
                     userId,
                     sender: 'assistant',
                     context: message.context || null,
-                    replyToId: userMessage.id
+                    replyToId: userMessage.id,
                 },
                 include: {
-                    replyTo: true
-                }
+                    replyTo: true,
+                },
             });
 
             return assistantMessage;
@@ -71,7 +72,7 @@ export class ChatService {
 
     /**
      * Retrieves all chat messages for a specific user and context.
-     * 
+     *
      * @param userId - The ID of the user whose messages to retrieve
      * @param context - Optional context to filter messages by
      * @returns Promise resolving to an array of Message objects
@@ -81,14 +82,14 @@ export class ChatService {
             return await this.prisma.chatMessage.findMany({
                 where: {
                     userId,
-                    context: context || null
+                    context: context || null,
                 },
                 orderBy: {
-                    createdAt: 'asc'
+                    createdAt: 'asc',
                 },
                 include: {
-                    replyTo: true
-                }
+                    replyTo: true,
+                },
             });
         } catch (error) {
             console.error('Error in getMessages:', error);
@@ -98,13 +99,16 @@ export class ChatService {
 
     /**
      * Internal method to generate an AI response using a language model.
-     * 
+     *
      * @param userMessage - The user's message content
      * @param context - Optional context for the conversation
      * @returns Promise resolving to the generated AI response
      * @private
      */
-    private async generateLLMResponse(userMessage: string, context: string | null): Promise<string> {
+    private async generateLLMResponse(
+        userMessage: string,
+        context: string | null,
+    ): Promise<string> {
         // TODO: Implement actual LLM integration with OpenAI or similar service
         return `I understand your question about SQL. Let me help you with: "${userMessage}"`;
     }

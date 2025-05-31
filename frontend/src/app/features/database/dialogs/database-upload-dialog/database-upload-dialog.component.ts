@@ -7,7 +7,7 @@ import { Database } from '../../models/database.model';
 @Component({
     selector: 'app-upload-database-dialog',
     templateUrl: './database-upload-dialog.component.html',
-    styleUrls: ['./database-upload-dialog.component.scss']
+    styleUrls: ['./database-upload-dialog.component.scss'],
 })
 export class DatabaseUploadDialogComponent {
     form: FormGroup;
@@ -16,11 +16,11 @@ export class DatabaseUploadDialogComponent {
     constructor(
         private fb: FormBuilder,
         private dialogRef: MatDialogRef<DatabaseUploadDialogComponent>,
-        private databaseService: DatabaseService
+        private databaseService: DatabaseService,
     ) {
         this.form = this.fb.group({
             name: ['', Validators.required],
-            description: ['']
+            description: [''],
         });
     }
 
@@ -39,7 +39,7 @@ export class DatabaseUploadDialogComponent {
                 },
                 error: (error: any) => {
                     console.error('Error uploading database:', error);
-                }
+                },
             });
         }
     }
@@ -47,4 +47,4 @@ export class DatabaseUploadDialogComponent {
     onCancel() {
         this.dialogRef.close();
     }
-} 
+}

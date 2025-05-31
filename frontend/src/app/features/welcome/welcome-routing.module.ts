@@ -9,17 +9,16 @@ import { ArchivComponent } from './fragen/archiv/archiv.component';
 import { BeantwortetComponent } from './fragen/beantwortet/beantwortet.component';
 
 const routes: Routes = [
-  { path: '', component: WelcomeComponent },          
-  { path: 'aufgaben', component: AufgabeComponent },  
-  { path: 'fragen', component: FragenComponent },   
-  { path: 'papierkorb', component: PapierkorbComponent },
-  { path: 'archiv', component: ArchivComponent },
-  { path: 'beantwortet', component: BeantwortetComponent },
- 
+    { path: '', component: WelcomeComponent },
+    { path: 'aufgaben', component: AufgabeComponent },
+    { path: 'fragen', component: FragenComponent },
+    { path: 'papierkorb', component: PapierkorbComponent },
+    { path: 'archiv', component: ArchivComponent },
+    { path: 'beantwortet', component: BeantwortetComponent },
 ];
 
 @NgModule({
-  imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+    imports: [RouterModule.forChild(routes)],
+    exports: [RouterModule],
 })
 export class WelcomeRoutingModule {}

@@ -5,16 +5,8 @@ import { MaterialModule } from '../../material.module';
 import { ChatPanelComponent } from './components/chat-panel/chat-panel.component';
 
 @NgModule({
-    declarations: [
-        ChatPanelComponent
-    ],
-    imports: [
-        CommonModule,
-        FormsModule,
-        MaterialModule
-    ],
-    exports: [
-        ChatPanelComponent
-    ]
+    declarations: [ChatPanelComponent],
+    imports: [CommonModule, FormsModule, MaterialModule],
+    exports: [ChatPanelComponent],
 })
-export class ChatModule { }
+export class ChatModule {}

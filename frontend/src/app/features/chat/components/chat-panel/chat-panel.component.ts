@@ -1,4 +1,14 @@
-import { Component, ElementRef, Input, OnDestroy, OnInit, Output, EventEmitter, ViewChild, AfterViewChecked } from '@angular/core';
+import {
+    Component,
+    ElementRef,
+    Input,
+    OnDestroy,
+    OnInit,
+    Output,
+    EventEmitter,
+    ViewChild,
+    AfterViewChecked,
+} from '@angular/core';
 import { Message } from '../../models/chat.model';
 import { ChatService } from '../../services/chat.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -8,13 +18,13 @@ import { HttpErrorResponse } from '@angular/common/http';
 @Component({
     selector: 'app-chat-panel',
     templateUrl: './chat-panel.component.html',
-    styleUrls: ['./chat-panel.component.scss']
+    styleUrls: ['./chat-panel.component.scss'],
 })
 export class ChatPanelComponent implements OnInit, OnDestroy, AfterViewChecked {
     @Input() context?: string;
     @Output() close = new EventEmitter<void>();
     @ViewChild('messageContainer') private messageContainer!: ElementRef;
-    
+
     newMessage = '';
     isLoading = false;
     error: string | null = null;
@@ -23,7 +33,7 @@ export class ChatPanelComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     constructor(
         private readonly chatService: ChatService,
-        private readonly snackBar: MatSnackBar
+        private readonly snackBar: MatSnackBar,
     ) {}
 
     get messages$() {
@@ -63,8 +73,8 @@ export class ChatPanelComponent implements OnInit, OnDestroy, AfterViewChecked {
                     this.isLoading = false;
                     this.error = 'Failed to load messages';
                     this.showError('Failed to load messages');
-                }
-            })
+                },
+            }),
         );
     }
 
@@ -78,7 +88,7 @@ export class ChatPanelComponent implements OnInit, OnDestroy, AfterViewChecked {
             sender: 'user',
             context: this.context,
             createdAt: new Date(),
-            updatedAt: new Date()
+            updatedAt: new Date(),
         };
 
         this.chatService.addMessage(tempMessage);
@@ -97,8 +107,8 @@ export class ChatPanelComponent implements OnInit, OnDestroy, AfterViewChecked {
                     console.error('Error sending message:', error);
                     this.isLoading = false;
                     this.showError('Failed to send message');
-                }
-            })
+                },
+            }),
         );
     }
 
@@ -118,7 +128,7 @@ export class ChatPanelComponent implements OnInit, OnDestroy, AfterViewChecked {
     private showError(message: string) {
         this.snackBar.open(message, 'Close', {
             duration: 3000,
-            panelClass: ['mat-toolbar', 'mat-warn']
+            panelClass: ['mat-toolbar', 'mat-warn'],
         });
     }
 }

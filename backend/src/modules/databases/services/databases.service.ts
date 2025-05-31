@@ -77,7 +77,12 @@ export class DatabasesService {
         return database;
     }
 
-    async updateDatabase(id: number, dto: UpdateDatabaseDto, userId: number, userRole: Role | string) {
+    async updateDatabase(
+        id: number,
+        dto: UpdateDatabaseDto,
+        userId: number,
+        userRole: Role | string,
+    ) {
         const database = await this.getDatabaseById(id);
 
         if (String(userRole).toUpperCase() !== 'TUTOR' || database.ownerId !== userId) {
@@ -112,7 +117,7 @@ export class DatabasesService {
         }
 
         const schema = file.buffer.toString();
-        
+
         const database = await this.prisma.database.create({
             data: {
                 name: file.originalname,

@@ -5,34 +5,34 @@ import { environment } from '../../../../environments/environment';
 import { Database, CreateDatabaseDto, UpdateDatabaseDto } from '../models/database.model';
 import { AuthService } from 'app/features/auth/services/auth.service';
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
 export class DatabaseService {
     private readonly baseUrl = `${environment.apiUrl}/databases`;
 
     constructor(
         private readonly http: HttpClient,
-        private readonly authService: AuthService
+        private readonly authService: AuthService,
     ) {}
 
     private convertDates(database: Database): Database {
         return {
             ...database,
             createdAt: new Date(database.createdAt),
-            updatedAt: new Date(database.updatedAt)
+            updatedAt: new Date(database.updatedAt),
         };
     }
 
     getAllDatabases(): Observable<Database[]> {
         return this.http
             .get<Database[]>(this.baseUrl)
-            .pipe(map(databases => databases.map(db => this.convertDates(db))));
+            .pipe(map((databases) => databases.map((db) => this.convertDates(db))));
     }
 
     getDatabase(id: number): Observable<Database> {
         return this.http
             .get<Database>(`${this.baseUrl}/${id}`)
-            .pipe(map(database => this.convertDates(database)));
+            .pipe(map((database) => this.convertDates(database)));
     }
 
     createDatabase(database: CreateDatabaseDto): Observable<Database> {
@@ -40,26 +40,24 @@ export class DatabaseService {
         console.log('DatabaseService - Current user role:', this.authService.getUserRole());
         console.log('DatabaseService - Is user a tutor?', this.authService.isTutor());
         console.log('DatabaseService - Auth token:', this.authService.getToken());
-        
-        return this.http
-            .post<Database>(this.baseUrl, database)
-            .pipe(
-                map(database => {
-                    console.log('DatabaseService - Database created successfully:', database);
-                    return this.convertDates(database);
-                }),
-                catchError(error => {
-                    console.error('DatabaseService - Error creating database:', error);
-                    console.error('DatabaseService - Error details:', error.error);
-                    throw error;
-                })
-            );
+
+        return this.http.post<Database>(this.baseUrl, database).pipe(
+            map((database) => {
+                console.log('DatabaseService - Database created successfully:', database);
+                return this.convertDates(database);
+            }),
+            catchError((error) => {
+                console.error('DatabaseService - Error creating database:', error);
+                console.error('DatabaseService - Error details:', error.error);
+                throw error;
+            }),
+        );
     }
 
     updateDatabase(id: number, database: UpdateDatabaseDto): Observable<Database> {
         return this.http
             .put<Database>(`${this.baseUrl}/${id}`, database)
-            .pipe(map(database => this.convertDates(database)));
+            .pipe(map((database) => this.convertDates(database)));
     }
 
     deleteDatabase(id: number): Observable<void> {
@@ -71,6 +69,6 @@ export class DatabaseService {
         formData.append('file', file);
         return this.http
             .post<Database>(`${this.baseUrl}/upload`, formData)
-            .pipe(map(database => this.convertDates(database)));
+            .pipe(map((database) => this.convertDates(database)));
     }
 }

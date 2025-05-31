@@ -10,7 +10,7 @@ import { DatabaseEditDialogComponent } from '../../dialogs/database-edit-dialog/
 @Component({
     selector: 'app-database-list',
     templateUrl: './database-list.component.html',
-    styleUrls: ['./database-list.component.scss']
+    styleUrls: ['./database-list.component.scss'],
 })
 export class DatabaseListComponent implements OnInit {
     databases: Database[] = [];
@@ -20,7 +20,7 @@ export class DatabaseListComponent implements OnInit {
     constructor(
         private databaseService: DatabaseService,
         private dialog: MatDialog,
-        private authService: AuthService
+        private authService: AuthService,
     ) {
         this.isTutor = this.authService.isTutor();
     }
@@ -31,14 +31,14 @@ export class DatabaseListComponent implements OnInit {
 
     loadDatabases(): void {
         this.databaseService.getAllDatabases().subscribe(
-            databases => this.databases = databases,
-            error => console.error('Error loading databases:', error)
+            (databases) => (this.databases = databases),
+            (error) => console.error('Error loading databases:', error),
         );
     }
 
     openUploadDialog(): void {
         const dialogRef = this.dialog.open(DatabaseUploadDialogComponent);
-        dialogRef.afterClosed().subscribe(result => {
+        dialogRef.afterClosed().subscribe((result) => {
             if (result) {
                 this.loadDatabases();
             }
@@ -47,7 +47,7 @@ export class DatabaseListComponent implements OnInit {
 
     openCreateDialog(): void {
         const dialogRef = this.dialog.open(DatabaseCreateDialogComponent);
-        dialogRef.afterClosed().subscribe(result => {
+        dialogRef.afterClosed().subscribe((result) => {
             if (result) {
                 this.loadDatabases();
             }
@@ -56,9 +56,9 @@ export class DatabaseListComponent implements OnInit {
 
     openEditDialog(database: Database): void {
         const dialogRef = this.dialog.open(DatabaseEditDialogComponent, {
-            data: database
+            data: database,
         });
-        dialogRef.afterClosed().subscribe(result => {
+        dialogRef.afterClosed().subscribe((result) => {
             if (result) {
                 this.loadDatabases();
             }
@@ -69,7 +69,7 @@ export class DatabaseListComponent implements OnInit {
         if (confirm('Are you sure you want to delete this database?')) {
             this.databaseService.deleteDatabase(id).subscribe(
                 () => this.loadDatabases(),
-                error => console.error('Error deleting database:', error)
+                (error) => console.error('Error deleting database:', error),
             );
         }
     }
@@ -78,4 +78,4 @@ export class DatabaseListComponent implements OnInit {
         // TODO: Implement database visualization
         console.log('View database:', database);
     }
-} 
+}

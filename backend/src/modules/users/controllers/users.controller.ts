@@ -30,7 +30,7 @@ export class UsersController {
     /**
      * Retrieves all users from the database.
      * Accessible only by administrators and tutors.
-     * 
+     *
      * @returns Promise resolving to an array of partial User objects
      */
     @Get('getAllUsers')
@@ -44,7 +44,7 @@ export class UsersController {
     /**
      * Retrieves a user by their ID.
      * Accessible only by administrators and tutors.
-     * 
+     *
      * @param id - The ID of the user to retrieve
      * @returns Promise resolving to a User object
      */
@@ -59,7 +59,7 @@ export class UsersController {
     /**
      * Retrieves a user by their email.
      * Accessible only by administrators and tutors.
-     * 
+     *
      * @param email - The email of the user to retrieve
      * @returns Promise resolving to a User object
      */
@@ -74,7 +74,7 @@ export class UsersController {
     /**
      * Retrieves users by their role.
      * Accessible only by administrators and tutors.
-     * 
+     *
      * @param role - The role to filter users by
      * @returns Promise resolving to an array of partial User objects
      */
@@ -89,7 +89,7 @@ export class UsersController {
     /**
      * Updates user information.
      * Accessible only by administrators and tutors.
-     * 
+     *
      * @param id - The ID of the user to update
      * @param updateData - The data to update the user with
      * @returns Promise resolving to the updated User object
@@ -108,7 +108,7 @@ export class UsersController {
     /**
      * Updates a user's role.
      * Accessible only by administrators.
-     * 
+     *
      * @param id - The ID of the user whose role to update
      * @param role - The new role to assign
      * @returns Promise resolving to the updated User object
@@ -127,7 +127,7 @@ export class UsersController {
     /**
      * Updates a user's password.
      * Accessible only by administrators and tutors.
-     * 
+     *
      * @param id - The ID of the user whose password to update
      * @param password - The new password
      * @returns Promise resolving to the updated User object
@@ -146,7 +146,7 @@ export class UsersController {
     /**
      * Deletes a user.
      * Accessible only by administrators.
-     * 
+     *
      * @param id - The ID of the user to delete
      */
     @Delete(':id')

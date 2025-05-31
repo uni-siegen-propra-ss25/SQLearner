@@ -7,7 +7,7 @@ import { Database } from '../../models/database.model';
 @Component({
     selector: 'app-edit-database-dialog',
     templateUrl: './database-edit-dialog.component.html',
-    styleUrls: ['./database-edit-dialog.component.scss']
+    styleUrls: ['./database-edit-dialog.component.scss'],
 })
 export class DatabaseEditDialogComponent {
     form: FormGroup;
@@ -16,12 +16,12 @@ export class DatabaseEditDialogComponent {
         private fb: FormBuilder,
         private dialogRef: MatDialogRef<DatabaseEditDialogComponent>,
         private databaseService: DatabaseService,
-        @Inject(MAT_DIALOG_DATA) public data: Database
+        @Inject(MAT_DIALOG_DATA) public data: Database,
     ) {
         this.form = this.fb.group({
             name: [data.name, Validators.required],
             description: [data.description],
-            schemaSql: [data.schemaSql, Validators.required]
+            schemaSql: [data.schemaSql, Validators.required],
         });
     }
 
@@ -33,7 +33,7 @@ export class DatabaseEditDialogComponent {
                 },
                 error: (error: any) => {
                     console.error('Error updating database:', error);
-                }
+                },
             });
         }
     }
@@ -41,4 +41,4 @@ export class DatabaseEditDialogComponent {
     onCancel() {
         this.dialogRef.close();
     }
-} 
+}

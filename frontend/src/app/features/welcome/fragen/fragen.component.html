@@ -16,7 +16,9 @@
   <div class="main-content">
     <!-- Linke Spalte: Fragen -->
     <div class="fragen-container">
-      <p class="unread">Sie haben <strong>{{ ungeleseneNachrichten }}</strong> ungelesene Fragen</p>
+      <p class="unread">
+        Sie haben <strong>{{ ungeleseneNachrichten }}</strong> ungelesene Fragen
+      </p>
 
       <div class="frage-box" *ngFor="let frage of fragen">
         <p class="frage-text">
@@ -37,7 +39,7 @@
       <h3>Markiert</h3>
       <div *ngIf="angepinnt.length === 0" class="leertext">Keine markierten Nachrichten</div>
       <div *ngFor="let frage of angepinnt" class="angeheftet-frage">
-        <p> {{ frage.name }} ({{ frage.datum }}): „{{ frage.text }}“</p>
+        <p>{{ frage.name }} ({{ frage.datum }}): „{{ frage.text }}“</p>
         <a href="#" (click)="entferneAngepinnt(frage, $event)">Entfernen</a>
       </div>
     </div>
@@ -50,9 +52,7 @@
       <textarea [(ngModel)]="antwortText" placeholder="Antwort schreiben..."></textarea>
 
       <input type="file" (change)="anhangHinzufuegen($event)" />
-      <div class="anhang-info" *ngIf="anhangName">
-        📎 Datei angehaengt: {{ anhangName }}
-      </div>
+      <div class="anhang-info" *ngIf="anhangName">📎 Datei angehaengt: {{ anhangName }}</div>
 
       <div class="antwort-aktionen">
         <button (click)="antwortAbschicken()">Antwort senden</button>

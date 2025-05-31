@@ -12,13 +12,7 @@ import {
     ParseIntPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import {
-    ApiTags,
-    ApiOperation,
-    ApiResponse,
-    ApiBearerAuth,
-    ApiConsumes,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
 import { DatabasesService } from '../services/databases.service';
 import { Database } from '../models/database.model';
 import { CreateDatabaseDto } from '../models/create-database.dto';
@@ -53,8 +47,6 @@ export class DatabasesController {
         @GetUser('id') userId: number,
         @GetUser('role') userRole: string,
     ) {
-        console.log('Controller - User ID:', userId);
-        console.log('Controller - User Role:', userRole);
         return this.databasesService.createDatabase(dto, userId, userRole);
     }
 

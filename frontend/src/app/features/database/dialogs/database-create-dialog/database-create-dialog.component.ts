@@ -7,7 +7,7 @@ import { Database } from '../../models/database.model';
 @Component({
     selector: 'app-create-database-dialog',
     templateUrl: './database-create-dialog.component.html',
-    styleUrls: ['./database-create-dialog.component.scss']
+    styleUrls: ['./database-create-dialog.component.scss'],
 })
 export class DatabaseCreateDialogComponent {
     form: FormGroup;
@@ -15,12 +15,12 @@ export class DatabaseCreateDialogComponent {
     constructor(
         private fb: FormBuilder,
         private dialogRef: MatDialogRef<DatabaseCreateDialogComponent>,
-        private databaseService: DatabaseService
+        private databaseService: DatabaseService,
     ) {
         this.form = this.fb.group({
             name: ['', Validators.required],
             description: [''],
-            schemaSql: ['', Validators.required]
+            schemaSql: ['', Validators.required],
         });
     }
 
@@ -28,7 +28,7 @@ export class DatabaseCreateDialogComponent {
         if (this.form.valid) {
             const formData = this.form.value;
             console.log('Sending data to server:', formData);
-            
+
             this.databaseService.createDatabase(formData).subscribe({
                 next: (database: Database) => {
                     console.log('Database created successfully:', database);
@@ -37,7 +37,7 @@ export class DatabaseCreateDialogComponent {
                 error: (error: any) => {
                     console.error('Error creating database:', error);
                     console.error('Error details:', error.error);
-                }
+                },
             });
         }
     }
@@ -45,4 +45,4 @@ export class DatabaseCreateDialogComponent {
     onCancel() {
         this.dialogRef.close();
     }
-} 
+}

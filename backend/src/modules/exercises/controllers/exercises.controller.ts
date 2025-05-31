@@ -34,7 +34,7 @@ export class ExercisesController {
 
     /**
      * Retrieves all exercises within a topic.
-     * 
+     *
      * @param topicId - The ID of the topic whose exercises to retrieve
      * @returns Promise resolving to an array of Exercise objects
      */
@@ -49,7 +49,7 @@ export class ExercisesController {
 
     /**
      * Retrieves a specific exercise by ID.
-     * 
+     *
      * @param id - The ID of the exercise to retrieve
      * @returns Promise resolving to the Exercise object
      * @throws NotFoundException if the exercise does not exist
@@ -70,7 +70,7 @@ export class ExercisesController {
 
     /**
      * Creates a new exercise in a topic.
-     * 
+     *
      * @param topicId - The ID of the topic to create the exercise in
      * @param createExerciseDto - The data for creating the new exercise
      * @returns Promise resolving to the ID of the created exercise
@@ -92,7 +92,7 @@ export class ExercisesController {
 
     /**
      * Updates an existing exercise.
-     * 
+     *
      * @param id - The ID of the exercise to update
      * @param updateExerciseDto - The data to update the exercise with
      * @returns Promise resolving to the updated Exercise object
@@ -113,7 +113,7 @@ export class ExercisesController {
 
     /**
      * Removes an exercise.
-     * 
+     *
      * @param id - The ID of the exercise to remove
      * @throws NotFoundException if the exercise does not exist
      */
@@ -131,7 +131,7 @@ export class ExercisesController {
 
     /**
      * Updates the order of exercises within a topic.
-     * 
+     *
      * @param topicId - The ID of the topic containing the exercises
      * @param reorderExercisesDto - The new order of exercises
      * @throws NotFoundException if any exercise does not exist

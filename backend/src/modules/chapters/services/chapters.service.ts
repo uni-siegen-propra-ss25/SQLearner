@@ -16,7 +16,7 @@ export class ChaptersService {
     /**
      * Retrieves all chapters from the database.
      * Includes associated topics and their exercises in the result.
-     * 
+     *
      * @returns Promise resolving to an array of Chapter objects
      */
     async getChapters(): Promise<Chapter[]> {
@@ -34,7 +34,7 @@ export class ChaptersService {
     /**
      * Retrieves a specific chapter by ID.
      * Includes associated topics and their exercises in the result.
-     * 
+     *
      * @param id - The ID of the chapter to retrieve
      * @returns Promise resolving to the Chapter object
      * @throws NotFoundException if the chapter does not exist
@@ -58,7 +58,7 @@ export class ChaptersService {
 
     /**
      * Creates a new chapter.
-     * 
+     *
      * @param createChapterDto - The data for creating the new chapter
      * @returns Promise resolving to the ID of the created chapter
      */
@@ -71,7 +71,7 @@ export class ChaptersService {
 
     /**
      * Updates an existing chapter.
-     * 
+     *
      * @param id - The ID of the chapter to update
      * @param updateChapterDto - The data to update the chapter with
      * @returns Promise resolving to the updated Chapter object
@@ -92,7 +92,7 @@ export class ChaptersService {
      * Removes a chapter and all its associated data.
      * This includes all topics and exercises within the chapter.
      * The deletion happens in a specific order to maintain referential integrity.
-     * 
+     *
      * @param id - The ID of the chapter to remove
      */
     async deleteChapter(id: number): Promise<void> {
