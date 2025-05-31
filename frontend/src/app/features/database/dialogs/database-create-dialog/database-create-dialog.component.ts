@@ -5,40 +5,38 @@ import { DatabaseService } from '../../services/database.service';
 import { Database } from '../../models/database.model';
 
 @Component({
-    selector: 'app-upload-database-dialog',
-    templateUrl: './upload-database-dialog.component.html',
-    styleUrls: ['./upload-database-dialog.component.scss']
+    selector: 'app-create-database-dialog',
+    templateUrl: './database-create-dialog.component.html',
+    styleUrls: ['./database-create-dialog.component.scss']
 })
-export class UploadDatabaseDialogComponent {
+export class DatabaseCreateDialogComponent {
     form: FormGroup;
-    selectedFile: File | null = null;
 
     constructor(
         private fb: FormBuilder,
-        private dialogRef: MatDialogRef<UploadDatabaseDialogComponent>,
+        private dialogRef: MatDialogRef<DatabaseCreateDialogComponent>,
         private databaseService: DatabaseService
     ) {
         this.form = this.fb.group({
             name: ['', Validators.required],
-            description: ['']
+            description: [''],
+            schemaSql: ['', Validators.required]
         });
     }
 
-    onFileSelected(event: Event) {
-        const input = event.target as HTMLInputElement;
-        if (input.files?.length) {
-            this.selectedFile = input.files[0];
-        }
-    }
-
     onSubmit() {
-        if (this.form.valid && this.selectedFile) {
-            this.databaseService.uploadSqlFile(this.selectedFile).subscribe({
+        if (this.form.valid) {
+            const formData = this.form.value;
+            console.log('Sending data to server:', formData);
+            
+            this.databaseService.createDatabase(formData).subscribe({
                 next: (database: Database) => {
+                    console.log('Database created successfully:', database);
                     this.dialogRef.close(database);
                 },
                 error: (error: any) => {
-                    console.error('Error uploading database:', error);
+                    console.error('Error creating database:', error);
+                    console.error('Error details:', error.error);
                 }
             });
         }

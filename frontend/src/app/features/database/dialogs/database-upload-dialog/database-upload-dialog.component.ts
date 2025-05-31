@@ -5,38 +5,40 @@ import { DatabaseService } from '../../services/database.service';
 import { Database } from '../../models/database.model';
 
 @Component({
-    selector: 'app-create-database-dialog',
-    templateUrl: './create-database-dialog.component.html',
-    styleUrls: ['./create-database-dialog.component.scss']
+    selector: 'app-upload-database-dialog',
+    templateUrl: './database-upload-dialog.component.html',
+    styleUrls: ['./database-upload-dialog.component.scss']
 })
-export class CreateDatabaseDialogComponent {
+export class DatabaseUploadDialogComponent {
     form: FormGroup;
+    selectedFile: File | null = null;
 
     constructor(
         private fb: FormBuilder,
-        private dialogRef: MatDialogRef<CreateDatabaseDialogComponent>,
+        private dialogRef: MatDialogRef<DatabaseUploadDialogComponent>,
         private databaseService: DatabaseService
     ) {
         this.form = this.fb.group({
             name: ['', Validators.required],
-            description: [''],
-            schemaSql: ['', Validators.required]
+            description: ['']
         });
     }
 
+    onFileSelected(event: Event) {
+        const input = event.target as HTMLInputElement;
+        if (input.files?.length) {
+            this.selectedFile = input.files[0];
+        }
+    }
+
     onSubmit() {
-        if (this.form.valid) {
-            const formData = this.form.value;
-            console.log('Sending data to server:', formData);
-            
-            this.databaseService.createDatabase(formData).subscribe({
+        if (this.form.valid && this.selectedFile) {
+            this.databaseService.uploadSqlFile(this.selectedFile).subscribe({
                 next: (database: Database) => {
-                    console.log('Database created successfully:', database);
                     this.dialogRef.close(database);
                 },
                 error: (error: any) => {
-                    console.error('Error creating database:', error);
-                    console.error('Error details:', error.error);
+                    console.error('Error uploading database:', error);
                 }
             });
         }

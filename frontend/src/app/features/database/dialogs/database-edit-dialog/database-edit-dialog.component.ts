@@ -6,15 +6,15 @@ import { Database } from '../../models/database.model';
 
 @Component({
     selector: 'app-edit-database-dialog',
-    templateUrl: './edit-database-dialog.component.html',
-    styleUrls: ['./edit-database-dialog.component.scss']
+    templateUrl: './database-edit-dialog.component.html',
+    styleUrls: ['./database-edit-dialog.component.scss']
 })
-export class EditDatabaseDialogComponent {
+export class DatabaseEditDialogComponent {
     form: FormGroup;
 
     constructor(
         private fb: FormBuilder,
-        private dialogRef: MatDialogRef<EditDatabaseDialogComponent>,
+        private dialogRef: MatDialogRef<DatabaseEditDialogComponent>,
         private databaseService: DatabaseService,
         @Inject(MAT_DIALOG_DATA) public data: Database
     ) {

@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from 'app/features/auth/services/auth.service';
-import { CreateDatabaseDialogComponent } from '../../dialogs/create-database-dialog/create-database-dialog.component';
-import { EditDatabaseDialogComponent } from '../../dialogs/edit-database-dialog/edit-database-dialog.component';
-import { UploadDatabaseDialogComponent } from '../../dialogs/upload-database-dialog/upload-database-dialog.component';
 import { Database } from '../../models/database.model';
 import { DatabaseService } from '../../services/database.service';
+import { DatabaseUploadDialogComponent } from '../../dialogs/database-upload-dialog/database-upload-dialog.component';
+import { DatabaseCreateDialogComponent } from '../../dialogs/database-create-dialog/database-create-dialog.component';
+import { DatabaseEditDialogComponent } from '../../dialogs/database-edit-dialog/database-edit-dialog.component';
 
 @Component({
     selector: 'app-database-list',
@@ -37,7 +37,7 @@ export class DatabaseListComponent implements OnInit {
     }
 
     openUploadDialog(): void {
-        const dialogRef = this.dialog.open(UploadDatabaseDialogComponent);
+        const dialogRef = this.dialog.open(DatabaseUploadDialogComponent);
         dialogRef.afterClosed().subscribe(result => {
             if (result) {
                 this.loadDatabases();
@@ -46,7 +46,7 @@ export class DatabaseListComponent implements OnInit {
     }
 
     openCreateDialog(): void {
-        const dialogRef = this.dialog.open(CreateDatabaseDialogComponent);
+        const dialogRef = this.dialog.open(DatabaseCreateDialogComponent);
         dialogRef.afterClosed().subscribe(result => {
             if (result) {
                 this.loadDatabases();
@@ -55,7 +55,7 @@ export class DatabaseListComponent implements OnInit {
     }
 
     openEditDialog(database: Database): void {
-        const dialogRef = this.dialog.open(EditDatabaseDialogComponent, {
+        const dialogRef = this.dialog.open(DatabaseEditDialogComponent, {
             data: database
         });
         dialogRef.afterClosed().subscribe(result => {
