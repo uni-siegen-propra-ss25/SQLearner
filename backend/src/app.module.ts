@@ -6,6 +6,7 @@ import { ChaptersModule } from './modules/chapters/chapters.module';
 import { TopicsModule } from './modules/topics/topics.module';
 import { ExercisesModule } from './modules/exercises/exercises.module';
 import { DatabasesModule } from './modules/databases/databases.module';
+import { ChatModule } from './modules/chat/chat.module';
 
 @Module({
     imports: [
@@ -18,6 +19,7 @@ import { DatabasesModule } from './modules/databases/databases.module';
         ChaptersModule,
         TopicsModule,
         ExercisesModule,
+        ChatModule,
     ],
 })
 export class AppModule {}

@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { Exercise } from '../../../roadmap/models/exercise.model';
 import { SubmissionService } from '../../services/submission.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 @Component({
     selector: 'app-query-exercise',
@@ -15,6 +16,7 @@ export class QueryExerciseComponent {
     isLoading = false;
     showFeedback = false;
     feedback: string | null = null;
+    currentView: 'schema' | 'result' = 'result';
 
     constructor(
         private submissionService: SubmissionService,

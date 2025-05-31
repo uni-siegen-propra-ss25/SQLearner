@@ -1,9 +1,29 @@
 .query-exercise {
-  .exercise-title {
-    font-size: 1.5rem;
-    font-weight: 500;
-    margin-bottom: 16px;
-    color: rgba(0, 0, 0, 0.87);
+  .exercise-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+
+    .exercise-title {
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: rgba(0, 0, 0, 0.87);
+      margin: 0;
+    }
+
+    .database-info {
+      margin-left: 16px;
+      display: flex;
+      align-items: center;
+      border: rgba(0, 0, 0, 0.87) 1px solid;
+      border-radius: 8px;
+      padding: 8px 12px;
+      mat-icon {
+        opacity: 0.9;
+        margin-right: 4px;
+      }
+    }
   }
 
   .exercise-description {
@@ -13,22 +33,7 @@
     margin-bottom: 24px;
   }
 
-  .database-info {
-    margin-bottom: 24px;
-
-    mat-chip-list {
-      .mat-mdc-chip {
-        background: rgba(0, 0, 0, 0.05);
-        color: rgba(0, 0, 0, 0.87);
-        font-weight: 500;
-
-        mat-icon {
-          opacity: 0.7;
-          margin-right: 4px;
-        }
-      }
-    }
-  }
+  /* Database info styles moved to exercise-header */
 
   .editor-section {
     margin-bottom: 20px;
@@ -46,14 +51,133 @@
 
   .actions {
     display: flex;
-    gap: 12px;
-    justify-content: flex-end;
+    align-items: center;
+    justify-content: space-between;
     margin-bottom: 24px;
 
-    button {
+    .toggle-view {
+      .mat-button-toggle-group {
+        border-radius: 20px;
+        overflow: hidden;
+      }
+
+      .mat-button-toggle {
+        padding: 4px 12px;
+      }
+    }
+
+    .query-actions {
+      display: flex;
+      gap: 12px;
+
+      button {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+    }
+  }
+
+  .view-container {
+    h3 {
       display: flex;
       align-items: center;
       gap: 8px;
+      margin-bottom: 16px;
+      color: rgba(0, 0, 0, 0.87);
+      font-size: 1.1rem;
+      font-weight: 500;
+
+      mat-icon {
+        opacity: 0.8;
+      }
+    }
+
+    .schema-content {
+      background: rgba(0, 0, 0, 0.02);
+      border-radius: 8px;
+      padding: 16px;
+
+      pre {
+        margin: 0;
+        font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        font-size: 14px;
+        line-height: 1.5;
+        white-space: pre-wrap;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+    }
+
+    .table-stats {
+      font-size: 0.9rem;
+      color: rgba(0, 0, 0, 0.6);
+      margin-bottom: 8px;
+    }
+
+    .results-table {
+      margin-top: 16px;
+      border-radius: 8px;
+      overflow: hidden;
+
+      .table-container {
+        max-height: 400px;
+        overflow: auto;
+      }
+
+      table {
+        width: 100%;
+      }
+
+      th {
+        background: #f5f5f5;
+        font-weight: 500;
+        color: rgba(0, 0, 0, 0.87);
+      }
+
+      td {
+        font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        font-size: 14px;
+      }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px;
+      color: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.02);
+      border-radius: 8px;
+
+      mat-icon {
+        font-size: 48px;
+        height: 48px;
+        width: 48px;
+        margin-bottom: 16px;
+        opacity: 0.6;
+      }
+
+      p {
+        margin: 0;
+        font-size: 1rem;
+      }
+    }
+
+    .schema-view {
+      h3 {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+        color: rgba(0, 0, 0, 0.87);
+        font-size: 1.1rem;
+        font-weight: 500;
+
+        .schema-header {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+      }
     }
   }
 
@@ -94,5 +218,3 @@
     margin-top: 24px;
   }
 }
-
-// Dark theme later

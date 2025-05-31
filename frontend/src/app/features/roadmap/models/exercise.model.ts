@@ -24,6 +24,8 @@ export interface Exercise {
     database?: {
         id: number;
         name: string;
+        description?: string;
+        schemaSql?: string;
     };
     databaseId?: number;
     querySolution?: string;

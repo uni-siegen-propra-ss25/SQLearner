@@ -3,8 +3,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { RoadmapViewComponent } from './components/roadmap-view/roadmap-view.component';
 import { Role } from '../../features/users/models/role.model';
 import { RoleGuard } from '../../core/guards/role.guard';
-import { DynamicExerciseComponent } from '../exercises/components/dynamic-exercise.component';
 import { ExerciseResolver } from '../exercises/resolvers/exercise.resolver';
+import { DynamicExerciseComponent } from '../exercises/components/dynamic-exercise/dynamic-exercise.component';
 
 const routes: Routes = [
     {
