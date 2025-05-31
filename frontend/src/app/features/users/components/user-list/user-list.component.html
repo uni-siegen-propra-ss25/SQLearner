@@ -1,20 +1,16 @@
 <div class="user-list-container">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>Nutzerverwaltung</mat-card-title>
-      <div class="header-actions">
-        <button
-          mat-raised-button
-          color="primary"
-          (click)="openCreateDialog()"
-          *ngIf="isTutorOrAdmin"
-        >
-          <mat-icon>add</mat-icon>
-          <span *ngIf="isAdmin">Neuen Nutzer anlegen</span>
-          <span *ngIf="!isAdmin">Neuen Studenten anlegen</span>
-        </button>
-      </div>
-    </mat-card-header>
+    <div class="header">
+        <h1>Nutzerverwaltung</h1>
+        <div class="actions" *ngIf="isTutorOrAdmin">
+            <button mat-raised-button color="primary" (click)="openCreateDialog()">
+                <mat-icon>person_add</mat-icon>
+                <span *ngIf="isAdmin">Neuen Nutzer anlegen</span>
+                <span *ngIf="!isAdmin">Neuen Studenten anlegen</span>
+            </button>
+        </div>
+    </div>
+
+    <mat-card>
 
     <mat-card-content>
       <mat-table [dataSource]="users" class="user-table">
@@ -52,7 +48,7 @@
         </ng-container>
 
         <ng-container matColumnDef="actions">
-          <mat-header-cell *matHeaderCellDef></mat-header-cell>
+          <mat-header-cell *matHeaderCellDef>Aktionen</mat-header-cell>
           <mat-cell *matCellDef="let user" class="actions-cell">
             <div
               class="action-buttons"
