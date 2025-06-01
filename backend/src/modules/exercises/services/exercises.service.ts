@@ -4,6 +4,7 @@ import { CreateExerciseDto, AnswerOptionDto } from '../models/create-exercise.dt
 import { UpdateExerciseDto } from '../models/update-exercise.dto';
 import { ReorderExercisesDto } from '../models/reorder-exercises.dto';
 import { Exercise, ExerciseType } from '@prisma/client';
+import { DatabasesService } from '../../databases/services/databases.service';
 
 /**
  * Service handling business logic for exercise-related operations.
@@ -12,7 +13,10 @@ import { Exercise, ExerciseType } from '@prisma/client';
  */
 @Injectable()
 export class ExercisesService {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly databasesService: DatabasesService,
+    ) {}
 
     /**
      * Retrieves all exercises within a topic.
@@ -50,6 +54,21 @@ export class ExercisesService {
             throw new NotFoundException('Exercise not found');
         }
         return exercise;
+    }
+
+    /**
+     * Retrieves all exercises.
+     *
+     * @returns Promise resolving to an array of Exercise objects with associated data
+     */
+    async getAllExercises(): Promise<Exercise[]> {
+        return this.prisma.exercise.findMany({
+            include: {
+                database: true,
+                answers: true,
+            },
+            orderBy: { order: 'asc' },
+        });
     }
 
     /**
@@ -226,5 +245,32 @@ export class ExercisesService {
                 });
             }
         });
+    }
+
+    /**
+     * Runs a SQL query for an exercise.
+     *
+     * @param id - The ID of the exercise to run the query for
+     * @param query - The query to run
+     * @returns Promise resolving to the query result
+     * @throws NotFoundException if the exercise or database does not exist
+     */
+    async runQuery(id: number, query: string): Promise<{ columns: string[]; rows: any[] }> {
+        const exercise = await this.prisma.exercise.findUnique({
+            where: { id },
+            include: {
+                database: true,
+            },
+        });
+
+        if (!exercise) {
+            throw new NotFoundException('Exercise not found');
+        }
+
+        if (!exercise.database) {
+            throw new NotFoundException('Exercise has no associated database');
+        }
+
+        return this.databasesService.runQuery(exercise.database.id, query);
     }
 }

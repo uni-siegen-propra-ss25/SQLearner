@@ -23,7 +23,17 @@ const routes: Routes = [
         data: {
             allowedRoles: [Role.STUDENT, Role.TUTOR, Role.ADMIN],
         },
-    },    {
+    },
+    {
+        path: 'exercises',
+        loadChildren: () =>
+            import('./features/exercises/exercises.module').then((m) => m.ExercisesModule),
+        canActivate: [RoleGuard],
+        data: {
+            allowedRoles: [Role.STUDENT, Role.TUTOR, Role.ADMIN],
+        },
+    },
+    {
         path: 'progress',
         loadChildren: () => import('./features/progress/progress.module').then((m) => m.ProgressModule),
         canActivate: [RoleGuard],

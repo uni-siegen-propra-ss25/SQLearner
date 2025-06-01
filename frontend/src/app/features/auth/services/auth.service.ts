@@ -47,7 +47,6 @@ export class AuthService {
         console.log('Attempting login with:', data);
         return this.http.post<LoginResponse>(`${this.baseUrl}/login`, data, this.httpOptions).pipe(
             tap((res) => {
-                console.log('Login response:', res);
                 this.saveToken(res.accessToken);
                 this._logStatusSubject$.next(true);
                 this._userSubject$.next(this.getUserFromToken());
@@ -65,15 +64,12 @@ export class AuthService {
 
     /** Saves the JWT to local storage. */
     private saveToken(token: string): void {
-        console.log('Saving token:', token);
         localStorage.setItem(this.tokenKey, token);
     }
 
     /** Returns the raw JWT or null. */
     getToken(): string | null {
-        const token = localStorage.getItem(this.tokenKey);
-        console.log('Getting token:', token);
-        return token;
+        return localStorage.getItem(this.tokenKey);
     }
 
     /** Helper for your AuthGuard: */

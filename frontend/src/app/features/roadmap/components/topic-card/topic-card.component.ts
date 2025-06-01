@@ -4,6 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Topic } from '../../models/topic.model';
 import { Exercise } from '../../models/exercise.model';
 import { RoadmapService } from '../../services/roadmap.service';
+import { ExercisesService } from '../../../exercises/services/exercises.service';
 import { ExerciseDialogComponent } from '../../dialogs/exercise-dialog/exercise-dialog.component';
 
 @Component({
@@ -23,6 +24,7 @@ export class TopicCardComponent implements OnInit {
 
     constructor(
         private readonly roadmapService: RoadmapService,
+        private readonly exercisesService: ExercisesService,
         private readonly dialog: MatDialog,
         private readonly snackBar: MatSnackBar,
     ) {}
@@ -33,7 +35,7 @@ export class TopicCardComponent implements OnInit {
 
     loadExercises() {
         this.isLoading = true;
-        this.roadmapService.getExercises(this.topic.id).subscribe({
+        this.exercisesService.getExercisesByTopic(this.topic.id).subscribe({
             next: (exercises) => {
                 this.exercises = exercises;
                 this.isLoading = false;
@@ -64,7 +66,9 @@ export class TopicCardComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
-                this.roadmapService.createExercise(this.topic.id, result).subscribe({
+                // Add topic ID to the exercise data
+                const exerciseData = { ...result, topicId: this.topic.id };
+                this.exercisesService.createExercise(exerciseData).subscribe({
                     next: () => {
                         this.loadExercises();
                         this.snackBar.open('Exercise created successfully', 'Close', {
@@ -90,7 +94,7 @@ export class TopicCardComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
-                this.roadmapService.updateExercise(this.topic.id, exercise.id, result).subscribe({
+                this.exercisesService.updateExercise(exercise.id, result).subscribe({
                     next: () => {
                         this.loadExercises();
                         this.snackBar.open('Exercise updated successfully', 'Close', {
@@ -110,7 +114,7 @@ export class TopicCardComponent implements OnInit {
 
     onExerciseDelete(exerciseId: number): void {
         if (confirm('Are you sure you want to delete this exercise?')) {
-            this.roadmapService.deleteExercise(this.topic.id, exerciseId).subscribe({
+            this.exercisesService.deleteExercise(exerciseId).subscribe({
                 next: () => {
                     this.loadExercises();
                     this.snackBar.open('Exercise deleted successfully', 'Close', {

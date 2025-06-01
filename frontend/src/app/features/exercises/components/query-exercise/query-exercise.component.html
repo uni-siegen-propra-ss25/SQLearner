@@ -13,16 +13,7 @@
 
     <!-- SQL Editor -->
     <div class="editor-section">
-      <mat-form-field appearance="outline" class="sql-editor">
-        <mat-label>Deine SQL Query</mat-label>
-        <textarea
-          matInput
-          [(ngModel)]="sqlQuery"
-          rows="6"
-          placeholder="SELECT * FROM..."
-        ></textarea>
-        <mat-hint>Schreibe deine SQL-Abfrage hier</mat-hint>
-      </mat-form-field>
+      <div #editorContainer class="monaco-editor"></div>
     </div>
 
     <!-- Actions -->
@@ -94,18 +85,28 @@
               gefunden
             </div>
             <div class="table-container mat-elevation-z1">
-              <table mat-table [dataSource]="queryResult.rows">
+              <table mat-table [dataSource]="paginatedRows">
                 <ng-container
                   [matColumnDef]="col"
                   *ngFor="let col of queryResult.columns; let i = index"
                 >
                   <th mat-header-cell *matHeaderCellDef>{{ col }}</th>
-                  <td mat-cell *matCellDef="let row">{{ row[i] }}</td>
+                  <td mat-cell *matCellDef="let row">{{ row[col] }}</td>
                 </ng-container>
 
                 <tr mat-header-row *matHeaderRowDef="queryResult.columns; sticky: true"></tr>
                 <tr mat-row *matRowDef="let row; columns: queryResult.columns"></tr>
               </table>
+
+              <mat-paginator
+                [length]="queryResult.rows.length"
+                [pageSize]="pageSize"
+                [pageSizeOptions]="pageSizeOptions"
+                [pageIndex]="pageIndex"
+                (page)="onPageChange($event)"
+                aria-label="Wähle eine Ergebnisseite"
+              >
+              </mat-paginator>
             </div>
           </div>
         </div>

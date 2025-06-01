@@ -1,10 +1,10 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { Database } from '../models/database.model';
 import { CreateDatabaseDto } from '../models/create-database.dto';
 import { UpdateDatabaseDto } from '../models/update-database.dto';
 import { Role } from '@prisma/client';
 import { Pool } from 'pg';
+import { SqlErrorException } from '../../../common/exceptions/sql-error.exception';
 
 @Injectable()
 export class DatabasesService {
@@ -13,22 +13,15 @@ export class DatabasesService {
     constructor(private prisma: PrismaService) {
         // Initialise connection pool with PostgreSQL
         this.pool = new Pool({
-            connectionString: process.env.DATABASE_URL,
+            host: process.env.DB_HOST,
+            port: parseInt(process.env.DB_PORT || '5432', 10),
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: process.env.DB_NAME
         });
     }
 
     async createDatabase(dto: CreateDatabaseDto, userId: number, userRole: Role | string) {
-        console.log('=== Database Creation Debug ===');
-        console.log('User ID:', userId);
-        console.log('User Role (raw):', userRole);
-        console.log('User Role Type:', typeof userRole);
-        console.log('Role.TUTOR:', Role.TUTOR);
-        console.log('Role.TUTOR Type:', typeof Role.TUTOR);
-        console.log('Direct comparison:', userRole === Role.TUTOR);
-        console.log('String comparison:', userRole === 'TUTOR');
-        console.log('Case-insensitive comparison:', String(userRole).toUpperCase() === 'TUTOR');
-        console.log('===========================');
-
         if (String(userRole).toUpperCase() !== 'TUTOR') {
             throw new ForbiddenException('Only tutors can create databases');
         }
@@ -138,5 +131,42 @@ export class DatabasesService {
         }
 
         return database;
+    }
+
+    /**
+     * Runs a SQL query on a database.
+     *
+     * @param id - The ID of the database to run the query on
+     * @param query - The query to run
+     * @returns Promise resolving to the query result
+     * @throws NotFoundException if the database does not exist
+     */
+    async runQuery(id: number, query: string): Promise<{ columns: string[]; rows: any[]; error?: string }> {
+        const database = await this.getDatabaseById(id);
+
+        if (!database) {
+            throw new NotFoundException('Database not found');
+        }
+
+        try {
+            const result = await this.pool.query(query);
+            
+            // Extract column names from fields
+            const columns = result.fields.map(field => field.name);
+            
+            // Return formatted result with empty rows if no results
+            return {
+                columns: columns || [],
+                rows: result.rows || []
+            };
+        } catch (error) {
+            // PostgreSQL error object has detailed information
+            const detail = error.message || error.detail || 'Unknown database error';
+            throw new SqlErrorException({
+                message: detail,
+                name: error.name || 'DatabaseError',
+                stack: error.stack
+            });
+        }
     }
 }

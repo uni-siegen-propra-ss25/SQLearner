@@ -2,15 +2,16 @@ import { Injectable } from '@angular/core';
 import { Resolve, ActivatedRouteSnapshot } from '@angular/router';
 import { Observable } from 'rxjs';
 import { Exercise } from '../../roadmap/models/exercise.model';
-import { ExerciseService } from '../services/exercise.service';
+import { ExercisesService } from '../services/exercises.service';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+    providedIn: 'root',
+})
 export class ExerciseResolver implements Resolve<Exercise> {
-    constructor(private exerciseService: ExerciseService) {}
+    constructor(private exercisesService: ExercisesService) {}
 
     resolve(route: ActivatedRouteSnapshot): Observable<Exercise> {
-        const topicId = Number(route.paramMap.get('topicId'));
-        const exerciseId = Number(route.paramMap.get('exerciseId'));
-        return this.exerciseService.getExercise(topicId, exerciseId);
+        const exerciseId = parseInt(route.paramMap.get('exerciseId') || '0', 10);
+        return this.exercisesService.getExercise(exerciseId);
     }
 }

@@ -26,6 +26,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 /**
  * MaterialModule imports and exports Angular Material modules.
@@ -62,6 +63,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
         MatMenuModule,
         MatChipsModule,
         MatButtonToggleModule,
+        MatPaginatorModule,
     ],
 })
 export class MaterialModule {}
