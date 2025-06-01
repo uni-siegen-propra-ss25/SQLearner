@@ -152,21 +152,29 @@ export class DatabasesService {
             const result = await this.pool.query(query);
             
             // Extract column names from fields
-            const columns = result.fields.map(field => field.name);
+            const columns = result.fields ? result.fields.map(field => field.name) : [];
             
-            // Return formatted result with empty rows if no results
+            // Always return an array for rows, even if empty
             return {
-                columns: columns || [],
+                columns,
                 rows: result.rows || []
             };
         } catch (error) {
-            // PostgreSQL error object has detailed information
-            const detail = error.message || error.detail || 'Unknown database error';
-            throw new SqlErrorException({
-                message: detail,
-                name: error.name || 'DatabaseError',
-                stack: error.stack
-            });
+            // Only throw SqlErrorException for actual SQL errors
+            if (error.code) {  // PostgreSQL errors have a code property
+                const detail = error.message || error.detail || 'Database error';
+                throw new SqlErrorException({
+                    message: detail,
+                    name: error.name || 'DatabaseError',
+                    stack: error.stack
+                });
+            }
+            
+            // For successful queries with no results, return empty structure
+            return {
+                columns: [],
+                rows: []
+            };
         }
     }
 }
