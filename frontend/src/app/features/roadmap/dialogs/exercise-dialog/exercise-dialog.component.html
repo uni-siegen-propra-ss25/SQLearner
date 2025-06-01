@@ -53,7 +53,7 @@
     <ng-container *ngIf="exerciseForm.get('type')?.value === 'QUERY'">
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Database</mat-label>
-        <mat-select formControlName="databaseId">
+        <mat-select formControlName="databaseId" required>
           <mat-option *ngFor="let db of databases" [value]="db.id">
             {{ db.name }}
           </mat-option>
@@ -68,10 +68,11 @@
         <textarea
           matInput
           formControlName="querySolution"
-          placeholder="Enter the solution SQL query"
-          rows="4"
-        >
-        </textarea>
+          placeholder="SELECT * FROM table WHERE condition"
+          required
+          rows="6"
+        ></textarea>
+        <mat-hint>Enter the SQL query that represents the correct solution</mat-hint>
         <mat-error *ngIf="exerciseForm.get('querySolution')?.hasError('required')">
           Solution query is required
         </mat-error>

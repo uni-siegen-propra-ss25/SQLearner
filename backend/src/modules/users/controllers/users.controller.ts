@@ -13,11 +13,12 @@ import { UsersService } from '../services/users.service';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth/jwt-auth.guard';
 import { RolesGuard } from 'src/common/guards/role/role.guard';
 import { Roles } from 'src/common/decorators/role.decorator';
-import { User } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 
 /**
  * UsersController handles HTTP requests related to user operations.
  * It delegates the actual logic to the UsersService.
+ * All endpoints require authentication and appropriate role permissions.
  */
 @ApiTags('Users')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -28,7 +29,9 @@ export class UsersController {
 
     /**
      * Retrieves all users from the database.
-     * @returns Promise resolving to an array of User objects.
+     * Accessible only by administrators and tutors.
+     *
+     * @returns Promise resolving to an array of partial User objects
      */
     @Get('getAllUsers')
     @Roles('ADMIN', 'TUTOR')
@@ -39,18 +42,57 @@ export class UsersController {
     }
 
     /**
-     * Get users by role
+     * Retrieves a user by their ID.
+     * Accessible only by administrators and tutors.
+     *
+     * @param id - The ID of the user to retrieve
+     * @returns Promise resolving to a User object
+     */
+    @Get(':id')
+    @Roles('ADMIN', 'TUTOR')
+    @ApiOperation({ summary: 'Get user by ID' })
+    @ApiResponse({ status: 200, description: 'User found successfully' })
+    async getUserById(@Param('id', ParseIntPipe) id: number): Promise<Partial<User>> {
+        return await this.usersService.getUserById(id);
+    }
+
+    /**
+     * Retrieves a user by their email.
+     * Accessible only by administrators and tutors.
+     *
+     * @param email - The email of the user to retrieve
+     * @returns Promise resolving to a User object
+     */
+    @Get('byEmail/:email')
+    @Roles('ADMIN', 'TUTOR')
+    @ApiOperation({ summary: 'Get user by email' })
+    @ApiResponse({ status: 200, description: 'User found successfully' })
+    async getUserByEmail(@Param('email') email: string): Promise<Partial<User>> {
+        return this.usersService.getUserByEmail(email);
+    }
+
+    /**
+     * Retrieves users by their role.
+     * Accessible only by administrators and tutors.
+     *
+     * @param role - The role to filter users by
+     * @returns Promise resolving to an array of partial User objects
      */
     @Get('byRole/:role')
     @Roles('ADMIN', 'TUTOR')
     @ApiOperation({ summary: 'Get users by role' })
     @ApiResponse({ status: 200, description: 'List of users with specified role' })
-    async getUsersByRole(@Param('role') role: string): Promise<Partial<User>[]> {
+    async getUsersByRole(@Param('role') role: Role): Promise<Partial<User>[]> {
         return this.usersService.getUsersByRole(role);
     }
 
     /**
-     * Update user information
+     * Updates user information.
+     * Accessible only by administrators and tutors.
+     *
+     * @param id - The ID of the user to update
+     * @param updateData - The data to update the user with
+     * @returns Promise resolving to the updated User object
      */
     @Patch(':id')
     @Roles('ADMIN', 'TUTOR')
@@ -64,7 +106,12 @@ export class UsersController {
     }
 
     /**
-     * Update user role
+     * Updates a user's role.
+     * Accessible only by administrators.
+     *
+     * @param id - The ID of the user whose role to update
+     * @param role - The new role to assign
+     * @returns Promise resolving to the updated User object
      */
     @Patch(':id/role')
     @Roles('ADMIN')
@@ -72,13 +119,18 @@ export class UsersController {
     @ApiResponse({ status: 200, description: 'User role updated successfully' })
     async updateUserRole(
         @Param('id', ParseIntPipe) id: number,
-        @Body('role') role: string,
+        @Body('role') role: Role,
     ): Promise<User> {
         return this.usersService.updateUserRole(id, role);
     }
 
     /**
-     * Update user password
+     * Updates a user's password.
+     * Accessible only by administrators and tutors.
+     *
+     * @param id - The ID of the user whose password to update
+     * @param password - The new password
+     * @returns Promise resolving to the updated User object
      */
     @Patch(':id/password')
     @Roles('ADMIN', 'TUTOR')
@@ -92,7 +144,10 @@ export class UsersController {
     }
 
     /**
-     * Delete user
+     * Deletes a user.
+     * Accessible only by administrators.
+     *
+     * @param id - The ID of the user to delete
      */
     @Delete(':id')
     @Roles('ADMIN')

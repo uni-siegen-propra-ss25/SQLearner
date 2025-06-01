@@ -14,8 +14,13 @@ export class JwtInterceptor implements HttpInterceptor {
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         const token = this.auth.getToken();
+        console.log('JwtInterceptor - Request URL:', req.url);
+        console.log('JwtInterceptor - Token:', token);
+        console.log('JwtInterceptor - User role:', this.auth.getUserRole());
+
         if (!token) {
-            return next.handle(req); // pass request to the next handler
+            console.log('JwtInterceptor - No token found, passing request through');
+            return next.handle(req);
         }
 
         // list of URLs to exclude from the interceptor
@@ -23,13 +28,18 @@ export class JwtInterceptor implements HttpInterceptor {
 
         // check if the request URL is in the excluded list
         if (excludedUrls.some((url) => req.url.includes(url))) {
-            return next.handle(req); // pass request to the next handler
+            console.log('JwtInterceptor - URL is excluded, passing request through');
+            return next.handle(req);
         }
 
         const cloned = req.clone({
             // clone the request to add the new header (requests are immutable)
             headers: req.headers.set('Authorization', `Bearer ${token}`), // add the token to the request headers
         });
+
+        console.log('JwtInterceptor - Request headers:', cloned.headers.keys());
+        console.log('JwtInterceptor - Authorization header:', cloned.headers.get('Authorization'));
+
         return next.handle(cloned); // pass the cloned request instead of the original to the next handler
     }
 }

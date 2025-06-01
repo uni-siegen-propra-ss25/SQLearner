@@ -1,36 +1,61 @@
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { Role } from '@prisma/client';
 
 /**
- * RolesGuard checks for @Roles() metadata on route handlers
- * and compares it to `request.user.role`. ADMIN always has access.
+ * Guard for role-based access control (RBAC).
+ * Validates that the authenticated user has the required role to access a route.
+ * Works in conjunction with the @Roles() decorator.
+ *
+ * Features:
+ * - Checks route's required roles against user's role
+ * - ADMIN role always has access to all routes
+ * - No roles = public route
+ *
+ * @example
+ * // Single role
+ * @Roles('ADMIN')
+ * @UseGuards(JwtAuthGuard, RolesGuard)
+ * @Delete('users/:id')
+ * deleteUser() {
+ *   // Only admins can access
+ * }
+ *
+ * // Multiple roles
+ * @Roles('ADMIN', 'TUTOR')
+ * @UseGuards(JwtAuthGuard, RolesGuard)
+ * @Get('users')
+ * getUsers() {
+ *   // Admins and tutors can access
+ * }
  */
 @Injectable()
 export class RolesGuard implements CanActivate {
     constructor(private reflector: Reflector) {}
 
     /**
-     * Determines whether the current request's user has the required roles.
-     * @param context ExecutionContext provided by Nest
-     * @returns boolean true if access is allowed
-     * @throws ForbiddenException if role is insufficient
+     * Determines if the current user has permission to access the route.
+     * Checks the roles required by @Roles() decorator against user's role.
+     *
+     * @param context Execution context containing the request and handler info
+     * @returns True if access is allowed, false otherwise
+     * @throws ForbiddenException if user's role is insufficient
      */
     canActivate(context: ExecutionContext): boolean {
-        const requiredRoles = this.reflector.get<string[]>('roles', context.getHandler());
+        const requiredRoles = this.reflector.get<Role[]>('roles', context.getHandler());
 
         // If no roles are required, allow access (route is public or unprotected)
         if (!requiredRoles || requiredRoles.length === 0) {
-            return true; // No roles specified = public route
+            return true;
         }
 
-        const { user } = context.switchToHttp().getRequest(); // Get the user object from the request (injected by JwtStrategy)
+        const { user } = context.switchToHttp().getRequest();
 
-        // If the user is not present or has no matching role, deny access
-        if (!user || (!requiredRoles.includes(user.role) && user.role !== 'ADMIN')) {
-            // easier then checking for all roles @Roles('SELLER', 'ADMIN')
+        // If the user is not present or has no matching role (and is not ADMIN), deny access
+        if (!user || (!requiredRoles.includes(user.role) && user.role !== Role.ADMIN)) {
             throw new ForbiddenException('Access denied: insufficient role');
         }
 
-        return true; // Role is valid → allow access
+        return true;
     }
 }

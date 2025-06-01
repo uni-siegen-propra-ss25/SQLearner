@@ -6,6 +6,11 @@ import { ChaptersService } from '../../chapters/services/chapters.service';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { Topic } from '@prisma/client';
 
+/**
+ * Service handling business logic for topic-related operations.
+ * Manages the creation, retrieval, update, and deletion of topics,
+ * as well as their ordering within chapters.
+ */
 @Injectable()
 export class TopicsService {
     constructor(
@@ -13,6 +18,13 @@ export class TopicsService {
         private readonly chaptersService: ChaptersService,
     ) {}
 
+    /**
+     * Retrieves all topics within a chapter.
+     *
+     * @param chapterId - The ID of the chapter whose topics to retrieve
+     * @returns Promise resolving to an array of Topic objects with their exercises
+     * @throws NotFoundException if the chapter does not exist
+     */
     async getTopics(chapterId: number): Promise<Topic[]> {
         // Verify chapter exists
         await this.chaptersService.getChapterById(Number(chapterId));
@@ -31,6 +43,13 @@ export class TopicsService {
         });
     }
 
+    /**
+     * Retrieves a specific topic by ID.
+     *
+     * @param id - The ID of the topic to retrieve
+     * @returns Promise resolving to the Topic object with its exercises
+     * @throws NotFoundException if the topic does not exist
+     */
     async getTopicById(id: number): Promise<Topic> {
         const topic = await this.prisma.topic.findUnique({
             where: { id: Number(id) },
@@ -51,6 +70,13 @@ export class TopicsService {
         return topic;
     }
 
+    /**
+     * Creates a new topic in a chapter.
+     *
+     * @param createTopicDto - The data for creating the new topic
+     * @returns Promise resolving to the ID of the created topic
+     * @throws NotFoundException if the chapter does not exist
+     */
     async createTopic(createTopicDto: CreateTopicDto): Promise<number> {
         // Verify chapter exists
         await this.chaptersService.getChapterById(createTopicDto.chapterId);
@@ -70,6 +96,14 @@ export class TopicsService {
         return topic.id;
     }
 
+    /**
+     * Updates an existing topic.
+     *
+     * @param id - The ID of the topic to update
+     * @param updateTopicDto - The data to update the topic with
+     * @returns Promise resolving to the updated Topic object
+     * @throws NotFoundException if the topic does not exist
+     */
     async updateTopic(id: number, updateTopicDto: UpdateTopicDto): Promise<Topic> {
         const topic = await this.getTopicById(Number(id));
         Object.assign(topic, updateTopicDto);
@@ -87,6 +121,12 @@ export class TopicsService {
         });
     }
 
+    /**
+     * Removes a topic and its associated exercises.
+     *
+     * @param id - The ID of the topic to remove
+     * @throws NotFoundException if the topic does not exist
+     */
     async removeTopic(id: number): Promise<void> {
         const topic = await this.getTopicById(Number(id));
         await this.prisma.topic.delete({
@@ -94,6 +134,13 @@ export class TopicsService {
         });
     }
 
+    /**
+     * Updates the order of topics within a chapter.
+     *
+     * @param chapterId - The ID of the chapter containing the topics
+     * @param reorderTopicsDto - The new order of topics
+     * @throws NotFoundException if any topic does not exist
+     */
     async reorderTopics(chapterId: number, reorderTopicsDto: ReorderTopicsDto): Promise<void> {
         const { topics: reorderedTopics } = reorderTopicsDto;
 

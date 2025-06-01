@@ -33,13 +33,16 @@ export class ExerciseDialogComponent implements OnInit {
     }
 
     private initForm() {
+        const type = this.data.type || ExerciseType.QUERY;
+        const validators = type === ExerciseType.QUERY ? [Validators.required] : [];
+
         this.exerciseForm = this.fb.group({
             title: [this.data.title || '', Validators.required],
             description: [this.data.description || '', Validators.required],
-            type: [this.data.type || ExerciseType.QUERY, Validators.required],
+            type: [type, Validators.required],
             difficulty: [this.data.difficulty || Difficulty.EASY, Validators.required],
-            databaseId: [this.data.databaseId],
-            querySolution: [this.data.querySolution],
+            databaseId: [this.data.databaseId || null, validators],
+            querySolution: [this.data.querySolution || null, validators],
             answers: this.fb.array([]),
             topicId: [this.data.topicId],
             order: [this.data.order || 0],
@@ -48,10 +51,6 @@ export class ExerciseDialogComponent implements OnInit {
         // Initialize answers for choice questions
         if (this.data.answers?.length) {
             this.data.answers.forEach((answer) => this.addAnswer(answer));
-        } else {
-            // Add two default empty answers
-            this.addAnswer();
-            this.addAnswer();
         }
     }
 
@@ -90,12 +89,6 @@ export class ExerciseDialogComponent implements OnInit {
             if (type === ExerciseType.QUERY) {
                 databaseIdControl?.setValidators([Validators.required]);
                 querySolutionControl?.setValidators([Validators.required]);
-
-                // Initialize answers array for choice types
-                if (answersControl.length === 0) {
-                    this.addAnswer();
-                    this.addAnswer();
-                }
             } else if (
                 type === ExerciseType.SINGLE_CHOICE ||
                 type === ExerciseType.MULTIPLE_CHOICE
@@ -135,7 +128,9 @@ export class ExerciseDialogComponent implements OnInit {
     }
 
     private loadDatabases() {
-        this.databaseService.getDatabases().subscribe((databases) => (this.databases = databases));
+        this.databaseService
+            .getAllDatabases()
+            .subscribe((databases: Database[]) => (this.databases = databases));
     }
 
     get answers() {

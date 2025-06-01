@@ -24,6 +24,8 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatTableModule } from '@angular/material/table';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 /**
  * MaterialModule imports and exports Angular Material modules.
@@ -58,6 +60,8 @@ import { MatMenuModule } from '@angular/material/menu';
         MatRadioModule,
         MatTableModule,
         MatMenuModule,
+        MatChipsModule,
+        MatButtonToggleModule,
     ],
 })
 export class MaterialModule {}

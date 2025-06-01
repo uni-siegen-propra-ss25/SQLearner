@@ -21,12 +21,12 @@ export class ProfileComponent implements OnInit {
     roleDisplayNames = {
         [Role.ADMIN]: 'Administrator',
         [Role.TUTOR]: 'Tutor',
-        [Role.STUDENT]: 'Student'
+        [Role.STUDENT]: 'Student',
     };
 
     constructor(
         private authService: AuthService,
-        private dialogRef: MatDialogRef<ProfileComponent>
+        private dialogRef: MatDialogRef<ProfileComponent>,
     ) {}
 
     /**

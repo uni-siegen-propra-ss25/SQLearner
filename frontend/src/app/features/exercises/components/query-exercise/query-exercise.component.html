@@ -1,59 +1,118 @@
 <div class="query-exercise">
   <mat-card-content>
+    <div class="exercise-header">
+      <h2 class="exercise-title">{{ exercise.title }}</h2>
+      <div class="database-info" *ngIf="exercise.database">
+        <mat-icon>storage</mat-icon>
+        <span>
+          {{ exercise.database.name }}
+        </span>
+      </div>
+    </div>
+    <p class="exercise-description">{{ exercise.description }}</p>
+
     <!-- SQL Editor -->
     <div class="editor-section">
-      <mat-form-field appearance="fill" class="sql-editor">
-        <mat-label>SQL Query</mat-label>
+      <mat-form-field appearance="outline" class="sql-editor">
+        <mat-label>Deine SQL Query</mat-label>
         <textarea
           matInput
           [(ngModel)]="sqlQuery"
           rows="6"
           placeholder="SELECT * FROM..."
         ></textarea>
-        <mat-icon matSuffix>code</mat-icon>
+        <mat-hint>Schreibe deine SQL-Abfrage hier</mat-hint>
       </mat-form-field>
     </div>
 
     <!-- Actions -->
     <div class="actions">
-      <button mat-stroked-button (click)="toggleFeedback()">
-        <mat-icon>chat</mat-icon>
-        {{ showFeedback ? 'Hide Feedback' : 'Show Feedback' }}
-      </button>
-      <button mat-stroked-button [disabled]="!sqlQuery.trim() || isLoading" (click)="runQuery()">
-        <mat-icon>play_arrow</mat-icon>
-        Run Query
-      </button>
-      <button
-        mat-flat-button
-        color="primary"
-        [disabled]="!sqlQuery.trim() || isLoading"
-        (click)="submitQuery()"
-      >
-        <mat-icon>check</mat-icon>
-        Submit Answer
-      </button>
+      <div class="toggle-view">
+        <mat-button-toggle-group [(ngModel)]="currentView">
+          <mat-button-toggle value="schema" matTooltip="Datenbankschema anzeigen">
+            <mat-icon>schema</mat-icon>
+          </mat-button-toggle>
+          <mat-button-toggle value="result" matTooltip="Abfrageergebnis anzeigen">
+            <mat-icon>table_chart</mat-icon>
+          </mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+
+      <div class="query-actions">
+        <button
+          mat-stroked-button
+          [disabled]="!sqlQuery.trim() || isLoading"
+          (click)="runQuery()"
+          matTooltip="Testet deine Query direkt in der Datenbank. Das Ergebnis wird dir sofort angezeigt."
+        >
+          <mat-icon>play_arrow</mat-icon>
+          Query testen
+        </button>
+        <button
+          mat-flat-button
+          color="primary"
+          [disabled]="!sqlQuery.trim() || isLoading"
+          (click)="submitQuery()"
+          matTooltip="Reicht deine Lösung ein. Die KI überprüft, ob deine Query das gewünschte Ergebnis liefert."
+        >
+          <mat-icon>send</mat-icon>
+          Lösung einreichen
+        </button>
+      </div>
     </div>
 
-    <!-- Results -->
-    <div class="results-section" *ngIf="queryResult || isLoading">
-      <h3>Results</h3>
-      <mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
+    <!-- View Container -->
+    <div class="view-container">
+      <!-- Schema View -->
+      <div class="schema-view" *ngIf="currentView === 'schema'">
+        <h3>
+          <div class="schema-header">
+            <mat-icon>schema</mat-icon>
+            <span>Datenbankschema</span>
+          </div>
+        </h3>
+        <div class="schema-content mat-elevation-z1">
+          <pre>{{ exercise.database?.schemaSql || 'Kein Schema verfügbar' }}</pre>
+        </div>
+      </div>
 
-      <div class="results-table" *ngIf="!isLoading && queryResult">
-        <div class="table-container mat-elevation-z1">
-          <table mat-table [dataSource]="queryResult.rows">
-            <ng-container
-              [matColumnDef]="col"
-              *ngFor="let col of queryResult.columns; let i = index"
-            >
-              <th mat-header-cell *matHeaderCellDef>{{ col }}</th>
-              <td mat-cell *matCellDef="let row">{{ row[i] }}</td>
-            </ng-container>
+      <!-- Results View -->
+      <div class="results-view" *ngIf="currentView === 'result'">
+        <div class="results-section" *ngIf="queryResult || isLoading">
+          <h3>
+            <mat-icon>table_chart</mat-icon>
+            {{ isLoading ? 'Query wird ausgeführt...' : 'Ergebnis deiner Query' }}
+          </h3>
 
-            <tr mat-header-row *matHeaderRowDef="queryResult.columns"></tr>
-            <tr mat-row *matRowDef="let row; columns: queryResult.columns"></tr>
-          </table>
+          <mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
+
+          <div class="results-table" *ngIf="!isLoading && queryResult">
+            <div class="table-stats">
+              {{ queryResult.rows.length }} Zeile{{
+                queryResult.rows.length !== 1 ? 'n' : ''
+              }}
+              gefunden
+            </div>
+            <div class="table-container mat-elevation-z1">
+              <table mat-table [dataSource]="queryResult.rows">
+                <ng-container
+                  [matColumnDef]="col"
+                  *ngFor="let col of queryResult.columns; let i = index"
+                >
+                  <th mat-header-cell *matHeaderCellDef>{{ col }}</th>
+                  <td mat-cell *matCellDef="let row">{{ row[i] }}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="queryResult.columns; sticky: true"></tr>
+                <tr mat-row *matRowDef="let row; columns: queryResult.columns"></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="empty-state" *ngIf="!queryResult && !isLoading">
+          <mat-icon>table_chart</mat-icon>
+          <p>Führe eine Query aus, um das Ergebnis zu sehen.</p>
         </div>
       </div>
     </div>

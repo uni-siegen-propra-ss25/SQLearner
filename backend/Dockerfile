@@ -9,7 +9,9 @@ RUN apk add --no-cache netcat-openbsd
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm install && \
+    npm install --save-dev @nestjs/swagger @types/express @types/multer @types/pg && \
+    npm install @prisma/client pg
 
 # Copy the rest of the application
 COPY . .

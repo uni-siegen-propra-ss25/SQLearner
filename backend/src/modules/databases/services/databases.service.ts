@@ -1,143 +1,142 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
+import { Database } from '../models/database.model';
 import { CreateDatabaseDto } from '../models/create-database.dto';
 import { UpdateDatabaseDto } from '../models/update-database.dto';
-import { Database } from '@prisma/client';
+import { Role } from '@prisma/client';
+import { Pool } from 'pg';
 
 @Injectable()
 export class DatabasesService {
-    constructor(private readonly prisma: PrismaService) {}
+    private pool: Pool;
 
-    async getDatabases(userId: number): Promise<Database[]> {
-        return this.prisma.database.findMany({
-            where: {
-                OR: [
-                    { ownerId: userId },
-                    // Add public databases or other conditions here if needed
-                ],
-            },
-            include: {
-                owner: {
-                    select: {
-                        id: true,
-                        firstName: true,
-                        lastName: true,
-                    },
-                },
-            },
+    constructor(private prisma: PrismaService) {
+        // Initialise connection pool with PostgreSQL
+        this.pool = new Pool({
+            connectionString: process.env.DATABASE_URL,
         });
     }
 
-    async getDatabaseById(id: number, userId: number): Promise<Database> {
-        const database = await this.prisma.database.findUnique({
-            where: { id },
-            include: {
-                owner: {
-                    select: {
-                        id: true,
-                        firstName: true,
-                        lastName: true,
-                    },
-                },
-                exercises: {
-                    select: {
-                        id: true,
-                        title: true,
-                        type: true,
-                    },
-                },
+    async createDatabase(dto: CreateDatabaseDto, userId: number, userRole: Role | string) {
+        console.log('=== Database Creation Debug ===');
+        console.log('User ID:', userId);
+        console.log('User Role (raw):', userRole);
+        console.log('User Role Type:', typeof userRole);
+        console.log('Role.TUTOR:', Role.TUTOR);
+        console.log('Role.TUTOR Type:', typeof Role.TUTOR);
+        console.log('Direct comparison:', userRole === Role.TUTOR);
+        console.log('String comparison:', userRole === 'TUTOR');
+        console.log('Case-insensitive comparison:', String(userRole).toUpperCase() === 'TUTOR');
+        console.log('===========================');
+
+        if (String(userRole).toUpperCase() !== 'TUTOR') {
+            throw new ForbiddenException('Only tutors can create databases');
+        }
+
+        // Create a record in the Database table
+        const database = await this.prisma.database.create({
+            data: {
+                name: dto.name,
+                description: dto.description,
+                schemaSql: dto.schemaSql,
+                ownerId: userId,
             },
         });
 
-        if (!database) {
-            throw new NotFoundException('Database not found');
-        }
-
-        // Check if user has access to this database
-        if (database.ownerId !== userId) {
-            // Add additional access checks here if needed
-            throw new ForbiddenException('You do not have access to this database');
+        try {
+            // Execute SQL schema
+            if (dto.schemaSql) {
+                await this.pool.query(dto.schemaSql);
+                console.log('SQL schema executed successfully');
+            }
+        } catch (error) {
+            console.error('Error executing SQL schema:', error);
+            // You can add additional error handling here
         }
 
         return database;
     }
 
-    async createDatabase(createDatabaseDto: CreateDatabaseDto, userId: number): Promise<Database> {
-        return this.prisma.database.create({
-            data: {
-                ...createDatabaseDto,
-                ownerId: userId,
-            },
-            include: {
-                owner: {
-                    select: {
-                        id: true,
-                        firstName: true,
-                        lastName: true,
-                    },
-                },
+    async getAllDatabases() {
+        return this.prisma.database.findMany({
+            orderBy: {
+                createdAt: 'desc',
             },
         });
+    }
+
+    async getDatabaseById(id: number) {
+        const database = await this.prisma.database.findUnique({
+            where: { id },
+        });
+
+        if (!database) {
+            throw new NotFoundException(`Database with ID ${id} not found`);
+        }
+
+        return database;
     }
 
     async updateDatabase(
         id: number,
-        updateDatabaseDto: UpdateDatabaseDto,
+        dto: UpdateDatabaseDto,
         userId: number,
-    ): Promise<Database> {
-        // Check if database exists and user owns it
-        const database = await this.prisma.database.findUnique({
-            where: { id },
-        });
+        userRole: Role | string,
+    ) {
+        const database = await this.getDatabaseById(id);
 
-        if (!database) {
-            throw new NotFoundException('Database not found');
-        }
-
-        if (database.ownerId !== userId) {
-            throw new ForbiddenException('You do not have permission to update this database');
+        if (String(userRole).toUpperCase() !== 'TUTOR' || database.ownerId !== userId) {
+            throw new ForbiddenException('Only the creator tutor can update this database');
         }
 
         return this.prisma.database.update({
             where: { id },
-            data: updateDatabaseDto,
-            include: {
-                owner: {
-                    select: {
-                        id: true,
-                        firstName: true,
-                        lastName: true,
-                    },
-                },
+            data: {
+                name: dto.name,
+                description: dto.description,
+                schemaSql: dto.schemaSql,
             },
         });
     }
 
-    async deleteDatabase(id: number, userId: number): Promise<void> {
-        // Check if database exists and user owns it
-        const database = await this.prisma.database.findUnique({
+    async deleteDatabase(id: number, userId: number, userRole: Role | string) {
+        const database = await this.getDatabaseById(id);
+
+        if (String(userRole).toUpperCase() !== 'TUTOR' || database.ownerId !== userId) {
+            throw new ForbiddenException('Only the creator tutor can delete this database');
+        }
+
+        return this.prisma.database.delete({
             where: { id },
         });
+    }
 
-        if (!database) {
-            throw new NotFoundException('Database not found');
+    async uploadSqlFile(file: Express.Multer.File, userId: number, userRole: Role | string) {
+        if (String(userRole).toUpperCase() !== 'TUTOR') {
+            throw new ForbiddenException('Only tutors can upload SQL files');
         }
 
-        if (database.ownerId !== userId) {
-            throw new ForbiddenException('You do not have permission to delete this database');
-        }
+        const schema = file.buffer.toString();
 
-        // Check if database is used in any exercises
-        const exercisesUsingDatabase = await this.prisma.exercise.count({
-            where: { databaseId: id },
+        const database = await this.prisma.database.create({
+            data: {
+                name: file.originalname,
+                description: 'Uploaded SQL file',
+                schemaSql: schema,
+                ownerId: userId,
+            },
         });
 
-        if (exercisesUsingDatabase > 0) {
-            throw new ForbiddenException('Cannot delete database as it is being used in exercises');
+        try {
+            // Execute SQL schema from file
+            if (schema) {
+                await this.pool.query(schema);
+                console.log('SQL schema from file executed successfully');
+            }
+        } catch (error) {
+            console.error('Error executing SQL schema from file:', error);
         }
 
-        await this.prisma.database.delete({
-            where: { id },
-        });
+        return database;
     }
 }
