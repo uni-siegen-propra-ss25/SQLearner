@@ -1,0 +1,65 @@
+<div class="container">
+    <!-- Page header with title and description -->
+    <div class="header">
+        <h1>Mein Fortschritt</h1>
+        <p>Verfolge deinen Lernfortschritt</p>
+    </div>
+
+    <!-- Main content grid layout -->
+    <div class="content">
+        <!-- Left card: Progress statistics -->
+        <mat-card class="progress-card">
+            <mat-card-header>
+                <mat-card-title>Mein Fortschritt</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <!-- Loading state -->
+                <div *ngIf="loading" class="loading-container">
+                    <mat-spinner diameter="50"></mat-spinner>
+                    <p>Lade Fortschrittsdaten...</p>
+                </div>
+                
+                <!-- Error state -->
+                <div *ngIf="error" class="error-container">
+                    <mat-icon color="warn">error</mat-icon>
+                    <p>{{error}}</p>
+                </div>
+                
+                <!-- Progress data display -->
+                <div *ngIf="!loading && !error && userProgress">
+                    <!-- Overall progress with custom bar -->
+                    <div class="total-progress">
+                        <h3>Gesamtfortschritt:</h3>
+                        <p>{{userProgress.completionPercentage | number:'1.0-0'}}%</p>
+                        <div class="bar average" [style.width.%]="userProgress.completionPercentage"></div>
+                    </div>
+                    
+                    <!-- Chapter-specific progress component -->
+                    <app-chapter-progress
+                        *ngIf="userProgress.chapterProgress && userProgress.chapterProgress.length > 0"
+                        [chapterProgress]="userProgress.chapterProgress">
+                    </app-chapter-progress>
+                    
+                    <!-- No chapters available fallback -->
+                    <div *ngIf="!userProgress.chapterProgress || userProgress.chapterProgress.length === 0" class="no-data">
+                        <p>Noch keine Kapitel verfügbar.</p>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+        
+        <!-- Right card: Bookmarked exercises -->
+        <mat-card class="bookmarks-card">
+            <mat-card-header>
+                <mat-card-title>Gemerkte Aufgaben</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <!-- Bookmarks component with remove functionality -->
+                <app-bookmarked-exercises
+                    [bookmarks]="bookmarks"
+                    (removeBookmark)="removeBookmark($event)">
+                </app-bookmarked-exercises>
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>
