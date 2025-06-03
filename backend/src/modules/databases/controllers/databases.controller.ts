@@ -23,6 +23,10 @@ import { Roles } from '../../../common/decorators/role.decorator';
 import { GetUser } from '../../../common/decorators/get-user.decorator';
 import { Role } from '@prisma/client';
 
+interface RunQueryDto {
+    query: string;
+}
+
 /**
  * Controller managing database operations for the SQL learning system.
  * Handles creation, modification, and deletion of practice databases.
@@ -101,5 +105,18 @@ export class DatabasesController {
         @GetUser('role') userRole: string,
     ) {
         return this.databasesService.uploadSqlFile(file, userId, userRole);
+    }
+
+    @Post(':id/query')
+    @ApiOperation({ summary: 'Run SQL query on database' })
+    @ApiResponse({ status: 200, description: 'Query executed successfully' })
+    @ApiResponse({ status: 400, description: 'Invalid query' })
+    @ApiResponse({ status: 403, description: 'Operation not allowed' })
+    @ApiResponse({ status: 404, description: 'Database not found' })
+    async runQuery(
+        @Param('id', ParseIntPipe) id: number,
+        @Body() dto: RunQueryDto,
+    ) {
+        return this.databasesService.runQuery(id, dto.query);
     }
 }

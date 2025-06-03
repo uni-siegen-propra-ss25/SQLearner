@@ -1,32 +1,80 @@
 <h2 mat-dialog-title>Datenbank bearbeiten</h2>
-<form [formGroup]="form" (ngSubmit)="onSubmit()">
-  <mat-dialog-content>
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Name</mat-label>
-      <input matInput formControlName="name" required />
-      <mat-error *ngIf="form.get('name')?.hasError('required')"> Name ist erforderlich </mat-error>
-    </mat-form-field>
 
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Beschreibung</mat-label>
-      <textarea matInput formControlName="description" rows="3"></textarea>
-    </mat-form-field>
-
-    <div class="sql-schema-field">
+<div class="dialog-content">
+  <!-- Basic Form -->
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <mat-dialog-content>
       <mat-form-field appearance="fill" class="full-width">
-        <mat-label>SQL-Schema</mat-label>
-        <textarea matInput formControlName="schemaSql" rows="10" required></textarea>
-        <mat-error *ngIf="form.get('schemaSql')?.hasError('required')">
-          SQL-Schema ist erforderlich
-        </mat-error>
+        <mat-label>Name</mat-label>
+        <input matInput formControlName="name" required />
+        <mat-error *ngIf="form.get('name')?.hasError('required')">Name ist erforderlich</mat-error>
       </mat-form-field>
-    </div>
-  </mat-dialog-content>
 
-  <mat-dialog-actions align="end">
-    <button mat-button type="button" (click)="onCancel()">Abbrechen</button>
-    <button mat-raised-button color="primary" type="submit" [disabled]="!form.valid">
-      Speichern
-    </button>
-  </mat-dialog-actions>
-</form>
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Beschreibung</mat-label>
+        <textarea matInput formControlName="description" rows="3"></textarea>
+      </mat-form-field>
+
+      <div class="sql-schema-field">
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>SQL-Schema</mat-label>
+          <textarea matInput formControlName="schemaSql" rows="10" required></textarea>
+          <mat-error *ngIf="form.get('schemaSql')?.hasError('required')">
+            SQL-Schema ist erforderlich
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+      <button mat-button type="button" (click)="onCancel()">Abbrechen</button>
+      <button mat-raised-button color="primary" type="submit" [disabled]="!form.valid">
+        Speichern
+      </button>
+    </mat-dialog-actions>
+  </form>
+
+  <!-- SQL Query Form -->
+  <div class="query-section">
+    <h3>SQL Queries</h3>
+    <form [formGroup]="queryForm" (ngSubmit)="executeQuery()">
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>SQL Query</mat-label>
+        <textarea matInput formControlName="query" rows="5" placeholder="Enter your SQL query here..."></textarea>
+      </mat-form-field>
+
+      <div class="query-actions">
+        <button mat-raised-button color="accent" type="submit" 
+                [disabled]="!queryForm.valid || isExecutingQuery">
+          {{ isExecutingQuery ? 'Executing...' : 'Execute Query' }}
+        </button>
+        <button mat-button type="button" (click)="clearQueryResult()" 
+                [disabled]="!queryResult">
+          Clear Results
+        </button>
+      </div>
+    </form>
+
+    <!-- Query Results -->
+    <div class="query-results" *ngIf="queryResult">
+      <h4>Query Results</h4>
+      <div class="result-table" *ngIf="queryResult.rows && queryResult.rows.length > 0">
+        <table mat-table [dataSource]="queryResult.rows" class="mat-elevation-z2">
+          <ng-container *ngFor="let column of queryResult.columns" [matColumnDef]="column">
+            <th mat-header-cell *matHeaderCellDef>{{column}}</th>
+            <td mat-cell *matCellDef="let row">{{row[column]}}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="queryResult.columns"></tr>
+          <tr mat-row *matRowDef="let row; columns: queryResult.columns;"></tr>
+        </table>
+      </div>
+      <div class="no-results" *ngIf="!queryResult.rows || queryResult.rows.length === 0">
+        No results found
+      </div>
+      <div class="query-info" *ngIf="queryResult.rowCount !== undefined">
+        <p>Affected rows: {{queryResult.rowCount}}</p>
+      </div>
+    </div>
+  </div>
+</div>

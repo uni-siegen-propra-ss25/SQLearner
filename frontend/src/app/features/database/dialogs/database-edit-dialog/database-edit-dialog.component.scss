@@ -63,3 +63,88 @@ mat-dialog-actions {
     border-top-color: rgba(255, 255, 255, 0.08);
   }
 }
+
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.sql-schema-field {
+  margin-top: 16px;
+}
+
+.query-section {
+  margin-top: 24px;
+  padding: 16px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+
+  h3 {
+    margin: 0 0 16px 0;
+    color: #333;
+  }
+}
+
+.query-actions {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.query-results {
+  margin-top: 16px;
+
+  h4 {
+    margin: 0 0 8px 0;
+    color: #333;
+  }
+}
+
+.result-table {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 8px;
+
+  table {
+    width: 100%;
+  }
+
+  th {
+    background-color: #f0f0f0;
+    font-weight: 500;
+  }
+
+  td, th {
+    padding: 8px 16px;
+    text-align: left;
+  }
+
+  tr:nth-child(even) {
+    background-color: #fafafa;
+  }
+}
+
+.no-results {
+  padding: 16px;
+  text-align: center;
+  color: #666;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.query-info {
+  margin-top: 8px;
+  font-size: 0.9em;
+  color: #666;
+}
+
+mat-form-field {
+  margin-bottom: 16px;
+}
+
+textarea {
+  font-family: 'Courier New', Courier, monospace;
+}

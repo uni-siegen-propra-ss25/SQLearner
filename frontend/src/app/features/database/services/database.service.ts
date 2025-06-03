@@ -4,6 +4,15 @@ import { Observable, map, catchError } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { Database, CreateDatabaseDto, UpdateDatabaseDto } from '../models/database.model';
 import { AuthService } from 'app/features/auth/services/auth.service';
+
+export interface QueryResult {
+    columns: string[];
+    rows: any[];
+    rowCount?: number;
+    command?: string;
+    error?: string;
+}
+
 @Injectable({
     providedIn: 'root',
 })
@@ -70,5 +79,9 @@ export class DatabaseService {
         return this.http
             .post<Database>(`${this.baseUrl}/upload`, formData)
             .pipe(map((database) => this.convertDates(database)));
+    }
+
+    runQuery(databaseId: number, query: string): Observable<QueryResult> {
+        return this.http.post<QueryResult>(`${this.baseUrl}/${databaseId}/query`, { query });
     }
 }
