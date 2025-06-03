@@ -14,11 +14,11 @@ export class ArchivComponent implements OnInit {
     }
 
     wiederherstellen(frage: any): void {
-        // Wieder in normale Fragen-Liste einfügen
         const fragen = JSON.parse(localStorage.getItem('fragen') || '[]');
-        fragen.push(frage);
-        localStorage.setItem('fragen', JSON.stringify(fragen));
-
+        if (!fragen.find((f: any) => f.frageId === frage.frageId)) {
+            fragen.push(frage);
+            localStorage.setItem('fragen', JSON.stringify(fragen));
+        }
         this.entferneAusArchiv(frage);
     }
 
@@ -29,7 +29,8 @@ export class ArchivComponent implements OnInit {
     }
 
     private entferneAusArchiv(frage: any): void {
-        this.fragen = this.fragen.filter((f) => f !== frage);
+        this.fragen = this.fragen.filter((f) => f.frageId !== frage.frageId);
         localStorage.setItem('archivFragen', JSON.stringify(this.fragen));
     }
 }
+

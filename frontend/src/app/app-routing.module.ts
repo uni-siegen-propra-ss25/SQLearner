@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { NavigationRailComponent } from './shared/components/navigation-rail/navigation-rail.component';
 import { Role } from './features/users/models/role.model';
 import { RoleGuard } from './core/guards/role.guard';
+import { AuthGuard } from './core/guards/auth.guard';
 
 const routes: Routes = [
     { path: '', redirectTo: 'welcome', pathMatch: 'full' },

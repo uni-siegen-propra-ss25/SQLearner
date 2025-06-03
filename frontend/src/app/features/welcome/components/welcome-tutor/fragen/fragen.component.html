@@ -6,9 +6,9 @@
       <p>Fragen der Studierenden</p>
     </div>
     <div class="nav-links">
-      <a routerLink="/welcome/beantwortet">Beantwortet</a>
-      <a routerLink="/welcome/archiv">Archiv</a>
-      <a routerLink="/welcome/papierkorb">Papierkorb</a>
+      <a routerLink="/welcome/tutor/beantwortet">Beantwortet</a>
+      <a routerLink="/welcome/tutor/archiv">Archiv</a>
+      <a routerLink="/welcome/tutor/papierkorb">Papierkorb</a>
     </div>
   </div>
 
@@ -23,7 +23,7 @@
       <div class="frage-box" *ngFor="let frage of fragen">
         <p class="frage-text">
           <mat-icon class="icon">mail</mat-icon>
-          {{ frage.name }} ({{ frage.datum }}): „{{ frage.text }}“
+          {{ frage.student }} ({{ frage.datum }}): „{{ frage.frageText }}“
         </p>
         <div class="aktionen">
           <a href="#" (click)="anpinnen(frage, $event)">Markieren</a>
@@ -39,7 +39,7 @@
       <h3>Markiert</h3>
       <div *ngIf="angepinnt.length === 0" class="leertext">Keine markierten Nachrichten</div>
       <div *ngFor="let frage of angepinnt" class="angeheftet-frage">
-        <p>{{ frage.name }} ({{ frage.datum }}): „{{ frage.text }}“</p>
+        <p>{{ frage.student }} ({{ frage.datum }}): „{{ frage.frageText }}“</p>
         <a href="#" (click)="entferneAngepinnt(frage, $event)">Entfernen</a>
       </div>
     </div>
@@ -48,7 +48,7 @@
   <!-- Antwort-Modal -->
   <div class="antwort-modal" *ngIf="ausgewaehlteFrage">
     <div class="antwort-box">
-      <h2>Antwort auf: {{ ausgewaehlteFrage.name }}</h2>
+      <h2>Antwort auf: {{ ausgewaehlteFrage.student }}</h2>
       <textarea [(ngModel)]="antwortText" placeholder="Antwort schreiben..."></textarea>
 
       <input type="file" (change)="anhangHinzufuegen($event)" />

@@ -32,17 +32,27 @@ export class LoginComponent {
                 email: this.loginForm.value.email,
                 password: this.loginForm.value.password,
             };
+
             this.authService.login(credentials).subscribe({
                 next: () => {
-                    // Navigate and reload to ensure navigation items are updated
-                    this.snackBar.open('Login successful!', 'Close', { duration: 2000 });
-                    this.router.navigate(['/']);
+                    const role = this.authService.getUserRole();
+
+                    if (role === 'TUTOR') {
+                        this.router.navigate(['/welcome/tutor']);
+                    } else if (role === 'STUDENT') {
+                        this.router.navigate(['/welcome/student']);
+                    } else {
+                        this.router.navigate(['/welcome']); // Fallback
+                    }
+
+                    this.snackBar.open('Login erfolgreich!', 'Schließen', { duration: 2000 });
                 },
                 error: (err) => {
-                    this.snackBar.open('Login failed', 'Close', { duration: 3000 });
+                    this.snackBar.open('Login fehlgeschlagen', 'Schließen', { duration: 3000 });
                     console.error('Login error:', err);
                 },
             });
         }
     }
 }
+
