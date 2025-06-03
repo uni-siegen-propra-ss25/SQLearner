@@ -99,9 +99,72 @@ export class DatabasesService {
             throw new ForbiddenException('Only the creator tutor can delete this database');
         }
 
+        try {
+            // Get database SQL schema
+            const schemaSql = database.schemaSql;
+            if (schemaSql) {
+                // Extract table names from CREATE TABLE statements
+                const tableNames = this.extractTableNames(schemaSql);
+                
+                // Drop each table if it exists
+                for (const tableName of tableNames) {
+                    // Check if this is not a Prisma system table
+                    if (!tableName.startsWith('_prisma_') && !this.isSystemTable(tableName)) {
+                        await this.pool.query(`DROP TABLE IF EXISTS "${tableName}" CASCADE`);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error dropping tables:', error);
+            // Continue deleting the database record even if dropping tables fails
+        }
+
+        // Delete the database record from the Database table
         return this.prisma.database.delete({
             where: { id },
         });
+    }
+
+    /**
+     * Extracts table names from the SQL schema
+     * @param schemaSql SQL database schema
+     * @returns array of table names
+     */
+    private extractTableNames(schemaSql: string): string[] {
+        const tableNames: string[] = [];
+        const createTableRegex = /CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?["']?([^"'\s(]+)["']?/gi;
+        let match;
+
+        while ((match = createTableRegex.exec(schemaSql)) !== null) {
+            const tableName = match[1].toLowerCase();
+            if (tableName && !tableNames.includes(tableName)) {
+                tableNames.push(tableName);
+            }
+        }
+
+        return tableNames;
+    }
+
+    /**
+     * Checks if a table is a system table
+     * @param tableName table name
+     * @returns true if the table is a system table
+     */
+    private isSystemTable(tableName: string): boolean {
+        const systemTables = [
+            'user',
+            'database',
+            'chapter',
+            'topic',
+            'exercise',
+            'answeroption',
+            'submission',
+            'dbsession',
+            'bookmark',
+            'progress',
+            'chatmessage'
+        ];
+        return systemTables.includes(tableName.toLowerCase());
     }
 
     async uploadSqlFile(file: Express.Multer.File, userId: number, userRole: Role | string) {
