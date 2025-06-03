@@ -1,0 +1,107 @@
+.welcome-container {
+  padding: 2rem;
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+
+  h1 {
+    margin-bottom: 1rem;
+    color: var(--text-color);
+  }
+
+  p {
+    color: var(--text-color);
+    font-size: 1.2rem;
+  }
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin: 24px auto;
+  max-width: 1200px;
+}
+
+.top-row {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.bottom-row {
+  width: 100%;
+}
+
+.box {
+  background-color: #e7e7e9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 16px;
+  flex: 1 1 45%;
+  min-width: 300px;
+}
+
+.todo-box ul {
+  padding-left: 0;
+  list-style: none;
+}
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.todo-add {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.todo-input {
+  flex: 1;
+}
+
+.question-box ul {
+  list-style: none;
+  padding: 0;
+}
+
+.question-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid #ccc;
+}
+// Mehr Abstand unter Hinweis-Titel
+.hint-box .hint-text {
+  margin-top: 12px; 
+  line-height: 1.6;
+}
+
+.todo-add button mat-icon {
+  font-size: 24px;
+}
+
+.hinweis-liste {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.hinweis-liste li {
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.keine-hinweise {
+  color: #888;
+  text-align: center;
+  font-style: italic;
+  margin-top: 80px;;     // mehr Abstand
+  display: block;
+}

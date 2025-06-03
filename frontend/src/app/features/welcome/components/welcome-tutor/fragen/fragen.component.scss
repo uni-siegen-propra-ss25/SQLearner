@@ -59,19 +59,19 @@
     }
 
     /* Icons je Link individuell zuweisen */
-    a[routerLink='/welcome/beantwortet']::before {
+    a[routerLink='/welcome/tutor/beantwortet']::before {
       content: 'send';
       font-family: 'Material Icons';
       font-size: 18px;
     }
 
-    a[routerLink='/welcome/archiv']::before {
+    a[routerLink='/welcome/tutor/archiv']::before {
       content: 'archive';
       font-family: 'Material Icons';
       font-size: 18px;
     }
 
-    a[routerLink='/welcome/papierkorb']::before {
+    a[routerLink='/welcome/tutor/papierkorb']::before {
       content: 'delete';
       font-family: 'Material Icons';
       font-size: 18px;

@@ -2,7 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { CreateExerciseDto, AnswerOptionDto } from '../models/create-exercise.dto';
 import { UpdateExerciseDto } from '../models/update-exercise.dto';
-import { ReorderExercisesDto } from '../models/reorder-exercises.dto';
 import { Exercise, ExerciseType } from '@prisma/client';
 import { DatabasesService } from '../../databases/services/databases.service';
 
@@ -205,45 +204,6 @@ export class ExercisesService {
         await this.getExerciseById(id);
         await this.prisma.exercise.delete({
             where: { id },
-        });
-    }
-
-    /**
-     * Updates the order of exercises within a topic.
-     *
-     * @param topicId - The ID of the topic containing the exercises
-     * @param reorderExercisesDto - The new order of exercises
-     * @throws NotFoundException if any exercise does not exist
-     */
-    async reorderExercises(
-        topicId: number,
-        reorderExercisesDto: ReorderExercisesDto,
-    ): Promise<void> {
-        const { exercises: reorderedExercises } = reorderExercisesDto;
-
-        const currentExercises = await this.prisma.exercise.findMany({
-            where: { topicId: Number(topicId) },
-            select: { id: true },
-        });
-
-        const currentIds = new Set(currentExercises.map((e) => e.id));
-
-        if (!reorderedExercises.every((e) => currentIds.has(Number(e.id)))) {
-            throw new NotFoundException('One or more exercises not found in this topic');
-        }
-
-        await this.prisma.$transaction(async (tx) => {
-            await tx.exercise.updateMany({
-                where: { topicId: Number(topicId) },
-                data: { order: -1 },
-            });
-
-            for (const exercise of reorderedExercises) {
-                await tx.exercise.update({
-                    where: { id: Number(exercise.id) },
-                    data: { order: Number(exercise.order) },
-                });
-            }
         });
     }
 
