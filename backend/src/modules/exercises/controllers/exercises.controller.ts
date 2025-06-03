@@ -16,7 +16,6 @@ import { DatabasesService } from '../../databases/services/databases.service';
 import { Exercise } from '@prisma/client';
 import { CreateExerciseDto } from '../models/create-exercise.dto';
 import { UpdateExerciseDto } from '../models/update-exercise.dto';
-import { ReorderExercisesDto } from '../models/reorder-exercises.dto';
 import { Role } from '@prisma/client';
 import { Roles } from 'src/common/decorators/role.decorator';
 
@@ -137,26 +136,6 @@ export class ExercisesController {
     @ApiResponse({ status: 404, description: 'Exercise not found' })
     async removeExercise(@Param('id') id: number): Promise<void> {
         await this.exercisesService.removeExercise(id);
-        return;
-    }
-
-    /**
-     * Updates the order of exercises within a topic.
-     *
-     * @param topicId - The ID of the topic containing the exercises
-     * @param reorderExercisesDto - The new order of exercises
-     * @throws NotFoundException if any exercise does not exist
-     */
-    @Put('reorder')
-    @Roles(Role.TUTOR, Role.ADMIN)
-    @ApiOperation({ summary: 'Reorder exercises in a topic' })
-    @ApiParam({ name: 'topicId', description: 'Topic ID' })
-    @ApiResponse({ status: 200, description: 'Exercises have been reordered' })
-    async reorderExercises(
-        @Param('topicId') topicId: number,
-        @Body() reorderExercisesDto: ReorderExercisesDto,
-    ): Promise<void> {
-        await this.exercisesService.reorderExercises(topicId, reorderExercisesDto);
         return;
     }
 

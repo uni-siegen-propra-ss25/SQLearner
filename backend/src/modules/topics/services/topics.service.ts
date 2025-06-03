@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTopicDto } from '../models/create-topic.dto';
 import { UpdateTopicDto } from '../models/update-topic.dto';
-import { ReorderTopicsDto } from '../models/reorder-topics.dto';
 import { ChaptersService } from '../../chapters/services/chapters.service';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { Topic } from '@prisma/client';
@@ -131,42 +130,6 @@ export class TopicsService {
         const topic = await this.getTopicById(Number(id));
         await this.prisma.topic.delete({
             where: { id: Number(id) },
-        });
-    }
-
-    /**
-     * Updates the order of topics within a chapter.
-     *
-     * @param chapterId - The ID of the chapter containing the topics
-     * @param reorderTopicsDto - The new order of topics
-     * @throws NotFoundException if any topic does not exist
-     */
-    async reorderTopics(chapterId: number, reorderTopicsDto: ReorderTopicsDto): Promise<void> {
-        const { topics: reorderedTopics } = reorderTopicsDto;
-
-        const currentTopics = await this.prisma.topic.findMany({
-            where: { chapterId: Number(chapterId) },
-            select: { id: true },
-        });
-
-        const currentIds = new Set(currentTopics.map((t) => t.id));
-
-        if (!reorderedTopics.every((t) => currentIds.has(Number(t.id)))) {
-            throw new NotFoundException('One or more topics not found in this chapter');
-        }
-
-        await this.prisma.$transaction(async (tx) => {
-            await tx.topic.updateMany({
-                where: { chapterId: Number(chapterId) },
-                data: { order: -1 },
-            });
-
-            for (const topic of reorderedTopics) {
-                await tx.topic.update({
-                    where: { id: Number(topic.id) },
-                    data: { order: Number(topic.order) },
-                });
-            }
         });
     }
 }

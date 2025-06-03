@@ -16,7 +16,6 @@ import { Topic } from '@prisma/client';
 import { Role } from '@prisma/client';
 import { Roles } from 'src/common/decorators/role.decorator';
 import { CreateTopicDto } from '../models/create-topic.dto';
-import { ReorderTopicsDto } from '../models/reorder-topics.dto';
 import { UpdateTopicDto } from '../models/update-topic.dto';
 
 /**
@@ -142,27 +141,6 @@ export class TopicsController {
         @Param('id') id: number,
     ): Promise<void> {
         await this.topicsService.removeTopic(id);
-        return;
-    }
-
-    /**
-     * Updates the order of topics within a chapter.
-     *
-     * @param chapterId - The ID of the chapter containing the topics
-     * @param reorderTopicsDto - The new order of topics
-     * @throws NotFoundException if any topic does not exist
-     */
-    @Put('reorder')
-    @Roles(Role.TUTOR, Role.ADMIN)
-    @HttpCode(HttpStatus.NO_CONTENT)
-    @ApiOperation({ summary: 'Reorder topics within a chapter' })
-    @ApiParam({ name: 'chapterId', description: 'Chapter ID' })
-    @ApiResponse({ status: 204, description: 'Topics have been reordered' })
-    async reorderTopics(
-        @Param('chapterId') chapterId: number,
-        @Body() reorderTopicsDto: ReorderTopicsDto,
-    ): Promise<void> {
-        await this.topicsService.reorderTopics(chapterId, reorderTopicsDto);
         return;
     }
 }
