@@ -148,3 +148,36 @@ mat-form-field {
 textarea {
   font-family: 'Courier New', Courier, monospace;
 }
+
+.view-controls {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    
+    .mat-button-toggle-group {
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .mat-button-toggle {
+        min-width: 120px;
+        background-color: #f5f5f5;
+        
+        &.mat-button-toggle-checked {
+            background-color: #e0e0e0;
+        }
+    }
+}
+
+:host-context(.dark-theme) {
+    .view-controls {
+        .mat-button-toggle {
+            background-color: #424242;
+            color: #fff;
+            
+            &.mat-button-toggle-checked {
+                background-color: #616161;
+            }
+        }
+    }
+}

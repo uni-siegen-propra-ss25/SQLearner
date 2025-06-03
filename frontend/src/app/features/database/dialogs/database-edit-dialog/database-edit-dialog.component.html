@@ -57,24 +57,40 @@
 
     <!-- Query Results -->
     <div class="query-results" *ngIf="queryResult">
-      <h4>Query Results</h4>
-      <div class="result-table" *ngIf="queryResult.rows && queryResult.rows.length > 0">
-        <table mat-table [dataSource]="queryResult.rows" class="mat-elevation-z2">
-          <ng-container *ngFor="let column of queryResult.columns" [matColumnDef]="column">
-            <th mat-header-cell *matHeaderCellDef>{{column}}</th>
-            <td mat-cell *matCellDef="let row">{{row[column]}}</td>
-          </ng-container>
+        <div class="view-controls">
+            <mat-button-toggle-group [(ngModel)]="currentView" (change)="onViewChange()">
+                <mat-button-toggle value="table">Table View</mat-button-toggle>
+                <mat-button-toggle value="er">ER Diagram</mat-button-toggle>
+            </mat-button-toggle-group>
+        </div>
 
-          <tr mat-header-row *matHeaderRowDef="queryResult.columns"></tr>
-          <tr mat-row *matRowDef="let row; columns: queryResult.columns;"></tr>
-        </table>
-      </div>
-      <div class="no-results" *ngIf="!queryResult.rows || queryResult.rows.length === 0">
-        No results found
-      </div>
-      <div class="query-info" *ngIf="queryResult.rowCount !== undefined">
-        <p>Affected rows: {{queryResult.rowCount}}</p>
-      </div>
+        <!-- Table View -->
+        <div *ngIf="currentView === 'table'">
+            <h4>Query Results</h4>
+            <div class="result-table" *ngIf="queryResult.rows && queryResult.rows.length > 0">
+                <table mat-table [dataSource]="queryResult.rows" class="mat-elevation-z2">
+                    <ng-container *ngFor="let column of queryResult.columns" [matColumnDef]="column">
+                        <th mat-header-cell *matHeaderCellDef>{{column}}</th>
+                        <td mat-cell *matCellDef="let row">{{row[column]}}</td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="queryResult.columns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: queryResult.columns;"></tr>
+                </table>
+            </div>
+            <div class="no-results" *ngIf="!queryResult.rows || queryResult.rows.length === 0">
+                No results found
+            </div>
+            <div class="query-info" *ngIf="queryResult.rowCount !== undefined">
+                <p>Affected rows: {{queryResult.rowCount}}</p>
+            </div>
+        </div>
+
+        <!-- ER Diagram View -->
+        <div *ngIf="currentView === 'er' && isSelectQuery">
+            <h4>Entity Relationship Diagram</h4>
+            <app-er-diagram [queryResult]="queryResult"></app-er-diagram>
+        </div>
     </div>
   </div>
 </div>

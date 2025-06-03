@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { DatabaseService } from '../../services/database.service';
+import { DatabaseService, QueryResult } from '../../services/database.service';
 import { Database } from '../../models/database.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -13,8 +13,10 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 export class DatabaseEditDialogComponent {
     form: FormGroup;
     queryForm: FormGroup;
-    queryResult: any = null;
+    queryResult: QueryResult | null = null;
     isExecutingQuery = false;
+    currentView: 'table' | 'er' = 'table';
+    isSelectQuery = false;
 
     constructor(
         private fb: FormBuilder,
@@ -38,10 +40,15 @@ export class DatabaseEditDialogComponent {
         if (this.queryForm.valid) {
             this.isExecutingQuery = true;
             const query = this.queryForm.get('query')?.value;
+            
+            // Detect if this is a SELECT query
+            this.isSelectQuery = query.trim().toUpperCase().startsWith('SELECT');
 
             this.databaseService.runQuery(this.data.id, query).subscribe({
                 next: (result) => {
                     this.queryResult = result;
+                    // Set default view based on query type
+                    this.currentView = this.isSelectQuery ? 'table' : 'table';
                     this.snackBar.open('Query executed successfully', 'Close', {
                         duration: 3000
                     });
@@ -57,6 +64,10 @@ export class DatabaseEditDialogComponent {
                 }
             });
         }
+    }
+
+    onViewChange() {
+        // Additional logic for view change if needed
     }
 
     onSubmit() {
