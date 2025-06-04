@@ -9,7 +9,7 @@ export class SettingsService {
         const setting = await this.prisma.settings.findUnique({
             where: { name },
         });
-        return setting?.value ?? null;
+        return setting?.value || null;
     }
 
     // TODO: Add encryption for sensitive settings like API keys

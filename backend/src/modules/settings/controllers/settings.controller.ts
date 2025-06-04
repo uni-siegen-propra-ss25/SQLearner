@@ -48,10 +48,12 @@ export class SettingsController {
     @ApiResponse({ status: 200, description: 'The setting value' })
     @ApiResponse({ status: 404, description: 'Setting not found' })
     async getSetting(@Param('name') name: string) {
-        const value = await this.settingsService.getSetting(name);
-        if (!value) {
-            throw new NotFoundException(`Setting ${name} not found`);
+        // Validate setting name
+        if (!Object.values(SETTINGS_KEYS).includes(name as any)) {
+            throw new BadRequestException(`Invalid setting name: ${name}`);
         }
+        
+        const value = await this.settingsService.getSetting(name);
         return { value };
     }
 

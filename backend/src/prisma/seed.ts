@@ -3,7 +3,7 @@ import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
-async function main() {
+export async function main() {
   console.log('Starting seed...');
 
   const defaultPassword = await bcrypt.hash('password123', 10);

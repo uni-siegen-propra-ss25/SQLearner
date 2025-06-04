@@ -48,12 +48,6 @@ export class AppComponent implements OnInit, OnDestroy {
             route: '/settings',
             requiredRoles: [Role.ADMIN],
         },
-        {
-            icon: 'vpn_key',
-            label: 'API-Key',
-            route: '/admin/api-key',
-            requiredRoles: [Role.ADMIN],
-        },
     ];
 
     private readonly commonItems: NavigationItem[] = [
