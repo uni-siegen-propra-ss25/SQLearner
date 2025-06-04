@@ -102,7 +102,21 @@
             />
           </mat-form-field>
 
-          <mat-checkbox formControlName="isCorrect" [disabled]="isCorrectDisabled(i)">
+          <!-- Single Choice: Radio button -->
+          <mat-radio-button
+            *ngIf="exerciseForm.get('type')?.value === 'SINGLE_CHOICE'"
+            [checked]="answer.get('isCorrect')?.value"
+            (change)="onSingleChoiceSelect(i)"
+            [disabled]="false"
+          >
+            Correct
+          </mat-radio-button>
+
+          <!-- Multiple Choice: Checkbox -->
+          <mat-checkbox
+            *ngIf="exerciseForm.get('type')?.value === 'MULTIPLE_CHOICE'"
+            formControlName="isCorrect"
+          >
             Correct
           </mat-checkbox>
 

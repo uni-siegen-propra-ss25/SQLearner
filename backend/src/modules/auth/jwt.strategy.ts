@@ -32,7 +32,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         const role = user.role as Role;
         console.log('JWT Strategy - User role from DB:', user.role);
         console.log('JWT Strategy - Converted role:', role);
-
+    
         return {
             id: user.id,
             email: user.email,

@@ -66,6 +66,14 @@ model User {
   messages ChatMessage[]
 }
 
+/// System settings for the application
+model Settings {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  value       String   // JSON string for complex settings
+  description String? 
+}
+
 /// Chat messages between users and the AI assistant
 model ChatMessage {
   id        Int           @id @default(autoincrement())

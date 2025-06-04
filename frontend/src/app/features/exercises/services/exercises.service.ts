@@ -45,6 +45,7 @@ export class ExercisesService {
     }
 
     createExercise(exercise: Partial<Exercise>): Observable<number> {
+        // No need to modify the topicId, it's already in the exercise data
         return this.http
             .post<number>(this.baseUrl, exercise)
             .pipe(catchError((error) => this.handleError(error)));
