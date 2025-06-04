@@ -12,6 +12,7 @@ export class ApiKeyController {
 
   @Post()
   async setApiKey(@Request() req, @Body('apiKey') apiKey: string) {
+    console.log(apiKey);
     await this.apiKeyService.setApiKey(req.user.id, apiKey);
     return { success: true };
   }
