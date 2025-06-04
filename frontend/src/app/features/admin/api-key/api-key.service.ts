@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ApiKeyService {
-  private readonly baseUrl = '/api/admin/api-key';
+  private readonly baseUrl = '/api/settings/api-key';
 
   constructor(private http: HttpClient) {}
 

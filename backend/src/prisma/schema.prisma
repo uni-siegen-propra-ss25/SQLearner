@@ -1,13 +1,3 @@
-/// Stores API keys for admin users
-model AdminApiKey {
-  id        Int      @id @default(autoincrement())
-  userId    Int     @unique
-  apiKey    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user      User     @relation(fields: [userId], references: [id])
-}
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
@@ -64,7 +54,6 @@ model User {
   lastName     String
   role         Role   @default(STUDENT)
   matriculationNumber String? @unique
-  adminApiKeys  AdminApiKey[]
 
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
@@ -75,6 +64,14 @@ model User {
 
   Database Database[]
   messages ChatMessage[]
+}
+
+/// System settings for the application
+model Settings {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  value       String   // JSON string for complex settings
+  description String? 
 }
 
 /// Chat messages between users and the AI assistant

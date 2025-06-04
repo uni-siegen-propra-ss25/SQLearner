@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Exercise, ExerciseType, Difficulty, AnswerOption } from '../../models/exercise.model';
 import { Database } from '../../../database/models/database.model';
 import { DatabaseService } from '../../../database/services/database.service';
@@ -21,6 +22,7 @@ export class ExerciseDialogComponent implements OnInit {
         private readonly fb: FormBuilder,
         private readonly dialogRef: MatDialogRef<ExerciseDialogComponent>,
         private readonly databaseService: DatabaseService,
+        private readonly snackBar: MatSnackBar,
         @Inject(MAT_DIALOG_DATA) private readonly data: Partial<Exercise>,
     ) {
         this.isEditing = !!data.id;
@@ -83,6 +85,13 @@ export class ExerciseDialogComponent implements OnInit {
                 while (answersControl.length) {
                     answersControl.removeAt(0);
                 }
+            } else {
+                // For choice exercises, ensure we have at least 2 answers
+                if (answersControl.length < 2) {
+                    while (answersControl.length < 2) {
+                        this.addAnswer();
+                    }
+                }
             }
 
             // Set up validators based on type
@@ -138,13 +147,20 @@ export class ExerciseDialogComponent implements OnInit {
     }
 
     addAnswer(answer?: AnswerOption) {
-        this.answers.push(
-            this.fb.group({
-                text: [answer?.text || '', Validators.required],
-                isCorrect: [answer?.isCorrect || false],
-                order: [answer?.order || this.answers.length],
-            }),
-        );
+        const group = this.fb.group({
+            text: [answer?.text || '', Validators.required],
+            isCorrect: [answer?.isCorrect || false],
+            order: [answer?.order || this.answers.length],
+        });
+
+        // For single choice, if this is the first answer and no other answers are correct,
+        // make it correct by default
+        const type = this.exerciseForm.get('type')?.value;
+        if (type === ExerciseType.SINGLE_CHOICE && this.answers.length === 0) {
+            group.get('isCorrect')?.setValue(true);
+        }
+
+        this.answers.push(group);
     }
 
     removeAnswer(index: number) {
@@ -155,36 +171,65 @@ export class ExerciseDialogComponent implements OnInit {
         });
     }
 
-    onSubmit(): void {
-        if (this.exerciseForm.valid) {
-            const formValue = { ...this.exerciseForm.value };
+    private validateForm(): { valid: boolean; error?: string } {
+        const formValue = this.exerciseForm.value;
+        const type = formValue.type;
 
-            // Clean up the form value based on exercise type
-            if (formValue.type !== ExerciseType.QUERY) {
-                delete formValue.databaseId;
-                delete formValue.querySolution;
-            }
-            if (
-                formValue.type !== ExerciseType.SINGLE_CHOICE &&
-                formValue.type !== ExerciseType.MULTIPLE_CHOICE
-            ) {
-                delete formValue.answers;
-            } else if (formValue.type === ExerciseType.SINGLE_CHOICE) {
-                // Ensure only one answer is marked as correct
-                const correctAnswers = formValue.answers.filter((a: any) => a.isCorrect);
-                if (correctAnswers.length > 1) {
-                    formValue.answers = formValue.answers.map((a: any, i: number) => ({
-                        ...a,
-                        isCorrect: i === correctAnswers[0].order,
-                    }));
-                }
-            }
-
-            this.dialogRef.close(formValue);
+        if (!this.exerciseForm.valid) {
+            return { valid: false, error: 'Please fill out all required fields.' };
         }
+
+        if (type === ExerciseType.MULTIPLE_CHOICE || type === ExerciseType.SINGLE_CHOICE) {
+            if (!formValue.answers || formValue.answers.length < 2) {
+                return { valid: false, error: 'Choice exercises must have at least two answer options.' };
+            }
+
+            const correctAnswers = formValue.answers.filter((a: any) => a.isCorrect) || [];
+
+            if (type === ExerciseType.SINGLE_CHOICE && correctAnswers.length !== 1) {
+                return { valid: false, error: 'Single choice exercises must have exactly one correct answer.' };
+            }
+
+            if (type === ExerciseType.MULTIPLE_CHOICE && correctAnswers.length === 0) {
+                return { valid: false, error: 'Multiple choice exercises must have at least one correct answer.' };
+            }
+        }
+
+        return { valid: true };
+    }
+
+    onSubmit(): void {
+        const validation = this.validateForm();
+        if (!validation.valid) {
+            this.snackBar.open(validation.error || 'Form validation failed', 'Close', { duration: 5000 });
+            return;
+        }
+
+        const formValue = { ...this.exerciseForm.value };
+
+        // Clean up the form value based on exercise type
+        if (formValue.type !== ExerciseType.QUERY) {
+            delete formValue.databaseId;
+            delete formValue.querySolution;
+        }
+        if (
+            formValue.type !== ExerciseType.SINGLE_CHOICE &&
+            formValue.type !== ExerciseType.MULTIPLE_CHOICE
+        ) {
+            delete formValue.answers;
+        }
+
+        this.dialogRef.close(formValue);
     }
 
     onCancel(): void {
         this.dialogRef.close();
+    }
+
+    onSingleChoiceSelect(selectedIndex: number) {
+        // Uncheck all other answers
+        this.answers.controls.forEach((control, index) => {
+            control.get('isCorrect')?.setValue(index === selectedIndex);
+        });
     }
 }

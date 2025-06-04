@@ -88,14 +88,9 @@ export class ExercisesController {
     @Post()
     @Roles(Role.TUTOR, Role.ADMIN)
     @HttpCode(HttpStatus.CREATED)
-    @ApiOperation({ summary: 'Create a new exercise' })
-    @ApiParam({ name: 'topicId', description: 'Topic ID' })
+    @ApiOperation({ summary: 'Create a new exercise' }) 
     @ApiResponse({ status: 201, description: 'The exercise has been created' })
-    async createExercise(
-        @Param('topicId') topicId: number,
-        @Body() createExerciseDto: CreateExerciseDto,
-    ): Promise<number> {
-        createExerciseDto.topicId = topicId;
+    async createExercise(@Body() createExerciseDto: CreateExerciseDto): Promise<number> {
         const exerciseId = await this.exercisesService.createExercise(createExerciseDto);
         return exerciseId;
     }
