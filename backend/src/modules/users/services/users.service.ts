@@ -1,157 +1,50 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
-import { User } from '@prisma/client';
+import { User, Role } from '@prisma/client';
 import { CreateUserDto } from '../models/create-user.dto';
 import { PrismaService } from '../../../prisma/prisma.service';
 
 /**
- * UsersService handles database operations related to the User model.
+ * Service handling business logic for user-related operations.
+ * Manages user accounts, authentication details, and role-based permissions.
  */
 @Injectable()
 export class UsersService {
     constructor(
-        private prisma: PrismaService,
-        private configService: ConfigService,
+        private readonly configService: ConfigService,
+        private readonly prisma: PrismaService,
     ) {}
 
     /**
-     * Retrieves a user by ID.
-     * @param id The user's unique identifier.
-     * @returns The User object.
-     * @throws NotFoundException if no user is found.
-     */
-    async getUserById(id: number): Promise<User> {
-        const user = await this.prisma.user.findUnique({ where: { id } });
-
-        if (!user) {
-            throw new NotFoundException('User not found');
-        }
-
-        return user;
-    }
-
-    /**
-     * Retrieves a user by email.
-     * @param email The user's email address.
-     * @returns The User object.
-     * @throws NotFoundException if no user is found.
-     */
-    async getUserByEmail(email: string): Promise<User> {
-        const user = await this.prisma.user.findUnique({ where: { email } });
-
-        if (!user) {
-            throw new NotFoundException('User not found');
-        }
-
-        return user as User;
-    }
-
-    /**
-     * Retrieves a user by matriculation number.
-     * @param matriculationNumber The user's matriculation number.
-     * @returns The User object.
-     * @throws NotFoundException if no user is found.
-     */
-    async getUserByMatriculationNumber(matriculationNumber: string): Promise<User> {
-        const user = await this.prisma.user.findUnique({ where: { matriculationNumber } });
-
-        if (!user) {
-            throw new NotFoundException('User not found');
-        }
-
-        return user;
-    }
-
-    /**
-     * Finds all users with a specific role.
-     * @param role Role name (e.g., 'STUDENT', 'TUTOR', 'ADMIN').
-     * @returns An array of user data objects.
-     */
-    async getUsersByRole(role: string): Promise<Partial<User>[]> {
-        return this.prisma.user.findMany({
-            where: { role: role.toUpperCase() as any },
-            select: {
-                id: true,
-                matriculationNumber: true,
-                email: true,
-                firstName: true,
-                lastName: true,
-                role: true,
-            },
-        });
-    }
-
-    /**
-     * Retrieves all users.
-     * @returns An array of user data objects.
-     */
-    async getAllUsers(): Promise<Partial<User>[]> {
-        return this.prisma.user.findMany({
-            select: {
-                id: true,
-                email: true,
-                firstName: true,
-                lastName: true,
-                role: true,
-                matriculationNumber: true,
-            },
-        });
-    }
-
-    /**
-     * Checks whether a user with the given email exists.
-     * @param email Email to check.
-     * @returns True if a user exists, false otherwise.
-     */
-    async checkEmailExists(email: string): Promise<boolean> {
-        const user = await this.prisma.user.findUnique({ where: { email } });
-        return Boolean(user);
-    }
-
-    /**
-     * Checks whether a user with the given matriculation number exists.
-     * @param matriculationNumber Matriculation number to check.
-     * @returns True if a user exists, false otherwise.
-     */
-    async checkMatriculationNumberExists(matriculationNumber: string): Promise<boolean> {
-        const user = await this.prisma.user.findUnique({ where: { matriculationNumber } });
-        return Boolean(user);
-    }
-
-    /**
-     * Creates a new user record, hashing the provided password.
-     * @param dto Data transfer object containing user registration fields
-     * @returns The created user without the password field
+     * Creates a new user account.
+     * Hashes the password before storing.
+     *
+     * @param dto - The data for creating the new user
+     * @returns Promise resolving to the ID of the created user
+     * @throws BadRequestException if the email is already taken
      */
     async createUser(dto: CreateUserDto): Promise<number> {
-        // Check if the email already exists
-        if (await this.checkEmailExists(dto.email)) {
-            throw new BadRequestException('This email is already taken');
+        const { email, password, role } = dto;
+
+        // Check if user with same email exists
+        const existingUser = await this.prisma.user.findUnique({
+            where: { email },
+        });
+
+        if (existingUser) {
+            throw new BadRequestException('Email already taken');
         }
 
-        // Check if the matriculation number already exists
-        if (
-            dto.matriculationNumber &&
-            (await this.checkMatriculationNumberExists(dto.matriculationNumber))
-        ) {
-            throw new BadRequestException('This matriculation number is already taken');
-        }
+        // Hash password
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        const saltRounds = parseInt(this.configService.get<string>('SALT_ROUNDS') || '10', 10);
-
-        const hashed = await bcrypt.hash(dto.password, saltRounds);
+        // Create user
         const user = await this.prisma.user.create({
             data: {
-                matriculationNumber: dto.matriculationNumber,
-                email: dto.email,
-                password: hashed,
-                firstName: dto.firstName,
-                lastName: dto.lastName,
-                role: dto.role,
-            },
-            select: {
-                id: true,
+                ...dto,
+                password: hashedPassword,
             },
         });
 
@@ -159,99 +52,216 @@ export class UsersService {
     }
 
     /**
-     * Updates a user's information.
-     * @param id The user's ID
-     * @param data The data to update
-     * @returns The updated user
+     * Retrieves all users from the database.
+     * Password field is excluded from the results.
+     *
+     * @returns Promise resolving to an array of partial User objects
      */
-    async updateUser(id: number, data: Partial<User>): Promise<User> {
-        await this.getUserById(id);
-
-        // Remove sensitive fields that shouldn't be updated directly
-        delete data.password;
-        delete data.role;
-
-        // Check if email is being updated and if it's already taken
-        if (
-            data.email &&
-            (await this.prisma.user.findFirst({
-                where: {
-                    email: data.email,
-                    id: { not: id },
-                },
-            }))
-        ) {
-            throw new BadRequestException('This email is already taken');
-        }
-
-        // Check if matriculation number is being updated and if it's already taken
-        if (
-            data.matriculationNumber &&
-            (await this.prisma.user.findFirst({
-                where: {
-                    matriculationNumber: data.matriculationNumber,
-                    id: { not: id },
-                },
-            }))
-        ) {
-            throw new BadRequestException('This matriculation number is already taken');
-        }
-
-        return this.prisma.user.update({
-            where: { id },
-            data: {
-                ...data,
-                updatedAt: new Date(),
+    async getAllUsers(): Promise<Partial<User>[]> {
+        return this.prisma.user.findMany({
+            select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                matriculationNumber: true,
+                role: true,
+                progress: true,
+                createdAt: true,
+                updatedAt: true,
+                password: false,
             },
         });
+    }
+
+    /**
+     * Retrieves a user by their ID.
+     * Password field is excluded from the results.
+     *
+     * @param id - The ID of the user to retrieve
+     * @returns Promise resolving to a User object
+     * @throws NotFoundException if the user does not exist
+     */
+    async getUserById(id: number): Promise<Partial<User>> {
+        const user = await this.prisma.user.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                matriculationNumber: true,
+                role: true,
+                progress: true,
+                createdAt: true,
+                updatedAt: true,
+                password: false,
+            },
+        });
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+        return user;
+    }
+
+    /**
+     * Retrieves a user by their email.
+     * Accessible only by administrators and tutors.
+     *
+     * @param email - The email of the user to retrieve
+     * @returns Promise resolving to a User object
+     */
+    async getUserByEmail(email: string): Promise<User> {
+        const user = await this.prisma.user.findUnique({
+            where: { email },
+            select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                matriculationNumber: true,
+                role: true,
+                progress: true,
+                createdAt: true,
+                updatedAt: true,
+                password: true, // Include password for authentication purposes
+            },
+        });
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+        return user;
+    }
+
+    /**
+     * Retrieves users by their role.
+     * Password field is excluded from the results.
+     *
+     * @param role - The role to filter users by
+     * @returns Promise resolving to an array of partial User objects
+     */
+    async getUsersByRole(role: Role): Promise<Partial<User>[]> {
+        return this.prisma.user.findMany({
+            where: { role },
+            select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                matriculationNumber: true,
+                role: true,
+                progress: true,
+                createdAt: true,
+                updatedAt: true,
+                password: false,
+            },
+        });
+    }
+
+    /**
+     * Updates a user's information.
+     *
+     * @param id - The ID of the user to update
+     * @param updateData - The data to update the user with
+     * @returns Promise resolving to the updated User object
+     * @throws BadRequestException if the email is already taken
+     * @throws NotFoundException if the user does not exist
+     */
+    async updateUser(id: number, updateData: Partial<User>): Promise<User> {
+        // If email is being updated, check if new email is already taken
+        if (updateData.email) {
+            const existingUser = await this.prisma.user.findFirst({
+                where: {
+                    email: updateData.email,
+                    NOT: {
+                        id,
+                    },
+                },
+            });
+
+            if (existingUser) {
+                throw new BadRequestException('Email already taken');
+            }
+        }
+
+        try {
+            return await this.prisma.user.update({
+                where: { id },
+                data: updateData,
+            });
+        } catch (error) {
+            throw new NotFoundException('User not found');
+        }
     }
 
     /**
      * Updates a user's role.
-     * @param id The user's ID
-     * @param role The new role
-     * @returns The updated user
+     *
+     * @param id - The ID of the user whose role to update
+     * @param role - The new role to assign
+     * @returns Promise resolving to the updated User object
+     * @throws NotFoundException if the user does not exist
      */
-    async updateUserRole(id: number, role: string): Promise<User> {
-        await this.getUserById(id);
-
-        return this.prisma.user.update({
-            where: { id },
-            data: {
-                role: role.toUpperCase() as any,
-                updatedAt: new Date(),
-            },
-        });
+    async updateUserRole(id: number, role: Role): Promise<User> {
+        try {
+            return await this.prisma.user.update({
+                where: { id },
+                data: { role },
+            });
+        } catch (error) {
+            throw new NotFoundException('User not found');
+        }
     }
 
     /**
      * Updates a user's password.
-     * @param id The user's ID
-     * @param password The new password
-     * @returns The updated user
+     * Hashes the new password before storing.
+     *
+     * @param id - The ID of the user whose password to update
+     * @param password - The new password
+     * @returns Promise resolving to the updated User object
+     * @throws NotFoundException if the user does not exist
      */
     async updateUserPassword(id: number, password: string): Promise<User> {
-        await this.getUserById(id);
-
-        const saltRounds = parseInt(this.configService.get<string>('SALT_ROUNDS') || '10', 10);
-
+        const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        return this.prisma.user.update({
-            where: { id },
-            data: {
-                password: hashedPassword,
-                updatedAt: new Date(),
-            },
+        try {
+            return await this.prisma.user.update({
+                where: { id },
+                data: { password: hashedPassword },
+            });
+        } catch (error) {
+            throw new NotFoundException('User not found');
+        }
+    }
+
+    /**
+     * Finds a user by their email address.
+     * Used primarily for authentication purposes.
+     *
+     * @param email - The email address to search for
+     * @returns Promise resolving to the User object if found
+     */
+    async findByEmail(email: string): Promise<User | null> {
+        return this.prisma.user.findUnique({
+            where: { email },
         });
     }
 
     /**
-     * Deletes a user.
-     * @param id The user's ID
+     * Removes a user and their associated data.
+     *
+     * @param id - The ID of the user to remove
+     * @throws NotFoundException if the user does not exist
      */
     async deleteUser(id: number): Promise<void> {
-        await this.getUserById(id);
-        await this.prisma.user.delete({ where: { id } });
+        try {
+            await this.prisma.user.delete({
+                where: { id },
+            });
+        } catch (error) {
+            throw new NotFoundException('User not found');
+        }
     }
 }

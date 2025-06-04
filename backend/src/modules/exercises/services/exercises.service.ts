@@ -2,13 +2,27 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { CreateExerciseDto, AnswerOptionDto } from '../models/create-exercise.dto';
 import { UpdateExerciseDto } from '../models/update-exercise.dto';
-import { ReorderExercisesDto } from '../models/reorder-exercises.dto';
 import { Exercise, ExerciseType } from '@prisma/client';
+import { DatabasesService } from '../../databases/services/databases.service';
 
+/**
+ * Service handling business logic for exercise-related operations.
+ * Manages the creation, update, deletion, and ordering of exercises within topics.
+ * Supports various exercise types including SQL queries, multiple choice, and free text.
+ */
 @Injectable()
 export class ExercisesService {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly databasesService: DatabasesService,
+    ) {}
 
+    /**
+     * Retrieves all exercises within a topic.
+     *
+     * @param topicId - The ID of the topic whose exercises to retrieve
+     * @returns Promise resolving to an array of Exercise objects with associated data
+     */
     async getExercises(topicId: number): Promise<Exercise[]> {
         return this.prisma.exercise.findMany({
             where: { topicId },
@@ -20,6 +34,13 @@ export class ExercisesService {
         });
     }
 
+    /**
+     * Retrieves a specific exercise by ID.
+     *
+     * @param id - The ID of the exercise to retrieve
+     * @returns Promise resolving to the Exercise object with associated data
+     * @throws NotFoundException if the exercise does not exist
+     */
     async getExerciseById(id: number): Promise<Exercise> {
         const exercise = await this.prisma.exercise.findUnique({
             where: { id },
@@ -34,6 +55,29 @@ export class ExercisesService {
         return exercise;
     }
 
+    /**
+     * Retrieves all exercises.
+     *
+     * @returns Promise resolving to an array of Exercise objects with associated data
+     */
+    async getAllExercises(): Promise<Exercise[]> {
+        return this.prisma.exercise.findMany({
+            include: {
+                database: true,
+                answers: true,
+            },
+            orderBy: { order: 'asc' },
+        });
+    }
+
+    /**
+     * Validates the answers for choice-type exercises.
+     *
+     * @param type - The type of exercise (SINGLE_CHOICE or MULTIPLE_CHOICE)
+     * @param answers - The answer options to validate
+     * @throws BadRequestException if answers are invalid for the exercise type
+     * @private
+     */
     private validateAnswers(type: ExerciseType, answers?: AnswerOptionDto[]): void {
         if (!answers || answers.length === 0) return;
 
@@ -50,112 +94,83 @@ export class ExercisesService {
         }
     }
 
+    /**
+     * Creates a new exercise in a topic.
+     *
+     * @param createExerciseDto - The data for creating the new exercise
+     * @returns Promise resolving to the ID of the created exercise
+     * @throws BadRequestException if the exercise data is invalid
+     */
     async createExercise(createExerciseDto: CreateExerciseDto): Promise<number> {
         const { answers, ...exerciseData } = createExerciseDto;
 
-        // Validate answers    // Validate that QUERY exercises have a solution and database
-        // Validate based on exercise type
-        switch (exerciseData.type) {
-            case ExerciseType.QUERY:
-                if (!exerciseData.querySolution) {
-                    throw new Error('SQL exercises must have a solution query');
-                }
-                if (!exerciseData.databaseId) {
-                    throw new Error('SQL exercises must be associated with a database');
-                }
-                break;
+        // Validate answers for choice-type exercises
+        this.validateAnswers(exerciseData.type, answers);
 
-            case ExerciseType.SINGLE_CHOICE:
-            case ExerciseType.MULTIPLE_CHOICE:
-                if (!answers || answers.length === 0) {
-                    throw new Error('Choice exercises must have answer options');
-                }
-                this.validateAnswers(exerciseData.type, answers);
-                break;
-
-            case ExerciseType.FREETEXT:
-                // No validation needed for freetext exercises
-                break;
+        // Determine order if not provided
+        if (!exerciseData.order) {
+            const lastExercise = await this.prisma.exercise.findFirst({
+                where: { topicId: createExerciseDto.topicId },
+                orderBy: { order: 'desc' },
+                take: 1,
+            });
+            exerciseData.order = lastExercise ? lastExercise.order + 1 : 0;
         }
 
         const exercise = await this.prisma.exercise.create({
             data: {
                 ...exerciseData,
-                // Include answers for choice exercises
-                answers:
-                    exerciseData.type === ExerciseType.SINGLE_CHOICE ||
-                    exerciseData.type === ExerciseType.MULTIPLE_CHOICE
-                        ? {
-                              create: answers?.map((answer, index) => ({
+                ...(answers
+                    ? {
+                          answers: {
+                              create: answers.map((answer, index) => ({
                                   ...answer,
                                   order: index,
                               })),
-                          }
-                        : undefined,
+                          },
+                      }
+                    : {}),
             },
             include: {
                 answers: true,
                 database: true,
             },
         });
+
         return exercise.id;
     }
 
+    /**
+     * Updates an existing exercise.
+     *
+     * @param id - The ID of the exercise to update
+     * @param updateExerciseDto - The data to update the exercise with
+     * @returns Promise resolving to the updated Exercise object
+     * @throws NotFoundException if the exercise does not exist
+     * @throws BadRequestException if the update data is invalid
+     */
     async updateExercise(id: number, updateExerciseDto: UpdateExerciseDto): Promise<Exercise> {
+        const existingExercise = await this.getExerciseById(id);
         const { answers, ...exerciseData } = updateExerciseDto;
 
-        const existingExercise = await this.prisma.exercise.findUnique({
-            where: { id: Number(id) },
-            include: { answers: true },
-        });
-
-        if (!existingExercise) {
-            throw new NotFoundException('Exercise not found');
-        }
-
-        // If updating exercise type, validate required fields
+        // Validate answers if provided for choice-type exercises
         if (exerciseData.type) {
-            if (exerciseData.type === ExerciseType.QUERY) {
-                if (!exerciseData.querySolution && !existingExercise.querySolution) {
-                    throw new Error('SQL exercises must have a solution query');
-                }
-                if (!exerciseData.databaseId && !existingExercise.databaseId) {
-                    throw new Error('SQL exercises must be associated with a database');
-                }
-            }
-
-            if (
-                (exerciseData.type === ExerciseType.SINGLE_CHOICE ||
-                    exerciseData.type === ExerciseType.MULTIPLE_CHOICE) &&
-                !answers &&
-                !existingExercise.answers.length
-            ) {
-                throw new Error('Choice exercises must have answer options');
-            }
-
-            // Validate choice answers
-            if (
-                exerciseData.type === ExerciseType.SINGLE_CHOICE ||
-                exerciseData.type === ExerciseType.MULTIPLE_CHOICE
-            ) {
-                if (answers) {
-                    this.validateAnswers(exerciseData.type, answers);
-                }
-            }
+            this.validateAnswers(exerciseData.type, answers);
+        } else if (answers) {
+            this.validateAnswers(existingExercise.type, answers);
         }
 
-        // Handle answer options update if provided
+        // Delete existing answers if new ones are provided
         if (answers) {
             await this.prisma.answerOption.deleteMany({
-                where: { exerciseId: Number(id) },
+                where: { exerciseId: id },
             });
         }
 
         const exercise = await this.prisma.exercise.update({
-            where: { id: Number(id) },
+            where: { id },
             data: {
                 ...exerciseData,
-                // Only include answers for CHOICE type
                 answers:
                     (exerciseData.type === ExerciseType.SINGLE_CHOICE ||
                         exerciseData.type === ExerciseType.MULTIPLE_CHOICE ||
@@ -179,50 +194,43 @@ export class ExercisesService {
         return exercise;
     }
 
+    /**
+     * Removes an exercise and its associated data.
+     *
+     * @param id - The ID of the exercise to remove
+     * @throws NotFoundException if the exercise does not exist
+     */
     async removeExercise(id: number): Promise<void> {
-        // First delete related answer options to avoid foreign key constraints
-        await this.prisma.answerOption.deleteMany({
-            where: { exerciseId: Number(id) },
+        await this.getExerciseById(id);
+        await this.prisma.exercise.delete({
+            where: { id },
         });
+    }
 
-        const exercise = await this.prisma.exercise.delete({
-            where: { id: Number(id) },
+    /**
+     * Runs a SQL query for an exercise.
+     *
+     * @param id - The ID of the exercise to run the query for
+     * @param query - The query to run
+     * @returns Promise resolving to the query result
+     * @throws NotFoundException if the exercise or database does not exist
+     */
+    async runQuery(id: number, query: string): Promise<{ columns: string[]; rows: any[] }> {
+        const exercise = await this.prisma.exercise.findUnique({
+            where: { id },
+            include: {
+                database: true,
+            },
         });
 
         if (!exercise) {
             throw new NotFoundException('Exercise not found');
         }
-    }
 
-    async reorderExercises(
-        topicId: number,
-        reorderExercisesDto: ReorderExercisesDto,
-    ): Promise<void> {
-        const { exercises: reorderedExercises } = reorderExercisesDto;
-
-        const currentExercises = await this.prisma.exercise.findMany({
-            where: { topicId: Number(topicId) },
-            select: { id: true },
-        });
-
-        const currentIds = new Set(currentExercises.map((e) => e.id));
-
-        if (!reorderedExercises.every((e) => currentIds.has(Number(e.id)))) {
-            throw new NotFoundException('One or more exercises not found in this topic');
+        if (!exercise.database) {
+            throw new NotFoundException('Exercise has no associated database');
         }
 
-        await this.prisma.$transaction(async (tx) => {
-            await tx.exercise.updateMany({
-                where: { topicId: Number(topicId) },
-                data: { order: -1 },
-            });
-
-            for (const exercise of reorderedExercises) {
-                await tx.exercise.update({
-                    where: { id: Number(exercise.id) },
-                    data: { order: Number(exercise.order) },
-                });
-            }
-        });
+        return this.databasesService.runQuery(exercise.database.id, query);
     }
 }

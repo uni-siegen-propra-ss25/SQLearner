@@ -1,0 +1,239 @@
+.container {
+  padding: 2rem;
+  font-family: 'Arial', sans-serif;
+}
+
+.header {
+  background-color: #e7e7e9;
+  color: rgb(0, 0, 0);
+  padding: 1.5rem 2rem;
+  border-radius: 6px;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+
+  .title-section {
+    h1 {
+      margin: 0;
+    }
+
+    p {
+      margin: 0.2rem 0 0 0;
+      font-size: 14px;
+    }
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 1rem;
+    position: absolute;
+    bottom: 1rem;
+    right: 2rem;
+
+    a {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      background-color: #f5f7fa;
+      color: #195aa9;
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      text-decoration: none;
+      border: 1px solid #cfd8dc;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s ease;
+
+      .material-icons {
+        font-size: 18px;
+      }
+
+      &:hover {
+        background-color: #e3eaf2;
+        border-color: #90a4ae;
+        color: #0d3a75;
+        text-decoration: none;
+      }
+    }
+
+    /* Icons je Link individuell zuweisen */
+    a[routerLink='/welcome/tutor/beantwortet']::before {
+      content: 'send';
+      font-family: 'Material Icons';
+      font-size: 18px;
+    }
+
+    a[routerLink='/welcome/tutor/archiv']::before {
+      content: 'archive';
+      font-family: 'Material Icons';
+      font-size: 18px;
+    }
+
+    a[routerLink='/welcome/tutor/papierkorb']::before {
+      content: 'delete';
+      font-family: 'Material Icons';
+      font-size: 18px;
+    }
+
+    a::before {
+      display: inline-block;
+      margin-right: 0.3rem;
+      color: #195aa9;
+    }
+  }
+}
+
+.main-content {
+  display: flex;
+  gap: 2rem;
+}
+
+.fragen-container {
+  flex: 2;
+
+  .unread {
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+  }
+
+  .frage-box {
+    background-color: #e7e7e9;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+
+    .frage-text {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+
+      .material-icons {
+        font-size: 18px;
+        color: #3f51b5; // Dein gewünschtes Blau
+        margin-right: 0.4rem;
+        vertical-align: middle;
+      }
+    }
+
+    .aktionen {
+      text-align: right;
+
+      a {
+        margin-left: 1rem;
+        font-size: 0.9rem;
+        color: #195aa9;
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}
+
+.angepinnt-box {
+  flex: 1;
+  background-color: #bdcbdb;
+  color: rgb(0, 0, 0);
+  padding: 1rem;
+  border-radius: 6px;
+  max-width: 300px;
+  min-height: 200px;
+
+  h3 {
+    margin-top: 0;
+  }
+
+  .leertext {
+    color: #737373;
+    text-align: center;
+    font-style: italic;
+    margin-top: 2rem;
+  }
+
+  .angeheftet-frage {
+    margin-bottom: 1rem;
+
+    a {
+      display: inline-block;
+      font-size: 0.8rem;
+      color: #fd3535;
+      text-decoration: underline;
+      margin-top: 0.3rem;
+    }
+  }
+}
+.antwort-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+
+  .antwort-box {
+    background: #f8faff;
+    padding: 2rem;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+
+    h2 {
+      margin-top: 0;
+    }
+
+    textarea {
+      width: 100%;
+      height: 150px;
+      margin-top: 1rem;
+      padding: 0.8rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      resize: vertical;
+      font-family: inherit;
+    }
+
+    input[type='file'] {
+      margin-top: 1rem;
+    }
+
+    .anhang-info {
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: #333;
+    }
+
+    .antwort-aktionen {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+
+      button {
+        padding: 0.5rem 1.2rem;
+        border: none;
+        border-radius: 5px;
+        font-weight: bold;
+        cursor: pointer;
+
+        &:first-child {
+          background-color: #1976d2;
+          color: white;
+        }
+
+        &.abbrechen {
+          background-color: transparent;
+          color: #555;
+        }
+      }
+    }
+  }
+}

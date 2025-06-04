@@ -12,27 +12,58 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { ExercisesService } from '../services/exercises.service';
+import { DatabasesService } from '../../databases/services/databases.service';
 import { Exercise } from '@prisma/client';
 import { CreateExerciseDto } from '../models/create-exercise.dto';
 import { UpdateExerciseDto } from '../models/update-exercise.dto';
-import { ReorderExercisesDto } from '../models/reorder-exercises.dto';
 import { Role } from '@prisma/client';
 import { Roles } from 'src/common/decorators/role.decorator';
 
+/**
+ * Controller managing exercise-related operations within topics.
+ * Handles CRUD operations for exercises and their ordering within topics.
+ * Supports different types of exercises including SQL queries, multiple choice,
+ * and free text answers. Protected by role-based access control for modifications.
+ *
+ * @class ExercisesController
+ */
 @ApiTags('Exercises')
-@Controller('topics/:topicId/exercises')
+@Controller('exercises')
 export class ExercisesController {
-    constructor(private readonly exercisesService: ExercisesService) {}
+    constructor(
+        private readonly exercisesService: ExercisesService,
+        private readonly databasesService: DatabasesService,
+    ) {}
 
+    /**
+     * Retrieves exercises. If topicId is provided, returns exercises for that topic.
+     * Otherwise returns all exercises.
+     *
+     * @param topicId - Optional ID of the topic whose exercises to retrieve
+     * @returns Promise resolving to an array of Exercise objects
+     */
     @Get()
+    @ApiOperation({ summary: 'Get all exercises' })
+    @ApiResponse({ status: 200, description: 'List of all exercises' })
+    async getAllExercises(): Promise<Exercise[]> {
+        return this.exercisesService.getAllExercises();
+    }
+
+    @Get('topics/:topicId')
     @ApiOperation({ summary: 'Get all exercises in a topic' })
     @ApiParam({ name: 'topicId', description: 'Topic ID' })
     @ApiResponse({ status: 200, description: 'List of all exercises in the topic' })
-    async getExercises(@Param('topicId') topicId: number): Promise<Exercise[]> {
-        const exercises = await this.exercisesService.getExercises(topicId);
-        return exercises;
+    async getExercisesByTopic(@Param('topicId') topicId: number): Promise<Exercise[]> {
+        return this.exercisesService.getExercises(topicId);
     }
 
+    /**
+     * Retrieves a specific exercise by ID.
+     *
+     * @param id - The ID of the exercise to retrieve
+     * @returns Promise resolving to the Exercise object
+     * @throws NotFoundException if the exercise does not exist
+     */
     @Get(':id')
     @ApiOperation({ summary: 'Get an exercise by ID' })
     @ApiParam({ name: 'topicId', description: 'Topic ID' })
@@ -47,6 +78,13 @@ export class ExercisesController {
         return exercise;
     }
 
+    /**
+     * Creates a new exercise in a topic.
+     *
+     * @param topicId - The ID of the topic to create the exercise in
+     * @param createExerciseDto - The data for creating the new exercise
+     * @returns Promise resolving to the ID of the created exercise
+     */
     @Post()
     @Roles(Role.TUTOR, Role.ADMIN)
     @HttpCode(HttpStatus.CREATED)
@@ -62,12 +100,19 @@ export class ExercisesController {
         return exerciseId;
     }
 
+    /**
+     * Updates an existing exercise.
+     *
+     * @param id - The ID of the exercise to update
+     * @param updateExerciseDto - The data to update the exercise with
+     * @returns Promise resolving to the updated Exercise object
+     * @throws NotFoundException if the exercise does not exist
+     */
     @Put(':id')
     @Roles(Role.TUTOR, Role.ADMIN)
     @ApiOperation({ summary: 'Update an exercise' })
     @ApiParam({ name: 'id', description: 'Exercise ID' })
     @ApiResponse({ status: 200, description: 'The exercise has been updated' })
-    @ApiResponse({ status: 404, description: 'Exercise not found' })
     async updateExercise(
         @Param('id') id: number,
         @Body() updateExerciseDto: UpdateExerciseDto,
@@ -76,6 +121,12 @@ export class ExercisesController {
         return exercise;
     }
 
+    /**
+     * Removes an exercise.
+     *
+     * @param id - The ID of the exercise to remove
+     * @throws NotFoundException if the exercise does not exist
+     */
     @Delete(':id')
     @Roles(Role.TUTOR, Role.ADMIN)
     @HttpCode(HttpStatus.NO_CONTENT)
@@ -88,16 +139,24 @@ export class ExercisesController {
         return;
     }
 
-    @Put('reorder')
-    @Roles(Role.TUTOR, Role.ADMIN)
-    @HttpCode(HttpStatus.NO_CONTENT)
-    @ApiOperation({ summary: 'Reorder exercises within a topic' })
-    @ApiResponse({ status: 204, description: 'Exercises have been reordered' })
-    async reorderExercises(
-        @Param('topicId') topicId: number,
-        @Body() reorderExercisesDto: ReorderExercisesDto,
-    ): Promise<void> {
-        await this.exercisesService.reorderExercises(topicId, reorderExercisesDto);
-        return;
+    /**
+     * Runs a SQL query for an exercise.
+     *
+     * @param id - The ID of the exercise to run the query for
+     * @param body - The query to run
+     * @returns Promise resolving to the query result
+     * @throws NotFoundException if the exercise or database does not exist
+     */
+    @Post(':id/run-query')
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Run a SQL query for an exercise' })
+    @ApiParam({ name: 'id', description: 'Exercise ID' })
+    @ApiResponse({ status: 200, description: 'Query executed successfully' })
+    @ApiResponse({ status: 404, description: 'Exercise or database not found' })
+    async runQuery(
+        @Param('id') id: number,
+        @Body() body: { query: string },
+    ): Promise<{ columns: string[]; rows: any[] }> {
+        return this.exercisesService.runQuery(id, body.query);
     }
 }

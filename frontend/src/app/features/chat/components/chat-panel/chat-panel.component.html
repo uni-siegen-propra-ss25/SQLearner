@@ -1,0 +1,45 @@
+<div class="chat-panel">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>smart_toy</mat-icon>
+        <span>KI Assistent</span>
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="messages">
+        <div *ngFor="let message of messages$ | async" class="message" [ngClass]="message.sender">
+          <p class="message-content">{{ message.content }}</p>
+        </div>
+      </div>
+
+      <div class="loading" *ngIf="isLoading">
+        <mat-progress-spinner mode="indeterminate" diameter="24"></mat-progress-spinner>
+        <span>KI denkt nach...</span>
+      </div>
+
+      <div class="input-area">
+        <mat-form-field appearance="outline">
+          <mat-label>Deine Nachricht</mat-label>
+          <textarea
+            matInput
+            [(ngModel)]="newMessage"
+            placeholder="Stelle eine Frage..."
+            (keydown.enter)="$event.preventDefault(); sendMessage()"
+            rows="1"
+          >
+          </textarea>
+        </mat-form-field>
+        <button
+          mat-icon-button
+          color="primary"
+          [disabled]="!newMessage.trim() || isLoading"
+          (click)="sendMessage()"
+        >
+          <mat-icon>send</mat-icon>
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

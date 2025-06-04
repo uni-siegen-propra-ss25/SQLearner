@@ -9,9 +9,25 @@ RUN apk add --no-cache netcat-openbsd
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install && \
-    npm install --save-dev @nestjs/swagger @types/express @types/multer @types/pg && \
-    npm install @prisma/client pg
+RUN npm install --legacy-peer-deps && \
+    npm install --save-dev --legacy-peer-deps \
+        @nestjs/swagger@6.3.0 \
+        @types/express@4.17.21 \
+        @types/multer@1.4.11 \
+        @types/pg@8.10.9 \
+        @types/node@20.11.24 \
+        typescript@5.3.3 \
+        ts-node@10.9.2 \
+        @typescript-eslint/parser@6.21.0 \
+        @typescript-eslint/eslint-plugin@6.21.0 && \
+    npm install --legacy-peer-deps \
+        @prisma/client@5.10.2 \
+        pg@8.11.3 \
+        @nestjs/common@10.3.3 \
+        @nestjs/core@10.3.3 \
+        @nestjs/platform-express@10.3.3 \
+        reflect-metadata@0.2.1 \
+        rxjs@7.8.1
 
 # Copy the rest of the application
 COPY . .

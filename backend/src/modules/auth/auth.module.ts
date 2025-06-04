@@ -9,6 +9,14 @@ import { LocalStrategy } from './local.strategy';
 import { UsersModule } from '../users/users.module';
 import { PrismaModule } from '../../prisma/prisma.module';
 
+/**
+ * Auth Module handles all authentication-related functionality.
+ *
+ * This module integrates JWT authentication, Passport.js strategies, and user authentication flows.
+ * It provides services for user registration, login, and JWT token management.
+ *
+ * @module AuthModule
+ */
 @Module({
     imports: [
         UsersModule,

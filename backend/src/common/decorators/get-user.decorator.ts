@@ -1,8 +1,27 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
 /**
- * GetUser decorator provides `request.user` to controller methods.
- * If a property key is provided, returns that specific property.
+ * A parameter decorator to extract the authenticated user or user properties from the request.
+ * The user must be present in `request.user`, typically set by an authentication guard.
+ *
+ * @example
+ * ```typescript
+ * // Get the entire user object
+ * @Get('profile')
+ * getProfile(@GetUser() user) {
+ *   return user;
+ * }
+ *
+ * // Get a specific user property
+ * @Get('email')
+ * getUserEmail(@GetUser('email') email: string) {
+ *   return email;
+ * }
+ * ```
+ *
+ * @param data Optional key to extract a specific property from the user object
+ * @param ctx The execution context from which to extract the request and user
+ * @returns The full user object or the specified user property
  */
 export const GetUser = createParamDecorator(
     /**

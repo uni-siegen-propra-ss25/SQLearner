@@ -12,13 +12,7 @@ import {
     ParseIntPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import {
-    ApiTags,
-    ApiOperation,
-    ApiResponse,
-    ApiBearerAuth,
-    ApiConsumes,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
 import { DatabasesService } from '../services/databases.service';
 import { Database } from '../models/database.model';
 import { CreateDatabaseDto } from '../models/create-database.dto';
@@ -29,6 +23,18 @@ import { Roles } from '../../../common/decorators/role.decorator';
 import { GetUser } from '../../../common/decorators/get-user.decorator';
 import { Role } from '@prisma/client';
 
+interface RunQueryDto {
+    query: string;
+}
+
+/**
+ * Controller managing database operations for the SQL learning system.
+ * Handles creation, modification, and deletion of practice databases.
+ * Includes functionality for uploading SQL files and managing database access.
+ * Protected by JWT authentication and role-based access control.
+ *
+ * @class DatabasesController
+ */
 @ApiTags('Databases')
 @Controller('databases')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -45,8 +51,6 @@ export class DatabasesController {
         @GetUser('id') userId: number,
         @GetUser('role') userRole: string,
     ) {
-        console.log('Controller - User ID:', userId);
-        console.log('Controller - User Role:', userRole);
         return this.databasesService.createDatabase(dto, userId, userRole);
     }
 
@@ -101,5 +105,18 @@ export class DatabasesController {
         @GetUser('role') userRole: string,
     ) {
         return this.databasesService.uploadSqlFile(file, userId, userRole);
+    }
+
+    @Post(':id/query')
+    @ApiOperation({ summary: 'Run SQL query on database' })
+    @ApiResponse({ status: 200, description: 'Query executed successfully' })
+    @ApiResponse({ status: 400, description: 'Invalid query' })
+    @ApiResponse({ status: 403, description: 'Operation not allowed' })
+    @ApiResponse({ status: 404, description: 'Database not found' })
+    async runQuery(
+        @Param('id', ParseIntPipe) id: number,
+        @Body() dto: RunQueryDto,
+    ) {
+        return this.databasesService.runQuery(id, dto.query);
     }
 }

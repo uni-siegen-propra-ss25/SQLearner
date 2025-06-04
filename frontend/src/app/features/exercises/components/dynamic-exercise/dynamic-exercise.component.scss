@@ -1,0 +1,91 @@
+:host {
+  display: block;
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.exercise-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+}
+
+.metadata {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.type-badge,
+.difficulty-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.type-badge {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: rgba(0, 0, 0, 0.7);
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.difficulty-badge {
+  color: white;
+}
+
+.exercise-content {
+  display: flex;
+  gap: 24px;
+  transition: all 0.3s ease;
+  height: 100%;
+
+  .main-content {
+    flex: 1;
+    min-width: 0; // Prevents flex child from overflowing
+  }
+
+  .chat-panel {
+    width: 0;
+    overflow: hidden;
+    transition: width 0.3s ease;
+    display: flex;
+    padding-bottom: 2rem; // Add padding to prevent shadow clipping
+  }
+
+  &.chat-open {
+    .chat-panel {
+      width: 400px;
+    }
+  }
+
+  // Responsive layout
+  @media (max-width: 1000px) {
+    flex-direction: column;
+    .chat-panel {
+      width: 100% !important;
+      height: 500px; // Feste Höhe für mobile Ansicht
+      margin-top: 24px;
+    }
+  }
+}
+
+mat-card {
+  border-radius: 12px;
+}

@@ -14,6 +14,8 @@ import { RouterModule } from '@angular/router';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { RoadmapModule } from './features/roadmap/roadmap.module';
 import { ExercisesModule } from './features/exercises/exercises.module';
+import { ChatModule } from './features/chat/chat.module';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
     declarations: [AppComponent],
@@ -29,6 +31,8 @@ import { ExercisesModule } from './features/exercises/exercises.module';
         DragDropModule,
         RoadmapModule,
         ExercisesModule,
+        ChatModule,
+        FormsModule,
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },

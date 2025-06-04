@@ -1,0 +1,123 @@
+<div class="container">
+  <div class="header">
+    <div class="title-section">
+      <h1>SQLearner</h1>
+      <p>Aufgaben erstellen und hochladen</p>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <input type="text" placeholder="Titel" [(ngModel)]="titel" />
+
+    <select [(ngModel)]="kategorie">
+      <option value="" disabled>Kategorie wählen</option>
+      <option value="SQL">SQL</option>
+      <option value="XML">XML</option>
+      <option value="Relationale Datenbank">Relationale DB</option>
+    </select>
+
+    <select [(ngModel)]="typ" (change)="onTypChange()">
+      <option value="" disabled>Typ wählen</option>
+      <option value="SQL Query">SQL Query</option>
+      <option value="Single Choice">Single Choice</option>
+      <option value="Multiple Choice">Multiple Choice</option>
+    </select>
+
+    <div class="difficulty">
+      <label
+        ><input type="radio" name="level" value="leicht" [(ngModel)]="schwierigkeit" />
+        Leicht</label
+      >
+      <label
+        ><input type="radio" name="level" value="mittel" [(ngModel)]="schwierigkeit" />
+        Mittel</label
+      >
+      <label
+        ><input type="radio" name="level" value="schwer" [(ngModel)]="schwierigkeit" />
+        Schwer</label
+      >
+    </div>
+
+    <div class="card card-body bg-light border border-primary">
+      <!-- SQL Query -->
+      <div *ngIf="typ === 'SQL Query' || typ === ''">
+        <textarea
+          placeholder="Aufgabenstellung"
+          [(ngModel)]="beschreibung"
+          rows="5"
+          class="form-control"
+        >
+        </textarea>
+        <br />
+        <textarea
+          placeholder="Musterlösung"
+          [(ngModel)]="musterloesung"
+          rows="3"
+          class="form-control"
+        >
+        </textarea>
+      </div>
+
+      <!-- Single / Multiple Choice -->
+      <div *ngIf="typ === 'Single Choice' || typ === 'Multiple Choice'">
+        <div *ngFor="let option of options; let i = index" class="choice-row">
+          <input
+            [type]="typ === 'Single Choice' ? 'radio' : 'checkbox'"
+            [attr.name]="typ === 'Single Choice' ? 'choiceGroup' : null"
+            [checked]="option.correct"
+            class="form-check-input"
+            (change)="onOptionSelect(i)"
+          />
+          <input
+            type="text"
+            [(ngModel)]="option.text"
+            class="option-input"
+            placeholder="Antwortmöglichkeit {{ i + 1 }}"
+            required
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="file-drop" (drop)="onFileDropped($event)" (dragover)="onDragOver($event)">
+      <div class="file-content">
+        <div class="upload-icon">⬆️</div>
+        <p>Datei hier ablegen oder auswählen</p>
+        <input type="file" (change)="onFileSelected($event)" />
+      </div>
+    </div>
+
+    <div class="note-field">
+      <textarea [(ngModel)]="notiz" rows="3" placeholder="Kommentar zur Aufgabe..."></textarea>
+    </div>
+
+    <button (click)="hochladen()">Hochladen</button>
+  </div>
+
+  <div class="preview" *ngIf="hochgeladeneAufgabe">
+    <h3>📦 Hochgeladene Aufgabe:</h3>
+    <p><strong>Titel:</strong> {{ hochgeladeneAufgabe.titel }}</p>
+    <p><strong>Kategorie:</strong> {{ hochgeladeneAufgabe.kategorie }}</p>
+    <p><strong>Typ:</strong> {{ hochgeladeneAufgabe.typ }}</p>
+    <p><strong>Schwierigkeit:</strong> {{ hochgeladeneAufgabe.schwierigkeit }}</p>
+    <div *ngIf="hochgeladeneAufgabe.typ === 'SQL Query'">
+      <p><strong>Beschreibung:</strong> {{ hochgeladeneAufgabe.beschreibung }}</p>
+      <p><strong>Musterlösung:</strong> {{ hochgeladeneAufgabe.musterloesung }}</p>
+    </div>
+    <div *ngIf="hochgeladeneAufgabe.options?.length > 0">
+      <p><strong>Antwortoptionen:</strong></p>
+      <ul>
+        <li *ngFor="let opt of hochgeladeneAufgabe.options">
+          {{ opt.text }} <span *ngIf="opt.correct">✔️</span>
+        </li>
+      </ul>
+    </div>
+    <p><strong>Kommentar:</strong> {{ hochgeladeneAufgabe.notiz }}</p>
+    <p>
+      <strong>Datei:</strong>
+      <a [href]="hochgeladeneAufgabe.dateiUrl" target="_blank">{{
+        hochgeladeneAufgabe.dateiName
+      }}</a>
+    </p>
+  </div>
+</div>

@@ -62,16 +62,10 @@ export class ExerciseCardComponent {
         }
     }
 
-    onCardClick() {
-        if (!this.isTutor && this.exercise) {
-            // Navigiere explizit zur DynamicExerciseComponent-Route
-            this.router.navigate([
-                '/roadmap',
-                'topics',
-                this.exercise.topicId,
-                'exercises',
-                this.exercise.id,
-            ]);
+    onCardClick(): void {
+        if (!this.isTutor && this.exercise && this.exercise.id != null) {
+            // Navigate to DynamicExerciseComponent
+            this.router.navigate(['/exercises', this.exercise.id]);
         }
     }
 }

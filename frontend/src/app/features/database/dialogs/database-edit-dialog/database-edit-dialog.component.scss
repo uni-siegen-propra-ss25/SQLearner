@@ -1,0 +1,183 @@
+:host {
+  display: block;
+
+  mat-dialog-content {
+    min-width: 500px;
+    max-width: 800px;
+    padding: 24px;
+  }
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+mat-form-field {
+  display: block;
+
+  &:last-of-type {
+    margin-bottom: 0;
+  }
+}
+
+textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.sql-schema-field {
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+
+  mat-form-field {
+    margin-bottom: 0;
+  }
+}
+
+mat-dialog-actions {
+  padding: 16px 24px;
+  margin: 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+
+  button {
+    min-width: 100px;
+
+    &[color='primary'] {
+      margin-left: 8px;
+    }
+  }
+}
+
+// Dark theme adjustments
+:host-context(.dark-theme) {
+  .sql-schema-field {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  mat-dialog-actions {
+    border-top-color: rgba(255, 255, 255, 0.08);
+  }
+}
+
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.sql-schema-field {
+  margin-top: 16px;
+}
+
+.query-section {
+  margin-top: 24px;
+  padding: 16px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+
+  h3 {
+    margin: 0 0 16px 0;
+    color: #333;
+  }
+}
+
+.query-actions {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.query-results {
+  margin-top: 16px;
+
+  h4 {
+    margin: 0 0 8px 0;
+    color: #333;
+  }
+}
+
+.result-table {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 8px;
+
+  table {
+    width: 100%;
+  }
+
+  th {
+    background-color: #f0f0f0;
+    font-weight: 500;
+  }
+
+  td, th {
+    padding: 8px 16px;
+    text-align: left;
+  }
+
+  tr:nth-child(even) {
+    background-color: #fafafa;
+  }
+}
+
+.no-results {
+  padding: 16px;
+  text-align: center;
+  color: #666;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.query-info {
+  margin-top: 8px;
+  font-size: 0.9em;
+  color: #666;
+}
+
+mat-form-field {
+  margin-bottom: 16px;
+}
+
+textarea {
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.view-controls {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    
+    .mat-button-toggle-group {
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .mat-button-toggle {
+        min-width: 120px;
+        background-color: #f5f5f5;
+        
+        &.mat-button-toggle-checked {
+            background-color: #e0e0e0;
+        }
+    }
+}
+
+:host-context(.dark-theme) {
+    .view-controls {
+        .mat-button-toggle {
+            background-color: #424242;
+            color: #fff;
+            
+            &.mat-button-toggle-checked {
+                background-color: #616161;
+            }
+        }
+    }
+}

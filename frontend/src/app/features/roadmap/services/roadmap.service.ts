@@ -96,43 +96,5 @@ export class RoadmapService {
             .pipe(catchError((error) => this.handleError(error)));
     }
 
-    // Exercise endpoints
-    getExercises(topicId: number): Observable<Exercise[]> {
-        return this.http
-            .get<Exercise[]>(`${this.baseUrl}/topics/${topicId}/exercises`)
-            .pipe(catchError((error) => this.handleError(error)));
-    }
-
-    getExercise(topicId: number, id: number): Observable<Exercise> {
-        return this.http
-            .get<Exercise>(`${this.baseUrl}/topics/${topicId}/exercises/${id}`)
-            .pipe(catchError((error) => this.handleError(error)));
-    }
-
-    createExercise(topicId: number, exercise: Partial<Exercise>): Observable<number> {
-        return this.http
-            .post<number>(`${this.baseUrl}/topics/${topicId}/exercises`, exercise)
-            .pipe(catchError((error) => this.handleError(error)));
-    }
-
-    updateExercise(topicId: number, id: number, exercise: Partial<Exercise>): Observable<Exercise> {
-        return this.http
-            .put<Exercise>(`${this.baseUrl}/topics/${topicId}/exercises/${id}`, exercise)
-            .pipe(catchError((error) => this.handleError(error)));
-    }
-
-    deleteExercise(topicId: number, id: number): Observable<void> {
-        return this.http
-            .delete<void>(`${this.baseUrl}/topics/${topicId}/exercises/${id}`)
-            .pipe(catchError((error) => this.handleError(error)));
-    }
-
-    reorderExercises(
-        topicId: number,
-        exercises: { id: number; order: number }[],
-    ): Observable<void> {
-        return this.http
-            .put<void>(`${this.baseUrl}/topics/${topicId}/exercises/reorder`, { exercises })
-            .pipe(catchError((error) => this.handleError(error)));
-    }
+    // Note: Exercise-related operations have been moved to ExercisesService
 }

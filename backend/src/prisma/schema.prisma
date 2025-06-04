@@ -47,6 +47,12 @@ enum Difficulty {
   HARD
 }
 
+/// Message sender type
+enum MessageSender {
+  user
+  assistant
+}
+
 // Models
 
 /// Application users
@@ -68,6 +74,24 @@ model User {
   bookmarks    Bookmark[]
 
   Database Database[]
+  messages ChatMessage[]
+}
+
+/// Chat messages between users and the AI assistant
+model ChatMessage {
+  id        Int           @id @default(autoincrement())
+  content   String
+  sender    MessageSender
+  userId    Int
+  context   String?
+  replyToId Int?
+
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  replyTo   ChatMessage?  @relation("ReplyToMessage", fields: [replyToId], references: [id])
+  replies   ChatMessage[] @relation("ReplyToMessage")
+
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
 }
 
 /// Imported or self-created database definitions
@@ -77,6 +101,7 @@ model Database {
   description String?
 
   schemaSql   String?    // original SQL dump - full CREATE TABLE / INSERT statements
+  exampleQueries String? // example SQL queries for this database (JSON array of queries)
 
   // TODO: check if this is needed
   ownerId Int
