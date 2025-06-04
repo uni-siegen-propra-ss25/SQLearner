@@ -5,6 +5,10 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
+    // Log loaded JWT_SECRET for debugging
+    // (Achtung: Niemals in Produktion so lassen!)
+    // eslint-disable-next-line no-console
+    console.log('Loaded JWT_SECRET:', process.env.JWT_SECRET);
 
     // Set global prefix for all routes
     app.setGlobalPrefix('api');

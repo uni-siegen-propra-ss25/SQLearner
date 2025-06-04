@@ -59,6 +59,12 @@ const routes: Routes = [
             allowedRoles: [Role.TUTOR],
         },
     },
+    {
+    path: 'admin/api-key',
+    loadChildren: () => import('./features/admin/api-key/api-key.module').then(m => m.ApiKeyModule),
+    canActivate: [RoleGuard],
+    data: { allowedRoles: [Role.ADMIN] }
+},
 ];
 
 @NgModule({
