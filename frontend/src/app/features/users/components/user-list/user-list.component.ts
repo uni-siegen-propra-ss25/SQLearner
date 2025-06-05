@@ -7,6 +7,7 @@ import { UserService } from '../../services/user.service';
 import { AuthService } from '../../../auth/services/auth.service';
 import { UserCreateDialogComponent } from '../../dialogs/user-create-dialog/user-create-dialog.component';
 import { UserUpdateDialogComponent } from '../../dialogs/user-update-dialog/user-update-dialog.component';
+import { ProgressService } from '../../../progress/services/progress.service';
 
 @Component({
     selector: 'app-user-list',
@@ -18,7 +19,7 @@ export class UserListComponent implements OnInit {
     @Input() canEditRoles = false;
     @Output() roleChange = new EventEmitter<{ userId: number; newRole: Role }>();
 
-    displayedColumns: string[] = ['name', 'email', 'role', 'matriculationNumber', 'actions'];
+    displayedColumns: string[] = ['name', 'email', 'role', 'matriculationNumber', 'progress', 'actions'];
     roleOptions = Object.values(Role);
     isAdmin = false;
 
@@ -26,6 +27,7 @@ export class UserListComponent implements OnInit {
         private dialog: MatDialog,
         private userService: UserService,
         private authService: AuthService,
+        private progressService: ProgressService,
         private snackBar: MatSnackBar,
     ) {}
 
@@ -39,10 +41,23 @@ export class UserListComponent implements OnInit {
         });
     }
 
-    loadUsers() {
+    async loadUsers() {
         this.userService.getAllUsers().subscribe({
-            next: (users) => {
-                this.users = users;
+            next: async (users) => {
+                // Load progress for students
+                const updatedUsers = await Promise.all(users.map(async (user) => {
+                    if (user.role === Role.STUDENT) {
+                        try {
+                            const progress = await this.progressService.getUserProgress().toPromise();
+                            return { ...user, progress: progress?.completionPercentage || 0 };
+                        } catch (error) {
+                            console.error(`Fehler beim Laden des Fortschritts für Benutzer ${user.id}:`, error);
+                            return { ...user, progress: 0 };
+                        }
+                    }
+                    return user;
+                }));
+                this.users = updatedUsers;
             },
             error: (error) => {
                 this.snackBar.open('Fehler beim Laden der Nutzer', 'Schließen', {
