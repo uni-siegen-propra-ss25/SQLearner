@@ -14,7 +14,7 @@ import { BookmarkData } from '../models/bookmark.model';
     providedIn: 'root'
 })
 export class BookmarkService {
-    private readonly baseUrl = environment.apiUrl;
+    private readonly baseUrl = `${environment.apiUrl}/bookmarks`;
 
     constructor(private readonly http: HttpClient) { }
 
@@ -48,7 +48,7 @@ export class BookmarkService {
      */
     getUserBookmarks(): Observable<BookmarkData[]> {
         return this.http
-            .get<BookmarkData[]>(`${this.baseUrl}/api/bookmarks/user`)
+            .get<BookmarkData[]>(`${this.baseUrl}/user`)
             .pipe(catchError((error) => this.handleError(error)));
     }
 
@@ -62,7 +62,7 @@ export class BookmarkService {
      */
     addBookmark(exerciseId: number): Observable<BookmarkData> {
         return this.http
-            .post<BookmarkData>(`${this.baseUrl}/api/bookmarks`, { exerciseId })
+            .post<BookmarkData>(this.baseUrl, { exerciseId })
             .pipe(catchError((error) => this.handleError(error)));
     }
 
@@ -76,7 +76,7 @@ export class BookmarkService {
      */
     removeBookmark(id: number): Observable<void> {
         return this.http
-            .delete<void>(`${this.baseUrl}/api/bookmarks/${id}`)
+            .delete<void>(`${this.baseUrl}/${id}`)
             .pipe(catchError((error) => this.handleError(error)));
     }
 }

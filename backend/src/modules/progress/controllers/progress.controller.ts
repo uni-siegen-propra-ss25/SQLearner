@@ -11,7 +11,7 @@ import { UserProgressSummary, ExerciseProgressUpdate } from '../models/progress.
  * Provides REST API endpoints for retrieving and updating exercise completion progress.
  * All endpoints require JWT authentication and role-based authorization.
  */
-@Controller('api/progress')
+@Controller('progress')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class ProgressController {
     constructor(private readonly progressService: ProgressService) {}

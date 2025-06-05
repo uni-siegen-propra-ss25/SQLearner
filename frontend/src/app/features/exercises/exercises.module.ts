@@ -4,6 +4,7 @@ import { ExercisesRoutingModule } from './exercises-routing.module';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MaterialModule } from 'app/material.module';
 import { ChatModule } from '../chat/chat.module';
+import { SharedModule } from '../../shared/shared.module';
 import { ChoiceExerciseComponent } from './components/choice-exercise/choice-exercise.component';
 import { FreetextExerciseComponent } from './components/freetext-exercise/freetext-exercise.component';
 import { QueryExerciseComponent } from './components/query-exercise/query-exercise.component';
@@ -19,6 +20,7 @@ import { DynamicExerciseComponent } from './components/dynamic-exercise/dynamic-
     imports: [
         CommonModule,
         MaterialModule,
+        SharedModule,
         ReactiveFormsModule,
         FormsModule,
         ExercisesRoutingModule,

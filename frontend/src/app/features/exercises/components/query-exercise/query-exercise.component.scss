@@ -36,10 +36,21 @@
   // Editor section styles
   .editor-section {
     margin-bottom: 20px;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    border: 1px solid var(--border-color, #ccc);
 
-    .monaco-editor {
-      height: 300px;
-      border: 1px solid rgba(0, 0, 0, 0.12);
+    .sql-editor {
+      flex: 1;
+      min-height: 0; // Important for Firefox
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
     }
   }
 

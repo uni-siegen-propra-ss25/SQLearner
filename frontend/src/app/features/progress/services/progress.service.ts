@@ -3,7 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
-import { ProgressData, ChapterProgress, UserProgressSummary } from '../models/progress.model';
+import { UserProgressSummary } from '../models/progress.model';
 
 /**
  * Service responsible for managing user progress data and communication with the backend API.
@@ -14,7 +14,7 @@ import { ProgressData, ChapterProgress, UserProgressSummary } from '../models/pr
     providedIn: 'root'
 })
 export class ProgressService {
-    private readonly baseUrl = environment.apiUrl;
+    private readonly baseUrl = `${environment.apiUrl}/progress`;
 
     constructor(private readonly http: HttpClient) { }
 
@@ -48,7 +48,21 @@ export class ProgressService {
      */
     getUserProgress(): Observable<UserProgressSummary> {
         return this.http
-            .get<UserProgressSummary>(`${this.baseUrl}/api/progress/user`)
+            .get<UserProgressSummary>(`${this.baseUrl}/user`)
+            .pipe(catchError((error) => this.handleError(error)));
+    }
+
+    /**
+     * Retrieves progress summary for a specific user by ID.
+     * Only accessible by tutors and admins.
+     * 
+     * @param {number} userId - The ID of the user to get progress for
+     * @returns {Observable<UserProgressSummary>} Observable containing complete progress data for the specified user
+     * @throws {Error} When API request fails or user is not authorized
+     */
+    getUserProgressById(userId: number): Observable<UserProgressSummary> {
+        return this.http
+            .get<UserProgressSummary>(`${this.baseUrl}/user/${userId}`)
             .pipe(catchError((error) => this.handleError(error)));
     }
 
@@ -63,10 +77,7 @@ export class ProgressService {
      */
     updateExerciseProgress(exerciseId: number, isPassed: boolean): Observable<void> {
         return this.http
-            .post<void>(`${this.baseUrl}/api/progress/exercise/${exerciseId}`, { 
-                exerciseId, 
-                isPassed 
-            })
+            .post<void>(`${this.baseUrl}/exercise/${exerciseId}`, { isPassed })
             .pipe(catchError((error) => this.handleError(error)));
     }
 }

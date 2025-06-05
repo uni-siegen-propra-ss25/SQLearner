@@ -6,10 +6,12 @@ import { Roles } from '../../../common/decorators/role.decorator';
 import { BookmarksService } from '../services/bookmarks.service';
 import { BookmarkData, CreateBookmarkDto } from '../models/bookmark.model';
 
-@Controller('api/bookmarks')
+@Controller('bookmarks')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class BookmarksController {
-    constructor(private readonly bookmarksService: BookmarksService) {}    @Get('user')
+    constructor(private readonly bookmarksService: BookmarksService) {}
+
+    @Get('user')
     @Roles('STUDENT')
     async getUserBookmarks(@GetUser('id') userId: number): Promise<BookmarkData[]> {
         return this.bookmarksService.getUserBookmarks(userId);

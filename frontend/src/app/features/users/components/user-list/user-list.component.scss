@@ -87,6 +87,28 @@ $color-text-light: rgba(0, 0, 0, 0.6);
       }
     }
 
+    // Progress Column
+    .mat-column-progress {
+      width: 180px;
+      
+      .progress-cell {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        mat-progress-bar {
+          flex: 1;
+        }
+
+        .progress-value {
+          min-width: 45px;
+          text-align: right;
+          font-size: 0.875rem;
+          color: $color-text-light;
+        }
+      }
+    }
+
     // Role Column
     .mat-column-role {
       width: 150px;

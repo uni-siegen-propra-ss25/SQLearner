@@ -7,6 +7,7 @@ export interface User {
     lastName: string;
     role: Role;
     matriculationNumber?: string;
+    progress?: number;
     createdAt?: Date;
     updatedAt?: Date;
 }

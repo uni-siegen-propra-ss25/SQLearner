@@ -21,7 +21,7 @@ export class TopicDialogComponent {
         // the chapterId is inside the data for the topicDto creation
         this.topicForm = this.fb.group({
             title: [data.title || '', Validators.required],
-            description: [data.description || '', Validators.required],
+            description: [data.description || ''],
             chapterId: [data.chapterId],
             order: [data.order || 0],
         });

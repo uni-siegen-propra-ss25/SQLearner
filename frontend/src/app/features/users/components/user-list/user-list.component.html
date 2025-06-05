@@ -43,6 +43,17 @@
           </mat-cell>
         </ng-container>
 
+        <ng-container matColumnDef="progress">
+          <mat-header-cell *matHeaderCellDef> Fortschritt </mat-header-cell>
+          <mat-cell *matCellDef="let user">
+            <div *ngIf="user.role === 'STUDENT'" class="progress-cell">
+              <mat-progress-bar mode="determinate" [value]="user.progress"></mat-progress-bar>
+              <span class="progress-value">{{user.progress}}%</span>
+            </div>
+            <span *ngIf="user.role !== 'STUDENT'" class="no-value">-</span>
+          </mat-cell>
+        </ng-container>
+
         <ng-container matColumnDef="actions">
           <mat-header-cell *matHeaderCellDef>Aktionen</mat-header-cell>
           <mat-cell *matCellDef="let user" class="actions-cell">
