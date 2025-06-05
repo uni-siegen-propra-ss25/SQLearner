@@ -59,7 +59,7 @@ export class RoadmapService {
             .pipe(catchError((error) => this.handleError(error)));
     }
 
-    // Topic endpoints
+    // Topic endpoints - nested under chapters as per backend structure
     getTopics(chapterId: number): Observable<Topic[]> {
         return this.http
             .get<Topic[]>(`${this.baseUrl}/chapters/${chapterId}/topics`)

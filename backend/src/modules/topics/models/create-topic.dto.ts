@@ -12,10 +12,10 @@ export class CreateTopicDto {
     @IsNotEmpty()
     title: string;
 
-    @ApiProperty({ description: 'The description of the topic' })
+    @ApiProperty({ description: 'The description of the topic', required: false })
     @IsString()
-    @IsNotEmpty()
-    description: string;
+    @IsOptional()
+    description?: string;
 
     @ApiProperty({ description: 'The order of the topic within its chapter', required: false })
     @IsInt()

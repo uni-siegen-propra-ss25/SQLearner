@@ -20,7 +20,7 @@ export class ChapterDialogComponent {
         this.isEditing = !!data.id;
         this.chapterForm = this.fb.group({
             title: [data.title || '', Validators.required],
-            description: [data.description || '', Validators.required],
+            description: [data.description || ''],
             order: [data.order || 0],
         });
     }

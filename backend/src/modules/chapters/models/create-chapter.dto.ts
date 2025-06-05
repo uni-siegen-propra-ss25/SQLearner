@@ -7,10 +7,10 @@ export class CreateChapterDto {
     @IsNotEmpty()
     title: string;
 
-    @ApiProperty({ description: 'The description of the chapter' })
+    @ApiProperty({ description: 'The description of the chapter', required: false })
+    @IsOptional()
     @IsString()
-    @IsNotEmpty()
-    description: string;
+    description?: string;
 
     @ApiProperty({ description: 'The order of the chapter in the sequence', required: false })
     @IsInt()
