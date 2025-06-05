@@ -295,6 +295,21 @@ export class SqlEditorComponent implements OnInit, OnDestroy {
             : suggestions;
     }
 
+    private layout(): void {
+        if (this.editor) {
+            this.editor.layout();
+        }
+    }
+
+    setTheme(theme: 'light' | 'dark'): void {
+        this.theme = theme;
+        if (this.editor) {
+            this.editor.updateOptions({
+                theme: theme === 'dark' ? 'sqlLearnerDark' : 'sqlLearnerLight'
+            });
+        }
+    }
+
     private getKeywords(): string[] {
         return [
             'SELECT', 'FROM', 'WHERE', 'GROUP BY', 'ORDER BY', 'HAVING',
@@ -408,45 +423,245 @@ export class SqlEditorComponent implements OnInit, OnDestroy {
 
     private validateSql(sql: string): ValidationError[] {
         const errors: ValidationError[] = [];
-        // Basic validation logic - can be expanded based on requirements
-        if (!sql.trim().toLowerCase().startsWith('select')) {
+        if (!sql.trim()) return errors;
+
+        const lowerSql = sql.toLowerCase().trim();
+        const lines = sql.split('\n');
+        const lastLine = lines[lines.length - 1];
+
+        // Check for multiple SELECT statements
+        const selectCount = (lowerSql.match(/\bselect\b/gi) || []).length;
+        if (selectCount > 1) {
             errors.push({
-                message: 'Query must start with SELECT',
+                message: 'Mehrere SELECT-Statements sind nicht erlaubt. Bitte nur eine Abfrage pro Ausführung.',
+                startLineNumber: 1,
+                startColumn: 1,
+                endLineNumber: lines.length,
+                endColumn: lastLine.length,
+                severity: monaco.MarkerSeverity.Error
+            });
+            return errors;
+        }
+
+        // Basic structure validation
+        if (!lowerSql.startsWith('select')) {
+            errors.push({
+                message: 'Query muss mit SELECT beginnen',
                 startLineNumber: 1,
                 startColumn: 1,
                 endLineNumber: 1,
-                endColumn: 2,
+                endColumn: Math.min(sql.length, 10),
+                severity: monaco.MarkerSeverity.Error
+            });
+            // Don't continue validation if basic structure is wrong
+            return errors;
+        }
+
+        // Extract tables from FROM and JOIN clauses (improved regex)
+        const fromRegex = /\bfrom\s+([a-zA-Z_][a-zA-Z0-9_]*)(?:\s+(?:as\s+)?([a-zA-Z_][a-zA-Z0-9_]*))?\b/i;
+        const joinRegex = /\bjoin\s+([a-zA-Z_][a-zA-Z0-9_]*)(?:\s+(?:as\s+)?([a-zA-Z_][a-zA-Z0-9_]*))?\b/gi;
+        
+        const fromMatch = lowerSql.match(fromRegex);
+        
+        // Check for required FROM clause with valid table name
+        if (!fromMatch) {
+            const fromKeywordPos = lowerSql.indexOf('from');
+            if (fromKeywordPos === -1) {
+                errors.push({
+                    message: 'FROM Klausel fehlt',
+                    startLineNumber: 1,
+                    startColumn: 1,
+                    endLineNumber: lines.length,
+                    endColumn: lastLine.length,
+                    severity: monaco.MarkerSeverity.Error
+                });
+            } else {
+                // FROM exists but table name is missing or invalid
+                errors.push({
+                    message: 'Tabellenname nach FROM fehlt oder ist ungültig',
+                    startLineNumber: this.getLineNumberForPosition(sql, fromKeywordPos),
+                    startColumn: this.getColumnForPosition(sql, fromKeywordPos),
+                    endLineNumber: this.getLineNumberForPosition(sql, fromKeywordPos + 4),
+                    endColumn: this.getColumnForPosition(sql, fromKeywordPos + 4),
+                    severity: monaco.MarkerSeverity.Error
+                });
+            }
+            return errors;
+        }
+        
+        const joinMatches = Array.from(lowerSql.matchAll(joinRegex));
+        
+        // Build a map of table aliases and their actual names
+        const tableAliases = new Map<string, string>();
+        
+        if (fromMatch) {
+            const [, tableName, alias] = fromMatch;
+            tableAliases.set(alias?.toLowerCase() || tableName.toLowerCase(), tableName.toLowerCase());
+            
+            // Validate FROM table exists
+            if (!this.tables.some(t => t.name.toLowerCase() === tableName.toLowerCase())) {
+                const pos = sql.toLowerCase().indexOf(tableName.toLowerCase());
+                errors.push({
+                    message: `Tabelle "${tableName}" existiert nicht in der Datenbank`,
+                    startLineNumber: this.getLineNumberForPosition(sql, pos),
+                    startColumn: this.getColumnForPosition(sql, pos),
+                    endLineNumber: this.getLineNumberForPosition(sql, pos + tableName.length),
+                    endColumn: this.getColumnForPosition(sql, pos + tableName.length),
+                    severity: monaco.MarkerSeverity.Error
+                });
+            }
+        }
+        
+        // Process and validate JOIN clauses
+        joinMatches.forEach(match => {
+            const [fullMatch, tableName, alias] = match;
+            tableAliases.set(alias?.toLowerCase() || tableName.toLowerCase(), tableName.toLowerCase());
+            
+            if (!this.tables.some(t => t.name.toLowerCase() === tableName.toLowerCase())) {
+                const pos = sql.toLowerCase().indexOf(match[0].toLowerCase());
+                errors.push({
+                    message: `Tabelle "${tableName}" existiert nicht in der Datenbank`,
+                    startLineNumber: this.getLineNumberForPosition(sql, pos + match[0].indexOf(tableName)),
+                    startColumn: this.getColumnForPosition(sql, pos + match[0].indexOf(tableName)),
+                    endLineNumber: this.getLineNumberForPosition(sql, pos + match[0].indexOf(tableName) + tableName.length),
+                    endColumn: this.getColumnForPosition(sql, pos + match[0].indexOf(tableName) + tableName.length),
+                    severity: monaco.MarkerSeverity.Error
+                });
+            }
+        });
+
+        // Check for missing ON clause in JOINs
+        const hasJoinWithoutOn = /\bjoin\s+\w+(?!\s+on\b)/i.test(lowerSql);
+        if (hasJoinWithoutOn) {
+            const pos = sql.toLowerCase().indexOf('join');
+            errors.push({
+                message: 'JOIN benötigt eine ON Bedingung',
+                startLineNumber: this.getLineNumberForPosition(sql, pos),
+                startColumn: this.getColumnForPosition(sql, pos),
+                endLineNumber: this.getLineNumberForPosition(sql, pos + 4),
+                endColumn: this.getColumnForPosition(sql, pos + 4),
                 severity: monaco.MarkerSeverity.Error
             });
         }
+
+        // Validate all table.column references
+        const tableColumnRegex = /([a-zA-Z_][a-zA-Z0-9_]*)\.([a-zA-Z_][a-zA-Z0-9_]*)/g;
+        let match;
+        while ((match = tableColumnRegex.exec(sql)) !== null) {
+            const [fullMatch, referenceTableName, columnName] = match;
+            const lowerTableName = referenceTableName.toLowerCase();
+            
+            if (!tableAliases.has(lowerTableName)) {
+                errors.push({
+                    message: `Tabelle oder Alias "${referenceTableName}" wird in der FROM/JOIN Klausel nicht verwendet`,
+                    startLineNumber: this.getLineNumberForPosition(sql, match.index),
+                    startColumn: this.getColumnForPosition(sql, match.index),
+                    endLineNumber: this.getLineNumberForPosition(sql, match.index + referenceTableName.length),
+                    endColumn: this.getColumnForPosition(sql, match.index + referenceTableName.length),
+                    severity: monaco.MarkerSeverity.Error
+                });
+                continue;
+            }
+
+            const actualTableName = tableAliases.get(lowerTableName)!;
+            const table = this.tables.find(t => t.name.toLowerCase() === actualTableName);
+            
+            if (!table) {
+                errors.push({
+                    message: `Tabelle "${actualTableName}" existiert nicht in der Datenbank`,
+                    startLineNumber: this.getLineNumberForPosition(sql, match.index),
+                    startColumn: this.getColumnForPosition(sql, match.index),
+                    endLineNumber: this.getLineNumberForPosition(sql, match.index + referenceTableName.length),
+                    endColumn: this.getColumnForPosition(sql, match.index + referenceTableName.length),
+                    severity: monaco.MarkerSeverity.Error
+                });
+                continue;
+            }
+
+            if (!table.columns.some(c => c.name.toLowerCase() === columnName.toLowerCase())) {
+                const columnStart = match.index + referenceTableName.length + 1;
+                errors.push({
+                    message: `Spalte "${columnName}" existiert nicht in Tabelle "${table.name}"`,
+                    startLineNumber: this.getLineNumberForPosition(sql, columnStart),
+                    startColumn: this.getColumnForPosition(sql, columnStart),
+                    endLineNumber: this.getLineNumberForPosition(sql, columnStart + columnName.length),
+                    endColumn: this.getColumnForPosition(sql, columnStart + columnName.length),
+                    severity: monaco.MarkerSeverity.Error
+                });
+            }
+        }
+
+        // Check for missing semicolon
+        if (!lowerSql.endsWith(';')) {
+            errors.push({
+                message: 'Query muss mit ; enden',
+                startLineNumber: lines.length,
+                startColumn: lastLine.length,
+                endLineNumber: lines.length,
+                endColumn: lastLine.length + 1,
+                severity: monaco.MarkerSeverity.Warning
+            });
+        }
+
         return errors;
     }
 
-    getValue(): string {
-        return this.editor?.getValue() || '';
+    private getLineNumberForPosition(text: string, position: number): number {
+        const textBefore = text.substring(0, position);
+        return (textBefore.match(/\n/g) || []).length + 1;
     }
 
-    setValue(value: string): void {
-        if (!this.editor) return;
-        
-        const currentValue = this.editor.getValue();
-        if (currentValue !== value) {
-            this.editor.setValue(value);
+    private getColumnForPosition(text: string, position: number): number {
+        const textBefore = text.substring(0, position);
+        const lastNewline = textBefore.lastIndexOf('\n');
+        return position - lastNewline;
+    }
+
+    private findColumnReferences(sql: string): Array<{ column: string, table: string, position: number }> {
+        const references: Array<{ column: string, table: string, position: number }> = [];
+        const lowerSql = sql.toLowerCase();
+
+        // Check explicit table.column references
+        const tableColumnRegex = /(\w+)\.(\w+)/g;
+        let match;
+        while ((match = tableColumnRegex.exec(sql)) !== null) {
+            references.push({
+                table: match[1],
+                column: match[2],
+                position: match.index + match[1].length + 1
+            });
         }
+
+        // Check columns in SELECT clause
+        const selectMatch = lowerSql.match(/select\s+((?:(?!from)[^;])*)/i);
+        if (selectMatch) {
+            const selectClause = selectMatch[1];
+            const fromMatch = lowerSql.match(/from\s+(\w+)/i);
+            if (fromMatch) {
+                const defaultTable = fromMatch[1];
+                const columns = selectClause.split(',')
+                    .map(col => col.trim())
+                    .filter(col => !col.includes('.') && !this.isAggregateFunction(col));
+                
+                columns.forEach(col => {
+                    const pos = sql.indexOf(col);
+                    if (pos !== -1) {
+                        references.push({
+                            table: defaultTable,
+                            column: col,
+                            position: pos
+                        });
+                    }
+                });
+            }
+        }
+
+        return references;
     }
 
-    setTheme(isDark: boolean): void {
-        this.theme = isDark ? 'dark' : 'light';
-        this.monacoEditorService.setTheme(isDark);
-    }
-
-    focus(): void {
-        if (!this.editor) return;
-        this.editor.focus();
-    }
-
-    layout(): void {
-        if (!this.editor) return;
-        this.editor.layout();
+    private isAggregateFunction(text: string): boolean {
+        const aggregateFunctions = ['count', 'sum', 'avg', 'min', 'max', 'distinct'];
+        const lower = text.toLowerCase().trim();
+        return aggregateFunctions.some(func => lower.startsWith(func + '('));
     }
 }

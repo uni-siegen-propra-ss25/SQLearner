@@ -38,13 +38,13 @@ export class QueryExerciseComponent {
     onEditorReady() {
         // You can perform any initialization that requires the editor to be ready
         if (this.isDarkMode) {
-            this.sqlEditor.setTheme(true);
+            this.sqlEditor.setTheme('dark');
         }
     }
 
     toggleTheme(isDark: boolean) {
         this.isDarkMode = isDark;
-        this.sqlEditor?.setTheme(isDark);
+        this.sqlEditor?.setTheme(isDark ? 'dark' : 'light');
     }
 
     runQuery(): void {
