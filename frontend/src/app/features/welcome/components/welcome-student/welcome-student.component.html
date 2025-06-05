@@ -50,17 +50,27 @@
   <div class="bottom-row">
     <mat-card class="box question-box">
       <mat-card-title>Fragenforum</mat-card-title>
-      <mat-card-content>
-        <ul>
-          <li *ngFor="let question of questions" class="question-item">
-            <mat-icon color="primary">help_outline</mat-icon>
-            {{ question }}
-          </li>
-        </ul>
-      </mat-card-content>
-      <mat-card-actions align="end">
-        <button mat-button color="primary" (click)="goToFragen()">Frage stellen</button>
-      </mat-card-actions>
-    </mat-card>
+  <mat-card-content>
+
+    <!-- Wenn es Fragen gibt, zeige die letzte Nachricht an -->
+  <div *ngIf="lastMessage; else noMessages" class="last-message">
+  <div class="message-header">
+    <strong>{{ lastMessage.from === 'tutor' ? 'Tutor' : 'Student' }}</strong>
+    <span class="timestamp">{{ lastMessage.timestamp | date: 'dd.MM.yyyy, HH:mm' }}</span>
+  </div>
+  <p>{{ lastMessage.text }}</p>
+  </div>
+
+
+    <!-- Falls keine Nachrichten vorhanden sind -->
+    <ng-template #noMessages>
+      <p>Keine Nachrichten vorhanden.</p>
+    </ng-template>
+
+  </mat-card-content>
+  <mat-card-actions align="end">
+    <button mat-button color="primary" (click)="goToFragen()">Frage stellen</button>
+  </mat-card-actions>
+  </mat-card>
   </div>
 </div>

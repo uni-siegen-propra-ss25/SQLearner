@@ -105,3 +105,29 @@
   margin-top: 80px;;     // mehr Abstand
   display: block;
 }
+.last-message {
+  display: inline-block;         // Box passt sich dem Inhalt an
+  max-width: 100%;               // Verhindert Überlauf bei sehr langen Texten
+  background-color: #cac7ca;   
+  padding: 12px 16px;            // Etwas mehr Horizontalpadding für Optik
+  border-radius: 8px;
+  margin-top: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); // optional für leichte Tiefe
+}
+
+mat-card-title {
+  margin-bottom: 8px;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 8px;
+}
+.message-header {
+  display: flex;
+  align-items: center;
+  gap: 16px; // Abstand zwischen "Tutor" und dem Datum
+  margin-bottom: 4px;
+}
+
+.timestamp {
+  font-size: 0.9rem;
+  color: #555;
+}
