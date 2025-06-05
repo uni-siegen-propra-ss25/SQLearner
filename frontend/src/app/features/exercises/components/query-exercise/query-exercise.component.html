@@ -13,7 +13,14 @@
 
     <!-- SQL Editor -->
     <div class="editor-section">
-      <div #editorContainer class="monaco-editor"></div>
+      <app-sql-editor
+        class="sql-editor"
+        [initialValue]="sqlQuery"
+        [schema]="exercise.database?.schemaSql || ''"
+        [theme]="isDarkMode ? 'dark' : 'light'"
+        (valueChange)="onSqlChange($event)"
+        (editorReady)="onEditorReady()"
+      ></app-sql-editor>
     </div>
 
     <!-- Actions -->
