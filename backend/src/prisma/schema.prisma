@@ -66,14 +66,6 @@ model User {
   messages ChatMessage[]
 }
 
-/// System settings for the application
-model Settings {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique
-  value       String   // JSON string for complex settings
-  description String? 
-}
-
 /// Chat messages between users and the AI assistant
 model ChatMessage {
   id        Int           @id @default(autoincrement())
@@ -98,9 +90,7 @@ model Database {
   description String?
 
   schemaSql   String?    // original SQL dump - full CREATE TABLE / INSERT statements
-  exampleQueries String? // example SQL queries for this database (JSON array of queries)
 
-  // TODO: check if this is needed
   ownerId Int
   owner   User @relation(fields: [ownerId], references: [id])
 
@@ -109,7 +99,6 @@ model Database {
 
   exercises   Exercise[]
 }
-
 
 /// Top-level grouping of chapters (e.g. "Relational Algebra", "Joins")
 model Chapter{
