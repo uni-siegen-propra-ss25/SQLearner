@@ -1,0 +1,36 @@
+<div class="fragenforum-container">
+  <div class="fragenforum-header">
+    <h1>SQLearner</h1>
+    <p>Fragenforum – Stellen Sie dem Tutor Fragen</p>
+  </div>
+
+  <div class="chat-messages">
+    <div
+      *ngFor="let msg of messages"
+      class="message"
+      [ngClass]="{ 'from-student': msg.from === 'student', 'from-tutor': msg.from === 'tutor' }"
+    >
+      <div class="message-text">{{ msg.text }}</div>
+      <div class="message-info">
+        <span class="timestamp">{{ msg.timestamp | date: 'dd.MM.yyyy, HH:mm' }}</span>
+        <button *ngIf="msg.from === 'student'" (click)="deleteMessage(msg)" mat-icon-button>
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-input">
+    <mat-form-field appearance="fill" class="input-field">
+      <mat-label>Deine Frage</mat-label>
+      <input matInput [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" />
+    </mat-form-field>
+
+    <input type="file" hidden #fileInput (change)="handleFileUpload($event)" />
+    <button mat-icon-button (click)="fileInput.click()">
+      <mat-icon>attach_file</mat-icon>
+    </button>
+
+    <button mat-raised-button color="primary" (click)="sendMessage()">Senden</button>
+  </div>
+</div>

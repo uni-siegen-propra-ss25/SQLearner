@@ -1,0 +1,60 @@
+<ng-container *ngIf="exercise" class="exercise-container">
+  <div class="exercise-header">
+    <div class="header-left">
+      <button mat-icon-button (click)="goBack()" matTooltip="Zurück">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="metadata">
+        <div class="type-badge">
+          <mat-icon>{{ getTypeIcon() }}</mat-icon>
+          {{ getTypeLabel() }}
+        </div>
+        <div class="difficulty-badge" [style.background-color]="getDifficultyColor()">
+          {{ exercise.difficulty }}
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button
+        mat-icon-button
+        (click)="toggleChat()"
+        [matTooltip]="isChatOpen ? 'Chat schließen' : 'KI Assistent öffnen'"
+      >
+        <mat-icon>{{ isChatOpen ? 'close' : 'chat' }}</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="exercise-content" [class.chat-open]="isChatOpen">
+    <div class="main-content">
+      <mat-card>
+        <app-query-exercise *ngIf="exercise.type === ExerciseType.QUERY" [exercise]="exercise">
+        </app-query-exercise>
+
+        <app-choice-exercise
+          *ngIf="
+            exercise.type === ExerciseType.SINGLE_CHOICE ||
+            exercise.type === ExerciseType.MULTIPLE_CHOICE
+          "
+          [exercise]="exercise"
+        >
+        </app-choice-exercise>
+
+        <app-freetext-exercise
+          *ngIf="exercise.type === ExerciseType.FREETEXT"
+          [exercise]="exercise"
+        >
+        </app-freetext-exercise>
+      </mat-card>
+    </div>
+
+    <app-chat-panel
+      *ngIf="isChatOpen"
+      [context]="exercise.id.toString()"
+      (close)="toggleChat()"
+      class="chat-panel"
+      [@slideInOut]
+    >
+    </app-chat-panel>
+  </div>
+</ng-container>

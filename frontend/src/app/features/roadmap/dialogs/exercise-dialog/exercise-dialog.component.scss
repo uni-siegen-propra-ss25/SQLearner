@@ -1,0 +1,105 @@
+.full-width {
+  width: 100%;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+
+  mat-form-field {
+    flex: 1;
+  }
+}
+
+.answers-container {
+  margin: 16px 0;
+
+  h3 {
+    margin-bottom: 16px;
+    color: var(--mat-primary-text);
+  }
+}
+
+.answer-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+
+  .answer-text {
+    flex: 1;
+  }
+
+  mat-checkbox {
+    margin: 0 16px;
+  }
+}
+
+.add-answer-button {
+  margin-top: 8px;
+  width: 100%;
+}
+
+.choices-container {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.choice-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: rgba(33, 150, 243, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+}
+
+.choice-text {
+  flex: 1;
+}
+
+.add-choice-button {
+  width: 100%;
+  margin-top: 12px;
+}
+
+mat-dialog-content {
+  min-width: 500px;
+  max-width: 800px;
+  padding: 24px;
+}
+
+textarea {
+  min-height: 120px;
+  border-radius: 8px;
+}
+
+// Dark theme adjustments
+:host-context(.dark-theme) {
+  .choices-container {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .choice-row {
+    background: rgba(255, 255, 255, 0.02);
+    border-color: rgba(255, 255, 255, 0.06);
+
+    &:hover {
+      border-color: rgba(33, 150, 243, 0.3);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+  }
+}

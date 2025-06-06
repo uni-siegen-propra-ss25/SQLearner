@@ -1,0 +1,82 @@
+.fragenforum-container {
+  padding: 2rem;
+  max-width: 80vw;
+  margin: 0 auto;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.fragenforum-header {
+  background-color: #cfdae1;
+  padding: 1.5rem;
+  color: rgb(0, 0, 0);
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  text-align: center;
+
+  h1 {
+    margin: 0;
+    font-size: 2rem;
+  }
+
+  p {
+    margin: 0.5rem 0 0;
+    font-size: 1.1rem;
+  }
+}
+
+.chat-messages {
+  background-color: #f1f1f1;
+  padding: 1rem;
+  border-radius: 8px;
+  height: 400px;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+
+  .message {
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    max-width: 60%;
+    position: relative;
+
+    &.from-student {
+      background-color: #b8f0cd;
+      align-self: flex-end;
+      margin-left: auto;
+    }
+
+    &.from-tutor {
+      background-color: #cac7ca;
+      align-self: flex-start;
+    }
+
+    .message-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: #555;
+      margin-top: 0.5rem;
+
+      button {
+        background: none;
+        border: none;
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.chat-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .input-field {
+    flex-grow: 1;
+  }
+
+  button {
+    min-width: 40px;
+    min-height: 40px;
+  }
+}

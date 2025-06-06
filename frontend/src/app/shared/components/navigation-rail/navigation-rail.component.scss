@@ -1,0 +1,107 @@
+.navigation-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100px;
+  height: 100%;
+  background-color: #1e1e1e;
+  color: white;
+}
+
+.menu-fab {
+  padding: 16px 0;
+  text-align: center;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.brand-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  fill: white;
+  color: white;
+}
+
+.default-logo {
+  font-size: 32px;
+  height: 32px;
+  width: 32px;
+  color: #7b68ee; /* Purple color similar to the image */
+}
+
+.segment {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  flex: 1;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 4px;
+  margin: 4px 8px;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+  border: none;
+  background: transparent;
+
+  &:hover {
+    color: white;
+
+    .icon-container {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  &.active {
+    color: white;
+
+    .icon-container {
+      background-color: rgba(255, 255, 255, 0.1);
+
+      mat-icon {
+        color: #7b68ee;
+      }
+    }
+  }
+}
+
+.icon-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 4px;
+  padding: 12px;
+  border-radius: 12px;
+  transition: background-color 0.2s ease;
+
+  mat-icon {
+    font-size: 24px;
+    height: 24px;
+    width: 24px;
+  }
+}
+
+.label-text {
+  font-size: 12px;
+  text-align: center;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav-footer {
+  margin-top: auto;
+  width: 100%;
+  padding: 16px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

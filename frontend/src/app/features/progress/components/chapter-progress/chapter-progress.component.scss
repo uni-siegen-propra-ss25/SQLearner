@@ -1,0 +1,133 @@
+/* Main container with top margin */
+.chapter-progress {
+    margin-top: 24px;
+    
+    h3 {
+        margin-bottom: 16px;
+        font-weight: 500;
+        font-size: 1.2rem;
+    }
+}
+
+/* Scrollable list container for multiple chapters */
+.chapters-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+/* Individual chapter card with hover effects and completion styling */
+.chapter-item {
+    background-color: rgba(0, 0, 0, 0.03);
+    border-radius: 8px;
+    padding: 16px;
+    transition: all 0.2s ease;
+    margin-bottom: 16px;
+    
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.06);
+    }
+    
+    /* Green border for 100% completed chapters */
+    &.completed {
+        border-left: 4px solid #4caf50;
+        background-color: rgba(76, 175, 80, 0.05);
+    }
+}
+
+/* Chapter title and exercise count layout */
+.chapter-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    
+    h4 {
+        margin: 0;
+        font-weight: 500;
+        font-size: 1rem;
+    }
+    
+    .completion {
+        font-size: 0.9rem;
+        color: rgba(0, 0, 0, 0.6);
+    }
+}
+
+/* Percentage text styling */
+p {
+    font-size: 1rem;
+    margin: 4px 0;
+}
+
+/* Empty state centered layout */
+.no-progress {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    text-align: center;
+    padding: 16px;
+    
+    mat-icon {
+        font-size: 48px;
+        height: 48px;
+        width: 48px;
+        margin-bottom: 16px;
+        color: rgba(0, 0, 0, 0.4);
+    }
+    
+    p {
+        margin: 8px 0;
+        color: rgba(0, 0, 0, 0.6);
+    }
+    
+    .hint {
+        font-size: 0.9rem;
+        max-width: 300px;
+    }
+}
+
+/* Custom scrollbar styling */
+.chapters-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chapters-list::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+}
+
+.chapters-list::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+/* Progress bar base styling */
+.bar {
+    height: 10px;
+    border-radius: 5px;
+    margin: 4px 0 12px 0;
+    background-color: #e0e0e0;
+    position: relative;
+}
+
+/* Progress bar color variants based on completion percentage */
+.bar.average {
+    background-color: #64b5f6; /* Light blue for < 50% progress */
+}
+
+.bar.correct {
+    background-color: #81c784; /* Green for >= 50% progress */
+}
+
+.bar.medium {
+    background-color: #fff176; /* Yellow (unused in this component) */
+}
+
+.bar.wrong {
+    background-color: #e57373; /* Red (unused in this component) */
+}

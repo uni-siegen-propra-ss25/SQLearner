@@ -1,0 +1,271 @@
+:host {
+  display: block;
+
+  mat-dialog-content {
+    min-width: 800px;
+    max-width: 1200px;
+    padding: 24px;
+  }
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+mat-form-field {
+  display: block;
+
+  ::ng-deep {
+    .mat-form-field-wrapper {
+      padding-bottom: 0;
+    }
+    
+    .mat-form-field-flex {
+      background-color: #f8f9fa;
+      border-radius: 4px;
+    }
+  }
+
+  &:last-of-type {
+    margin-bottom: 0;
+  }
+}
+
+textarea {
+  min-height: 200px;
+  resize: vertical;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 12px;
+  tab-size: 4;
+}
+
+.sql-schema-field {
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+
+  mat-form-field {
+    margin-bottom: 0;
+  }
+}
+
+mat-dialog-actions {
+  padding: 16px 24px;
+  margin: 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+
+  button {
+    min-width: 100px;
+
+    &[color='primary'] {
+      margin-left: 8px;
+    }
+  }
+}
+
+// Dark theme adjustments
+:host-context(.dark-theme) {
+  .sql-schema-field {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  mat-dialog-actions {
+    border-top-color: rgba(255, 255, 255, 0.08);
+  }
+
+  mat-form-field {
+    ::ng-deep {
+      .mat-form-field-flex {
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+    }
+  }
+}
+
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 0 8px;
+}
+
+.sql-schema-field {
+  margin-top: 16px;
+}
+
+.query-section {
+  margin-top: 24px;
+  padding: 16px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+
+  h3 {
+    margin: 0 0 16px 0;
+    color: #333;
+  }
+}
+
+.query-actions {
+  display: flex;
+  gap: 12px;
+  margin: 20px 0;
+  padding: 0 4px;
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 140px;
+    height: 40px;
+    
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      margin-right: 4px;
+    }
+
+    &.execute-button {
+      background-color: #2196f3;
+      color: white;
+      
+      &:hover:not([disabled]) {
+        background-color: #1976d2;
+      }
+      
+      &:disabled {
+        background-color: rgba(33, 150, 243, 0.5);
+      }
+    }
+
+    &.clear-button {
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      
+      &:hover:not([disabled]) {
+        background-color: rgba(0, 0, 0, 0.04);
+      }
+    }
+  }
+}
+
+// Dark theme adjustments for buttons
+:host-context(.dark-theme) {
+  .query-actions {
+    button {
+      &.clear-button {
+        border-color: rgba(255, 255, 255, 0.12);
+        
+        &:hover:not([disabled]) {
+          background-color: rgba(255, 255, 255, 0.04);
+        }
+      }
+    }
+  }
+}
+
+.query-results {
+  margin-top: 16px;
+
+  h4 {
+    margin: 0 0 16px 0;
+    color: #333;
+    font-size: 18px;
+    font-weight: 500;
+  }
+}
+
+.result-table {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 8px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  table {
+    width: 100%;
+  }
+
+  th {
+    background-color: #f0f0f0;
+    font-weight: 500;
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  td, th {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  tr:nth-child(even) {
+    background-color: #fafafa;
+  }
+
+  tr:hover {
+    background-color: #f5f5f5;
+  }
+}
+
+.no-results {
+  padding: 24px;
+  text-align: center;
+  color: #666;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.query-info {
+  margin-top: 16px;
+  font-size: 14px;
+  color: #666;
+  padding: 8px 0;
+}
+
+// Dark theme adjustments
+:host-context(.dark-theme) {
+  .query-results {
+    h4 {
+      color: #fff;
+    }
+  }
+
+  .result-table {
+    th {
+      background-color: #424242;
+      color: #fff;
+    }
+
+    td {
+      border-bottom-color: rgba(255, 255, 255, 0.08);
+    }
+
+    tr:nth-child(even) {
+      background-color: #303030;
+    }
+
+    tr:hover {
+      background-color: #383838;
+    }
+  }
+
+  .no-results {
+    background-color: #303030;
+    color: #bdbdbd;
+  }
+
+  .query-info {
+    color: #bdbdbd;
+  }
+}

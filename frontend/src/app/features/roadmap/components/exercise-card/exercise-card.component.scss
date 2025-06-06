@@ -1,0 +1,226 @@
+// Main exercise card styling
+.exercise-card {
+  margin: 12px 0; // Vertical spacing between cards
+  border-radius: 16px; // Rounded corners
+  background-color: white; // Light theme background
+  transition: all 0.2s ease-in-out; // Smooth animations
+  border: 1px solid rgba(0, 0, 0, 0.08); // Subtle border
+  position: relative; // For positioning child elements
+  overflow: hidden; // Prevent content overflow
+
+  // Hover effects for better interactivity
+  &:hover {
+    transform: translateY(-2px); // Slight lift effect
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08); // Enhanced shadow
+    border-color: rgba(0, 0, 0, 0.12); // Darker border
+  }
+
+  // Dragging state styling
+  &.dragging {
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15); // Stronger shadow
+    transform: scale(1.02); // Slight scale increase
+    opacity: 0.9; // Subtle transparency
+  }
+
+  // Clickable state for student cards
+  &.clickable {
+    cursor: pointer; // Pointer cursor
+    transition: box-shadow 0.2s; // Smooth transition
+
+    &:hover {
+      box-shadow: 0 4px 16px rgba(33, 150, 243, 0.12); // Blue shadow
+      border-color: #2196f3; // Blue border
+    }
+  }
+}
+
+// Card header styling
+mat-card-header {
+  padding: 20px 20px 0; // Custom padding
+  margin-bottom: 0; // Remove default margin
+
+  .header-content {
+    display: flex; // Flexbox layout
+    justify-content: space-between; // Space between title and actions
+    align-items: flex-start; // Align to top
+    width: 100%; // Full width
+  }
+
+  .title-section {
+    flex: 1; // Take available space
+    margin-right: 16px; // Space from action buttons
+  }
+
+  mat-card-title {
+    font-size: 1.25rem; // Larger title font
+    font-weight: 600; // Semi-bold weight
+    margin-bottom: 16px; // Space below title
+    color: rgba(0, 0, 0, 0.87); // Dark text color
+  }
+}
+
+// Badge container and styling
+.badges {
+  display: flex; // Horizontal layout
+  gap: 12px; // Space between badges
+  align-items: center; // Center alignment
+  flex-wrap: wrap; // Allow wrapping
+}
+
+// Difficulty badge styling
+.difficulty-badge {
+  padding: 4px 12px; // Internal padding
+  border-radius: 20px; // Pill shape
+  color: white; // White text
+  font-size: 0.8rem; // Smaller font
+  font-weight: 500; // Medium weight
+  text-transform: lowercase; // Lowercase text
+  letter-spacing: 0.02em; // Slight letter spacing
+  display: flex; // Flex layout
+  align-items: center; // Center content
+}
+
+// Exercise type badge styling
+.type-badge {
+  display: flex; // Flex layout
+  align-items: center; // Center alignment
+  gap: 6px; // Space between icon and text
+  padding: 4px 12px; // Internal padding
+  border-radius: 20px; // Pill shape
+  background-color: rgba(0, 0, 0, 0.05); // Light background
+  color: rgba(0, 0, 0, 0.7); // Dark text
+  font-size: 0.8rem; // Smaller font
+  font-weight: 500; // Medium weight
+
+  mat-icon {
+    font-size: 16px; // Icon size
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// Action buttons container
+.action-buttons {
+  display: flex; // Horizontal layout
+  gap: 8px; // Space between buttons
+  
+  // Bookmark button specific styling
+  .bookmark-button {
+    transition: all 0.2s ease-in-out; // Smooth transitions
+    
+    &:hover {
+      transform: scale(1.1); // Scale on hover
+    }
+    
+    &:disabled {
+      opacity: 0.6; // Disabled state
+    }
+    
+    mat-icon {
+      transition: color 0.2s ease-in-out; // Color transition
+    }
+  }
+}
+
+// Card content styling
+mat-card-content {
+  padding: 20px; // Standard padding
+  padding-top: 16px; // Less top padding
+}
+
+// Exercise description styling
+.exercise-description {
+  color: rgba(0, 0, 0, 0.7); // Muted text color
+  font-size: 0.95rem; // Slightly smaller font
+  line-height: 1.6; // Better readability
+  margin-bottom: 24px; // Space below description
+}
+
+// Metadata section styling
+.exercise-metadata {
+  display: flex; // Horizontal layout
+  flex-wrap: wrap; // Allow wrapping
+  gap: 16px; // Space between items
+  padding-top: 16px; // Top padding
+  border-top: 1px solid rgba(0, 0, 0, 0.08); // Top border
+}
+
+// Individual metadata item styling
+.metadata-item {
+  display: flex; // Horizontal layout
+  align-items: center; // Center alignment
+  gap: 6px; // Space between icon and text
+  color: rgba(0, 0, 0, 0.6); // Muted text color
+  font-size: 0.85rem; // Small font size
+
+  mat-icon {
+    font-size: 18px; // Icon size
+    width: 18px;
+    height: 18px;
+  }
+}
+
+// Drag handle for reordering
+.drag-handle {
+  position: absolute; // Absolute positioning
+  top: 50%; // Center vertically
+  right: 0; // Right edge
+  transform: translateY(-50%); // Center transform
+  padding: 8px; // Click area
+  cursor: move; // Move cursor
+  opacity: 0; // Hidden by default
+  transition: opacity 0.2s ease; // Fade transition
+  color: rgba(0, 0, 0, 0.3); // Muted color
+
+  &:hover {
+    color: rgba(0, 0, 0, 0.6); // Darker on hover
+  }
+}
+
+// Show drag handle on card hover
+.exercise-card:hover .drag-handle {
+  opacity: 1; // Show handle
+}
+
+// Dark theme adjustments
+:host-context(.dark-theme) {
+  .exercise-card {
+    background-color: rgba(255, 255, 255, 0.05); // Dark background
+    border-color: rgba(255, 255, 255, 0.1); // Light border
+
+    &:hover {
+      border-color: rgba(255, 255, 255, 0.15); // Lighter border
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); // Stronger shadow
+    }
+  }
+
+  // Dark theme text colors
+  mat-card-title {
+    color: rgba(255, 255, 255, 0.87); // Light text
+  }
+
+  .type-badge {
+    background-color: rgba(255, 255, 255, 0.1); // Light background
+    color: rgba(255, 255, 255, 0.7); // Light text
+  }
+
+  .exercise-description {
+    color: rgba(255, 255, 255, 0.7); // Light text
+  }
+
+  .exercise-metadata {
+    border-top-color: rgba(255, 255, 255, 0.1); // Light border
+  }
+
+  .metadata-item {
+    color: rgba(255, 255, 255, 0.6); // Light text
+  }
+
+  .drag-handle {
+    color: rgba(255, 255, 255, 0.3); // Light color
+
+    &:hover {
+      color: rgba(255, 255, 255, 0.6); // Lighter on hover
+    }
+  }
+}

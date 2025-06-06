@@ -1,0 +1,135 @@
+:host {
+  display: block;
+  margin: 8px 0;
+}
+
+::ng-deep {
+  .mat-expansion-panel {
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    border-left: 2px solid var(--md-sys-color-outline-variant);
+    margin-left: -2px;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.01) !important;
+      border-left-color: var(--md-sys-color-primary);
+    }
+  }
+
+  .mat-expansion-panel-header {
+    padding: 16px 16px 16px 24px;
+    height: auto !important;
+
+    &:hover {
+      background: transparent !important;
+    }
+  }
+
+  .mat-expansion-panel-header-title {
+    color: var(--md-sys-color-on-surface);
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-right: 16px;
+  }
+
+  .mat-expansion-panel-body {
+    padding: 0 24px 16px 24px !important;
+  }
+
+  .mat-expansion-indicator::after {
+    border-width: 0 2px 2px 0 !important;
+    padding: 3px !important;
+    color: var(--md-sys-color-on-surface);
+  }
+}
+
+.topic-panel {
+  margin: 8px 0;
+  border-radius: 12px;
+  background-color: var(--mat-surface-container-low);
+
+  .mat-expansion-panel-header {
+    padding: 20px;
+    height: auto;
+
+    &:hover {
+      background-color: var(--mat-surface-container-hover);
+    }
+  }
+
+  .topic-title {
+    font-size: 1rem;
+    font-weight: 500;
+    width: 100%;
+    color: var(--mat-primary-text);
+  }
+
+  .topic-actions {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+  }
+
+  .topic-description {
+    color: var(--mat-secondary-text);
+    margin: 0 20px 20px;
+    line-height: 1.6;
+  }
+}
+
+.exercises-container {
+  padding: 0 20px 20px;
+}
+
+.empty-exercises {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px;
+  color: var(--mat-secondary-text);
+  text-align: center;
+  background: var(--mat-surface-container-lowest);
+  border-radius: 8px;
+  margin: 8px 0;
+
+  mat-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    margin-bottom: 12px;
+    opacity: 0.7;
+  }
+}
+
+.add-exercise-button {
+  margin-top: 16px;
+  width: 100%;
+}
+
+// Dark theme adjustments
+:host-context(.dark-theme) {
+  ::ng-deep {
+    .mat-expansion-panel {
+      &:hover {
+        background: rgba(255, 255, 255, 0.03) !important;
+      }
+    }
+
+    .mat-expansion-panel-header-title {
+      color: var(--md-sys-color-on-surface);
+    }
+
+    .mat-expansion-indicator::after {
+      color: var(--md-sys-color-on-surface);
+    }
+  }
+
+  .topic-description {
+    color: var(--md-sys-color-on-surface-variant);
+  }
+
+  .empty-exercises {
+    color: var(--md-sys-color-on-surface-variant);
+  }
+}

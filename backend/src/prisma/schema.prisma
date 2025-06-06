@@ -1,0 +1,229 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+
+/// User roles in the system
+enum Role {
+  STUDENT
+  TUTOR
+  ADMIN
+}
+
+/// Types of exercises supported
+enum ExerciseType {
+  SINGLE_CHOICE
+  MULTIPLE_CHOICE
+  QUERY
+  FREETEXT
+}
+
+/// Difficulty levels for exercises
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+/// Message sender type
+enum MessageSender {
+  user
+  assistant
+}
+
+// Models
+
+/// Application users
+model User {
+  id           Int       @id @default(autoincrement())  
+  email        String    @unique
+  password     String
+  firstName    String
+  lastName     String
+  role         Role   @default(STUDENT)
+  matriculationNumber String? @unique
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  submissions  Submission[]
+  progress     Progress[]
+  bookmarks    Bookmark[]
+
+  Database Database[]
+  messages ChatMessage[]
+}
+
+/// System settings for the application
+model Settings {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  value       String   // JSON string for complex settings
+  description String? 
+}
+
+/// Chat messages between users and the AI assistant
+model ChatMessage {
+  id        Int           @id @default(autoincrement())
+  content   String
+  sender    MessageSender
+  userId    Int
+  context   String?
+  replyToId Int?
+
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  replyTo   ChatMessage?  @relation("ReplyToMessage", fields: [replyToId], references: [id])
+  replies   ChatMessage[] @relation("ReplyToMessage")
+
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+/// Imported or self-created database definitions
+model Database {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+
+  schemaSql   String?    // original SQL dump - full CREATE TABLE / INSERT statements
+  exampleQueries String? // example SQL queries for this database (JSON array of queries)
+
+  // TODO: check if this is needed
+  ownerId Int
+  owner   User @relation(fields: [ownerId], references: [id])
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  exercises   Exercise[]
+}
+
+
+/// Top-level grouping of chapters (e.g. "Relational Algebra", "Joins")
+model Chapter{
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String?
+  order       Int        @default(0)
+
+  topics    Topic[]
+}
+
+/// Subdivision innerhalb eines Chapters (z.B. "JOIN variants")
+model Topic {
+  id           Int          @id @default(autoincrement())
+  chapterId    Int
+  title        String
+  description  String?
+  order       Int          @default(0)
+
+  chapter      Chapter      @relation(fields: [chapterId], references: [id])
+  exercises    Exercise[]
+}
+
+/// Core exercise entity
+model Exercise {
+  id              Int             @id @default(autoincrement())
+  topicId         Int
+  title           String
+  description     String
+  type            ExerciseType
+  difficulty      Difficulty      @default(MEDIUM)
+  order           Int             @default(0)
+
+  database        Database?       @relation(fields: [databaseId], references: [id])
+  databaseId      Int?            // only for SQL_QUERY
+  querySolution     String?         // Direct SQL solution for SQL_QUERY type
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  topic           Topic           @relation(fields: [topicId], references: [id])
+  answers         AnswerOption[]  @relation("ExerciseAnswers")
+  submissions     Submission[]
+  bookmarks       Bookmark[]
+  Progress        Progress[]
+}
+
+/// Single/Multiple-Choice options
+model AnswerOption {
+  id          Int       @id @default(autoincrement())
+  exerciseId  Int
+  text        String
+  isCorrect   Boolean   @default(false)
+  order       Int       @default(0)
+
+  exercise    Exercise  @relation("ExerciseAnswers", fields: [exerciseId], references: [id])
+}
+
+/// A student's submission on an exercise
+model Submission {
+  id             Int      @id @default(autoincrement())
+
+  userId         Int
+  exerciseId     Int
+
+  answerText     String      // SQL text, chosen option IDs, or free text
+  isCorrect      Boolean     @default(false)
+  feedback       String?     // LLM-generated feedback
+  createdAt      DateTime    @default(now())
+
+  user          User      @relation(fields: [userId], references: [id])
+  exercise      Exercise  @relation(fields: [exerciseId], references: [id])
+
+  session        DbSession?
+}
+
+/// Isolated DB session/container for SQL execution
+model DbSession {
+  id            Int      @id @default(autoincrement())
+  submissionId  Int      @unique
+  containerId   String      // e.g. Docker container name or ID
+  status        String      // "running" | "finished" | "failed"
+  startedAt     DateTime    @default(now())
+  endedAt       DateTime?
+
+  submission    Submission  @relation(fields: [submissionId], references: [id])
+}
+
+/// Bookmark that a user sets on an exercise to revisit later
+model Bookmark {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  exerciseId  Int
+  createdAt   DateTime   @default(now())
+
+  user        User       @relation(fields: [userId], references: [id])
+  exercise    Exercise   @relation(fields: [exerciseId], references: [id])
+
+  @@unique([userId, exerciseId])
+}
+
+/// Track each student's progress per exercise
+model Progress {
+  id            Int       @id @default(autoincrement())
+  userId        Int
+  exerciseId    Int
+  attempts      Int        @default(0)
+  lastAttemptAt DateTime   @updatedAt
+
+  isPassed      Boolean   @default(false)
+  passedAt      DateTime? 
+
+  user          User       @relation(fields: [userId], references: [id])
+  exercise      Exercise   @relation(fields: [exerciseId], references: [id])
+
+  @@unique([userId, exerciseId])
+}

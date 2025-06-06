@@ -1,0 +1,160 @@
+// Host element styling
+:host {
+  display: block;
+  margin-bottom: 16px; // Space between chapters
+}
+
+// Global Material Design overrides
+::ng-deep {
+  // Expansion panel base styling
+  .mat-expansion-panel {
+    background: transparent !important; // Remove default background
+    box-shadow: none !important; // Remove shadow
+    border-radius: 0 !important; // Remove rounded corners
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08); // Add subtle border
+
+    // Hover effect
+    &:hover {
+      background: rgba(0, 0, 0, 0.01) !important;
+    }
+  }
+
+  // Header styling
+  .mat-expansion-panel-header {
+    padding: 0; // Remove default padding
+    font-size: 1.25rem; // Larger font for chapter titles
+    height: auto !important; // Dynamic height
+
+    // Remove hover background
+    &:hover {
+      background: transparent !important;
+    }
+  }
+
+  // Title styling
+  .mat-expansion-panel-header-title {
+    color: var(--md-sys-color-on-surface); // Theme-aware color
+    font-weight: 500; // Medium weight
+    margin-right: 16px; // Space from actions
+  }
+
+  // Content area padding
+  .mat-expansion-panel-body {
+    padding: 0 0 8px 8px !important; // Minimal padding
+  }
+
+  // Expansion indicator arrow
+  .mat-expansion-indicator::after {
+    border-width: 0 2px 2px 0 !important; // Arrow thickness
+    padding: 3px !important; // Arrow size
+    color: var(--md-sys-color-on-surface); // Theme color
+  }
+}
+
+// Chapter panel specific styles
+.chapter-panel {
+  margin-bottom: 16px; // Space between chapters
+  border-radius: 16px; // Rounded corners
+  background-color: transparent; // Transparent background
+
+  // Header override for chapter panel
+  .mat-expansion-panel-header {
+    padding: 24px; // Generous padding
+    height: auto; // Dynamic height
+
+    // Hover effect
+    &:hover {
+      background-color: var(--mat-surface-hover); // Subtle hover
+    }
+  }
+
+  // Chapter title styling
+  .chapter-title {
+    font-size: 1.1rem; // Slightly larger font
+    font-weight: 500; // Medium weight
+    color: var(--mat-primary-text); // Primary text color
+  }
+
+  // Action buttons container
+  .chapter-actions {
+    display: flex; // Horizontal layout
+    gap: 8px; // Space between buttons
+    margin-left: auto; // Push to right
+  }
+
+  // Topic description text
+  .topic-description {
+    color: var(--mat-secondary-text); // Secondary text color
+    margin: 0 20px 20px; // Margin around text
+    line-height: 1.6; // Better readability
+  }
+}
+
+// Topics container
+.topics-container {
+  padding: 0 24px 24px; // Padding around topics
+}
+
+// Empty state styling
+.empty-topics {
+  display: flex; // Vertical layout
+  flex-direction: column;
+  align-items: center; // Center alignment
+  padding: 32px; // Generous padding
+  color: var(--mat-secondary-text); // Muted color
+  text-align: center; // Center text
+
+  // Large icon for empty state
+  mat-icon {
+    font-size: 48px; // Large icon
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px; // Space below icon
+    opacity: 0.7; // Subtle opacity
+  }
+}
+
+// Add topic button
+.add-topic-button {
+  margin-top: 16px; // Space above button
+  width: 100%; // Full width
+}
+
+// Dark theme adjustments
+:host-context(.dark-theme) {
+  ::ng-deep {
+    // Dark theme expansion panel
+    .mat-expansion-panel {
+      border-bottom-color: rgba(255, 255, 255, 0.08); // Light border
+
+      // Dark theme hover
+      &:hover {
+        background: rgba(255, 255, 255, 0.03) !important;
+      }
+    }
+
+    // Dark theme text colors
+    .mat-expansion-panel-header-title {
+      color: var(--md-sys-color-on-surface);
+    }
+
+    .mat-expansion-indicator::after {
+      color: var(--md-sys-color-on-surface);
+    }
+  }
+
+  // Dark theme chapter description
+  .chapter-description {
+    color: var(--md-sys-color-on-surface-variant);
+  }
+
+  // Dark theme topics container
+  .topics-container::before {
+    background: var(--md-sys-color-outline-variant);
+  }
+
+  // Dark theme empty state
+  .empty-topics {
+    color: var(--md-sys-color-on-surface-variant);
+  }
+}

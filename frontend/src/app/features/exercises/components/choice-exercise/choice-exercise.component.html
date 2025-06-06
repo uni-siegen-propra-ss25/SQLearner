@@ -1,0 +1,65 @@
+<div class="choice-exercise">
+  <mat-card-content>
+    <h2 class="exercise-title">{{ exercise.title }}</h2>
+    <p class="exercise-description">{{ exercise.description }}</p>
+
+    <div class="options-container">
+      <!-- Single Choice -->
+      <mat-radio-group
+        *ngIf="exercise.type === ExerciseType.SINGLE_CHOICE"
+        [(ngModel)]="selectedOptions[0]"
+        required
+        aria-label="Select an answer option"
+      >
+        <div
+          *ngFor="let option of exercise.answers"
+          class="option"
+          (click)="option.id && (selectedOptions[0] = option.id)"
+        >
+          <mat-radio-button [value]="option.id">
+            {{ option.text }}
+          </mat-radio-button>
+        </div>
+      </mat-radio-group>
+
+      <!-- Multiple Choice -->
+      <div *ngIf="exercise.type === ExerciseType.MULTIPLE_CHOICE" class="multiple-choice">
+        <div
+          *ngFor="let option of exercise.answers"
+          class="option"
+          (click)="option.id && toggleOption(option.id)"
+        >
+          <mat-checkbox
+            [checked]="selectedOptions.includes(option.id!)"
+            (change)="toggleOption(option.id!)"
+          >
+            {{ option.text }}
+          </mat-checkbox>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button
+        mat-flat-button
+        color="primary"
+        [disabled]="selectedOptions.length === 0 || isSubmitting"
+        (click)="submitAnswer()"
+      >
+        <mat-icon>{{ isSubmitting ? 'hourglass_empty' : 'check' }}</mat-icon>
+        {{ isSubmitting ? 'Submitting...' : 'Submit Answer' }}
+      </button>
+    </div>
+
+    <!-- Feedback Section -->
+    <mat-expansion-panel *ngIf="showFeedback" class="feedback-section">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <mat-icon>chat</mat-icon>
+          AI Feedback
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <p>{{ feedback || 'Loading feedback...' }}</p>
+    </mat-expansion-panel>
+  </mat-card-content>
+</div>

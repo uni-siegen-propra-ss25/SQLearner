@@ -1,0 +1,48 @@
+.app-container {
+  height: 100vh;
+  width: 100vw;
+  background-color: var(--background-color);
+}
+
+.sidenav {
+  width: 100px;
+  border-radius: 0;
+  border-right: 1px solid var(--border-color);
+  background-color: var(--surface-color);
+
+  ::ng-deep .mat-drawer-inner-container {
+    border-radius: 0;
+    overflow: hidden;
+  }
+}
+
+.sidenav-content {
+  overflow-x: hidden;
+  background-color: var(--background-color);
+}
+
+.sidenav-content-wrapper {
+  color: var(--text-color);
+}
+
+// Override Material's default border radius
+::ng-deep {
+  .mat-drawer,
+  .mat-drawer-container {
+    border-radius: 0 !important;
+  }
+}
+
+:root {
+  --background-color: #ffffff;
+  --surface-color: #ffffff;
+  --border-color: rgba(0, 0, 0, 0.12);
+  --text-color: rgba(0, 0, 0, 0.87);
+}
+
+.dark-theme {
+  --background-color: #121212;
+  --surface-color: #1e1e1e;
+  --border-color: rgba(255, 255, 255, 0.12);
+  --text-color: rgba(255, 255, 255, 0.87);
+}

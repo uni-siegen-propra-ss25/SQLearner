@@ -1,0 +1,154 @@
+<h2 mat-dialog-title>{{ isEditing ? 'Edit Exercise' : 'New Exercise' }}</h2>
+<form [formGroup]="exerciseForm" (ngSubmit)="onSubmit()">
+  <mat-dialog-content>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Title</mat-label>
+      <input matInput formControlName="title" placeholder="Enter exercise title" />
+      <mat-error *ngIf="exerciseForm.get('title')?.hasError('required')">
+        Title is required
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Description</mat-label>
+      <textarea
+        matInput
+        formControlName="description"
+        placeholder="Enter exercise description"
+        rows="4"
+      >
+      </textarea>
+      <mat-error *ngIf="exerciseForm.get('description')?.hasError('required')">
+        Description is required
+      </mat-error>
+    </mat-form-field>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Type</mat-label>
+        <mat-select formControlName="type">
+          <mat-option *ngFor="let type of exerciseTypes" [value]="type">
+            {{ type }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="exerciseForm.get('type')?.hasError('required')">
+          Type is required
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Difficulty</mat-label>
+        <mat-select formControlName="difficulty">
+          <mat-option *ngFor="let level of difficultyLevels" [value]="level">
+            {{ level }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="exerciseForm.get('difficulty')?.hasError('required')">
+          Difficulty is required
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Query specific fields -->
+    <ng-container *ngIf="exerciseForm.get('type')?.value === 'QUERY'">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Database</mat-label>
+        <mat-select formControlName="databaseId" required>
+          <mat-option *ngFor="let db of databases" [value]="db.id">
+            {{ db.name }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="exerciseForm.get('databaseId')?.hasError('required')">
+          Database is required for SQL exercises
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Solution Query</mat-label>
+        <textarea
+          matInput
+          formControlName="querySolution"
+          placeholder="SELECT * FROM table WHERE condition"
+          required
+          rows="6"
+        ></textarea>
+        <mat-hint>Enter the SQL query that represents the correct solution</mat-hint>
+        <mat-error *ngIf="exerciseForm.get('querySolution')?.hasError('required')">
+          Solution query is required
+        </mat-error>
+      </mat-form-field>
+    </ng-container>
+
+    <!-- Choice specific fields -->
+    <ng-container
+      *ngIf="
+        exerciseForm.get('type')?.value === 'SINGLE_CHOICE' ||
+        exerciseForm.get('type')?.value === 'MULTIPLE_CHOICE'
+      "
+    >
+      <div formArrayName="answers" class="answers-container">
+        <h3>Answer Options</h3>
+        <div
+          *ngFor="let answer of answers.controls; let i = index"
+          [formGroupName]="i"
+          class="answer-row"
+        >
+          <mat-form-field appearance="outline" class="answer-text">
+            <mat-label>Answer {{ i + 1 }}</mat-label>
+            <input
+              matInput
+              formControlName="text"
+              [placeholder]="'Enter answer option ' + (i + 1)"
+            />
+          </mat-form-field>
+
+          <!-- Single Choice: Radio button -->
+          <mat-radio-button
+            *ngIf="exerciseForm.get('type')?.value === 'SINGLE_CHOICE'"
+            [checked]="answer.get('isCorrect')?.value"
+            (change)="onSingleChoiceSelect(i)"
+            [disabled]="false"
+          >
+            Correct
+          </mat-radio-button>
+
+          <!-- Multiple Choice: Checkbox -->
+          <mat-checkbox
+            *ngIf="exerciseForm.get('type')?.value === 'MULTIPLE_CHOICE'"
+            formControlName="isCorrect"
+          >
+            Correct
+          </mat-checkbox>
+
+          <button
+            type="button"
+            mat-icon-button
+            color="warn"
+            (click)="removeAnswer(i)"
+            [disabled]="answers.length <= 2"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+
+        <button
+          type="button"
+          mat-button
+          color="primary"
+          (click)="addAnswer()"
+          class="add-answer-button"
+        >
+          <mat-icon>add</mat-icon>
+          Add Answer Option
+        </button>
+      </div>
+    </ng-container>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()">Cancel</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="!exerciseForm.valid">
+      {{ isEditing ? 'Save' : 'Create' }}
+    </button>
+  </mat-dialog-actions>
+</form>

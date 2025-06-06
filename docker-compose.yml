@@ -1,0 +1,63 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: sqlearner-db
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=sqlearner
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  migrations:
+    build: ./backend
+    command: sh -c "while ! nc -z db 5432; do sleep 1; done && npx prisma migrate deploy"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/sqlearner?schema=public
+    depends_on:
+      db:
+        condition: service_healthy
+
+  backend:
+    build: ./backend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/sqlearner?schema=public
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=sqlearner
+      - JWT_SECRET=your_jwt_secret_key_here
+      - JWT_EXPIRES_IN=1h
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      migrations:
+        condition: service_completed_successfully
+    command: npm run start:dev
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "4200:4200"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data: 

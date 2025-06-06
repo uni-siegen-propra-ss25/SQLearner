@@ -1,0 +1,71 @@
+<!-- Main expansion panel for chapter display -->
+<mat-expansion-panel
+  class="chapter-panel"
+  [expanded]="isExpanded"
+  (opened)="onExpand()"
+  (closed)="isExpanded = false"
+>
+  <!-- Chapter header with title and tutor actions -->
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      <div class="chapter-title">{{ chapter.title }}</div>
+    </mat-panel-title>
+    <mat-panel-description>
+      <!-- Edit and delete buttons for tutors only -->
+      <div class="chapter-actions" *ngIf="isTutor">
+        <button
+          mat-icon-button
+          color="primary"
+          (click)="$event.stopPropagation(); edit.emit(chapter)"
+          matTooltip="Edit chapter"
+        >
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          color="warn"
+          (click)="$event.stopPropagation(); delete.emit(chapter.id)"
+          matTooltip="Delete chapter"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </mat-panel-description>
+  </mat-expansion-panel-header>
+
+  <!-- Chapter description text -->
+  <div class="chapter-description">{{ chapter.description }}</div>
+
+  <!-- Container for topics within this chapter -->
+  <div class="topics-container">
+    <!-- Topic cards with bookmark functionality -->
+    <app-topic-card
+      *ngFor="let topic of topics"
+      [topic]="topic"
+      [isTutor]="isTutor"
+      [bookmarkedExerciseIds]="bookmarkedExerciseIds"
+      (edit)="onTopicEdit($event)"
+      (delete)="onTopicDelete($event)"
+      (bookmarkToggled)="onBookmarkToggled($event)"
+    >
+    </app-topic-card>
+
+    <!-- Empty state when no topics exist -->
+    <div *ngIf="topics.length === 0" class="empty-topics">
+      <mat-icon>subject</mat-icon>
+      <p>No topics available in this chapter.</p>
+    </div>
+
+    <!-- Add topic button for tutors -->
+    <button
+      *ngIf="isTutor"
+      mat-flat-button
+      color="primary"
+      class="add-topic-button"
+      (click)="openNewTopicDialog()"
+    >
+      <mat-icon>add</mat-icon>
+      Add Topic
+    </button>
+  </div>
+</mat-expansion-panel>

@@ -1,0 +1,40 @@
+<div class="freetext-exercise">
+  <mat-card-content>
+    <h2 class="exercise-title">{{ exercise.title }}</h2>
+    <p class="exercise-description">{{ exercise.description }}</p>
+
+    <mat-form-field appearance="fill" class="answer-field">
+      <mat-label>Your Answer</mat-label>
+      <textarea
+        matInput
+        [(ngModel)]="answer"
+        rows="8"
+        placeholder="Type your answer here..."
+      ></textarea>
+      <mat-hint>Write your answer in the text area above</mat-hint>
+    </mat-form-field>
+
+    <div class="actions">
+      <button
+        mat-flat-button
+        color="primary"
+        [disabled]="!answer.trim() || isSubmitting"
+        (click)="submitAnswer()"
+      >
+        <mat-icon>send</mat-icon>
+        {{ isSubmitting ? 'Submitting...' : 'Submit Answer' }}
+      </button>
+    </div>
+
+    <!-- Feedback Section -->
+    <mat-expansion-panel *ngIf="showFeedback" class="feedback-section">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <mat-icon>chat</mat-icon>
+          AI Feedback
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <p>{{ feedback || 'Loading feedback...' }}</p>
+    </mat-expansion-panel>
+  </mat-card-content>
+</div>
