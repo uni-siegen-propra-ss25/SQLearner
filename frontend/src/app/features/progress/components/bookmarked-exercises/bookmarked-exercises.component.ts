@@ -30,16 +30,15 @@ export class BookmarkedExercisesComponent {
     @Output() removeBookmark = new EventEmitter<number>();
     
     constructor(private router: Router) {}
-    
-    /**
+      /**
      * Navigates to the specified exercise detail page.
-     * Uses Angular Router to redirect user to the exercise within its topic context.
+     * Uses Angular Router to redirect user to the exercise detail component.
      * 
-     * @param {number} topicId - The unique identifier of the topic containing the exercise
+     * @param {number} topicId - The unique identifier of the topic containing the exercise (not used for navigation)
      * @param {number} exerciseId - The unique identifier of the exercise to navigate to
      */
     navigateToExercise(topicId: number, exerciseId: number): void {
-        this.router.navigate(['/roadmap', 'topics', topicId, 'exercises', exerciseId]);
+        this.router.navigate(['/exercises', exerciseId]);
     }
     
     /**
