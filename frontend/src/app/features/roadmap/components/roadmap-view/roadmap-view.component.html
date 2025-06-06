@@ -1,29 +1,37 @@
+<!-- Main container for the entire roadmap layout -->
 <div class="roadmap-container">
+  <!-- Header section with main title -->
   <div class="roadmap-header">
     <h1>Learning Roadmap</h1>
   </div>
 
+  <!-- Container for all chapter cards with bookmark integration -->
   <div class="chapters-container">
+    <!-- Individual chapter cards with bookmark and tutor functionality -->
     <app-chapter-card
       *ngFor="let chapter of chapters"
       [chapter]="chapter"
       [isTutor]="isTutor"
+      [bookmarkedExerciseIds]="bookmarkedExerciseIds"
       (edit)="onChapterEdit($event)"
       (delete)="onChapterDelete($event)"
+      (bookmarkToggled)="onBookmarkToggled($event)"
     >
     </app-chapter-card>
   </div>
 
+  <!-- Empty state when no chapters exist -->
   <div *ngIf="chapters.length === 0" class="empty-state">
     <mat-icon>school</mat-icon>
     <p>No chapters available yet.</p>
+    <!-- First chapter creation button for tutors -->
     <button *ngIf="isTutor" mat-raised-button color="primary" (click)="openNewChapterDialog()">
       <mat-icon class="add-icon">add</mat-icon>
       Create First Chapter
     </button>
   </div>
 
-  <!-- Add Chapter Button for existing chapters -->
+  <!-- Add chapter button when chapters already exist (tutors only) -->
   <div *ngIf="chapters.length > 0 && isTutor" class="add-chapter-container">
     <button mat-raised-button color="primary" (click)="openNewChapterDialog()">
       <mat-icon class="add-icon">add</mat-icon>

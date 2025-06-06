@@ -1,47 +1,73 @@
+<!-- Main exercise card container with click navigation -->
 <mat-card class="exercise-card" (click)="onCardClick()" [class.clickable]="!isTutor">
+  <!-- Card header with title, badges, and action buttons -->
   <mat-card-header>
     <div class="header-content">
+      <!-- Title and badge section -->
       <div class="title-section">
         <mat-card-title>{{ exercise.title }}</mat-card-title>
         <div class="badges">
+          <!-- Difficulty badge with dynamic color -->
           <div
             class="difficulty-badge"
             [style.background-color]="getDifficultyColor(exercise.difficulty)"
           >
             {{ exercise.difficulty }}
           </div>
+          <!-- Exercise type badge with icon -->
           <div class="type-badge">
             <mat-icon>{{ getExerciseTypeIcon(exercise.type) }}</mat-icon>
             <span>{{ getExerciseTypeLabel(exercise.type) }}</span>
           </div>
         </div>
       </div>
-      <div class="action-buttons" *ngIf="isTutor">
+      
+      <!-- Action buttons section -->
+      <div class="action-buttons">
+        <!-- Bookmark button for students only -->
         <button
+          *ngIf="!isTutor"
           mat-icon-button
-          color="primary"
-          (click)="edit.emit(exercise)"
-          matTooltip="Edit exercise"
+          [color]="isBookmarked ? 'accent' : ''"
+          (click)="onBookmarkClick($event)"
+          [disabled]="isBookmarkLoading"
+          matTooltip="{{ isBookmarked ? 'Lesezeichen entfernen' : 'Lesezeichen hinzufügen' }}"
+          class="bookmark-button"
         >
-          <mat-icon>edit</mat-icon>
+          <mat-icon>{{ isBookmarked ? 'bookmark' : 'bookmark_border' }}</mat-icon>
         </button>
-        <button
-          mat-icon-button
-          color="warn"
-          (click)="delete.emit(exercise.id)"
-          matTooltip="Delete exercise"
-        >
-          <mat-icon>delete</mat-icon>
-        </button>
+        
+        <!-- Edit and delete buttons for tutors only -->
+        <ng-container *ngIf="isTutor">
+          <button
+            mat-icon-button
+            color="primary"
+            (click)="edit.emit(exercise)"
+            matTooltip="Edit exercise"
+          >
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            color="warn"
+            (click)="delete.emit(exercise.id)"
+            matTooltip="Delete exercise"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </ng-container>
       </div>
     </div>
   </mat-card-header>
 
+  <!-- Card content with description and metadata -->
   <mat-card-content>
+    <!-- Exercise description text -->
     <p class="exercise-description">{{ exercise.description }}</p>
 
+    <!-- Exercise metadata section -->
     <div class="exercise-metadata">
-      <!-- Show database name for QUERY exercises -->
+      <!-- Database information for SQL query exercises -->
       <div
         class="metadata-item database-info"
         *ngIf="exercise.type === ExerciseType.QUERY && exercise.database"
@@ -50,7 +76,7 @@
         <span>{{ exercise.database.name }}</span>
       </div>
 
-      <!-- Show number of options for Choice exercises -->
+      <!-- Options count for choice exercises -->
       <div
         class="metadata-item options-info"
         *ngIf="
@@ -63,7 +89,7 @@
         <span>{{ exercise.answers.length }} options</span>
       </div>
 
-      <!-- Show creation date -->
+      <!-- Creation date -->
       <div class="metadata-item date-info">
         <mat-icon>calendar_today</mat-icon>
         <span>{{ exercise.createdAt | date: 'mediumDate' }}</span>
