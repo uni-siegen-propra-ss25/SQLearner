@@ -41,12 +41,13 @@ export class ChoiceExerciseComponent {
 
         this.isSubmitting = true;
         this.submissionService
-            .submitAnswer(this.exercise.id, this.selectedOptions.join(','))
-            .subscribe({
+            .submitAnswer(this.exercise.id, this.selectedOptions.join(','))            .subscribe({
                 next: (submission) => {
                     this.isSubmitting = false;
-                    this.snackBar.open('Answer submitted successfully', 'Close', {
-                        duration: 3000,
+                    // Backend-Feedback anzeigen statt generischer Nachricht
+                    const message = submission.feedback || 'Answer submitted successfully';
+                    this.snackBar.open(message, 'Close', {
+                        duration: 4000, // Etwas länger für Feedback
                     });
 
                     // Get feedback if available
