@@ -17,31 +17,36 @@ export class ProgressController {
     constructor(private readonly progressService: ProgressService) {}
 
     /**
+     * Retrieves all users' progress summaries.
+     * Only accessible by tutors and admins.
+     * 
+     * @returns {Promise<UserProgressSummary[]>} Array of progress summaries for all users
+     */
+    @Get('users')
+    @Roles('TUTOR', 'ADMIN')
+    async getAllUsersProgress(): Promise<UserProgressSummary[]> {
+        return this.progressService.getAllUsersProgress();
+    }
+
+    /**
      * Retrieves the authenticated student's own progress summary.
      * Returns comprehensive progress data including completion statistics and chapter breakdown.
      * 
      * @param {number} userId - The authenticated user's ID extracted from JWT token
-     * @returns {Promise<UserProgressSummary>} Complete progress summary with exercise completion stats, chapter progress, and difficulty breakdown
-     * @throws {UnauthorizedException} When user is not authenticated
-     * @throws {ForbiddenException} When user role is not STUDENT
-     * @throws {NotFoundException} When user with specified ID does not exist
+     * @returns {Promise<UserProgressSummary>} Complete progress summary with exercise completion stats
      */
     @Get('user')
-    @Roles('STUDENT')
+    @Roles('STUDENT', 'TUTOR', 'ADMIN')
     async getUserProgress(@GetUser('id') userId: number): Promise<UserProgressSummary> {
         return this.progressService.getUserProgress(userId);
     }
 
     /**
      * Retrieves progress summary for any user by their ID.
-     * Allows tutors and admins to view student progress for monitoring and assessment purposes.
+     * Allows tutors and admins to view student progress for monitoring.
      * 
      * @param {number} userId - The target user's ID from URL parameter
-     * @returns {Promise<UserProgressSummary>} Complete progress summary with exercise completion stats, chapter progress, and difficulty breakdown
-     * @throws {UnauthorizedException} When user is not authenticated
-     * @throws {ForbiddenException} When user role is not TUTOR or ADMIN
-     * @throws {NotFoundException} When user with specified ID does not exist
-     * @throws {BadRequestException} When userId parameter is not a valid integer
+     * @returns {Promise<UserProgressSummary>} Complete progress summary with exercise completion stats
      */
     @Get('user/:id')
     @Roles('TUTOR', 'ADMIN')
@@ -51,16 +56,10 @@ export class ProgressController {
 
     /**
      * Updates progress for a specific exercise when a student submits an attempt.
-     * Records attempt count, completion status, and timestamps for learning analytics.
      * 
      * @param {number} exerciseId - The exercise ID from URL parameter
-     * @param {ExerciseProgressUpdate} progressUpdate - Progress update data containing completion status
-     * @param {number} userId - The authenticated student's ID extracted from JWT token
-     * @returns {Promise<void>} Resolves when progress is successfully updated
-     * @throws {UnauthorizedException} When user is not authenticated
-     * @throws {ForbiddenException} When user role is not STUDENT
-     * @throws {NotFoundException} When exercise with specified ID does not exist
-     * @throws {BadRequestException} When exerciseId parameter is not a valid integer or request body is invalid
+     * @param {ExerciseProgressUpdate} progressUpdate - Progress update data with completion status
+     * @param {number} userId - The authenticated student's ID from JWT token
      */
     @Post('exercise/:id')
     @Roles('STUDENT')

@@ -30,12 +30,13 @@ export class WelcomeStudentComponent implements OnInit {
       this.newTodo = '';
     }
   }
+  
   // Beispiel: letzte Nachricht 
-lastMessage = {
-  from: 'tutor',
-  text: 'Für diese Aufgabe nicht. Es wäre aber nicht verkehrt für die Klausur beide Varianten zu lernen',
-  timestamp: new Date()
-};
+  lastMessage = {
+    from: 'tutor',
+    text: 'Für diese Aufgabe nicht. Es wäre aber nicht verkehrt für die Klausur beide Varianten zu lernen',
+    timestamp: new Date()
+  };
 
   removeTodo(index: number) {
     this.todos.splice(index, 1);
