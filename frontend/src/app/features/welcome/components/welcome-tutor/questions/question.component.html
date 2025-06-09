@@ -20,16 +20,16 @@
         Sie haben <strong>{{ ungeleseneNachrichten }}</strong> ungelesene Fragen
       </p>
 
-      <div class="frage-box" *ngFor="let frage of fragen">
+      <div class="frage-box" *ngFor="let question of questions">
         <p class="frage-text">
           <mat-icon class="icon">mail</mat-icon>
-          {{ frage.student }} ({{ frage.datum }}): „{{ frage.frageText }}“
+          {{ question.student_name }} ({{ question.erstellt_am | date:'dd.MM.yyyy HH:mm' }}): „{{ question.frage }}“
         </p>
         <div class="aktionen">
-          <a href="#" (click)="anpinnen(frage, $event)">Markieren</a>
-          <a href="#" (click)="archivieren(frage, $event)">Archivieren</a>
-          <a href="#" (click)="beantworten(frage, $event)">Beantworten</a>
-          <a href="#" (click)="loeschen(frage, $event)">Löschen</a>
+          <a href="#" (click)="anpinnen(question, $event)">Markieren</a>
+          <a href="#" (click)="archivieren(question, $event)">Archivieren</a>
+          <a href="#" (click)="beantworten(question, $event)">Beantworten</a>
+          <a href="#" (click)="loeschen(question, $event)">Löschen</a>
         </div>
       </div>
     </div>
@@ -38,21 +38,21 @@
     <div class="angepinnt-box">
       <h3>Markiert</h3>
       <div *ngIf="angepinnt.length === 0" class="leertext">Keine markierten Nachrichten</div>
-      <div *ngFor="let frage of angepinnt" class="angeheftet-frage">
-        <p>{{ frage.student }} ({{ frage.datum }}): „{{ frage.frageText }}“</p>
-        <a href="#" (click)="entferneAngepinnt(frage, $event)">Entfernen</a>
+      <div *ngFor="let question of angepinnt" class="angeheftet-frage">
+        <p>{{ question.student_name }} ({{ question.erstellt_am | date:'dd.MM.yyyy HH:mm' }}): „{{ question.frage }}“</p>
+        <a href="#" (click)="entferneAngepinnt(question, $event)">Entfernen</a>
       </div>
     </div>
   </div>
 
   <!-- Antwort-Modal -->
-  <div class="antwort-modal" *ngIf="ausgewaehlteFrage">
+  <div class="antwort-modal" *ngIf="ausgewaehlteQuestion">
     <div class="antwort-box">
-      <h2>Antwort auf: {{ ausgewaehlteFrage.student }}</h2>
+      <h2>Antwort auf: {{ ausgewaehlteQuestion.student_name }}</h2>
       <textarea [(ngModel)]="antwortText" placeholder="Antwort schreiben..."></textarea>
 
       <input type="file" (change)="anhangHinzufuegen($event)" />
-      <div class="anhang-info" *ngIf="anhangName">📎 Datei angehaengt: {{ anhangName }}</div>
+      <div class="anhang-info" *ngIf="anhangName">📎 Datei angehängt: {{ anhangName }}</div>
 
       <div class="antwort-aktionen">
         <button (click)="antwortAbschicken()">Antwort senden</button>

@@ -71,13 +71,25 @@
     <mat-card-title>Fragen der Studierenden</mat-card-title>
     <mat-card-content>
       <div class="fragenliste">
-        <p *ngIf="fragen.length === 0" class="keine-fragen">Es wurden keine neuen Fragen gesendet</p>
-        <!-- Wenn später Fragen aus der DB kommen, kannst du hier *ngFor einfügen -->
+        <ng-container *ngIf="fragen.length > 0; else keineFragen">
+          <div *ngFor="let frage of fragen.slice(0, 3)" class="frage-item">
+            <div class="frage-details">
+              <strong>{{ frage.student_name }}</strong><br>
+              <small>{{ frage.erstellt_am | date: 'dd.MM.yyyy, HH:mm' }}</small>
+              <p class="frage-text">{{ frage.frage }}</p>
+            </div>
+          </div>
+        </ng-container>
+        <ng-template #keineFragen>
+          <p class="keine-fragen">Sie haben noch keine Fragen</p>
+        </ng-template>
       </div>
     </mat-card-content>
-    <mat-card-actions align="end">
-      <button mat-button color="primary" (click)="goToFragen()">Alle anzeigen</button>
-    </mat-card-actions>
-  </mat-card>
+
+  <!-- Button fest unten rechts in der Box -->
+  <mat-card-actions class="fragen-actions">
+    <button mat-button color="primary" (click)="goToFragen()">Alle anzeigen</button>
+  </mat-card-actions>
+</mat-card>
 </div>
 </div>

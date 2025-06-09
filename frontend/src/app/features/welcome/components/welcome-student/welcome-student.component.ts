@@ -2,6 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { HintService } from 'app/features/welcome/services/hint.service';
 import { TodoService, Todo } from 'app/features/welcome/services/todo.service';
+import { QuestionService, Question } from 'app/features/welcome/services/question.service';
+
+interface ChatMessage {
+  from: 'student' | 'tutor';
+  text: string;
+  timestamp: Date;
+}
 
 @Component({
   selector: 'app-welcome-student',
@@ -12,22 +19,28 @@ export class WelcomeStudentComponent implements OnInit {
   todos: Todo[] = [];
   newTodo = '';
   hinweise: string[] = [];
+  lastMessage?: ChatMessage;
 
   constructor(
     private router: Router,
     private hintService: HintService,
-    private todoService: TodoService
+    private todoService: TodoService,
+    private questionService: QuestionService
   ) {}
 
   ngOnInit(): void {
-    // Holt Hinweise vom Server
+    // Hinweise laden
     this.hintService.getHints().subscribe((hints) => {
-      this.hinweise = hints.map(h => h.text); // Annahme: Hint hat 'text'
+      this.hinweise = hints.map(h => h.text);
     });
 
+    // To-Dos laden
     this.todoService.getTodos().subscribe((data) => {
       this.todos = data;
     });
+
+    // Letzte Nachricht laden
+    this.loadLastMessage();
   }
 
   addTodo(): void {
@@ -51,14 +64,36 @@ export class WelcomeStudentComponent implements OnInit {
     this.todoService.updateTodo(todo).subscribe();
   }
 
-  lastMessage = {
-    from: 'tutor',
-    text: 'Für diese Aufgabe nicht. Es wäre aber nicht verkehrt für die Klausur beide Varianten zu lernen',
-    timestamp: new Date(),
-  };
+  loadLastMessage(): void {
+    this.questionService.getAll().subscribe((data: Question[]) => {
+      const chat = data
+        .filter(q => !q.ist_archiviert && !q.ist_geloescht)
+        .map(q => [
+          {
+            from: 'student' as const,
+            text: q.frage,
+            timestamp: new Date(q.erstellt_am),
+          },
+          ...(q.antwort
+            ? [{
+                from: 'tutor' as const,
+                text: q.antwort,
+                timestamp: new Date(q.erstellt_am), // optional: q.antwort_am
+              }]
+            : [])
+        ])
+        .flat();
+
+      if (chat.length > 0) {
+        chat.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+        this.lastMessage = chat[chat.length - 1];
+      } else {
+        this.lastMessage = undefined;
+      }
+    });
+  }
 
   goToFragen(): void {
     this.router.navigate(['welcome/student/fragen']);
   }
 }
-

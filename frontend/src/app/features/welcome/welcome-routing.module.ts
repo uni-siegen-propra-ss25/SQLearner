@@ -7,10 +7,10 @@ import { RoleGuard } from '../../core/guards/role.guard';
 import { WelcomeRedirectComponent } from './components/welcome-redirect/welcome-redirect.component';
 import { WelcomeComponent } from 'app/features/welcome/welcome.component';
 
-import { FragenComponent } from './components/welcome-tutor/fragen/fragen.component';
-import { PapierkorbComponent } from './components/welcome-tutor/fragen/papierkorb/papierkorb.component';
-import { ArchivComponent } from './components/welcome-tutor/fragen/archiv/archiv.component';
-import { BeantwortetComponent } from './components/welcome-tutor/fragen/beantwortet/beantwortet.component';
+import { QuestionComponent } from './components/welcome-tutor/questions/question.component';
+import { PapierkorbComponent } from './components/welcome-tutor/questions/papierkorb/papierkorb.component';
+import { ArchivComponent } from './components/welcome-tutor/questions/archiv/archiv.component';
+import { BeantwortetComponent } from './components/welcome-tutor/questions/beantwortet/beantwortet.component';
 
 import { FragenChatComponent } from './components/welcome-student/fragen-chat/fragen-chat.component';
 
@@ -36,8 +36,8 @@ const routes: Routes = [
     data: { allowedRoles: [Role.TUTOR] },
   },
   {
-    path: 'tutor/fragen',
-    component: FragenComponent,
+    path: 'tutor/questions',
+    component: QuestionComponent,
     canActivate: [RoleGuard],
     data: { allowedRoles: [Role.TUTOR] },
   },

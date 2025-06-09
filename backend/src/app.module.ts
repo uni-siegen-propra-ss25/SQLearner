@@ -15,7 +15,7 @@ import { SettingsModule } from './modules/settings/settings.module';
 
 import { TodosModule } from './modules/todos/todos.module';
 import { HintsModule } from './modules/hints/hints.module';
-
+import { QuestionModule } from './modules/questions/question.module';
 
 @Module({
     imports: [
@@ -35,6 +35,7 @@ import { HintsModule } from './modules/hints/hints.module';
         TodosModule,    
         DatabaseModule,
         HintsModule,
+        QuestionModule,
         ],
 })
 export class AppModule {}

@@ -9,10 +9,10 @@ import { FormsModule } from '@angular/forms';
 import { WelcomeComponent } from 'app/features/welcome/welcome.component';
 import { HttpClientModule } from '@angular/common/http';
 
-import { FragenComponent } from 'app/features/welcome/components/welcome-tutor/fragen/fragen.component';
-import { PapierkorbComponent } from './components/welcome-tutor/fragen/papierkorb/papierkorb.component';
-import { ArchivComponent } from './components/welcome-tutor/fragen/archiv/archiv.component';
-import { BeantwortetComponent } from './components/welcome-tutor/fragen/beantwortet/beantwortet.component';
+import { QuestionComponent } from 'app/features/welcome/components/welcome-tutor/questions/question.component';
+import { PapierkorbComponent } from './components/welcome-tutor/questions/papierkorb/papierkorb.component';
+import { ArchivComponent } from './components/welcome-tutor/questions/archiv/archiv.component';
+import { BeantwortetComponent } from './components/welcome-tutor/questions/beantwortet/beantwortet.component';
 
 import { FragenChatComponent } from './components/welcome-student/fragen-chat/fragen-chat.component';
 
@@ -22,7 +22,7 @@ import { FragenChatComponent } from './components/welcome-student/fragen-chat/fr
     WelcomeStudentComponent,
     WelcomeRedirectComponent,
     WelcomeComponent,
-    FragenComponent,   
+    QuestionComponent,   
     PapierkorbComponent,
     ArchivComponent,
     BeantwortetComponent,

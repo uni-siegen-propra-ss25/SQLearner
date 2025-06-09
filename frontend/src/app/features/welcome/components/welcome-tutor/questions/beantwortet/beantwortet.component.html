@@ -8,8 +8,8 @@
   <div class="archiv-liste" *ngIf="beantworteteFragen.length > 0; else leer">
     <div class="archiv-item" *ngFor="let eintrag of beantworteteFragen">
       <div class="frage-info">
-        <strong>{{ eintrag.student }}</strong> ({{ eintrag.datum }} {{ eintrag.uhrzeit }})
-        <p class="frage-text">„{{ eintrag.frageText }}“</p>
+        <strong>{{ eintrag.student_name }}</strong> ({{ eintrag.erstellt_am | date:'dd.MM.yyyy HH:mm' }})
+        <p class="frage-text">„{{ eintrag.frage }}“</p>
         <p class="antwort-text"><strong>Antwort:</strong> {{ eintrag.antwort }}</p>
       </div>
 

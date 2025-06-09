@@ -8,9 +8,9 @@
   <div class="papierkorb-liste" *ngIf="fragen.length > 0; else leer">
     <div class="papierkorb-item" *ngFor="let frage of fragen">
       <div class="frage-info">
-        <strong>{{ frage.student }}</strong> ({{ frage.datum }} {{ frage.uhrzeit }})
-        <p class="frage-text">„{{ frage.frageText }}“</p>
-        <p class="antwort-text"><strong>Antwort:</strong> {{ frage.antwort }}</p>
+        <strong>{{ frage.student_name }}</strong> ({{ frage.erstellt_am | date:'dd.MM.yyyy HH:mm' }})
+          <p class="frage-text">„{{ frage.frage }}“</p>
+          <p class="antwort-text" *ngIf="frage.antwort"><strong>Antwort:</strong> {{ frage.antwort }}</p>
       </div>
       <div class="frage-aktionen">
         <button mat-icon-button color="primary" (click)="wiederherstellen(frage)">

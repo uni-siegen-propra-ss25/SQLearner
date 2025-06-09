@@ -5,20 +5,28 @@
   </div>
 
   <div class="chat-messages">
-    <div
-      *ngFor="let msg of messages"
-      class="message"
-      [ngClass]="{ 'from-student': msg.from === 'student', 'from-tutor': msg.from === 'tutor' }"
-    >
-      <div class="message-text">{{ msg.text }}</div>
+  <ng-container *ngFor="let q of questions">
+    <!-- Student Nachricht -->
+    <div class="message from-student">
+      <div class="message-text">{{ q.frage }}</div>
       <div class="message-info">
-        <span class="timestamp">{{ msg.timestamp | date: 'dd.MM.yyyy, HH:mm' }}</span>
-        <button *ngIf="msg.from === 'student'" (click)="deleteMessage(msg)" mat-icon-button>
+        <span class="timestamp">{{ q.erstellt_am | date: 'dd.MM.yyyy, HH:mm' }}</span>
+        <button (click)="deleteMessage(q)" mat-icon-button>
           <mat-icon>delete</mat-icon>
         </button>
       </div>
     </div>
-  </div>
+
+    <!-- Tutor Nachricht -->
+    <div *ngIf="q.antwort" class="message from-tutor">
+      <div class="message-text">{{ q.antwort }}</div>
+      <div class="message-info">
+        <span class="timestamp">Tutorantwort</span>
+      </div>
+    </div>
+  </ng-container>
+</div>
+
 
   <div class="chat-input">
     <mat-form-field appearance="fill" class="input-field">
@@ -34,3 +42,4 @@
     <button mat-raised-button color="primary" (click)="sendMessage()">Senden</button>
   </div>
 </div>
+

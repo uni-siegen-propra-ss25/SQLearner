@@ -54,20 +54,18 @@
       <mat-card-title>Fragenforum</mat-card-title>
   <mat-card-content>
 
-    <!-- Wenn es Fragen gibt, zeige die letzte Nachricht an -->
-  <div *ngIf="lastMessage; else noMessages" class="last-message">
+<!-- Letzte Nachricht im Fragenforum -->
+<div *ngIf="lastMessage; else noMessages" class="last-message">
   <div class="message-header">
     <strong>{{ lastMessage.from === 'tutor' ? 'Tutor' : 'Student' }}</strong>
     <span class="timestamp">{{ lastMessage.timestamp | date: 'dd.MM.yyyy, HH:mm' }}</span>
   </div>
   <p>{{ lastMessage.text }}</p>
-  </div>
+</div>
 
-
-    <!-- Falls keine Nachrichten vorhanden sind -->
-    <ng-template #noMessages>
-      <p>Keine Nachrichten vorhanden.</p>
-    </ng-template>
+<ng-template #noMessages>
+  <p>Keine Nachrichten vorhanden.</p>
+</ng-template>
 
   </mat-card-content>
   <mat-card-actions align="end">

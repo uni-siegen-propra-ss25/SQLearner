@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { HintService, Hint } from 'app/features/welcome/services/hint.service';
 import { TodoService, Todo } from 'app/features/welcome/services/todo.service';
+import { QuestionService, Question } from 'app/features/welcome/services/question.service';
 
 @Component({
   selector: 'app-welcome-tutor',
@@ -14,18 +15,19 @@ export class WelcomeTutorComponent implements OnInit {
 
   todos: Todo[] = [];
   newTodo = '';
-  fragen: any[] = [];
-
+  fragen: Question[] = [];
 
   constructor(
     private router: Router,
     private hintService: HintService,
-    private todoService: TodoService
+    private todoService: TodoService,
+    private questionService: QuestionService
   ) {}
 
   ngOnInit() {
     this.loadHints();
     this.loadTodos();
+    this.loadFragen();
   }
 
   loadHints() {
@@ -37,6 +39,14 @@ export class WelcomeTutorComponent implements OnInit {
   loadTodos() {
     this.todoService.getTodos().subscribe((data) => {
       this.todos = data;
+    });
+  }
+
+  loadFragen() {
+    this.questionService.getAll().subscribe((fragen: Question[]) => {
+      this.fragen = fragen
+        .filter(f => !f.ist_archiviert && !f.ist_geloescht)
+        .sort((a, b) => new Date(b.erstellt_am).getTime() - new Date(a.erstellt_am).getTime());
     });
   }
 
@@ -79,6 +89,6 @@ export class WelcomeTutorComponent implements OnInit {
   }
 
   goToFragen() {
-    this.router.navigate(['welcome/tutor/fragen']);
+    this.router.navigate(['welcome/tutor/questions']);
   }
 }

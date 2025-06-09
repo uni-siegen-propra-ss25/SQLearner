@@ -1,54 +1,64 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { QuestionService, Question } from 'app/features/welcome/services/question.service';
 
 @Component({
   selector: 'app-fragen-chat',
   templateUrl: './fragen-chat.component.html',
   styleUrls: ['./fragen-chat.component.scss']
 })
-export class FragenChatComponent {
+export class FragenChatComponent implements OnInit {
   newMessage: string = '';
-  messages: { from: 'student' | 'tutor'; text: string; timestamp: Date }[] = [
-    { from: 'student', text: 'Benötigen wir für die Aufgabe 8 den NATURAL JOIN?', timestamp: new Date() },
-    { from: 'tutor', text: 'Für diese Aufgabe nicht. Es wäre aber nicht verkehrt für die Klausur beide Varianten zu lernen', timestamp: new Date() }
-  ];
+  questions: Question[] = [];
+
+  constructor(private questionService: QuestionService) {}
+
+  ngOnInit() {
+    this.loadQuestions();
+  }
+
+  loadQuestions() {
+    this.questionService.getAll().subscribe(data => {
+      this.questions = data
+        .filter(q => !q.ist_archiviert && !q.ist_geloescht)
+        .sort((a, b) => new Date(a.erstellt_am).getTime() - new Date(b.erstellt_am).getTime());
+    });
+  }
 
   sendMessage() {
     const trimmed = this.newMessage.trim();
-    if (trimmed) {
-      this.messages.push({
-        from: 'student',
-        text: trimmed,
-        timestamp: new Date()
-      });
+    if (!trimmed) return;
 
-      this.newMessage = '';
+this.questionService.create({
+  student_name: 'Student',
+  frage: trimmed
+}).subscribe(() => {
+  this.newMessage = '';
+  this.loadQuestions();
+});
 
-      setTimeout(() => {
-        this.messages.push({
-          from: 'tutor',
-          text: 'Danke für deine Frage! Ich schaue es mir an.',
-          timestamp: new Date()
-        });
-      }, 1000);
-    }
+
   }
 
-  deleteMessage(msgToDelete: { from: string; text: string; timestamp: Date }) {
-    this.messages = this.messages.filter(msg => msg !== msgToDelete);
+  deleteMessage(question: Question) {
+    this.questionService.löschen(question.id).subscribe(() => {
+      this.loadQuestions();
+    });
   }
 
   handleFileUpload(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       const file = input.files[0];
-      console.log('Datei hochgeladen:', file.name);
+      const fileMessage = `📎 Datei angehängt: ${file.name}`;
 
-      this.messages.push({
-        from: 'student',
-        text: `📎 Datei angehängt: ${file.name}`,
-        timestamp: new Date()
-      });
+this.questionService.create({
+  student_name: 'Student',
+  frage: fileMessage
+}).subscribe(() => {
+  this.loadQuestions();
+});
+
+
     }
   }
 }
-
