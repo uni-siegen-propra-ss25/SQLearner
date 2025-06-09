@@ -27,7 +27,9 @@
   <mat-card-content>
     <ul>
       <li *ngFor="let task of todos; let i = index" class="todo-item">
-        <mat-checkbox [(ngModel)]="task.done">{{ task.text }}</mat-checkbox>
+      <mat-checkbox [(ngModel)]="task.done" (change)="toggleDone(task)">
+         {{ task.text }}
+      </mat-checkbox>
         <button mat-icon-button color="warn" (click)="removeTodo(i)">
           <mat-icon>delete</mat-icon>
         </button>

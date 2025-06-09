@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
+import { DatabaseModule } from 'src/database.module';
 
 import { ChaptersModule } from './modules/chapters/chapters.module';
 import { TopicsModule } from './modules/topics/topics.module';
@@ -11,6 +12,10 @@ import { ChatModule } from './modules/chat/chat.module';
 import { ProgressModule } from './modules/progress/progress.module';
 import { BookmarksModule } from './modules/bookmarks/bookmarks.module';
 import { SettingsModule } from './modules/settings/settings.module';
+
+import { TodosModule } from './modules/todos/todos.module';
+import { HintsModule } from './modules/hints/hints.module';
+
 
 @Module({
     imports: [
@@ -26,7 +31,10 @@ import { SettingsModule } from './modules/settings/settings.module';
         ChatModule,
         ProgressModule,
         BookmarksModule,
-        SettingsModule,     
+        SettingsModule, 
+        TodosModule,    
+        DatabaseModule,
+        HintsModule,
         ],
 })
 export class AppModule {}

@@ -6,30 +6,7 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./fragen.component.scss'],
 })
 export class FragenComponent implements OnInit {
-  fragen = [
-    {
-      id: 1,
-      student: 'Max M.',
-      datum: '30.05.2025',
-      uhrzeit: '12:17:53',
-      frageText: 'Ich verstehe NATURAL JOIN nicht ganz...',
-    },
-    {
-      id: 2,
-      student: 'Lisa S.',
-      datum: '29.05.2025',
-      uhrzeit: '10:05:12',
-      frageText: 'Könnte man ein Beispiel zu Aggregatfunktionen machen?',
-    },
-    {
-      id: 3,
-      student: 'Jonas T.',
-      datum: '28.05.2025',
-      uhrzeit: '15:45:33',
-      frageText: 'Wie genau funktioniert Relationale Division?',
-    },
-  ];
-
+  fragen: any[] = []; // Keine Testdaten mehr
   angepinnt: any[] = [];
   ausgewaehlteFrage: any = null;
   antwortText: string = '';
@@ -40,16 +17,7 @@ export class FragenComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.ladeAngepinnt();
-  }
-
-  ladeAngepinnt() {
-    const gespeicherte = localStorage.getItem('angeheftet');
-    this.angepinnt = gespeicherte ? JSON.parse(gespeicherte) : [];
-  }
-
-  speichern() {
-    localStorage.setItem('angeheftet', JSON.stringify(this.angepinnt));
+    // Hier später: HTTP-Call zum Laden der Fragen
   }
 
   beantworten(frage: any, event: Event) {
@@ -75,26 +43,7 @@ export class FragenComponent implements OnInit {
   antwortAbschicken() {
     if (!this.ausgewaehlteFrage) return;
 
-    const antwort = {
-      frageId: this.ausgewaehlteFrage.id,
-      frageText: this.ausgewaehlteFrage.frageText,
-      student: this.ausgewaehlteFrage.student,
-      antwort: this.antwortText,
-      datei: this.anhangName,
-      uhrzeit: new Date().toLocaleTimeString(),
-      datum: new Date().toLocaleDateString(),
-    };
-
-    const beantwortet = JSON.parse(localStorage.getItem('beantworteteFragen') || '[]');
-    const index = beantwortet.findIndex((a: any) => a.frageId === antwort.frageId);
-
-    if (index === -1) {
-      beantwortet.push(antwort);
-    } else {
-      beantwortet[index] = antwort;
-    }
-
-    localStorage.setItem('beantworteteFragen', JSON.stringify(beantwortet));
+    // Hier später: HTTP-POST zum Speichern der Antwort
     this.fragen = this.fragen.filter((f) => f.id !== this.ausgewaehlteFrage.id);
     this.antwortAbbrechen();
   }
@@ -104,7 +53,7 @@ export class FragenComponent implements OnInit {
 
     if (!this.angepinnt.find((f) => f.id === frage.id)) {
       this.angepinnt.push(frage);
-      this.speichern();
+      // Hier später: optional DB-Speicherung der Markierung
     }
 
     this.fragen = this.fragen.filter((f) => f.id !== frage.id);
@@ -112,55 +61,20 @@ export class FragenComponent implements OnInit {
 
   archivieren(frage: any, event: Event) {
     event.preventDefault();
-
-    const beantwortet = JSON.parse(localStorage.getItem('beantworteteFragen') || '[]');
-    const archiv = JSON.parse(localStorage.getItem('archivFragen') || '[]');
-    const gespeicherteAntwort = beantwortet.find((f: any) => f.frageId === frage.id);
-
-    if (gespeicherteAntwort) {
-      if (!archiv.find((f: any) => f.frageId === frage.id)) {
-        archiv.push(gespeicherteAntwort);
-      }
-    } else {
-      const neueFrage = {
-        frageId: frage.id,
-        frageText: frage.frageText,
-        student: frage.student,
-        antwort: '',
-        datum: frage.datum,
-        uhrzeit: frage.uhrzeit,
-      };
-      archiv.push(neueFrage);
-    }
-
-    localStorage.setItem('archivFragen', JSON.stringify(archiv));
+    // Hier später: HTTP-Call zum Archivieren
     this.fragen = this.fragen.filter((f) => f.id !== frage.id);
   }
 
   loeschen(frage: any, event: Event) {
     event.preventDefault();
-
-    const papierkorb = JSON.parse(localStorage.getItem('papierkorbFragen') || '[]');
-
-    const geloeschteFrage = {
-      frageId: frage.id,
-      frageText: frage.frageText,
-      student: frage.student,
-      antwort: '',
-      datum: frage.datum,
-      uhrzeit: frage.uhrzeit,
-    };
-
-    papierkorb.push(geloeschteFrage);
-    localStorage.setItem('papierkorbFragen', JSON.stringify(papierkorb));
-
+    // Hier später: HTTP-Call zum Löschen / in Papierkorb verschieben
     this.fragen = this.fragen.filter((f) => f.id !== frage.id);
   }
 
   entferneAngepinnt(frage: any, event: Event) {
     event.preventDefault();
     this.angepinnt = this.angepinnt.filter((f) => f.id !== frage.id);
-    this.speichern();
+    // Hier später: optional DB-Aktualisierung
   }
 }
 

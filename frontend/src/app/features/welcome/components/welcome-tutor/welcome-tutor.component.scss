@@ -3,209 +3,146 @@
   text-align: center;
   max-width: 800px;
   margin: 0 auto;
+
+  h1 {
+    margin-bottom: 1rem;
+    color: var(--text-color);
+  }
+
+  p {
+    color: var(--text-color);
+    font-size: 1.2rem;
+  }
 }
 
-.welcome-container h1 {
-  margin-bottom: 1rem;
-  color: var(--text-color);
-}
-
-.welcome-container p {
-  color: var(--text-color);
-  font-size: 1.2rem;
-}
-
-/* Layout */
 .main-content {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start; /* WICHTIG: sorgt für obere Ausrichtung */
-  margin: 24px;
+  flex-direction: column;
   gap: 24px;
+  margin: 24px auto;
+  max-width: 1200px;
 }
 
-.left-column {
-  width: 60%;
+.top-row {
   display: flex;
-  flex-direction: column;
-  gap: 20px;
+  gap: 24px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
-.right-column {
-  width: 35%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start; /* Inhalt oben ausrichten */
-}
-
-/* Gemeinsamer Stil für alle Boxen */
-.box,
-.hinweise-box,
-.aufgaben-box {
-  background-color: #e7e7e9; /* hellblauer Hintergrund */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  padding: 16px;
-}
-
-/* Buttons */
-.button-row {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 16px;
-}
-
-/* Hinweise */
-.hinweis-input {
+.bottom-row {
   width: 100%;
 }
 
-.hinweis-button-container {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 8px;
+.box {
+  background-color: #e7e7e9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 16px;
+  flex: 1 1 45%;
+  min-width: 300px;
 }
 
+.todo-box ul,
 .hinweis-liste {
-  margin-top: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  padding-left: 0;
+  list-style: none;
 }
 
+.todo-item,
 .einzelner-hinweis {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
 }
 
-/* Fortschritt */
-.fortschritt-box {
-  font-size: 14px;
-}
-
-.fortschritt-daten {
-  margin: 12px 0;
-}
-
-.tendenz {
+.todo-add {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 0.5rem;
+  margin-top: 1rem;
 }
 
-/* Aufgaben */
-.aufgaben-box {
-  min-height: 180px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+.todo-input {
+  flex: 1;
 }
 
-/* Fragenliste */
+.hinweis-button-container {
+  margin: 1rem 0;
+}
+
 .fragenliste {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+  text-align: center;
 }
 
 .frage-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 15px;
-  color: var(--text-color);
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid #ccc;
 }
 
-.frage-item .icon {
-  font-size: 18px;
-  color: #3f51b5;
+.keine-fragen {
+  color: #888;
+  font-style: italic;
+  text-align: center;
+  margin-top: 1rem;
 }
 
-.frage-text .datum {
-  color: black;
-  font-style: normal;
-  margin-left: 4px;
+.mat-card-title {
+  margin-bottom: 8px;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 8px;
+}
+.hinweis-liste {
+  padding-left: 0;
+  list-style: none;
+  margin-bottom: 1rem;
 }
 
-.frage-text .inhalt {
-  margin-left: 4px;
+.einzelner-hinweis {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+
+  .hinweis-text {
+    flex: 1;
+  }
 }
 
-/* Blaue Buttons */
-.flach-button {
-  color: #1e88e5;
-  font-weight: normal;
-  text-transform: none;
-  background: none;
-  border: none;
-  padding: 6px 12px;
-  font-size: 15px;
-  cursor: pointer;
-  transition: color 0.2s ease;
+.hint-add {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 1rem;
 }
 
-.flach-button:hover {
-  text-decoration: underline;
-  background: transparent;
-  color: #1565c0;
-}
-.bar {
-  height: 10px;
-  border-radius: 5px;
-  margin: 4px 0 12px 0;
+.hint-input {
+  flex: 1;
 }
 
-.bar.average {
-  background-color: #64b5f6; // Hellblau
+.keine-eintraege {
+  color: #888;
+  font-style: italic;
+  text-align: center;
+  margin: 1rem 0;
 }
-
-.bar.correct {
-  background-color: #81c784; // Grün
-}
-
-.bar.medium {
-  background-color: #fff176; // Gelb
-}
-
-.bar.wrong {
-  background-color: #e57373; // Rot
-}
-
-.aufgabenliste {
+.question-box {
+  height: 300px; // feste Höhe, bei Bedarf anpassen
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 10px;
-}
+  justify-content: space-between;
 
-.aufgabe-item {
-  font-size: 15px;
-  color: var(--text-color);
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
-
-.aufgabe-item .datum {
-  color: black;
-  font-style: normal;
-}
-
-.transparent-table {
-  background-color: transparent !important; /* Hintergrund weg */
-  box-shadow: none !important; /* Schatten entfernen */
-  color: inherit; /* Textfarbe übernehmen */
-}
-
-.transparent-table th.mat-header-cell {
-  background-color: transparent !important; /* Header ebenfalls transparent */
-  color: inherit;
-  font-weight: 600;
-}
-
-.transparent-table td.mat-cell {
-  background-color: transparent !important;
-  color: inherit;
+  .mat-card-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }

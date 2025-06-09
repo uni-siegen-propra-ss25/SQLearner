@@ -1,47 +1,64 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { HinweisService } from 'app/features/welcome/services/hinweis.service'; 
+import { HintService } from 'app/features/welcome/services/hint.service';
+import { TodoService, Todo } from 'app/features/welcome/services/todo.service';
 
 @Component({
   selector: 'app-welcome-student',
   templateUrl: './welcome-student.component.html',
-  styleUrls: ['./welcome-student.component.scss']
+  styleUrls: ['./welcome-student.component.scss'],
 })
 export class WelcomeStudentComponent implements OnInit {
-  todos = [
-    { text: 'SQL-Übung 1 bearbeiten', done: false },
-    { text: 'Video zum JOIN-Thema schauen', done: false }
-  ];
-  newTodo: string = '';
-  questions =  [];
-
+  todos: Todo[] = [];
+  newTodo = '';
   hinweise: string[] = [];
 
-  constructor(private router: Router, private hinweisService: HinweisService) {}
+  constructor(
+    private router: Router,
+    private hintService: HintService,
+    private todoService: TodoService
+  ) {}
 
-  ngOnInit() {
-    this.hinweise = this.hinweisService.getHinweise();
+  ngOnInit(): void {
+    // Holt Hinweise vom Server
+    this.hintService.getHints().subscribe((hints) => {
+      this.hinweise = hints.map(h => h.text); // Annahme: Hint hat 'text'
+    });
+
+    this.todoService.getTodos().subscribe((data) => {
+      this.todos = data;
+    });
   }
 
-  addTodo() {
+  addTodo(): void {
     const trimmed = this.newTodo.trim();
     if (trimmed) {
-      this.todos.push({ text: trimmed, done: false });
-      this.newTodo = '';
+      this.todoService.addTodo({ text: trimmed, done: false }).subscribe((createdTodo) => {
+        this.todos.push(createdTodo);
+        this.newTodo = '';
+      });
     }
   }
-  // Beispiel: letzte Nachricht 
-lastMessage = {
-  from: 'tutor',
-  text: 'Für diese Aufgabe nicht. Es wäre aber nicht verkehrt für die Klausur beide Varianten zu lernen',
-  timestamp: new Date()
-};
 
-  removeTodo(index: number) {
-    this.todos.splice(index, 1);
+  removeTodo(index: number): void {
+    const todo = this.todos[index];
+    this.todoService.deleteTodo(todo.id).subscribe(() => {
+      this.todos.splice(index, 1);
+    });
   }
 
-  goToFragen() {
+  toggleDone(todo: Todo): void {
+    this.todoService.updateTodo(todo).subscribe();
+  }
+
+  lastMessage = {
+    from: 'tutor',
+    text: 'Für diese Aufgabe nicht. Es wäre aber nicht verkehrt für die Klausur beide Varianten zu lernen',
+    timestamp: new Date(),
+  };
+
+  goToFragen(): void {
     this.router.navigate(['welcome/student/fragen']);
   }
 }
+

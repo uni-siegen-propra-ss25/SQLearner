@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { HinweisService } from 'app/features/welcome/services/hinweis.service'; 
+import { HintService, Hint } from 'app/features/welcome/services/hint.service';
+import { TodoService, Todo } from 'app/features/welcome/services/todo.service';
 
 @Component({
   selector: 'app-welcome-tutor',
@@ -8,43 +9,73 @@ import { HinweisService } from 'app/features/welcome/services/hinweis.service';
   styleUrls: ['./welcome-tutor.component.scss'],
 })
 export class WelcomeTutorComponent implements OnInit {
-  newHinweis: string = '';
-  hinweise: string[] = [];
+  newHint = '';
+  hints: Hint[] = [];
 
-  fragen = [
-    { name: 'Max M.', datum: '12.05', text: 'Könnte man ein Beispiel zu Aggregatfunktionen machen?' },
-    { name: 'Lisa S.', datum: '11.05', text: 'Ist der NATURAL JOIN prüfungsrelevant?' },
-    { name: 'Jonas T.', datum: '10.05', text: 'Wie genau funktioniert Relationale Division?' },
-  ];
+  todos: Todo[] = [];
+  newTodo = '';
+  fragen: any[] = [];
 
-  displayedColumns: string[] = ['titel', 'typ', 'kategorie', 'datum'];
-  aufgaben = [
-    { titel: 'GartenCenter', typ: 'SQL-Abfrage', kategorie: 'SQL', datum: '2025-05-01' },
-    { titel: 'XML Basics', typ: 'Einzel-Abfrage ', kategorie: 'XML', datum: '2025-05-05' },
-    { titel: 'KinoBesuch', typ: 'SQL-Abfrage', kategorie: 'SQL', datum: '2025-05-10' },
-  ];
 
-  constructor(private router: Router, private hinweisService: HinweisService) {}
+  constructor(
+    private router: Router,
+    private hintService: HintService,
+    private todoService: TodoService
+  ) {}
 
   ngOnInit() {
-    this.hinweise = this.hinweisService.getHinweise();
+    this.loadHints();
+    this.loadTodos();
   }
 
-  addHinweis() {
-    if (this.newHinweis.trim()) {
-      this.hinweisService.addHinweis(this.newHinweis.trim());
-      this.newHinweis = '';
-      this.hinweise = this.hinweisService.getHinweise(); // Aktualisiere lokale Liste
+  loadHints() {
+    this.hintService.getHints().subscribe((data) => {
+      this.hints = data;
+    });
+  }
+
+  loadTodos() {
+    this.todoService.getTodos().subscribe((data) => {
+      this.todos = data;
+    });
+  }
+
+  addHint() {
+    const text = this.newHint.trim();
+    if (text) {
+      this.hintService.addHint(text).subscribe((hint) => {
+        this.hints.push(hint);
+        this.newHint = '';
+      });
     }
   }
 
-  removeHinweis(index: number) {
-    this.hinweisService.removeHinweis(index);
-    this.hinweise = this.hinweisService.getHinweise(); // Aktualisiere lokale Liste
+  removeHint(index: number) {
+    const id = this.hints[index].id;
+    this.hintService.deleteHint(id).subscribe(() => {
+      this.hints.splice(index, 1);
+    });
   }
 
-  goToAufgaben() {
-    this.router.navigate(['welcome/tutor/aufgaben']);
+  addTodo() {
+    const text = this.newTodo.trim();
+    if (text) {
+      this.todoService.addTodo({ text, done: false }).subscribe((todo) => {
+        this.todos.push(todo);
+        this.newTodo = '';
+      });
+    }
+  }
+
+  removeTodo(index: number) {
+    const id = this.todos[index].id;
+    this.todoService.deleteTodo(id).subscribe(() => {
+      this.todos.splice(index, 1);
+    });
+  }
+
+  toggleDone(todo: Todo) {
+    this.todoService.updateTodo(todo).subscribe();
   }
 
   goToFragen() {

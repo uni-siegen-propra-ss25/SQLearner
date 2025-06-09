@@ -7,8 +7,8 @@ import { WelcomeRedirectComponent } from './components/welcome-redirect/welcome-
 import { MaterialModule } from 'app/material.module'; 
 import { FormsModule } from '@angular/forms'; 
 import { WelcomeComponent } from 'app/features/welcome/welcome.component';
+import { HttpClientModule } from '@angular/common/http';
 
-import { AufgabeComponent } from 'app/features/welcome/components/welcome-tutor/aufgaben/aufgaben.component';
 import { FragenComponent } from 'app/features/welcome/components/welcome-tutor/fragen/fragen.component';
 import { PapierkorbComponent } from './components/welcome-tutor/fragen/papierkorb/papierkorb.component';
 import { ArchivComponent } from './components/welcome-tutor/fragen/archiv/archiv.component';
@@ -22,7 +22,6 @@ import { FragenChatComponent } from './components/welcome-student/fragen-chat/fr
     WelcomeStudentComponent,
     WelcomeRedirectComponent,
     WelcomeComponent,
-    AufgabeComponent,  
     FragenComponent,   
     PapierkorbComponent,
     ArchivComponent,
@@ -34,6 +33,7 @@ import { FragenChatComponent } from './components/welcome-student/fragen-chat/fr
     WelcomeRoutingModule,
     FormsModule,
     MaterialModule,
+    HttpClientModule,
   ],
 })
 export class WelcomeModule {}

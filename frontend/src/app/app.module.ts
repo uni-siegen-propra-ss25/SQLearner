@@ -16,6 +16,7 @@ import { RoadmapModule } from './features/roadmap/roadmap.module';
 import { ExercisesModule } from './features/exercises/exercises.module';
 import { ChatModule } from './features/chat/chat.module';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
     declarations: [AppComponent],
@@ -33,6 +34,7 @@ import { FormsModule } from '@angular/forms';
         ExercisesModule,
         ChatModule,
         FormsModule,
+        CommonModule,
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
