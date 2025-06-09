@@ -361,6 +361,7 @@ export class ExercisesService {
         const isCorrect = selectedOption.isCorrect;
         const correctOption = exercise.answers.find((option: any) => option.isCorrect);
         
+        // TODO: Warum wird verraten was die richtige Antwort ist?
         const feedback = isCorrect
             ? '✅ Richtig! Gut gemacht.'
             : `❌ Falsch. Die richtige Antwort ist: "${correctOption?.text || 'Nicht verfügbar'}"`;

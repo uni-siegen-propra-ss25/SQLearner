@@ -11,6 +11,21 @@ export class ProgressService {
     constructor(private readonly prisma: PrismaService) {}
 
     /**
+     * Retrieves progress summaries for all users.
+     * Can be resource-intensive for large number of users.
+     * 
+     * @returns {Promise<UserProgressSummary[]>} Array of progress summaries for all users
+     */
+    async getAllUsersProgress(): Promise<UserProgressSummary[]> {
+        // Get all users
+        const users = await this.prisma.user.findMany();
+        
+        // Get progress for each user
+        const progressPromises = users.map(user => this.getUserProgress(user.id));
+        return Promise.all(progressPromises);
+    }
+
+    /**
      * Retrieves comprehensive progress information for a specific user.
      * Calculates overall completion, chapter-specific progress, and difficulty statistics.
      * 
