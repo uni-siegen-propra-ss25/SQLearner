@@ -34,9 +34,7 @@
             <mat-icon>table_chart</mat-icon>
           </mat-button-toggle>
         </mat-button-toggle-group>
-      </div>
-
-      <div class="query-actions">
+      </div>      <div class="query-actions">
         <button
           mat-stroked-button
           [disabled]="!sqlQuery.trim() || isLoading"
@@ -45,6 +43,16 @@
         >
           <mat-icon>play_arrow</mat-icon>
           Query testen
+        </button>
+        <button
+          mat-stroked-button
+          color="accent"
+          [disabled]="!sqlQuery.trim() || isLoading"
+          (click)="getAiFeedback()"
+          matTooltip="Lässt deine SQL Query von der KI analysieren und gibt dir detailliertes Feedback."
+        >
+          <mat-icon>smart_toy</mat-icon>
+          KI-Feedback
         </button>
         <button
           mat-flat-button

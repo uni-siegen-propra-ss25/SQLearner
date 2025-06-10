@@ -182,4 +182,28 @@ export class ExercisesController {
     ): Promise<{ columns: string[]; rows: any[] }> {
         return this.exercisesService.runQuery(id, body.query);
     }
+
+    /**
+     * Provides AI-powered feedback for SQL queries.
+     *
+     * @param id - The ID of the exercise
+     * @param body - The query and request data
+     * @param userId - The authenticated user's ID
+     * @returns Promise resolving to the AI feedback
+     */
+    @Post(':id/sql-feedback')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.STUDENT)
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Get AI feedback for SQL query' })
+    @ApiParam({ name: 'id', description: 'Exercise ID' })
+    @ApiResponse({ status: 200, description: 'AI feedback generated successfully' })
+    @ApiResponse({ status: 404, description: 'Exercise not found' })
+    async getSqlFeedback(
+        @Param('id') id: number,
+        @Body() body: { query: string },
+        @GetUser('id') userId: number,
+    ): Promise<any> {
+        return this.exercisesService.getSqlQueryFeedback(id, body.query, userId);
+    }
 }

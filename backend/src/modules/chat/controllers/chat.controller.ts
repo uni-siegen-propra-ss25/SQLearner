@@ -43,4 +43,24 @@ export class ChatController {
     async getMessages(@GetUser('id') userId: number, @Query('context') context?: string) {
         return this.chatService.getMessages(userId, context);
     }
+
+    /**
+     * Provides AI-powered feedback for SQL queries submitted by students.
+     *
+     * @param userId - The ID of the user submitting the query
+     * @param feedbackData - The SQL query feedback request data
+     * @returns Promise resolving to the AI feedback message
+     */
+    @Post('sql-feedback')
+    @ApiOperation({ summary: 'Get AI feedback for SQL query' })
+    async getSqlQueryFeedback(
+        @GetUser('id') userId: number, 
+        @Body() feedbackData: { exerciseId: number; query: string }
+    ) {
+        return this.chatService.provideSqlQueryFeedback(
+            userId, 
+            feedbackData.exerciseId, 
+            feedbackData.query
+        );
+    }
 }

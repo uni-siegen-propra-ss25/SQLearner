@@ -82,8 +82,10 @@ model ChatMessage {
   userId    Int
   context   String?
   replyToId Int?
+  exerciseId Int?
 
   user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercise  Exercise?     @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
   replyTo   ChatMessage?  @relation("ReplyToMessage", fields: [replyToId], references: [id])
   replies   ChatMessage[] @relation("ReplyToMessage")
 
@@ -155,6 +157,7 @@ model Exercise {
   submissions     Submission[]
   bookmarks       Bookmark[]
   Progress        Progress[]
+  chatMessages    ChatMessage[]
 }
 
 /// Single/Multiple-Choice options

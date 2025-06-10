@@ -117,4 +117,34 @@ export class QueryExerciseComponent {
         const start = this.pageIndex * this.pageSize;
         return this.queryResult.rows.slice(start, start + this.pageSize);
     }
+
+    /**
+     * Requests AI-powered feedback for the current SQL query.
+     */
+    getAiFeedback(): void {
+        if (!this.sqlQuery.trim()) {
+            this.snackBar.open('Bitte geben Sie zuerst eine SQL Query ein', 'Close', {
+                duration: 3000,
+            });
+            return;
+        }
+
+        this.isLoading = true;
+        this.submissionService.getSqlQueryFeedback(this.exercise.id, this.sqlQuery).subscribe({
+            next: (response) => {
+                this.isLoading = false;
+                this.feedback = response.feedback || 'KI-Feedback wurde generiert.';
+                this.showFeedback = true;
+                this.snackBar.open('KI-Feedback erfolgreich erhalten', 'Close', { duration: 3000 });
+            },
+            error: (error) => {
+                this.isLoading = false;
+                const errorMessage = error.error?.message || error.message || 'Fehler beim Abrufen des KI-Feedbacks';
+                this.snackBar.open(errorMessage, 'Close', {
+                    duration: 5000,
+                    panelClass: ['error-snackbar']
+                });
+            },
+        });
+    }
 }

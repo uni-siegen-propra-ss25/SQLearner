@@ -25,4 +25,15 @@ export class SubmissionService {
     getFeedback(submissionId: number): Observable<string> {
         return this.http.get<string>(`${this.baseUrl}/submissions/${submissionId}/feedback`);
     }
+
+    /**
+     * Requests AI-powered feedback for a SQL query.
+     *
+     * @param exerciseId - The ID of the exercise
+     * @param query - The SQL query to get feedback for
+     * @returns Observable resolving to the AI feedback
+     */
+    getSqlQueryFeedback(exerciseId: number, query: string): Observable<any> {
+        return this.http.post<any>(`${this.baseUrl}/exercises/${exerciseId}/sql-feedback`, { query });
+    }
 }

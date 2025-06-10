@@ -5,6 +5,7 @@ import { UpdateExerciseDto } from '../models/update-exercise.dto';
 import { Exercise, ExerciseType } from '@prisma/client';
 import { DatabasesService } from '../../databases/services/databases.service';
 import { ProgressService } from '../../progress/services/progress.service';
+import OpenAI from 'openai';
 
 /**
  * Service handling business logic for exercise-related operations.
@@ -15,8 +16,7 @@ import { ProgressService } from '../../progress/services/progress.service';
  * @class ExercisesService
  */
 @Injectable()
-export class ExercisesService {
-    /**
+export class ExercisesService {    /**
      * Erstellt eine neue Instanz des ExercisesService.
      * 
      * @param {PrismaService} prisma - Prisma ORM Service für Datenbankoperationen
@@ -272,23 +272,23 @@ export class ExercisesService {
         createdAt: Date;
     }> {
         const exercise = await this.getExerciseById(id);
-        
-        // Nur Single Choice und Multiple Choice Aufgaben behandeln
+          // Nur Single Choice, Multiple Choice und Query Aufgaben behandeln
         if (exercise.type !== ExerciseType.SINGLE_CHOICE && 
-            exercise.type !== ExerciseType.MULTIPLE_CHOICE) {
+            exercise.type !== ExerciseType.MULTIPLE_CHOICE &&
+            exercise.type !== ExerciseType.QUERY) {
             throw new BadRequestException(
-                `Exercise type ${exercise.type} wird für Antwortauswertung nicht unterstützt. Nur Single-Choice und Multiple-Choice Aufgaben werden behandelt.`
+                `Exercise type ${exercise.type} wird für Antwortauswertung nicht unterstützt. Nur Single-Choice, Multiple-Choice und Query Aufgaben werden behandelt.`
             );
         }
 
         let isCorrect = false;
-        let feedback = '';
-
-        // Antwort je nach Aufgabentyp evaluieren
+        let feedback = '';        // Antwort je nach Aufgabentyp evaluieren
         if (exercise.type === ExerciseType.SINGLE_CHOICE) {
             ({ isCorrect, feedback } = this.evaluateSingleChoice(exercise, answerText));
         } else if (exercise.type === ExerciseType.MULTIPLE_CHOICE) {
             ({ isCorrect, feedback } = this.evaluateMultipleChoice(exercise, answerText));
+        } else if (exercise.type === ExerciseType.QUERY) {
+            ({ isCorrect, feedback } = await this.evaluateSqlQuery(exercise, answerText, userId));
         }
 
         // Submission in Datenbank erstellen
@@ -403,5 +403,253 @@ export class ExercisesService {
             : '❌ Falsch. Versuchen Sie es noch einmal!';
 
         return { isCorrect, feedback };
+    }
+
+    /**
+     * Evaluiert eine SQL Query Aufgabe durch Vergleich mit der Musterlösung.
+     * Nutzt KI-basiertes Feedback für detaillierte Bewertung der Studentenantwort.
+     *
+     * @param {any} exercise - Die Aufgabe mit SQL-Lösung und Datenbankkontext
+     * @param {string} answerText - Die SQL Query des Studenten
+     * @param {number} userId - ID des Studenten für Chat-Feedback
+     * @returns {Promise<{isCorrect: boolean; feedback: string}>} Evaluierungsergebnis mit Korrektheit und Feedback
+     * @private
+     */
+    private async evaluateSqlQuery(
+        exercise: any,
+        answerText: string,
+        userId: number,
+    ): Promise<{ isCorrect: boolean; feedback: string }> {
+        try {
+            // Validierung der SQL Query
+            if (!answerText || !answerText.trim()) {
+                return {
+                    isCorrect: false,
+                    feedback: 'Bitte geben Sie eine SQL Query ein.',
+                };
+            }
+
+            // Überprüfen ob eine Musterlösung vorhanden ist
+            if (!exercise.querySolution) {
+                return {
+                    isCorrect: false,
+                    feedback: 'Für diese Aufgabe ist keine Musterlösung verfügbar. Bitte wenden Sie sich an Ihren Tutor.',
+                };
+            }
+
+            let isCorrect = false;
+            let feedback = '';
+
+            try {
+                // Ausführung der Student-Query
+                const studentResult = await this.databasesService.runQuery(exercise.database.id, answerText);
+                
+                // Ausführung der Musterlösung
+                const solutionResult = await this.databasesService.runQuery(exercise.database.id, exercise.querySolution);
+
+                // Vergleich der Ergebnisse
+                isCorrect = this.compareQueryResults(studentResult, solutionResult);
+
+                if (isCorrect) {
+                    feedback = '✅ Perfekt! Ihre SQL Query liefert das korrekte Ergebnis.';
+                } else {
+                    feedback = '❌ Das Ergebnis Ihrer Query unterscheidet sich von der erwarteten Lösung. Überprüfen Sie Ihre SQL-Syntax und Logik.';
+                }
+
+            } catch (error) {
+                // SQL Fehler in der Student-Query
+                isCorrect = false;
+                feedback = `❌ SQL Fehler: ${error.message || 'Ungültige SQL Query'}. Bitte überprüfen Sie Ihre Syntax.`;
+            }
+
+            return { isCorrect, feedback };
+
+        } catch (error) {
+            console.error('Error in evaluateSqlQuery:', error);
+            return {
+                isCorrect: false,
+                feedback: 'Fehler bei der Auswertung der SQL Query. Bitte versuchen Sie es erneut.',
+            };
+        }
+    }
+
+    /**
+     * Vergleicht zwei Query-Ergebnisse auf Gleichheit.
+     * Prüft sowohl die Spaltennamen als auch die Datenzeilen.
+     *
+     * @param {any} result1 - Erstes Query-Ergebnis
+     * @param {any} result2 - Zweites Query-Ergebnis
+     * @returns {boolean} True wenn die Ergebnisse identisch sind
+     * @private
+     */
+    private compareQueryResults(result1: any, result2: any): boolean {
+        try {
+            // Vergleich der Spaltenanzahl
+            if (result1.columns.length !== result2.columns.length) {
+                return false;
+            }
+
+            // Vergleich der Spaltennamen (reihenfolgenunabhängig)
+            const cols1 = result1.columns.sort();
+            const cols2 = result2.columns.sort();
+            if (JSON.stringify(cols1) !== JSON.stringify(cols2)) {
+                return false;
+            }
+
+            // Vergleich der Zeilenzahl
+            if (result1.rows.length !== result2.rows.length) {
+                return false;
+            }
+
+            // Sortierung der Zeilen für konsistenten Vergleich
+            const sortedRows1 = this.sortRowsForComparison(result1.rows, result1.columns);
+            const sortedRows2 = this.sortRowsForComparison(result2.rows, result2.columns);
+
+            // Vergleich der Zeileninhalte
+            return JSON.stringify(sortedRows1) === JSON.stringify(sortedRows2);
+
+        } catch (error) {
+            console.error('Error comparing query results:', error);
+            return false;
+        }
+    }
+
+    /**
+     * Sortiert Tabellenzeilen für konsistenten Vergleich.
+     *
+     * @param {any[]} rows - Die zu sortierenden Zeilen
+     * @param {string[]} columns - Die Spaltennamen
+     * @returns {any[]} Sortierte Zeilen
+     * @private
+     */
+    private sortRowsForComparison(rows: any[], columns: string[]): any[] {
+        return rows.sort((a, b) => {
+            for (const col of columns) {
+                const valueA = a[col];
+                const valueB = b[col];
+                
+                if (valueA < valueB) return -1;
+                if (valueA > valueB) return 1;
+            }
+            return 0;
+        });
+    }
+
+    /**
+     * Provides AI-powered feedback for SQL queries submitted by students.
+     * Integrates with the chat system to generate contextual feedback.
+     *
+     * @param {number} exerciseId - The ID of the exercise
+     * @param {string} query - The SQL query submitted by the student
+     * @param {number} userId - The ID of the user submitting the query
+     * @returns {Promise<any>} Promise resolving to the AI feedback message
+     * @throws {NotFoundException} if the exercise does not exist
+     * @throws {BadRequestException} if the exercise is not a SQL query type
+     */
+    async getSqlQueryFeedback(exerciseId: number, query: string, userId: number): Promise<any> {
+        const exercise = await this.getExerciseById(exerciseId);
+        
+        if (exercise.type !== ExerciseType.QUERY) {
+            throw new BadRequestException('This endpoint only supports SQL query exercises');
+        }        if (!exercise.databaseId) {
+            throw new BadRequestException('Exercise has no associated database');
+        }        // Generate AI feedback directly
+        const feedback = await this.generateSqlFeedback(exerciseId, query, userId);
+
+        return {
+            exerciseId,
+            query,
+            feedback: feedback,
+            isCorrect: false, // This could be enhanced to include correctness evaluation
+        };
+    }
+
+    /**
+     * Generates AI-powered feedback for SQL queries.
+     * 
+     * @param exerciseId - The ID of the exercise
+     * @param query - The SQL query to analyze
+     * @param userId - The ID of the user submitting the query
+     * @returns Promise resolving to the feedback string
+     * @private
+     */
+    private async generateSqlFeedback(exerciseId: number, query: string, userId: number): Promise<string> {
+        try {
+            // Get exercise details including expected solution
+            const exercise = await this.prisma.exercise.findUnique({
+                where: { id: exerciseId },
+                include: {
+                    database: true,
+                },
+            });
+
+            if (!exercise) {
+                return 'Exercise nicht gefunden.';
+            }
+
+            // Get API key from settings
+            const apiKeySetting = await this.prisma.settings.findUnique({
+                where: { name: 'OPENAI_API_KEY' },
+            });
+
+            const apiKey = process.env.OPENAI_API_KEY || apiKeySetting?.value;
+
+            if (!apiKey) {
+                return '⚠️ KI-Feedback ist derzeit nicht verfügbar. Bitte konfigurieren Sie den OpenAI API-Key in den Einstellungen.';
+            }
+
+            const openai = new OpenAI({
+                apiKey: apiKey,
+            });
+
+            // Build context for AI
+            let context = `Student's SQL Query:\n${query}\n\n`;
+            context += `Exercise Description:\n${exercise.description}\n\n`;
+            
+            if (exercise.querySolution) {
+                context += `Expected Solution:\n${exercise.querySolution}\n\n`;
+            }
+            
+            context += 'Please provide detailed feedback on the student\'s SQL query.';
+
+            const systemPrompt = `Du bist ein erfahrener SQL-Tutor und Datenbankexperte. Deine Aufgabe ist es, konstruktives und detailliertes Feedback zu SQL-Queries von Studenten zu geben.
+
+Analysiere die SQL-Query des Studenten basierend auf folgenden Kriterien:
+
+1. **Syntax**: Ist die Query syntaktisch korrekt?
+2. **Logik**: Löst die Query das gestellte Problem?
+3. **Effizienz**: Kann die Query optimiert werden?
+4. **Best Practices**: Folgt die Query SQL-Best-Practices?
+5. **Vergleich mit Lösung**: Wie unterscheidet sich die Query von der Musterlösung (falls vorhanden)?
+
+Dein Feedback sollte:
+- Konstruktiv und ermutigend sein
+- Konkrete Verbesserungsvorschläge enthalten
+- Fehler klar erklären
+- Alternative Lösungsansätze aufzeigen
+- Auf Deutsch verfasst sein
+
+Struktur dein Feedback in folgende Bereiche:
+✅ **Positive Aspekte**
+⚠️ **Verbesserungsmöglichkeiten**  
+🔧 **Konkrete Tipps**
+📝 **Zusammenfassung**`;
+
+            const completion = await openai.chat.completions.create({
+                model: "gpt-3.5-turbo",
+                messages: [
+                    { role: "system", content: systemPrompt },
+                    { role: "user", content: context }
+                ],
+                max_tokens: 1500,
+                temperature: 0.3,
+            });
+
+            return completion.choices[0]?.message?.content || "Entschuldigung, ich konnte kein Feedback generieren.";
+
+        } catch (error) {
+            console.error('Error generating SQL feedback:', error);
+            return "Entschuldigung, es gab einen Fehler beim Generieren des SQL-Feedbacks. Bitte versuchen Sie es später erneut.";
+        }
     }
 }
