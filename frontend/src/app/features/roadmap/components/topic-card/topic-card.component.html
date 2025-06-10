@@ -5,6 +5,17 @@
     <mat-panel-title>
       <!-- Topic title display -->
       <div class="topic-title">{{ topic.title }}</div>
+      <span class="topic-progress" *ngIf="exercises.length > 0">
+        {{ getCompletedCount() }}/{{ exercises.length }} erledigt
+        <mat-progress-bar
+          *ngIf="exercises.length > 0"
+          class="topic-progress-bar"
+          mode="determinate"
+          [value]="(getCompletedCount() / exercises.length) * 100"
+          color="primary"
+          style="margin-top: 4px; min-width: 120px; max-width: 200px; height: 8px; border-radius: 4px;"
+        ></mat-progress-bar>
+      </span>
     </mat-panel-title>
     <mat-panel-description>
       <!-- Edit and delete buttons for tutors only -->

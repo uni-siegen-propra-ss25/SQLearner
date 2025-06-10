@@ -299,4 +299,21 @@ export class TopicCardComponent implements OnInit {
     onExerciseCompleted(exerciseId: number): void {
         this.exerciseCompleted.emit(exerciseId);
     }
+
+    getCompletedCount(): number {
+        return this.exercises.filter(
+            ex => this.isExerciseCompleted(ex.id) || this.isLocallyCompleted(ex.id)
+        ).length;
+    }
+
+    isLocallyCompleted(exerciseId: number): boolean {
+        const completed = localStorage.getItem('completedExercises');
+        if (!completed) return false;
+        try {
+            const arr = JSON.parse(completed);
+            return Array.isArray(arr) && arr.includes(exerciseId);
+        } catch {
+            return false;
+        }
+    }
 }
