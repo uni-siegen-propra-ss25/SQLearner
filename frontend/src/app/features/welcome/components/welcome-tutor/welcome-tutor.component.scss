@@ -40,36 +40,86 @@
   padding: 16px;
   flex: 1 1 45%;
   min-width: 300px;
+  display: flex;
+  flex-direction: column;
 }
 
-.todo-box ul,
-.hinweis-liste {
+/* Überschriften-Styling mit Linien */
+
+.hint-box {
+mat-card-title {
+  margin-bottom: 8px;
+  border-bottom: 1px solid #ccc;  // graue, durchgezogene Linie unter allen Überschriften
+  padding-bottom: 8px;
+}
+
+}
+
+.todo-box {
+mat-card-title {
+  margin-bottom: 8px;
+  border-bottom: 1px solid #ccc;  // graue, durchgezogene Linie unter allen Überschriften
+  padding-bottom: 8px;
+}
+
+}
+
+.question-box {
+mat-card-title {
+  margin-bottom: 8px;
+  border-bottom: 1px solid #ccc;  // graue, durchgezogene Linie unter allen Überschriften
+  padding-bottom: 8px;
+}
+
+}
+
+/* Listen & Items */
+
+.hinweis-liste,
+.todo-box ul {
   padding-left: 0;
   list-style: none;
 }
 
-.todo-item,
-.einzelner-hinweis {
+.einzelner-hinweis,
+.todo-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 0.5rem;
 }
 
-.todo-add {
+.hinweis-text {
+  flex: 1;
+}
+
+.todo-add,
+.hint-add {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   margin-top: 1rem;
 }
 
-.todo-input {
+.todo-input,
+.hint-input {
   flex: 1;
 }
 
-.hinweis-button-container {
+/* To-do und Hinweise Buttons */
+
+button[mat-icon-button] {
+  margin-left: 0.5rem;
+}
+
+.keine-eintraege {
+  color: #888;
+  font-style: italic;
+  text-align: center;
   margin: 1rem 0;
 }
+
+/* Fragenliste */
 
 .fragenliste {
   max-height: 300px;
@@ -79,14 +129,14 @@
 }
 
 .frage-item {
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px dashed #ccc; 
   padding: 1rem 0;
+  text-align: left;
 }
 
 .frage-details {
-  text-align: left;
-  margin: 0 auto;
   max-width: 600px;
+  margin: 0 auto;
 }
 
 .frage-text {
@@ -102,91 +152,23 @@
   margin-top: 1rem;
 }
 
+/* Fragen Button unten rechts */
 
-.mat-card-title {
-  margin-bottom: 8px;
-  border-bottom: 1px solid #ccc;
-  padding-bottom: 8px;
-}
-.hinweis-liste {
-  padding-left: 0;
-  list-style: none;
-  margin-bottom: 1rem;
-}
-
-.einzelner-hinweis {
+.fragen-actions {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-
-  .hinweis-text {
-    flex: 1;
-  }
-}
-
-.hint-add {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  justify-content: flex-end;
+  padding-top: 0.5rem;
   margin-top: auto;
-  padding-top: 1rem;
 }
 
-.hint-input {
-  flex: 1;
+/* Flexbox Fixes für mat-card */
+
+.mat-card-content {
+  flex: 1 1 auto;
+  overflow-y: auto;
 }
 
-.keine-eintraege {
-  color: #888;
-  font-style: italic;
-  text-align: center;
-  margin: 1rem 0;
-}
-.question-box {
-  height: 320px;
-  display: flex;
-  flex-direction: column;
-
-  .mat-card-title {
-    margin-bottom: 0.5rem;
-  }
-
-  .fragen-content {
-    flex: 1;
-    overflow-y: auto;
-    padding-right: 8px;
-  }
-
-  .fragen-actions {
-    display: flex;
-    justify-content: flex-end;
-    padding-top: 0.5rem;
-    border-top: 1px solid #ccc;
-  }
-}
-
-.frage-item {
-  border-bottom: 1px solid #ccc;
-  padding: 0.75rem 0;
-  text-align: left;
-}
-
-.frage-details {
-  max-width: 100%;
-}
-
-.frage-text {
-  margin-top: 0.4rem;
-  font-size: 1rem;
-  color: #333;
-}
-
-.keine-fragen {
-  color: #888;
-  font-style: italic;
-  text-align: left;
-  margin-top: 1rem;
+.mat-card-actions {
+  flex-shrink: 0;
 }
 

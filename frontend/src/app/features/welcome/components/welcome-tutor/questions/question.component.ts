@@ -82,9 +82,13 @@ archivieren(frage: any, event: Event) {
 loeschen(frage: any, event: Event) {
   event.preventDefault();
   this.questionService.löschen(frage.id).subscribe(() => {
+    // Frage lokal als gelöscht markieren (falls du später noch was anzeigen willst)
+    frage.ist_geloescht = true;
+    // aus der sichtbaren Liste entfernen
     this.questions = this.questions.filter((f) => f.id !== frage.id);
   });
 }
+
 
 
 entferneAngepinnt(frage: any, event: Event) {
