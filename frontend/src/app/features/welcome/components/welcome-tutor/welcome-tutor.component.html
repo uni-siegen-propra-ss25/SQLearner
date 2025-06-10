@@ -1,43 +1,44 @@
-<!-- Willkommensnachricht --> 
+<!-- Begrüßung oben -->
 <div class="welcome-container">
   <h1>Willkommen bei SQLearner</h1>
   <p>Ihre Plattform zum Lernen und Üben von SQL</p>
 </div>
 
-<!-- Hauptlayout -->
+<!-- Hauptbereich -->
 <div class="main-content">
-  <!-- Oberer Bereich -->
+
+  <!-- Obere Boxenreihe -->
   <div class="top-row">
-<!-- Hinweise-Box links -->
-<mat-card class="box hint-box">
-  <mat-card-title>Hinweise für Studierende</mat-card-title>
-  <mat-card-content>
-    <ul class="hinweis-liste">
-      <li *ngFor="let hint of hints; let i = index" class="einzelner-hinweis">
-        <mat-icon color="warn">warning</mat-icon>
-        <span class="hinweis-text">{{ hint.text }}</span>
-        <button mat-icon-button color="warn" (click)="removeHint(i)">
-          <mat-icon>delete</mat-icon>
+
+    <!-- Hinweise für Studierende -->
+    <mat-card class="box hint-box">
+      <mat-card-title>Hinweise für Studierende</mat-card-title>
+      <mat-card-content>
+        <ul class="hinweis-liste">
+          <li *ngFor="let hint of hints; let i = index" class="einzelner-hinweis">
+            <mat-icon color="warn">warning</mat-icon>
+            <span class="hinweis-text">{{ hint.text }}</span>
+            <button mat-icon-button color="warn" (click)="removeHint(i)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </li>
+        </ul>
+        <p *ngIf="hints.length === 0" class="keine-eintraege">Erstellen Sie einen Hinweis</p>
+      </mat-card-content>
+
+      <!-- Eingabefeld für neuen Hinweis -->
+      <mat-card-actions class="hint-add">
+        <mat-form-field appearance="fill" class="hint-input">
+          <mat-label>Neuen Hinweis hinzufügen...</mat-label>
+          <input matInput [(ngModel)]="newHint" (keyup.enter)="addHint()" />
+        </mat-form-field>
+        <button mat-icon-button color="primary" (click)="addHint()">
+          <mat-icon>arrow_upward</mat-icon>
         </button>
-      </li>
-    </ul>
-    <p *ngIf="hints.length === 0" class="keine-eintraege">Erstellen Sie einen Hinweis</p>
-  </mat-card-content>
+      </mat-card-actions>
+    </mat-card>
 
-  <!-- Eingabefeld unten -->
-  <mat-card-actions class="hint-add">
-    <mat-form-field appearance="fill" class="hint-input">
-      <mat-label>Neuen Hinweis hinzufügen...</mat-label>
-      <input matInput [(ngModel)]="newHint" (keyup.enter)="addHint()" />
-    </mat-form-field>
-    <button mat-icon-button color="primary" (click)="addHint()">
-      <mat-icon>arrow_upward</mat-icon>
-    </button>
-  </mat-card-actions>
-</mat-card>
-
-
-    <!-- To-do-Box rechts -->
+    <!-- Eigene Aufgabenliste -->
     <mat-card class="box todo-box">
       <mat-card-title>Meine To-dos</mat-card-title>
       <mat-card-content>
@@ -52,6 +53,8 @@
           </li>
         </ul>
         <p *ngIf="todos.length === 0" class="keine-eintraege">Ergänzen Sie Ihre To-do-Liste</p>
+
+        <!-- Neue To-do Eingabe -->
         <div class="todo-add">
           <mat-form-field appearance="fill" class="todo-input">
             <mat-label>Neue Aufgabe hinzufügen...</mat-label>
@@ -65,31 +68,32 @@
     </mat-card>
   </div>
 
-<!-- Unterer Bereich -->
-<div class="bottom-row">
-  <mat-card class="box question-box">
-    <mat-card-title>Fragen der Studierenden</mat-card-title>
-    <mat-card-content>
-      <div class="fragenliste">
-        <ng-container *ngIf="fragen.length > 0; else keineFragen">
-          <div *ngFor="let frage of fragen.slice(0, 3)" class="frage-item">
-            <div class="frage-details">
-              <strong>{{ frage.student_name }}</strong><br>
-              <small>{{ frage.erstellt_am | date: 'dd.MM.yyyy, HH:mm' }}</small>
-              <p class="frage-text">{{ frage.frage }}</p>
+  <!-- Untere Zeile mit aktuellen Fragen -->
+  <div class="bottom-row">
+    <mat-card class="box question-box">
+      <mat-card-title>Fragen der Studierenden</mat-card-title>
+      <mat-card-content>
+        <div class="fragenliste">
+          <!-- Zeigt max. 3 Fragen an -->
+          <ng-container *ngIf="fragen.length > 0; else keineFragen">
+            <div *ngFor="let frage of fragen.slice(0, 3)" class="frage-item">
+              <div class="frage-details">
+                <strong>{{ frage.student_name }}</strong><br>
+                <small>{{ frage.erstellt_am | date: 'dd.MM.yyyy, HH:mm' }}</small>
+                <p class="frage-text">{{ frage.frage }}</p>
+              </div>
             </div>
-          </div>
-        </ng-container>
-        <ng-template #keineFragen>
-          <p class="keine-fragen">Sie haben noch keine Fragen</p>
-        </ng-template>
-      </div>
-    </mat-card-content>
+          </ng-container>
+          <ng-template #keineFragen>
+            <p class="keine-fragen">Sie haben noch keine Fragen</p>
+          </ng-template>
+        </div>
+      </mat-card-content>
 
-  <!-- Button fest unten rechts in der Box -->
-  <mat-card-actions class="fragen-actions">
-    <button mat-button color="primary" (click)="goToFragen()">Alle anzeigen</button>
-  </mat-card-actions>
-</mat-card>
-</div>
+      <!-- Button zu allen Fragen -->
+      <mat-card-actions class="fragen-actions">
+        <button mat-button color="primary" (click)="goToFragen()">Alle anzeigen</button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
 </div>

@@ -1,17 +1,21 @@
 <div class="papierkorb-container">
+  <!-- Header -->
   <div class="papierkorb-header">
-    <h1>SQLearner</h1>
-    <p>Papierkorb - Gelöschte Fragen verwalten</p>
+    <h1>Papierkorb</h1>
+    <p>Gelöschte Fragen endgültig löschen oder wiederherstellen</p>
   </div>
 
   <!-- Liste gelöschter Fragen -->
   <div class="papierkorb-liste" *ngIf="fragen.length > 0; else leer">
     <div class="papierkorb-item" *ngFor="let frage of fragen">
       <div class="frage-info">
-        <strong>{{ frage.student_name }}</strong> ({{ frage.erstellt_am | date:'dd.MM.yyyy HH:mm' }})
-          <p class="frage-text">„{{ frage.frage }}“</p>
-          <p class="antwort-text" *ngIf="frage.antwort"><strong>Antwort:</strong> {{ frage.antwort }}</p>
+        <strong>{{ frage.student_name }}</strong>
+        ({{ frage.erstellt_am | date:'dd.MM.yyyy HH:mm' }})
+        <p class="frage-text">„{{ frage.frage }}“</p>
+        <p class="antwort-text" *ngIf="frage.antwort"><strong>Antwort:</strong> {{ frage.antwort }}</p>
       </div>
+
+      <!-- Aktionen -->
       <div class="frage-aktionen">
         <button mat-icon-button color="primary" (click)="wiederherstellen(frage)">
           <mat-icon>restore</mat-icon>
@@ -23,6 +27,7 @@
     </div>
   </div>
 
+  <!-- Leerer Papierkorb -->
   <ng-template #leer>
     <p class="leertext">Der Papierkorb ist leer 🗑️</p>
   </ng-template>

@@ -1,18 +1,21 @@
 <div class="archiv-container">
-  <!-- Oberer blauer Balken -->
+  <!-- Kopfbereich mit Titel -->
   <div class="archiv-header">
     <h1>SQLearner</h1>
     <p>Archiv - Archivierte Fragen verwalten</p>
   </div>
 
-  <!-- Liste archivierter Fragen -->
+  <!-- Liste der archivierten Fragen -->
   <div class="archiv-liste" *ngIf="fragen.length > 0; else leer">
     <div class="archiv-item" *ngFor="let frage of fragen">
       <div class="frage-info">
-        <strong>{{ frage.student_name }}</strong> ({{ frage.erstellt_am | date:'dd.MM.yyyy HH:mm' }})
-          <p class="frage-text">„{{ frage.frage }}“</p>
-          <p class="antwort-text" *ngIf="frage.antwort"><strong>Antwort:</strong> {{ frage.antwort }}</p>
+        <strong>{{ frage.student_name }}</strong>
+        ({{ frage.erstellt_am | date:'dd.MM.yyyy HH:mm' }})
+        <p class="frage-text">„{{ frage.frage }}“</p>
+        <p class="antwort-text" *ngIf="frage.antwort"><strong>Antwort:</strong> {{ frage.antwort }}</p>
       </div>
+
+      <!-- Aktionen: Wiederherstellen / Löschen -->
       <div class="frage-aktionen">
         <button mat-icon-button color="primary" (click)="wiederherstellen(frage)">
           <mat-icon>restore</mat-icon>
@@ -24,7 +27,7 @@
     </div>
   </div>
 
-  <!-- Leerer Zustand -->
+  <!-- Fallback bei leerer Liste -->
   <ng-template #leer>
     <p class="leertext">Das Archiv ist leer 📦</p>
   </ng-template>

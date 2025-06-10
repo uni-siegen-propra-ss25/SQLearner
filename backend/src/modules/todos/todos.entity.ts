@@ -1,19 +1,19 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-@Entity()
+@Entity() // Markiert die Klasse als Datenbanktabelle (Tabellenname wird automatisch zu „todo“)
 export class Todo {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn() // Automatisch generierter Primärschlüssel
   id: number;
 
-  @Column()
+  @Column() // Text der ToDo-Aufgabe
   text: string;
 
-  @Column({ default: false })
+  @Column({ default: false }) // Status: Ist die Aufgabe erledigt? Standard = false
   done: boolean;
 
-  @Column()
+  @Column() // Rolle, für wen die Aufgabe gedacht ist (TUTOR oder STUDENT)
   role: 'TUTOR' | 'STUDENT';
-    user: any;
-}
 
+  user: any; // Zusatzfeld (nicht in der Datenbank gespeichert, da ohne @Column), evtl. für spätere Erweiterung
+}
 

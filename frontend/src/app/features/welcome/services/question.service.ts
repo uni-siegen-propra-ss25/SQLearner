@@ -66,5 +66,4 @@ export class QuestionService {
   hardDelete(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
-
 }

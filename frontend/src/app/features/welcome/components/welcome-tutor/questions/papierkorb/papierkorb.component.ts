@@ -16,17 +16,20 @@ export class PapierkorbComponent implements OnInit {
   }
 
   ladeGeloeschteFragen(): void {
+    // Nur Fragen anzeigen, die gelöscht wurden
     this.questionService.getAll().subscribe(data => {
       this.fragen = data.filter(q => q.ist_geloescht);
     });
   }
 
+  // Stellt eine gelöschte Frage wieder her
   wiederherstellen(frage: Question): void {
     this.questionService.patchGeloescht(frage.id, false).subscribe(() => {
       this.ladeGeloeschteFragen();
     });
   }
 
+  // Entfernt eine Frage endgültig
   endgueltigLoeschen(frage: Question): void {
     if (confirm('Diese Frage endgültig löschen?')) {
       this.questionService.hardDelete(frage.id).subscribe(() => {
@@ -35,6 +38,5 @@ export class PapierkorbComponent implements OnInit {
     }
   }
 }
-
 
 

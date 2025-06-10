@@ -1,44 +1,37 @@
-<div class="archiv-container">
-  <div class="archiv-header" style="background-color: #b3cbbf">
-    <h1>SQLearner</h1>
-    <p>Beantwortet – Deine beantworteten Fragen</p>
+<div class="beantwortet-container">
+  <!-- Header -->
+  <div class="beantwortet-header">
+    <h1>Beantwortete Fragen</h1>
+    <p>Verwalte alle beantworteten, nicht archivierten Fragen</p>
   </div>
 
-  <!-- Liste beantworteter Fragen -->
-  <div class="archiv-liste" *ngIf="beantworteteFragen.length > 0; else leer">
-    <div class="archiv-item" *ngFor="let eintrag of beantworteteFragen">
+  <!-- Fragenliste -->
+  <div class="beantwortet-liste" *ngIf="beantworteteFragen.length > 0; else leer">
+    <div class="beantwortet-item" *ngFor="let frage of beantworteteFragen">
       <div class="frage-info">
-        <strong>{{ eintrag.student_name }}</strong> ({{ eintrag.erstellt_am | date:'dd.MM.yyyy HH:mm' }})
-        <p class="frage-text">„{{ eintrag.frage }}“</p>
-        <p class="antwort-text"><strong>Antwort:</strong> {{ eintrag.antwort }}</p>
+        <strong>{{ frage.student_name }}</strong>
+        ({{ frage.erstellt_am | date:'dd.MM.yyyy HH:mm' }})
+        <p class="frage-text">„{{ frage.frage }}“</p>
+        <p class="antwort-text"><strong>Antwort:</strong> {{ frage.antwort }}</p>
       </div>
 
+      <!-- Aktionsbuttons -->
       <div class="frage-aktionen">
-        <button
-          mat-icon-button
-          color="primary"
-          (click)="insArchivVerschieben(eintrag)"
-          title="Archivieren"
-        >
+        <button mat-icon-button color="primary" (click)="insArchivVerschieben(frage)">
           <mat-icon>archive</mat-icon>
         </button>
-        <button mat-icon-button color="accent" (click)="markieren(eintrag)" title="Anpinnen">
+        <button mat-icon-button color="accent" (click)="markieren(frage)">
           <mat-icon>push_pin</mat-icon>
         </button>
-        <button
-          mat-icon-button
-          color="warn"
-          (click)="inPapierkorbVerschieben(eintrag)"
-          title="Löschen"
-        >
+        <button mat-icon-button color="warn" (click)="inPapierkorbVerschieben(frage)">
           <mat-icon>delete</mat-icon>
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Leerer Zustand -->
+  <!-- Wenn keine beantworteten Fragen -->
   <ng-template #leer>
-    <p class="leertext">Sie haben noch keine Fragen beantwortet ✍️</p>
+    <p class="leertext">Keine beantworteten Fragen vorhanden ✅</p>
   </ng-template>
 </div>

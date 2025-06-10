@@ -16,9 +16,10 @@ export class BeantwortetComponent implements OnInit {
   }
 
   ladeBeantworteteFragen(): void {
+    // Nur beantwortete Fragen, die weder archiviert, gelöscht noch angepinnt sind
     this.questionService.getAll().subscribe((data) => {
       this.beantworteteFragen = data.filter(
-        (frage) =>
+        frage =>
           frage.ist_beantwortet &&
           !frage.ist_archiviert &&
           !frage.ist_geloescht &&
@@ -27,21 +28,21 @@ export class BeantwortetComponent implements OnInit {
     });
   }
 
-  // Archivieren
+  // Verschiebt Frage ins Archiv
   insArchivVerschieben(frage: any): void {
     this.questionService.archivieren(frage.id, true).subscribe(() => {
       this.entfernenAusListe(frage.id);
     });
   }
 
-  // Löschen
+  // Verschiebt Frage in den Papierkorb
   inPapierkorbVerschieben(frage: any): void {
     this.questionService.löschen(frage.id).subscribe(() => {
       this.entfernenAusListe(frage.id);
     });
   }
 
-  // Anpinnen
+  // Pinnt die Frage
   markieren(frage: any): void {
     this.questionService.pin(frage.id, true).subscribe(() => {
       this.entfernenAusListe(frage.id);
@@ -49,7 +50,8 @@ export class BeantwortetComponent implements OnInit {
   }
 
   private entfernenAusListe(frageId: number): void {
-    this.beantworteteFragen = this.beantworteteFragen.filter((f) => f.id !== frageId);
+    this.beantworteteFragen = this.beantworteteFragen.filter(f => f.id !== frageId);
   }
 }
+
 

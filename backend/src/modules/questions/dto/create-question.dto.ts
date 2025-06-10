@@ -1,17 +1,18 @@
 import { IsString, IsOptional, IsBoolean } from 'class-validator';
 
+// DTO-Klasse zur Validierung eingehender Daten beim Erstellen einer Frage
 export class CreateQuestionDto {
-  @IsString()
+  @IsString() // Muss ein Text sein
   student_name: string;
 
-  @IsString()
+  @IsString() // Muss ein Text sein
   frage: string;
 
-  @IsOptional()
-  @IsString()
+  @IsOptional() // Optionales Feld
+  @IsString() // Muss ein gültiger Datums-String sein (z. B. ISO-Zeitstempel)
   erstellt_am?: string;
 
-  @IsOptional()
+  @IsOptional() // Optional und boolesch
   @IsBoolean()
   ist_archiviert?: boolean;
 
@@ -27,4 +28,3 @@ export class CreateQuestionDto {
   @IsBoolean()
   ist_beantwortet?: boolean;
 }
-

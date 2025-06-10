@@ -1,5 +1,8 @@
+// Import grundlegender Angular-Funktionalitäten und Services
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+
+// Import von Services und Datenmodellen für Hinweise, To-dos und Fragen
 import { HintService, Hint } from 'app/features/welcome/services/hint.service';
 import { TodoService, Todo } from 'app/features/welcome/services/todo.service';
 import { QuestionService, Question } from 'app/features/welcome/services/question.service';
@@ -10,11 +13,18 @@ import { QuestionService, Question } from 'app/features/welcome/services/questio
   styleUrls: ['./welcome-tutor.component.scss'],
 })
 export class WelcomeTutorComponent implements OnInit {
+
+  // Neueingabe für Hinweis
   newHint = '';
+  // Liste aller Hinweise
   hints: Hint[] = [];
 
-  todos: Todo[] = [];
+  // Neueingabe für To-do
   newTodo = '';
+  // Liste aller To-dos
+  todos: Todo[] = [];
+
+  // Fragenliste der Studierenden
   fragen: Question[] = [];
 
   constructor(
@@ -24,24 +34,28 @@ export class WelcomeTutorComponent implements OnInit {
     private questionService: QuestionService
   ) {}
 
+  // Beim Laden der Komponente werden Daten geholt
   ngOnInit() {
     this.loadHints();
     this.loadTodos();
     this.loadFragen();
   }
 
+  // Lädt Hinweise aus dem Backend
   loadHints() {
     this.hintService.getHints().subscribe((data) => {
       this.hints = data;
     });
   }
 
+  // Lädt To-dos aus dem Backend
   loadTodos() {
     this.todoService.getTodos().subscribe((data) => {
       this.todos = data;
     });
   }
 
+  // Lädt Fragen, filtert archivierte oder gelöschte aus und sortiert nach Erstellungsdatum
   loadFragen() {
     this.questionService.getAll().subscribe((fragen: Question[]) => {
       this.fragen = fragen
@@ -50,16 +64,18 @@ export class WelcomeTutorComponent implements OnInit {
     });
   }
 
+  // Fügt einen neuen Hinweis hinzu (wenn nicht leer)
   addHint() {
     const text = this.newHint.trim();
     if (text) {
       this.hintService.addHint(text).subscribe((hint) => {
         this.hints.push(hint);
-        this.newHint = '';
+        this.newHint = ''; // Eingabefeld zurücksetzen
       });
     }
   }
 
+  // Entfernt einen Hinweis per Index
   removeHint(index: number) {
     const id = this.hints[index].id;
     this.hintService.deleteHint(id).subscribe(() => {
@@ -67,6 +83,7 @@ export class WelcomeTutorComponent implements OnInit {
     });
   }
 
+  // Fügt ein neues To-do hinzu (wenn nicht leer)
   addTodo() {
     const text = this.newTodo.trim();
     if (text) {
@@ -77,6 +94,7 @@ export class WelcomeTutorComponent implements OnInit {
     }
   }
 
+  // Entfernt ein To-do per Index
   removeTodo(index: number) {
     const id = this.todos[index].id;
     this.todoService.deleteTodo(id).subscribe(() => {
@@ -84,10 +102,12 @@ export class WelcomeTutorComponent implements OnInit {
     });
   }
 
+  // Aktualisiert den "done"-Status eines To-dos
   toggleDone(todo: Todo) {
     this.todoService.updateTodo(todo).subscribe();
   }
 
+  // Navigiert zur Detailansicht der Fragen
   goToFragen() {
     this.router.navigate(['welcome/tutor/questions']);
   }

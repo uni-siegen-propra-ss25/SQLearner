@@ -1,25 +1,35 @@
 <div class="container">
-  <!-- Kopfzeile -->
+  <!-- Kopfbereich mit Titel und Navigation -->
   <div class="header">
     <div class="title-section">
       <h1>SQLearner</h1>
       <p>Fragen der Studierenden</p>
     </div>
     <div class="nav-links">
+      <!-- Navigation zu beantworteten, archivierten und gelöschten Fragen -->
       <a routerLink="/welcome/tutor/beantwortet">Beantwortet</a>
       <a routerLink="/welcome/tutor/archiv">Archiv</a>
       <a routerLink="/welcome/tutor/papierkorb">Papierkorb</a>
     </div>
   </div>
 
-  <!-- Hauptinhalt: Zwei Spalten -->
+  <!-- Hauptbereich mit Fragenliste und markierten Fragen -->
   <div class="main-content">
-    <!-- Linke Spalte: Fragen -->
+    <!-- Linke Spalte: unbeantwortete Fragen -->
     <div class="fragen-container">
       <p class="unread">
-        Sie haben <strong>{{ ungeleseneNachrichten }}</strong> unbeantwortete Fragen
+        <ng-container *ngIf="ungeleseneNachrichten === 0">
+          Sie haben <strong>keine</strong> unbeantwortete Frage
+        </ng-container>
+        <ng-container *ngIf="ungeleseneNachrichten === 1">
+          Sie haben <strong>eine</strong> unbeantwortete Frage
+        </ng-container>
+        <ng-container *ngIf="ungeleseneNachrichten > 1">
+          Sie haben <strong>{{ ungeleseneNachrichten }}</strong> unbeantwortete Fragen
+        </ng-container>
       </p>
 
+      <!-- Jede Frage mit Aktionen -->
       <div class="frage-box" *ngFor="let question of questions">
         <p class="frage-text">
           <mat-icon class="icon">mail</mat-icon>
@@ -34,7 +44,7 @@
       </div>
     </div>
 
-    <!-- Rechte Spalte: Angepinnt -->
+    <!-- Rechte Spalte: markierte Fragen -->
     <div class="angepinnt-box">
       <h3>Markiert</h3>
       <div *ngIf="angepinnt.length === 0" class="leertext">Keine markierten Nachrichten</div>
@@ -45,7 +55,7 @@
     </div>
   </div>
 
-  <!-- Antwort-Modal -->
+  <!-- Modal zur Beantwortung einer Frage -->
   <div class="antwort-modal" *ngIf="ausgewaehlteQuestion">
     <div class="antwort-box">
       <h2>Antwort auf: {{ ausgewaehlteQuestion.student_name }}</h2>

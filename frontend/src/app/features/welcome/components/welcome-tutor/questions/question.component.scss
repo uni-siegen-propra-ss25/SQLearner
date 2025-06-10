@@ -3,25 +3,19 @@
   font-family: 'Arial', sans-serif;
 }
 
+// Kopfzeile mit Titel und Navigationslinks
 .header {
   background-color: #e7e7e9;
-  color: rgb(0, 0, 0);
   padding: 1.5rem 2rem;
   border-radius: 6px;
-  margin-bottom: 2rem;
   display: flex;
   justify-content: space-between;
+  margin-bottom: 2rem;
   position: relative;
 
   .title-section {
-    h1 {
-      margin: 0;
-    }
-
-    p {
-      margin: 0.2rem 0 0 0;
-      font-size: 14px;
-    }
+    h1 { margin: 0; }
+    p { font-size: 14px; margin: 0.2rem 0 0; }
   }
 
   .nav-links {
@@ -32,88 +26,60 @@
     right: 2rem;
 
     a {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
       background-color: #f5f7fa;
       color: #195aa9;
-      font-size: 0.9rem;
-      font-weight: 500;
       padding: 0.5rem 1rem;
       border-radius: 999px;
-      text-decoration: none;
       border: 1px solid #cfd8dc;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      font-weight: 500;
       transition: all 0.2s ease;
-
-      .material-icons {
-        font-size: 18px;
-      }
+      text-decoration: none;
 
       &:hover {
         background-color: #e3eaf2;
         border-color: #90a4ae;
-        color: #0d3a75;
-        text-decoration: none;
       }
     }
 
-    /* Icons je Link individuell zuweisen */
-    a[routerLink='/welcome/tutor/beantwortet']::before {
-      content: 'send';
-      font-family: 'Material Icons';
-      font-size: 18px;
-    }
-
-    a[routerLink='/welcome/tutor/archiv']::before {
-      content: 'archive';
-      font-family: 'Material Icons';
-      font-size: 18px;
-    }
-
-    a[routerLink='/welcome/tutor/papierkorb']::before {
-      content: 'delete';
-      font-family: 'Material Icons';
-      font-size: 18px;
-    }
+    // Icons je nach Route
+    a[routerLink='/welcome/tutor/beantwortet']::before { content: 'send'; }
+    a[routerLink='/welcome/tutor/archiv']::before { content: 'archive'; }
+    a[routerLink='/welcome/tutor/papierkorb']::before { content: 'delete'; }
 
     a::before {
-      display: inline-block;
+      font-family: 'Material Icons';
+      font-size: 18px;
       margin-right: 0.3rem;
-      color: #195aa9;
     }
   }
 }
 
+// Zwei-Spalten-Layout
 .main-content {
   display: flex;
   gap: 2rem;
 }
 
+// Linke Spalte: Fragenliste
 .fragen-container {
   flex: 2;
 
-  .unread {
-    font-weight: bold;
-    margin-bottom: 1.5rem;
-  }
+  .unread { font-weight: bold; }
 
   .frage-box {
     background-color: #e7e7e9;
     padding: 1rem;
-    border-radius: 6px;
     margin-bottom: 1rem;
+    border-radius: 6px;
 
     .frage-text {
       display: flex;
       align-items: center;
-      margin-bottom: 1rem;
 
       .material-icons {
         font-size: 18px;
-        color: #3f51b5; // Dein gewünschtes Blau
+        color: #3f51b5;
         margin-right: 0.4rem;
-        vertical-align: middle;
       }
     }
 
@@ -122,73 +88,59 @@
 
       a {
         margin-left: 1rem;
-        font-size: 0.9rem;
         color: #195aa9;
-        text-decoration: none;
+        font-size: 0.9rem;
 
-        &:hover {
-          text-decoration: underline;
-        }
+        &:hover { text-decoration: underline; }
       }
     }
   }
 }
 
+// Rechte Spalte: Markierte Fragen
 .angepinnt-box {
   flex: 1;
   background-color: #bdcbdb;
-  color: rgb(0, 0, 0);
   padding: 1rem;
   border-radius: 6px;
   max-width: 300px;
-  min-height: 200px;
 
-  h3 {
-    margin-top: 0;
-  }
+  h3 { margin-top: 0; }
 
   .leertext {
-    color: #737373;
     text-align: center;
+    color: #737373;
     font-style: italic;
-    margin-top: 2rem;
   }
 
   .angeheftet-frage {
     margin-bottom: 1rem;
 
     a {
-      display: inline-block;
       font-size: 0.8rem;
       color: #fd3535;
       text-decoration: underline;
-      margin-top: 0.3rem;
     }
   }
 }
+
+// Antwortmodal
 .antwort-modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
   background: rgba(0, 0, 0, 0.3);
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 1000;
+  justify-content: center;
 
   .antwort-box {
     background: #f8faff;
     padding: 2rem;
     border-radius: 10px;
-    width: 90%;
     max-width: 500px;
+    width: 90%;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-
-    h2 {
-      margin-top: 0;
-    }
 
     textarea {
       width: 100%;
@@ -198,7 +150,6 @@
       border-radius: 8px;
       border: 1px solid #ccc;
       resize: vertical;
-      font-family: inherit;
     }
 
     input[type='file'] {
@@ -206,9 +157,8 @@
     }
 
     .anhang-info {
-      margin-top: 0.5rem;
       font-size: 0.9rem;
-      color: #333;
+      margin-top: 0.5rem;
     }
 
     .antwort-aktionen {
@@ -219,7 +169,6 @@
 
       button {
         padding: 0.5rem 1.2rem;
-        border: none;
         border-radius: 5px;
         font-weight: bold;
         cursor: pointer;
@@ -230,7 +179,7 @@
         }
 
         &.abbrechen {
-          background-color: transparent;
+          background: transparent;
           color: #555;
         }
       }

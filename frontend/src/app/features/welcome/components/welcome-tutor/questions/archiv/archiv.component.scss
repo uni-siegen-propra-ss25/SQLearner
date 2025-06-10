@@ -1,12 +1,14 @@
+// Container für das Archiv
 .archiv-container {
   padding: 2rem;
   max-width: 800px;
-  margin: 0 auto;
+  margin: 0 auto; // Zentriert
   font-family: 'Segoe UI', sans-serif;
 }
 
+// Header-Bereich des Archivs
 .archiv-header {
-  background-color: #8fa8b9;
+  background-color: #8fa8b9; // Gleiche Farbe wie Papierkorb
   padding: 1.5rem;
   color: rgb(0, 0, 0);
   border-radius: 8px;
@@ -24,12 +26,14 @@
   }
 }
 
+// Liste der archivierten Elemente
 .archiv-liste {
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
+  gap: 1.2rem; // Abstand zwischen den Elementen
 }
 
+// Einzelnes Element im Archiv
 .archiv-item {
   display: flex;
   justify-content: space-between;
@@ -40,6 +44,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
+// Bereich für Frageinformationen
 .frage-info {
   flex: 1;
   color: #333;
@@ -50,10 +55,12 @@
   }
 }
 
+// Buttonbereich für Aktionen zu einer Frage
 .frage-aktionen button {
   margin-left: 0.5rem;
 }
 
+// Text bei leerem Archiv
 .leertext {
   text-align: center;
   font-size: 1.2rem;

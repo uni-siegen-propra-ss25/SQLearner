@@ -1,3 +1,4 @@
+// Container für die Begrüßung (Titel, Text)
 .welcome-container {
   padding: 2rem;
   text-align: center;
@@ -15,6 +16,7 @@
   }
 }
 
+// Hauptinhaltsbereich
 .main-content {
   display: flex;
   flex-direction: column;
@@ -23,6 +25,7 @@
   max-width: 1200px;
 }
 
+// Erste Zeile mit Boxen nebeneinander
 .top-row {
   display: flex;
   gap: 24px;
@@ -30,10 +33,12 @@
   justify-content: center;
 }
 
+// Untere Zeile für die Fragenbox
 .bottom-row {
   width: 100%;
 }
 
+// Allgemeines Box-Styling (mat-card-Ersatz)
 .box {
   background-color: #e7e7e9;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -44,43 +49,25 @@
   flex-direction: column;
 }
 
-/* Überschriften-Styling mit Linien */
-
-.hint-box {
-mat-card-title {
-  margin-bottom: 8px;
-  border-bottom: 1px solid #ccc;  // graue, durchgezogene Linie unter allen Überschriften
-  padding-bottom: 8px;
-}
-
-}
-
-.todo-box {
-mat-card-title {
-  margin-bottom: 8px;
-  border-bottom: 1px solid #ccc;  // graue, durchgezogene Linie unter allen Überschriften
-  padding-bottom: 8px;
-}
-
-}
-
+// Einheitliches Styling für Überschriften in Boxen
+.hint-box,
+.todo-box,
 .question-box {
-mat-card-title {
-  margin-bottom: 8px;
-  border-bottom: 1px solid #ccc;  // graue, durchgezogene Linie unter allen Überschriften
-  padding-bottom: 8px;
+  mat-card-title {
+    margin-bottom: 8px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 8px;
+  }
 }
 
-}
-
-/* Listen & Items */
-
+// Hinweis- und To-do-Listen
 .hinweis-liste,
 .todo-box ul {
   padding-left: 0;
   list-style: none;
 }
 
+// Einzelne Einträge (flex-Anordnung)
 .einzelner-hinweis,
 .todo-item {
   display: flex;
@@ -89,10 +76,12 @@ mat-card-title {
   margin-bottom: 0.5rem;
 }
 
+// Platz für den Hinweistext
 .hinweis-text {
   flex: 1;
 }
 
+// Eingabebereich mit Feld + Button
 .todo-add,
 .hint-add {
   display: flex;
@@ -106,12 +95,12 @@ mat-card-title {
   flex: 1;
 }
 
-/* To-do und Hinweise Buttons */
-
+// Icon-Buttons (z. B. Papierkorb)
 button[mat-icon-button] {
   margin-left: 0.5rem;
 }
 
+// Hinweis bei leeren Listen
 .keine-eintraege {
   color: #888;
   font-style: italic;
@@ -119,8 +108,7 @@ button[mat-icon-button] {
   margin: 1rem 0;
 }
 
-/* Fragenliste */
-
+// Fragen-Box mit begrenzter Höhe
 .fragenliste {
   max-height: 300px;
   overflow-y: auto;
@@ -129,7 +117,7 @@ button[mat-icon-button] {
 }
 
 .frage-item {
-  border-bottom: 1px dashed #ccc; 
+  border-bottom: 1px dashed #ccc;
   padding: 1rem 0;
   text-align: left;
 }
@@ -145,6 +133,7 @@ button[mat-icon-button] {
   color: #333;
 }
 
+// Hinweis bei keinen Fragen
 .keine-fragen {
   color: #888;
   font-style: italic;
@@ -152,8 +141,7 @@ button[mat-icon-button] {
   margin-top: 1rem;
 }
 
-/* Fragen Button unten rechts */
-
+// Button ganz unten rechts in der Fragenbox
 .fragen-actions {
   display: flex;
   justify-content: flex-end;
@@ -161,8 +149,7 @@ button[mat-icon-button] {
   margin-top: auto;
 }
 
-/* Flexbox Fixes für mat-card */
-
+// Flexbox-Korrekturen für mat-card
 .mat-card-content {
   flex: 1 1 auto;
   overflow-y: auto;
@@ -171,4 +158,3 @@ button[mat-icon-button] {
 .mat-card-actions {
   flex-shrink: 0;
 }
-
