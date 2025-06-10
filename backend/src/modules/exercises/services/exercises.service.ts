@@ -356,15 +356,11 @@ export class ExercisesService {
                 isCorrect: false,
                 feedback: 'Ausgewählte Option wurde nicht gefunden.',
             };
-        }
-
-        const isCorrect = selectedOption.isCorrect;
-        const correctOption = exercise.answers.find((option: any) => option.isCorrect);
+        }        const isCorrect = selectedOption.isCorrect;
         
-        // TODO: Warum wird verraten was die richtige Antwort ist?
         const feedback = isCorrect
             ? '✅ Richtig! Gut gemacht.'
-            : `❌ Falsch. Die richtige Antwort ist: "${correctOption?.text || 'Nicht verfügbar'}"`;
+            : '❌ Falsch. Versuchen Sie es noch einmal!';
 
         return { isCorrect, feedback };
     }
@@ -398,20 +394,13 @@ export class ExercisesService {
         const correctOptionIds = exercise.answers
             .filter((option: any) => option.isCorrect)
             .map((option: any) => option.id)
-            .sort();
-
-        // Prüfen ob die ausgewählten Optionen exakt den korrekten entsprechen
+            .sort();        // Prüfen ob die ausgewählten Optionen exakt den korrekten entsprechen
         const selectedSorted = selectedOptionIds.sort();
         const isCorrect = JSON.stringify(selectedSorted) === JSON.stringify(correctOptionIds);
 
-        // Feedback generieren
-        const correctOptions = exercise.answers
-            .filter((option: any) => option.isCorrect)
-            .map((option: any) => option.text);
-
         const feedback = isCorrect
             ? '✅ Richtig! Sie haben alle richtigen Antworten ausgewählt.'
-            : `❌ Falsch. Die richtigen Antworten sind: "${correctOptions.join('", "')}"`;
+            : '❌ Falsch. Versuchen Sie es noch einmal!';
 
         return { isCorrect, feedback };
     }

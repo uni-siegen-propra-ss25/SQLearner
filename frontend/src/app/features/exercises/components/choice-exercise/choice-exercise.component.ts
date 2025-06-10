@@ -9,9 +9,10 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     styleUrls: ['./choice-exercise.component.scss'],
 })
 export class ChoiceExerciseComponent {
-    @Input() exercise!: Exercise;
-    selectedOptions: number[] = [];
+    @Input() exercise!: Exercise;    selectedOptions: number[] = [];
     isSubmitting = false;
+    isAnswered = false;
+    isCorrectAnswer = false;
     showFeedback = false;
     feedback: string | null = null;
     ExerciseType = ExerciseType;
@@ -19,9 +20,9 @@ export class ChoiceExerciseComponent {
     constructor(
         private submissionService: SubmissionService,
         private snackBar: MatSnackBar,
-    ) {}
-
-    toggleOption(optionId: number): void {
+    ) {}    toggleOption(optionId: number): void {
+        if (this.isCorrectAnswer) return; // Only prevent changes if answer was correct
+        
         const index = this.selectedOptions.indexOf(optionId);
         if (index > -1) {
             this.selectedOptions.splice(index, 1);
@@ -32,28 +33,25 @@ export class ChoiceExerciseComponent {
                 this.selectedOptions.push(optionId);
             }
         }
-    }
-
-    submitAnswer(): void {
-        if (this.selectedOptions.length === 0) return;
+    }    submitAnswer(): void {
+        if (this.selectedOptions.length === 0 || this.isCorrectAnswer) return; // Only prevent if correct answer already submitted
         if (this.exercise.type === ExerciseType.SINGLE_CHOICE && this.selectedOptions.length > 1)
             return;
 
         this.isSubmitting = true;
         this.submissionService
-            .submitAnswer(this.exercise.id, this.selectedOptions.join(','))            .subscribe({
+            .submitAnswer(this.exercise.id, this.selectedOptions.join(','))
+            .subscribe({
                 next: (submission) => {
                     this.isSubmitting = false;
+                    this.isAnswered = true;
+                    this.isCorrectAnswer = submission.isCorrect; // Track if answer was correct
+                    
                     // Backend-Feedback anzeigen statt generischer Nachricht
                     const message = submission.feedback || 'Answer submitted successfully';
                     this.snackBar.open(message, 'Close', {
                         duration: 4000, // Etwas länger für Feedback
                     });
-
-                    // Get feedback if available
-                    if (submission.id) {
-                        this.loadFeedback(submission.id);
-                    }
                 },
                 error: (error) => {
                     this.isSubmitting = false;
@@ -62,18 +60,5 @@ export class ChoiceExerciseComponent {
                     });
                 },
             });
-    }
-
-    private loadFeedback(submissionId: number): void {
-        this.submissionService.getFeedback(submissionId).subscribe({
-            next: (feedback) => {
-                this.feedback = feedback;
-                this.showFeedback = true;
-            },
-            error: () => {
-                // Silently fail, feedback might not be available yet
-                this.feedback = 'Feedback is being generated...';
-            },
-        });
     }
 }
