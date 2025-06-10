@@ -13,9 +13,11 @@
       [chapter]="chapter"
       [isTutor]="isTutor"
       [bookmarkedExerciseIds]="bookmarkedExerciseIds"
+      [completedExerciseIds]="completedExerciseIds"
       (edit)="onChapterEdit($event)"
       (delete)="onChapterDelete($event)"
       (bookmarkToggled)="onBookmarkToggled($event)"
+      (exerciseCompleted)="onExerciseCompleted($event)"
     >
     </app-chapter-card>
   </div>

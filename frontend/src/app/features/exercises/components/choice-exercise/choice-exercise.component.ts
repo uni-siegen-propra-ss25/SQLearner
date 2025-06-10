@@ -1,7 +1,8 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Exercise, ExerciseType } from '../../../roadmap/models/exercise.model';
 import { SubmissionService } from '../../services/submission.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ProgressService } from '../../../progress/services/progress.service';
 
 @Component({
     selector: 'app-choice-exercise',
@@ -9,7 +10,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     styleUrls: ['./choice-exercise.component.scss'],
 })
 export class ChoiceExerciseComponent {
-    @Input() exercise!: Exercise;    selectedOptions: number[] = [];
+    @Input() exercise!: Exercise;
+    @Output() completed = new EventEmitter<number>();
+    selectedOptions: number[] = [];
     isSubmitting = false;
     isAnswered = false;
     isCorrectAnswer = false;
@@ -20,7 +23,10 @@ export class ChoiceExerciseComponent {
     constructor(
         private submissionService: SubmissionService,
         private snackBar: MatSnackBar,
-    ) {}    toggleOption(optionId: number): void {
+        private progressService: ProgressService
+    ) {}
+
+    toggleOption(optionId: number): void {
         if (this.isCorrectAnswer) return; // Only prevent changes if answer was correct
         
         const index = this.selectedOptions.indexOf(optionId);
@@ -33,8 +39,10 @@ export class ChoiceExerciseComponent {
                 this.selectedOptions.push(optionId);
             }
         }
-    }    submitAnswer(): void {
-        if (this.selectedOptions.length === 0 || this.isCorrectAnswer) return; // Only prevent if correct answer already submitted
+    }
+
+    submitAnswer(): void {
+        if (this.selectedOptions.length === 0 || this.isCorrectAnswer) return;
         if (this.exercise.type === ExerciseType.SINGLE_CHOICE && this.selectedOptions.length > 1)
             return;
 
@@ -45,12 +53,26 @@ export class ChoiceExerciseComponent {
                 next: (submission) => {
                     this.isSubmitting = false;
                     this.isAnswered = true;
-                    this.isCorrectAnswer = submission.isCorrect; // Track if answer was correct
+                    this.isCorrectAnswer = submission.isCorrect;
                     
-                    // Backend-Feedback anzeigen statt generischer Nachricht
+                    if (submission.isCorrect) {
+                        this.progressService.updateExerciseProgress(this.exercise.id, true).subscribe();
+                        this.completed.emit(this.exercise.id);
+                        // Markiere die Aufgabe lokal als erledigt
+                        const completed = localStorage.getItem('completedExercises');
+                        let arr: number[] = [];
+                        try {
+                            arr = completed ? JSON.parse(completed) : [];
+                        } catch { arr = []; }
+                        if (!arr.includes(this.exercise.id)) {
+                            arr.push(this.exercise.id);
+                            localStorage.setItem('completedExercises', JSON.stringify(arr));
+                        }
+                    }
+                    
                     const message = submission.feedback || 'Answer submitted successfully';
                     this.snackBar.open(message, 'Close', {
-                        duration: 4000, // Etwas länger für Feedback
+                        duration: 4000,
                     });
                 },
                 error: (error) => {

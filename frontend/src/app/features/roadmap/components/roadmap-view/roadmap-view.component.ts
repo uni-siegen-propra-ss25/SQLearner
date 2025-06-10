@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { RoadmapService } from '../../services/roadmap.service';
 import { AuthService } from '../../../auth/services/auth.service';
 import { BookmarkService } from '../../../progress/services/bookmark.service';
+import { ProgressService } from '../../../progress/services/progress.service';
 import { Chapter } from '../../models/chapter.model';
 import { Role } from '../../../users/models/role.model';
 import { ChapterDialogComponent } from '../../dialogs/chapter-dialog/chapter-dialog.component';
@@ -47,6 +48,13 @@ export class RoadmapViewComponent implements OnInit, OnDestroy {
     bookmarkedExerciseIds: Set<number> = new Set();
     
     /** 
+     * Set of exercise IDs that are completed by the current user.
+     * Used for efficient O(1) completion status lookups across all exercise cards.
+     * @type {Set<number>}
+     */
+    completedExerciseIds: Set<number> = new Set();
+    
+    /** 
      * Array of RxJS subscriptions for proper cleanup and memory leak prevention.
      * Contains all active subscriptions that need to be unsubscribed on component destroy.
      * @type {Subscription[]}
@@ -67,12 +75,14 @@ export class RoadmapViewComponent implements OnInit, OnDestroy {
      * @param {RoadmapService} roadmapService - Service for chapter and roadmap data operations
      * @param {AuthService} authService - Service for user authentication and role management
      * @param {BookmarkService} bookmarkService - Service for bookmark CRUD operations
+     * @param {ProgressService} progressService - Service for progress CRUD operations
      * @param {MatDialog} dialog - Angular Material dialog service for chapter management dialogs
      */
     constructor(
         private readonly roadmapService: RoadmapService,
         private readonly authService: AuthService,
         private readonly bookmarkService: BookmarkService,
+        private readonly progressService: ProgressService,
         private readonly dialog: MatDialog,
     ) {}
 
@@ -123,12 +133,21 @@ export class RoadmapViewComponent implements OnInit, OnDestroy {
                 })
               )
             : of([]);
+        const progressRequest = !this.isTutor && this.authService.hasToken()
+            ? this.progressService.getUserProgress().pipe(
+                catchError(error => {
+                    console.error('Failed to load progress:', error);
+                    return of(null);
+                })
+              )
+            : of(null);
 
         forkJoin({
             chapters: chaptersRequest,
-            bookmarks: bookmarksRequest
+            bookmarks: bookmarksRequest,
+            progress: progressRequest
         }).subscribe({
-            next: ({ chapters, bookmarks }) => {
+            next: ({ chapters, bookmarks, progress }) => {
                 this.chapters = chapters.sort((a, b) => a.order - b.order);
                 this.previousChaptersState = [...this.chapters];
                 
@@ -136,10 +155,20 @@ export class RoadmapViewComponent implements OnInit, OnDestroy {
                 this.bookmarkedExerciseIds = new Set(
                     bookmarks.map(bookmark => bookmark.exercise.id)
                 );
+
+                // Store completed exercise IDs for efficient lookup operations
+                if (progress) {
+                    this.completedExerciseIds = new Set(
+                        progress.chapterProgress
+                            .flatMap(chapter => chapter.exercises || [])
+                            .filter(ex => ex.isPassed)
+                            .map(ex => ex.exerciseId)
+                    );
+                }
             },
             error: (error) => {
                 console.error('Failed to load data:', error);
-                // Graceful fallback: load chapters only if bookmark loading fails
+                // Graceful fallback: load chapters only if loading fails
                 this.loadChapters();
             }
         });
@@ -244,5 +273,19 @@ export class RoadmapViewComponent implements OnInit, OnDestroy {
                 this.loadChapters();
             });
         }
+    }
+
+    onExerciseCompleted(exerciseId: number): void {
+        // Nach Abschluss einer Aufgabe Progress neu laden
+        this.progressService.getUserProgress().subscribe(progress => {
+            if (progress) {
+                this.completedExerciseIds = new Set(
+                    progress.chapterProgress
+                        .flatMap(chapter => chapter.exercises || [])
+                        .filter(ex => ex.isPassed)
+                        .map(ex => ex.exerciseId)
+                );
+            }
+        });
     }
 }

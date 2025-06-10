@@ -1,11 +1,16 @@
 <!-- Main exercise card container with click navigation -->
-<mat-card class="exercise-card" (click)="onCardClick()" [class.clickable]="!isTutor">
+<mat-card class="exercise-card" (click)="onCardClick()" [class.clickable]="!isTutor" [class.completed]="isCompleted || isLocallyCompleted()">
   <!-- Card header with title, badges, and action buttons -->
   <mat-card-header>
     <div class="header-content">
       <!-- Title and badge section -->
       <div class="title-section">
-        <mat-card-title>{{ exercise.title }}</mat-card-title>
+        <div class="exercise-header">
+          <h2 class="exercise-title">
+            {{ exercise.title }}
+          </h2>
+          <mat-icon *ngIf="isCompleted || isLocallyCompleted()" class="completed-icon" matTooltip="Erledigt">check_circle</mat-icon>
+        </div>
         <div class="badges">
           <!-- Difficulty badge with dynamic color -->
           <div

@@ -1,6 +1,11 @@
 <div class="choice-exercise">
   <mat-card-content>
-    <h2 class="exercise-title">{{ exercise.title }}</h2>
+    <div class="exercise-header">
+      <h2 class="exercise-title">
+        {{ exercise.title }}
+        <mat-icon *ngIf="isCorrectAnswer" class="completed-icon">check_circle</mat-icon>
+      </h2>
+    </div>
     <p class="exercise-description">{{ exercise.description }}</p>
 
     <div class="options-container">

@@ -27,6 +27,14 @@ export class ChapterCardComponent implements OnInit {
      */
     @Input() bookmarkedExerciseIds: Set<number> = new Set();
     
+    /**
+     * Set of exercise IDs that are completed by the user.
+     * Used to determine completion status for exercises within this chapter.
+     * Passed down to child topic components for completion state synchronization.
+     * @type {Set<number>}
+     */
+    @Input() completedExerciseIds: Set<number> = new Set();
+    
     @Output() edit = new EventEmitter<Chapter>();
     @Output() delete = new EventEmitter<number>();
     
@@ -36,6 +44,8 @@ export class ChapterCardComponent implements OnInit {
      * @type {EventEmitter<{exerciseId: number; isBookmarked: boolean}>}
      */
     @Output() bookmarkToggled = new EventEmitter<{ exerciseId: number; isBookmarked: boolean }>();
+
+    @Output() exerciseCompleted = new EventEmitter<number>();
 
     topics: Topic[] = [];
     isExpanded = false;
@@ -161,5 +171,9 @@ export class ChapterCardComponent implements OnInit {
      */
     onBookmarkToggled(event: { exerciseId: number; isBookmarked: boolean }): void {
         this.bookmarkToggled.emit(event);
+    }
+
+    onExerciseCompleted(exerciseId: number): void {
+        this.exerciseCompleted.emit(exerciseId);
     }
 }

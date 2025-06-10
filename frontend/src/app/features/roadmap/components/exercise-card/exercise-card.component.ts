@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { BookmarkService } from '../../../progress/services/bookmark.service';
 import { AuthService } from '../../../auth/services/auth.service';
 import { Subject, takeUntil, catchError, of } from 'rxjs';
+import { ProgressService } from '../../../progress/services/progress.service';
 
 /**
  * Component for displaying individual exercise cards with interactive features.
@@ -58,6 +59,13 @@ export class ExerciseCardComponent implements OnInit, OnDestroy {
     @Input() isBookmarked = false;
     
     /**
+     * Flag indicating if the exercise is completed by the user
+     * @type {boolean}
+     * @default false
+     */
+    @Input() isCompleted = false;
+    
+    /**
      * Event emitter for exercise edit operations triggered by tutors.
      * Emits the complete exercise object to parent component for editing.
      * @type {EventEmitter<Exercise>}
@@ -77,6 +85,13 @@ export class ExerciseCardComponent implements OnInit, OnDestroy {
      * @type {EventEmitter<{exerciseId: number; isBookmarked: boolean}>}
      */
     @Output() bookmarkToggled = new EventEmitter<{ exerciseId: number; isBookmarked: boolean }>();
+
+    /**
+     * Event emitter for exercise completion operations triggered by tutors.
+     * Emits the exercise ID to parent component for marking the exercise as completed.
+     * @type {EventEmitter<number>}
+     */
+    @Output() completed = new EventEmitter<number>();
 
     /** Reference to ExerciseType enum for template usage and type checking */
     ExerciseType = ExerciseType;
@@ -98,11 +113,13 @@ export class ExerciseCardComponent implements OnInit, OnDestroy {
      * @param {Router} router - Angular router service for navigation to exercise details
      * @param {BookmarkService} bookmarkService - Service for bookmark CRUD operations
      * @param {AuthService} authService - Service for authentication state and user management
+     * @param {ProgressService} progressService - Service for progress tracking
      */
     constructor(
         private router: Router,
         private bookmarkService: BookmarkService,
-        private authService: AuthService
+        private authService: AuthService,
+        private progressService: ProgressService
     ) {}
 
     /**
@@ -114,6 +131,7 @@ export class ExerciseCardComponent implements OnInit, OnDestroy {
         // Load bookmark status for authenticated students
         if (!this.isTutor && this.authService.hasToken()) {
             this.loadBookmarkStatus();
+            this.loadCompletionStatus();
         }
     }
 
@@ -149,6 +167,50 @@ export class ExerciseCardComponent implements OnInit, OnDestroy {
                 this.isBookmarked = !!bookmark;
                 this.bookmarkId = bookmark?.id || null;
             });
+    }
+
+    /**
+     * Loads the completion status for the current exercise from the backend API.
+     * Sets the internal completion flag if the exercise is completed by the user.
+     * Handles errors gracefully without blocking the UI functionality.
+     * @private
+     */
+    private loadCompletionStatus(): void {
+        if (!this.exercise?.id) return;
+        
+        // Initial load
+        this.updateCompletionStatus();
+
+        // Subscribe to progress updates
+        this.progressService.getUserProgress()
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (progress) => {
+                    const exerciseProgress = progress.chapterProgress
+                        .flatMap(chapter => chapter.exercises || [])
+                        .find(ex => ex.exerciseId === this.exercise.id);
+                    this.isCompleted = exerciseProgress?.isPassed || false;
+                },
+                error: (error) => {
+                    console.error('Error loading completion status:', error);
+                }
+            });
+    }
+
+    private updateCompletionStatus(): void {
+        if (!this.exercise?.id) return;
+        
+        this.progressService.getUserProgress().subscribe({
+            next: (progress) => {
+                const exerciseProgress = progress.chapterProgress
+                    .flatMap(chapter => chapter.exercises || [])
+                    .find(ex => ex.exerciseId === this.exercise.id);
+                this.isCompleted = exerciseProgress?.isPassed || false;
+            },
+            error: (error) => {
+                console.error('Error updating completion status:', error);
+            }
+        });
     }
 
     /**
@@ -287,6 +349,18 @@ export class ExerciseCardComponent implements OnInit, OnDestroy {
         if (!this.isTutor && this.exercise && this.exercise.id != null) {
             // Navigate to DynamicExerciseComponent with exercise ID
             this.router.navigate(['/exercises', this.exercise.id]);
+        }
+    }
+
+    isLocallyCompleted(): boolean {
+        // Fallback: Prüfe, ob die ID im localStorage als erledigt markiert ist
+        const completed = localStorage.getItem('completedExercises');
+        if (!completed) return false;
+        try {
+            const arr = JSON.parse(completed);
+            return Array.isArray(arr) && arr.includes(this.exercise.id);
+        } catch {
+            return false;
         }
     }
 }

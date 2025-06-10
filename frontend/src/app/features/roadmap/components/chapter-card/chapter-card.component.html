@@ -44,9 +44,11 @@
       [topic]="topic"
       [isTutor]="isTutor"
       [bookmarkedExerciseIds]="bookmarkedExerciseIds"
+      [completedExerciseIds]="completedExerciseIds"
       (edit)="onTopicEdit($event)"
       (delete)="onTopicDelete($event)"
       (bookmarkToggled)="onBookmarkToggled($event)"
+      (exerciseCompleted)="onExerciseCompleted($event)"
     >
     </app-topic-card>
 

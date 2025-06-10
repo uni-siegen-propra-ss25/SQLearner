@@ -40,34 +40,38 @@
     <mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
     
     <!-- Exercise cards with bookmark functionality -->
-    <app-exercise-card
-      *ngFor="let exercise of exercises"
-      [exercise]="exercise"
-      [isTutor]="isTutor"
-      [isBookmarked]="isExerciseBookmarked(exercise.id)"
-      (edit)="onExerciseEdit($event)"
-      (delete)="onExerciseDelete($event)"
-      (bookmarkToggled)="onBookmarkToggled($event)"
-    >
-    </app-exercise-card>
-    
-    <!-- Empty state when no exercises exist -->
-    <div *ngIf="!isLoading && exercises.length === 0" class="empty-exercises">
-      <mat-icon>assignment</mat-icon>
-      <p>No exercises available in this topic.</p>
+    <div class="exercises-list">
+      <app-exercise-card
+        *ngFor="let exercise of exercises"
+        [exercise]="exercise"
+        [isTutor]="isTutor"
+        [isBookmarked]="isExerciseBookmarked(exercise.id!)"
+        [isCompleted]="isExerciseCompleted(exercise.id!)"
+        (edit)="onExerciseEdit($event)"
+        (delete)="onExerciseDelete($event)"
+        (bookmarkToggled)="onBookmarkToggled($event)"
+        (completed)="onExerciseCompleted($event)"
+      >
+      </app-exercise-card>
+      
+      <!-- Empty state when no exercises exist -->
+      <div *ngIf="!isLoading && exercises.length === 0" class="empty-exercises">
+        <mat-icon>assignment</mat-icon>
+        <p>No exercises available in this topic.</p>
+      </div>
+      
+      <!-- Add new exercise button for tutors -->
+      <button
+        *ngIf="isTutor"
+        mat-flat-button
+        color="primary"
+        class="add-exercise-button"
+        [disabled]="isLoading"
+        (click)="openNewExerciseDialog()"
+      >
+        <mat-icon>add</mat-icon>
+        Add Exercise
+      </button>
     </div>
-    
-    <!-- Add new exercise button for tutors -->
-    <button
-      *ngIf="isTutor"
-      mat-flat-button
-      color="primary"
-      class="add-exercise-button"
-      [disabled]="isLoading"
-      (click)="openNewExerciseDialog()"
-    >
-      <mat-icon>add</mat-icon>
-      Add Exercise
-    </button>
   </div>
 </mat-expansion-panel>
