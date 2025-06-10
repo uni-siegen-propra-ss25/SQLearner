@@ -20,7 +20,9 @@
             {{ option.text }}
           </mat-radio-button>
         </div>
-      </mat-radio-group>      <!-- Multiple Choice -->
+      </mat-radio-group>
+
+      <!-- Multiple Choice -->
       <div *ngIf="exercise.type === ExerciseType.MULTIPLE_CHOICE" class="multiple-choice">
         <div
           *ngFor="let option of exercise.answers"
