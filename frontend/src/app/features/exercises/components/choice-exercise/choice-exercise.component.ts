@@ -41,7 +41,8 @@ export class ChoiceExerciseComponent {
 
         this.isSubmitting = true;
         this.submissionService
-            .submitAnswer(this.exercise.id, this.selectedOptions.join(','))            .subscribe({
+            .submitAnswer(this.exercise.id, this.selectedOptions.join(','))
+            .subscribe({
                 next: (submission) => {
                     this.isSubmitting = false;
                     // Backend-Feedback anzeigen statt generischer Nachricht
@@ -49,11 +50,6 @@ export class ChoiceExerciseComponent {
                     this.snackBar.open(message, 'Close', {
                         duration: 4000, // Etwas länger für Feedback
                     });
-
-                    // Get feedback if available
-                    if (submission.id) {
-                        this.loadFeedback(submission.id);
-                    }
                 },
                 error: (error) => {
                     this.isSubmitting = false;
@@ -62,18 +58,5 @@ export class ChoiceExerciseComponent {
                     });
                 },
             });
-    }
-
-    private loadFeedback(submissionId: number): void {
-        this.submissionService.getFeedback(submissionId).subscribe({
-            next: (feedback) => {
-                this.feedback = feedback;
-                this.showFeedback = true;
-            },
-            error: () => {
-                // Silently fail, feedback might not be available yet
-                this.feedback = 'Feedback is being generated...';
-            },
-        });
     }
 }
