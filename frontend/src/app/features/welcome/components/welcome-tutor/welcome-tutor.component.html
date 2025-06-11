@@ -1,20 +1,21 @@
-<!-- Begrüßung oben -->
+<!-- Greeting section at the top of the page -->
 <div class="welcome-container">
   <h1>Willkommen bei SQLearner</h1>
   <p>Ihre Plattform zum Lernen und Üben von SQL</p>
 </div>
 
-<!-- Hauptbereich -->
+<!-- Main content area -->
 <div class="main-content">
 
-  <!-- Obere Boxenreihe -->
+  <!-- Top row containing two side-by-side boxes -->
   <div class="top-row">
 
-    <!-- Hinweise für Studierende -->
+    <!-- Hint box for students -->
     <mat-card class="box hint-box">
       <mat-card-title>Hinweise für Studierende</mat-card-title>
       <mat-card-content>
         <ul class="hinweis-liste">
+          <!-- Loop through all hints, displaying each with a warning icon, text, and a delete button -->
           <li *ngFor="let hint of hints; let i = index" class="einzelner-hinweis">
               <mat-icon class="warn-icon">warning</mat-icon>
             <span class="hinweis-text">{{ hint.text }}</span>
@@ -23,10 +24,11 @@
             </button>
           </li>
         </ul>
+        <!-- Message shown if no hints exist -->
         <p *ngIf="hints.length === 0" class="keine-eintraege">Erstellen Sie einen Hinweis</p>
       </mat-card-content>
 
-      <!-- Eingabefeld für neuen Hinweis -->
+      <!-- Input field to add a new hint -->
       <mat-card-actions class="hint-add">
         <mat-form-field appearance="fill" class="hint-input">
           <mat-label>Neuen Hinweis hinzufügen...</mat-label>
@@ -38,11 +40,12 @@
       </mat-card-actions>
     </mat-card>
 
-    <!-- Eigene Aufgabenliste -->
+    <!-- Personal to-do list box -->
     <mat-card class="box todo-box">
       <mat-card-title>Meine To-dos</mat-card-title>
       <mat-card-content>
         <ul>
+          <!-- Loop through all to-dos, showing checkbox to mark done and delete button -->
           <li *ngFor="let task of todos; let i = index" class="todo-item">
             <mat-checkbox [(ngModel)]="task.done" (change)="toggleDone(task)">
               {{ task.text }}
@@ -52,9 +55,10 @@
             </button>
           </li>
         </ul>
+        <!-- Message shown if no to-dos exist -->
         <p *ngIf="todos.length === 0" class="keine-eintraege">Ergänzen Sie Ihre To-do-Liste</p>
 
-        <!-- Neue To-do Eingabe -->
+        <!-- Input to add a new to-do -->
         <div class="todo-add">
           <mat-form-field appearance="fill" class="todo-input">
             <mat-label>Neue Aufgabe hinzufügen...</mat-label>
@@ -68,14 +72,15 @@
     </mat-card>
   </div>
 
-  <!-- Untere Zeile mit aktuellen Fragen -->
+  <!-- Bottom row with the latest student questions -->
   <div class="bottom-row">
     <mat-card class="box question-box">
       <mat-card-title>Fragen der Studierenden</mat-card-title>
       <mat-card-content>
         <div class="fragenliste">
-          <!-- Zeigt max. 3 Fragen an -->
+          <!-- Conditionally display questions if any exist; otherwise show fallback message -->
           <ng-container *ngIf="fragen.length > 0; else keineFragen">
+            <!-- Show up to 3 most recent questions -->
             <div *ngFor="let frage of fragen.slice(0, 3)" class="frage-item">
               <div class="frage-details">
                 <strong>{{ frage.student_name }}</strong><br>
@@ -90,7 +95,7 @@
         </div>
       </mat-card-content>
 
-      <!-- Button zu allen Fragen -->
+      <!-- Button linking to the full questions list -->
       <mat-card-actions class="fragen-actions">
         <button mat-button color="primary" (click)="goToFragen()">Alle anzeigen</button>
       </mat-card-actions>

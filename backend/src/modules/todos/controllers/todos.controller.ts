@@ -2,17 +2,24 @@ import { Controller, Get, Post, Body, Param, Patch, Delete, Query } from '@nestj
 import { Todo } from '../todos.entity';
 import { TodosService } from '../services/todos.service';
 
-@Controller('todos') // Alle Routen starten mit /todos
+/**
+ * Controller for managing Todo HTTP requests.
+ */
+@Controller('todos')
 export class TodosController {
   constructor(private readonly todosService: TodosService) {}
 
-  // GET /todos?role=TUTOR → Alle Todos für eine bestimmte Rolle abrufen
+  /**
+   * GET /todos?role=... - Get all todos for a specific role
+   */
   @Get()
   findAll(@Query('role') role: 'TUTOR' | 'STUDENT'): Promise<Todo[]> {
     return this.todosService.findAll(role);
   }
 
-  // POST /todos → Neue Aufgabe erstellen (Text & Rolle im Body)
+  /**
+   * POST /todos - Create a new todo
+   */
   @Post()
   create(
     @Body('text') text: string,
@@ -21,16 +28,20 @@ export class TodosController {
     return this.todosService.create(text, role);
   }
 
-  // PATCH /todos/:id → Status "done" einer Aufgabe ändern
+  /**
+   * PATCH /todos/:id - Update a todo's status
+   */
   @Patch(':id')
   update(
     @Param('id') id: string,
     @Body('done') done: boolean,
   ): Promise<Todo> {
-    return this.todosService.update(+id, done); // +id: Konvertiert ID zu Zahl
+    return this.todosService.update(+id, done);
   }
 
-  // DELETE /todos/:id → Aufgabe dauerhaft löschen
+  /**
+   * DELETE /todos/:id - Permanently delete a todo
+   */
   @Delete(':id')
   remove(@Param('id') id: string): Promise<void> {
     return this.todosService.remove(+id);

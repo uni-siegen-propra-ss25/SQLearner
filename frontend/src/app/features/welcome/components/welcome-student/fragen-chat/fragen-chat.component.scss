@@ -1,4 +1,4 @@
-// Hauptcontainer des Fragenforums
+// Main container for the question forum
 .fragenforum-container {
   padding: 2rem;
   max-width: 80vw;
@@ -6,8 +6,7 @@
   font-family: 'Segoe UI', sans-serif;
 }
 
-// Kopfbereich mit Titel und Untertitel
-// Kopfbereich mit Titel und Untertitel
+// Header section with title and subtitle
 .fragenforum-header {
   background-color: #cfdae1;
   padding: 1.5rem;
@@ -27,7 +26,7 @@
     font-size: 1.1rem;
   }
 
-  // Zurück-zur-Startseite Button im Headerbereich (richtig verschoben!)
+  // Back button placed in bottom left corner
   .back-button {
     position: absolute;
     bottom: 1rem;
@@ -40,47 +39,46 @@
   }
 }
 
-
-// Container für alle Chatnachrichten
+// Container for all chat messages
 .chat-messages {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem; // Abstand zwischen den Nachrichten
+  gap: 0.5rem; // Spacing between messages
   background-color: #f1f1f1;
   padding: 1rem;
   border-radius: 8px;
-  height: 400px; // Feste Höhe mit Scrollbereich
+  height: 400px; // Fixed height with scroll
   overflow-y: auto;
 
-  // Gemeinsames Styling für alle Nachrichtenblasen
+  // Common styling for message bubbles
   .message {
     padding: 0.75rem 1rem;
     border-radius: 1rem;
-    max-width: 70%; // Breite der Nachricht
+    max-width: 70%;
     position: relative;
     word-wrap: break-word;
   }
 
-  // Nachrichten vom Studenten (rechts, grün)
+  // Student messages (right aligned, green)
   .from-student {
     align-self: flex-end;
     background-color: #b8f0cd;
-    border-bottom-right-radius: 0; // Ecke unten rechts eckig
+    border-bottom-right-radius: 0;
   }
 
-  // Nachrichten vom Tutor (links, grau)
+  // Tutor messages (left aligned, gray)
   .from-tutor {
     align-self: flex-start;
     background-color: #e2e2e2;
-    border-bottom-left-radius: 0; // Ecke unten links eckig
+    border-bottom-left-radius: 0;
   }
 
-  // Nachrichtentext (Inhalt der Blase)
+  // Text inside the message bubble
   .message-text {
     font-size: 1rem;
   }
 
-  // Fußzeile jeder Nachricht: Uhrzeit, ggf. Löschen
+  // Footer for message (timestamp, delete)
   .message-info {
     display: flex;
     justify-content: space-between;
@@ -96,15 +94,14 @@
   }
 }
 
-// Eingabebereich unter dem Chatfenster
+// Input section below chat area
 .chat-input {
   display: flex;
   align-items: center;
   gap: 8px;
 
-  // Eingabefeld nimmt den verfügbaren Platz ein
+  // Input field expands to fill available space
   .input-field {
     flex-grow: 1;
   }
-
 }

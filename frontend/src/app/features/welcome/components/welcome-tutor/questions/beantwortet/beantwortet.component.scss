@@ -1,7 +1,7 @@
-// Importiert gemeinsame Styles aus dem Archiv
+// Import common styles from archive component
 @import '../archiv/archiv.component.scss';
 
-// Hauptcontainer für beantwortete Fragen
+// Main container for answered questions page
 .beantwortet-container {
   padding: 2rem;
   max-width: 800px;
@@ -10,7 +10,7 @@
 }
 
 .beantwortet-header {
-  background-color: #8fa8b9;
+   background-color: #8fa8b9;
   padding: 1.5rem;
   color: #000;
   border-radius: 8px;
@@ -35,7 +35,7 @@
     align-items: center;
     gap: 6px;
     cursor: pointer;
-    color: #1976d2; // Blau passend zum Material Design
+    color: #1976d2; // Blue matching Material Design
 
     .klickbares-icon {
       font-size: 24px;
@@ -55,14 +55,12 @@
   }
 }
 
-// Liste der beantworteten Fragen
 .archiv-liste {
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
 }
 
-// Einzelnes Frage-Antwort-Element
 .archiv-item {
   display: flex;
   justify-content: space-between;
@@ -73,7 +71,6 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-// Header mit Frage-Titel und Aktionen
 .item-header {
   display: flex;
   justify-content: space-between;
@@ -81,7 +78,6 @@
   margin-bottom: 0.5rem;
 }
 
-// Stil für die Frage (hervorgehoben)
 .frage {
   font-weight: 600;
   font-size: 1rem;
@@ -89,7 +85,6 @@
   text-align: left;
 }
 
-// Stil für die Antwort (kursiv, leicht abgesetzt)
 .antwort {
   font-style: italic;
   color: #444;
@@ -97,20 +92,17 @@
   text-align: left;
 }
 
-// Zeitstempel für Frage/Antwort
 .zeitstempel {
   margin-top: 0.5rem;
   font-size: 0.85rem;
   color: #666;
 }
 
-// Aktionen-Buttonbereich (z. B. Archivieren, Löschen)
 .aktionen {
   display: flex;
   gap: 0.5rem;
 }
 
-// Allgemeiner Stil für Icon-Buttons
 .icon-button {
   border: none;
   background: transparent;
@@ -120,13 +112,11 @@
   align-items: center;
 }
 
-// Größe der Icons
 .icon-button img {
   width: 24px;
   height: 24px;
 }
 
-// Text bei leerer Liste
 .leertext {
   text-align: center;
   font-size: 1.2rem;

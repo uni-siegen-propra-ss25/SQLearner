@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { QuestionService, Question } from 'app/features/welcome/services/question.service';
-import { Router } from '@angular/router';  // <-- Router importieren
+import { Router } from '@angular/router';  // <-- Import Router for navigation
 
 @Component({
   selector: 'app-archiv',
@@ -8,42 +8,41 @@ import { Router } from '@angular/router';  // <-- Router importieren
   styleUrls: ['./archiv.component.scss'],
 })
 export class ArchivComponent implements OnInit {
-  // Liste archivierter, aber nicht gelöschter Fragen
+  // List of archived but not deleted questions
   fragen: Question[] = [];
   
-constructor(
-  private questionService: QuestionService,
-  private router: Router  // Router hier injizieren
-) {}
+  constructor(
+    private questionService: QuestionService,
+    private router: Router  // Inject Router here
+  ) {}
 
   ngOnInit(): void {
-    // Beim Start: Lade archivierte Fragen
+    // On component initialization: load archived questions
     this.ladeArchivierteFragen();
   }
 
   ladeArchivierteFragen(): void {
-    // API-Aufruf: Nur Fragen, die archiviert und nicht gelöscht sind
+    // API call: Get only questions that are archived and not deleted
     this.questionService.getAll().subscribe(data => {
       this.fragen = data.filter(q => q.ist_archiviert && !q.ist_geloescht);
     });
   }
 
-  // Stellt Frage aus dem Archiv wieder her
+  // Restore a question from the archive
   wiederherstellen(frage: Question): void {
     this.questionService.archivieren(frage.id, false).subscribe(() => {
       this.ladeArchivierteFragen();
     });
   }
 
-  // Löscht Frage endgültig (mit Bestätigung)
-  endgueltigLoeschen(frage: Question): void {
-    if (confirm('Diese Frage endgültig löschen?')) {
-      this.questionService.löschen(frage.id).subscribe(() => {
-        this.ladeArchivierteFragen();
-      });
-    }
-  }
-    // Neue Methode für Zurück-Button
+inPapierkorbVerschieben(frage: Question): void {
+  this.questionService.patchGeloescht(frage.id, true).subscribe(() => {
+    this.ladeArchivierteFragen();
+  });
+}
+
+
+  // Method for the Back button navigation
   zurueck(): void {
     this.router.navigate(['/welcome/tutor/questions']);
   }

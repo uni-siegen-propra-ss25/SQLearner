@@ -1,31 +1,42 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-@Entity('fragen') // Gibt den Tabellennamen in der Datenbank an („fragen“ statt automatisch generiertem Namen)
+/**
+ * Question entity represents a student's question in the system.
+ */
+@Entity('fragen')
 export class Question {
-  @PrimaryGeneratedColumn() // Automatisch generierter Primärschlüssel
+  @PrimaryGeneratedColumn()
   id: number;
 
-  @Column() // Name des/der Studierenden
+  /** Name of the student */
+  @Column()
   student_name: string;
 
-  @Column() // Die gestellte Frage
+  /** The question asked */
+  @Column()
   frage: string;
 
-  @Column({ nullable: true }) // Antwort kann optional sein (z. B. zu Beginn leer)
+  /** The answer to the question (optional) */
+  @Column({ nullable: true })
   antwort: string;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' }) // Automatisches Erstellungsdatum
+  /** Timestamp when the question was created */
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   erstellt_am: Date;
 
-  @Column({ default: false }) // Gibt an, ob die Frage archiviert wurde
+  /** Whether the question has been archived */
+  @Column({ default: false })
   ist_archiviert: boolean;
 
-  @Column({ default: false }) // Gibt an, ob die Frage angepinnt wurde (für Priorisierung)
+  /** Whether the question is pinned */
+  @Column({ default: false })
   ist_angepinnt: boolean;
 
-  @Column({ default: false }) // Gibt an, ob die Frage gelöscht ist (Soft Delete)
+  /** Whether the question is soft deleted */
+  @Column({ default: false })
   ist_geloescht: boolean;
 
-  @Column({ default: false }) // Gibt an, ob eine Antwort vorhanden ist
+  /** Whether the question has been answered */
+  @Column({ default: false })
   ist_beantwortet: boolean;
 }

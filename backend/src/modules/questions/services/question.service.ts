@@ -4,60 +4,83 @@ import { Repository } from 'typeorm';
 import { Question } from '../question.entity';
 import { CreateQuestionDto } from '../dto/create-question.dto';
 
-@Injectable() // Kennzeichnet den Service als Provider (wird von NestJS verwaltet)
+/**
+ * Service for managing Question entities.
+ */
+@Injectable()
 export class QuestionService {
   constructor(
     @InjectRepository(Question)
-    private questionRepository: Repository<Question>, // Zugriff auf die DB über das Repository
+    private questionRepository: Repository<Question>,
   ) {}
 
-  // Erstellt eine neue Frage in der DB
+  /**
+   * Create a new question.
+   */
   create(dto: CreateQuestionDto) {
-    const question = this.questionRepository.create(dto); // Erstellt neues Question-Objekt
-    return this.questionRepository.save(question); // Speichert es in der Datenbank
+    const question = this.questionRepository.create(dto);
+    return this.questionRepository.save(question);
   }
 
-  // Gibt alle Fragen zurück, die NICHT gelöscht sind, sortiert nach Erstellungsdatum (neu zuerst)
+  /**
+   * Find all non-deleted questions, sorted by date descending.
+   */
   findAll() {
     return this.questionRepository.find({
       order: { erstellt_am: 'DESC' },
       where: { ist_geloescht: false },
     });
   }
-  // FrageService → unterhalb von findAll()
+
+  /**
+   * Find all soft-deleted questions.
+   */
   findGeloeschte() {
-  return this.questionRepository.find({
-    order: { erstellt_am: 'DESC' },
-    where: { ist_geloescht: true },
-  });
-}
+    return this.questionRepository.find({
+      order: { erstellt_am: 'DESC' },
+      where: { ist_geloescht: true },
+    });
+  }
 
-
-  // Setzt Antworttext und den Status "beantwortet" auf true
+  /**
+   * Update the answer of a question.
+   */
   updateAntwort(id: number, antwort: string) {
     return this.questionRepository.update(id, { antwort, ist_beantwortet: true });
   }
 
-  // Pinnt oder entpinnt eine Frage
+  /**
+   * Pin or unpin a question.
+   */
   updatePin(id: number, ist_angepinnt: boolean) {
     return this.questionRepository.update(id, { ist_angepinnt });
   }
 
-  // Archiviert oder entarchiviert eine Frage
+  /**
+   * Archive or unarchive a question.
+   */
   updateArchiv(id: number, ist_archiviert: boolean) {
     return this.questionRepository.update(id, { ist_archiviert });
   }
 
-  // "Löscht" eine Frage – jedoch nur soft delete (Daten bleiben erhalten)
+  /**
+   * Soft delete a question.
+   */
   delete(id: number) {
     return this.questionRepository.update(id, { ist_geloescht: true });
   }
 
+  /**
+   * Set soft-delete flag.
+   */
   updateGeloescht(id: number, ist_geloescht: boolean) {
-  return this.questionRepository.update(id, { ist_geloescht });
-}
-// Frage komplett aus der DB entfernen (Hard Delete)
-async hardDelete(id: number): Promise<void> {
-  await this.questionRepository.delete(id);
-}
+    return this.questionRepository.update(id, { ist_geloescht });
+  }
+
+  /**
+   * Hard delete a question from the database.
+   */
+  async hardDelete(id: number): Promise<void> {
+    await this.questionRepository.delete(id);
+  }
 }

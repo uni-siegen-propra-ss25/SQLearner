@@ -1,4 +1,4 @@
-// Container für die Begrüßung (Titel, Text)
+// Container for the welcome section (title and description)
 .welcome-container {
   padding: 2rem;
   text-align: center;
@@ -7,7 +7,7 @@
 
   h1 {
     margin-bottom: 1rem;
-    color: var(--text-color);
+    color: var(--text-color); // Uses CSS variable for text color
   }
 
   p {
@@ -16,7 +16,7 @@
   }
 }
 
-// Hauptinhaltsbereich
+// Main content area layout with vertical stacking and spacing
 .main-content {
   display: flex;
   flex-direction: column;
@@ -25,7 +25,7 @@
   max-width: 1200px;
 }
 
-// Erste Zeile mit Boxen nebeneinander
+// Top row containing boxes side-by-side, wrapping on smaller screens
 .top-row {
   display: flex;
   gap: 24px;
@@ -33,23 +33,23 @@
   justify-content: center;
 }
 
-// Untere Zeile für die Fragenbox
+// Bottom row for the questions box, full width
 .bottom-row {
   width: 100%;
 }
 
-// Allgemeines Box-Styling (mat-card-Ersatz)
+// General styling for all boxes (replacement for mat-card)
 .box {
   background-color: #e7e7e9;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   padding: 16px;
-  flex: 1 1 45%;
+  flex: 1 1 45%; // flexible sizing with minimum 45% width
   min-width: 300px;
   display: flex;
   flex-direction: column;
 }
 
-// Einheitliches Styling für Überschriften in Boxen
+// Common header styling inside hint, todo, and question boxes
 .hint-box,
 .todo-box,
 .question-box {
@@ -60,14 +60,14 @@
   }
 }
 
-// Hinweis- und To-do-Listen
+// Styling for hint and todo lists (remove default list styling)
 .hinweis-liste,
 .todo-box ul {
   padding-left: 0;
   list-style: none;
 }
 
-// Einzelne Einträge (flex-Anordnung)
+// Layout for individual hint and todo items: flexbox for alignment and spacing
 .einzelner-hinweis,
 .todo-item {
   display: flex;
@@ -76,12 +76,12 @@
   margin-bottom: 0.5rem;
 }
 
-// Platz für den Hinweistext
+// Area for the hint text to take available space
 .hinweis-text {
   flex: 1;
 }
 
-// Eingabebereich mit Feld + Button
+// Input area containing input field and add button with spacing
 .todo-add,
 .hint-add {
   display: flex;
@@ -90,17 +90,18 @@
   margin-top: 1rem;
 }
 
+// Input fields grow to fill available space
 .todo-input,
 .hint-input {
   flex: 1;
 }
 
-// Icon-Buttons (z. B. Papierkorb)
+// Margin for icon buttons (e.g., delete trash icons)
 button[mat-icon-button] {
   margin-left: 0.5rem;
 }
 
-// Hinweis bei leeren Listen
+// Style for placeholder text when lists are empty
 .keine-eintraege {
   color: #888;
   font-style: italic;
@@ -108,32 +109,39 @@ button[mat-icon-button] {
   margin: 1rem 0;
 }
 
-// Fragen-Box mit begrenzter Höhe
+// Question list container with max height and scroll overflow
 .fragenliste {
   max-height: 300px;
   overflow-y: auto;
-  text-align: center;
   padding: 1rem 0;
+  text-align: left;
 }
 
+// Individual question items separated by dashed borders
 .frage-item {
   border-bottom: 1px dashed #ccc;
   padding: 1rem 0;
   text-align: left;
 }
 
+// Container for question details, centered and limited width
 .frage-details {
-  max-width: 600px;
-  margin: 0 auto;
+  max-width: 100%;         
+  margin: 0;               
+  padding-left: 0.5rem;    
+  text-align: left;        
 }
 
+
+// Styling for the actual question text
 .frage-text {
   margin-top: 0.5rem;
   font-size: 1rem;
   color: #333;
+  text-align: left;
 }
 
-// Hinweis bei keinen Fragen
+// Placeholder text styling when no questions are available
 .keine-fragen {
   color: #888;
   font-style: italic;
@@ -141,7 +149,7 @@ button[mat-icon-button] {
   margin-top: 1rem;
 }
 
-// Button ganz unten rechts in der Fragenbox
+// Container for the bottom-right aligned button in the questions box
 .fragen-actions {
   display: flex;
   justify-content: flex-end;
@@ -149,7 +157,7 @@ button[mat-icon-button] {
   margin-top: auto;
 }
 
-// Flexbox-Korrekturen für mat-card
+// Flexbox fixes for mat-card content and actions to ensure proper scrolling and layout
 .mat-card-content {
   flex: 1 1 auto;
   overflow-y: auto;
@@ -159,9 +167,10 @@ button[mat-icon-button] {
   flex-shrink: 0;
 }
 
+// Styling the warning icon with typical yellow color and spacing for alignment
 .warn-icon {
-  color: #e0d35f; // typisches Gelb für Warnungen (Material Yellow 500)
-  margin-right: 8px; // mehr Abstand zwischen Icon und Text
-  vertical-align: middle; // schönere Ausrichtung zum Text
-  font-size: 24px; // Größe ggf. anpassen
+  color: #e0d35f; // Typical yellow (Material Yellow 500)
+  margin-right: 8px; // Spacing between icon and text
+  vertical-align: middle; // Better vertical alignment with text
+  font-size: 24px; // Icon size adjustment
 }

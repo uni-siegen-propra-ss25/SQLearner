@@ -1,3 +1,4 @@
+// Container for the welcome message at the top
 .welcome-container {
   padding: 2rem;
   text-align: center;
@@ -5,7 +6,7 @@
   margin: 0 auto;
 
   h1 {
-    color: var(--text-color); // Einheitliche Textfarbe
+    color: var(--text-color); // Use consistent text color
   }
 
   p {
@@ -13,6 +14,7 @@
   }
 }
 
+// Main content layout container
 .main-content {
   display: flex;
   flex-direction: column;
@@ -21,6 +23,7 @@
   max-width: 1200px;
 }
 
+// Row that holds hint and to-do cards
 .top-row {
   display: flex;
   flex-wrap: wrap;
@@ -28,11 +31,12 @@
   justify-content: center;
 }
 
+// Row that holds the forum card
 .bottom-row {
   width: 100%;
 }
 
-// Kartenbox-Design
+// Base styling for all content boxes (cards)
 .box {
   background-color: #e7e7e9;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -41,12 +45,13 @@
   min-width: 300px;
 }
 
-// To-do-Liste optisch aufbereitet
+// To-do box list styling
 .todo-box ul {
   list-style: none;
   padding-left: 0;
 }
 
+// Individual to-do item layout
 .todo-item {
   display: flex;
   justify-content: space-between;
@@ -54,17 +59,19 @@
   margin-bottom: 0.5rem;
 }
 
+// Layout for the to-do input section
 .todo-add {
   display: flex;
   gap: 0.5rem;
   margin-top: 1rem;
 }
 
+// Input field should expand to available space
 .todo-input {
   flex: 1;
 }
 
-// Hinweisliste
+// Styling for the list of tutor hints
 .hinweis-liste {
   list-style: none;
   padding: 0;
@@ -75,6 +82,7 @@
   }
 }
 
+// Text displayed when there are no hints
 .keine-hinweise {
   text-align: center;
   font-style: italic;
@@ -82,7 +90,7 @@
   margin-top: 80px;
 }
 
-// Letzte Nachricht optisch hervorgehoben
+// Container for the latest message preview
 .last-message {
   background-color: #cac7ca;
   border-radius: 8px;
@@ -93,19 +101,29 @@
   max-width: 100%;
 }
 
+// Header for the last message (name + timestamp)
 .message-header {
   display: flex;
   gap: 16px;
   margin-bottom: 4px;
 }
 
+// Timestamp styling
 .timestamp {
   font-size: 0.9rem;
   color: #555;
 }
 
+// Styling for card titles
 mat-card-title {
   border-bottom: 1px solid #ccc;
   padding-bottom: 8px;
   margin-bottom: 8px;
+}
+
+.placeholder-text {
+  color: #888; // grau
+  font-style: italic; // schräg
+  font-size: 1rem;
+  text-align: center;
 }

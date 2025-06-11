@@ -1,19 +1,25 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-@Entity() // Markiert die Klasse als Datenbanktabelle (Tabellenname wird automatisch zu „todo“)
+/**
+ * Todo entity represents a task assigned to a user role.
+ */
+@Entity()
 export class Todo {
-  @PrimaryGeneratedColumn() // Automatisch generierter Primärschlüssel
+  @PrimaryGeneratedColumn()
   id: number;
 
-  @Column() // Text der ToDo-Aufgabe
+  /** Description of the task */
+  @Column()
   text: string;
 
-  @Column({ default: false }) // Status: Ist die Aufgabe erledigt? Standard = false
+  /** Whether the task is completed */
+  @Column({ default: false })
   done: boolean;
 
-  @Column() // Rolle, für wen die Aufgabe gedacht ist (TUTOR oder STUDENT)
+  /** Role of the user the task is assigned to */
+  @Column()
   role: 'TUTOR' | 'STUDENT';
 
-  user: any; // Zusatzfeld (nicht in der Datenbank gespeichert, da ohne @Column), evtl. für spätere Erweiterung
+  /** Custom user field (not stored in database) */
+  user: any;
 }
-

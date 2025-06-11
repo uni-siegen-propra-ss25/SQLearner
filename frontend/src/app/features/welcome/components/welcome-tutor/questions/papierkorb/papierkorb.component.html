@@ -10,7 +10,7 @@
     </div>
   </div>
 
-  <!-- Liste gelöschter Fragen -->
+  <!-- List of trashed questions -->
   <div class="papierkorb-liste" *ngIf="fragen.length > 0; else leer">
     <div class="papierkorb-item" *ngFor="let frage of fragen">
       <div class="frage-info">
@@ -20,7 +20,7 @@
         <p class="antwort-text" *ngIf="frage.antwort"><strong>Antwort:</strong> {{ frage.antwort }}</p>
       </div>
 
-      <!-- Aktionen -->
+       <!-- Actions: Restore from trash / Delete permanently -->
       <div class="frage-aktionen">
         <button mat-icon-button color="primary" (click)="wiederherstellen(frage)">
           <mat-icon>restore</mat-icon>
@@ -32,7 +32,7 @@
     </div>
   </div>
 
-  <!-- Leerer Papierkorb -->
+  <!-- Empty trash fallback -->
   <ng-template #leer>
     <p class="leertext">Der Papierkorb ist leer 🗑️</p>
   </ng-template>

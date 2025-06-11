@@ -1,12 +1,12 @@
 <div class="container">
-  <!-- Kopfbereich mit Titel und Navigation -->
+   <!-- Header section with title and navigation -->
   <div class="header">
     <div class="title-section">
       <h1>SQLearner</h1>
       <p>Fragen der Studierenden</p>
     </div>
     <div class="nav-links">
-      <!-- Navigation zu beantworteten, archivierten und gelöschten Fragen -->
+      <!-- Navigation links to answered, archived and deleted questions -->
       <a routerLink="/welcome/tutor/beantwortet">Beantwortet</a>
       <a routerLink="/welcome/tutor/archiv">Archiv</a>
       <a routerLink="/welcome/tutor/papierkorb">Papierkorb</a>
@@ -16,9 +16,9 @@
     </div>
   </div>
 
-  <!-- Hauptbereich mit Fragenliste und markierten Fragen -->
+  <!-- Main content with question list and pinned questions -->
   <div class="main-content">
-    <!-- Linke Spalte: unbeantwortete Fragen -->
+    <!-- Left column: unanswered questions -->
     <div class="fragen-container">
       <p class="unread">
         <ng-container *ngIf="ungeleseneNachrichten === 0">
@@ -32,7 +32,7 @@
         </ng-container>
       </p>
 
-      <!-- Jede Frage mit Aktionen -->
+      <!-- Each question with action links -->
       <div class="frage-box" *ngFor="let question of questions">
         <p class="frage-text">
           <mat-icon class="icon">mail</mat-icon>
@@ -47,7 +47,7 @@
       </div>
     </div>
 
-    <!-- Rechte Spalte: markierte Fragen -->
+    <!-- Right column: pinned questions -->
     <div class="angepinnt-box">
       <h3>Markiert</h3>
       <div *ngIf="angepinnt.length === 0" class="leertext">Keine markierten Nachrichten</div>
@@ -58,7 +58,7 @@
     </div>
   </div>
 
-  <!-- Modal zur Beantwortung einer Frage -->
+  <!-- Modal for answering a question -->
   <div class="antwort-modal" *ngIf="ausgewaehlteQuestion">
     <div class="antwort-box">
       <h2>Antwort auf: {{ ausgewaehlteQuestion.student_name }}</h2>

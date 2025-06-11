@@ -1,14 +1,15 @@
-// Entity-Dekoratoren von TypeORM
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-// Definiert die Tabelle "Hint" in der Datenbank
+/**
+ * Hint entity represents a simple hint message in the database.
+ */
 @Entity()
 export class Hint {
-  // Primärschlüssel, wird automatisch generiert
+  /** Primary key (auto-incremented ID) */
   @PrimaryGeneratedColumn()
   id: number;
 
-  // Spalte für den Hinweistext
+  /** The content of the hint */
   @Column()
   text: string;
 }

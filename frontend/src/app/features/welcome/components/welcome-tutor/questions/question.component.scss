@@ -3,7 +3,7 @@
   font-family: 'Arial', sans-serif;
 }
 
-// Kopfzeile mit Titel und Navigationslinks
+// Header with title and navigation links
 .header {
   background-color: #e7e7e9;
   padding: 1.5rem 2rem;
@@ -42,29 +42,29 @@
     }
 
     .back-button-tutor {
-  background-color: #f5f7fa;
-  color: #195aa9;
-  padding: 0.5rem 1rem;
-  border-radius: 999px;
-  border: 1px solid #cfd8dc;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
+      background-color: #f5f7fa;
+      color: #195aa9;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      border: 1px solid #cfd8dc;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
 
-  mat-icon {
-    font-size: 22px;
-  }
+      mat-icon {
+        font-size: 22px;
+      }
 
-  &:hover {
-    background-color: #e3eaf2;
-    border-color: #90a4ae;
-  }
-}
+      &:hover {
+        background-color: #e3eaf2;
+        border-color: #90a4ae;
+      }
+    }
 
-    // Icons je nach Route
+    // Icons based on route
     a[routerLink='/welcome/tutor/beantwortet']::before { content: 'send'; }
     a[routerLink='/welcome/tutor/archiv']::before { content: 'archive'; }
     a[routerLink='/welcome/tutor/papierkorb']::before { content: 'delete'; }
@@ -77,13 +77,13 @@
   }
 }
 
-// Zwei-Spalten-Layout
+// Two-column layout
 .main-content {
   display: flex;
   gap: 2rem;
 }
 
-// Linke Spalte: Fragenliste
+// Left column: question list
 .fragen-container {
   flex: 2;
 
@@ -120,7 +120,7 @@
   }
 }
 
-// Rechte Spalte: Markierte Fragen
+// Right column: pinned questions
 .angepinnt-box {
   flex: 1;
   background-color: #bdcbdb;
@@ -147,7 +147,7 @@
   }
 }
 
-// Antwortmodal
+// Answer modal
 .antwort-modal {
   position: fixed;
   top: 0; left: 0;
@@ -184,37 +184,37 @@
       margin-top: 0.5rem;
     }
 
-.antwort-aktionen {
-  margin-top: 1rem;
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
+    .antwort-aktionen {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
 
-  button {
-    padding: 0.5rem 1.2rem;
-    border-radius: 999px;
-    font-weight: 500;
-    border: none;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
+      button {
+        padding: 0.5rem 1.2rem;
+        border-radius: 999px;
+        font-weight: 500;
+        border: none;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
 
-    &:first-child {
-      background-color: #3372bf;
+        &:first-child {
+          background-color: #3372bf;
 
-      &:hover {
-        background-color: #14488c;
-      }
-    }
+          &:hover {
+            background-color: #14488c;
+          }
+        }
 
-    &.abbrechen {
-      background-color: #9e9e9e;
+        &.abbrechen {
+          background-color: #9e9e9e;
 
-      &:hover {
-        background-color: #7e7e7e;
+          &:hover {
+            background-color: #6f6f6f;
+          }
+        }
       }
     }
   }
-}
-}
 }

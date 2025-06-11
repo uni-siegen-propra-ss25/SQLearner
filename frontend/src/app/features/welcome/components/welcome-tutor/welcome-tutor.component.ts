@@ -1,4 +1,4 @@
-// Import grundlegender Angular-Funktionalitäten und Services
+// Import core Angular features and routing service
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
@@ -14,17 +14,17 @@ import { QuestionService, Question } from 'app/features/welcome/services/questio
 })
 export class WelcomeTutorComponent implements OnInit {
 
-  // Neueingabe für Hinweis
+  // Model for new hint input field
   newHint = '';
-  // Liste aller Hinweise
+  // Array to store all current hints
   hints: Hint[] = [];
 
-  // Neueingabe für To-do
+  // Model for new todo input field
   newTodo = '';
-  // Liste aller To-dos
+  // Array to store all current todos
   todos: Todo[] = [];
 
-  // Fragenliste der Studierenden
+  // Array to store student questions
   fragen: Question[] = [];
 
   constructor(
@@ -34,48 +34,52 @@ export class WelcomeTutorComponent implements OnInit {
     private questionService: QuestionService
   ) {}
 
-  // Beim Laden der Komponente werden Daten geholt
+  // Lifecycle hook: runs when component initializes, loading data from backend
   ngOnInit() {
     this.loadHints();
     this.loadTodos();
     this.loadFragen();
   }
 
-  // Lädt Hinweise aus dem Backend
+  // Fetch all hints from the backend service and assign to local array
   loadHints() {
     this.hintService.getHints().subscribe((data) => {
       this.hints = data;
     });
   }
 
-  // Lädt To-dos aus dem Backend
+  // Fetch all todos from the backend service
   loadTodos() {
     this.todoService.getTodos().subscribe((data) => {
       this.todos = data;
     });
   }
 
-  // Lädt Fragen, filtert archivierte oder gelöschte aus und sortiert nach Erstellungsdatum
+  // Fetch latest student questions from backend service
   loadFragen() {
     this.questionService.getAll().subscribe((fragen: Question[]) => {
-      this.fragen = fragen
-        .filter(f => !f.ist_archiviert && !f.ist_geloescht)
-        .sort((a, b) => new Date(b.erstellt_am).getTime() - new Date(a.erstellt_am).getTime());
+    this.fragen = fragen
+    .filter(f =>
+    !f.ist_archiviert &&
+    !f.ist_geloescht &&
+    !f.ist_beantwortet &&
+    !f.ist_angepinnt
+  )
+  .sort((a, b) => new Date(b.erstellt_am).getTime() - new Date(a.erstellt_am).getTime());
     });
   }
-
-  // Fügt einen neuen Hinweis hinzu (wenn nicht leer)
+  // Add a new hint if input is not empty; then reset input and reload list
   addHint() {
     const text = this.newHint.trim();
     if (text) {
       this.hintService.addHint(text).subscribe((hint) => {
         this.hints.push(hint);
-        this.newHint = ''; // Eingabefeld zurücksetzen
+        this.newHint = ''; 
       });
     }
   }
 
-  // Entfernt einen Hinweis per Index
+  // Remove hint by index from the list, then reload hints from backend
   removeHint(index: number) {
     const id = this.hints[index].id;
     this.hintService.deleteHint(id).subscribe(() => {
@@ -83,7 +87,7 @@ export class WelcomeTutorComponent implements OnInit {
     });
   }
 
-  // Fügt ein neues To-do hinzu (wenn nicht leer)
+    // Add a new todo task if input is not empty; then reset input and reload list
   addTodo() {
     const text = this.newTodo.trim();
     if (text) {
@@ -94,7 +98,7 @@ export class WelcomeTutorComponent implements OnInit {
     }
   }
 
-  // Entfernt ein To-do per Index
+    // Remove todo by index, then reload todo list
   removeTodo(index: number) {
     const id = this.todos[index].id;
     this.todoService.deleteTodo(id).subscribe(() => {
@@ -102,12 +106,12 @@ export class WelcomeTutorComponent implements OnInit {
     });
   }
 
-  // Aktualisiert den "done"-Status eines To-dos
+   // Toggle done status of a todo item and update it via service
   toggleDone(todo: Todo) {
     this.todoService.updateTodo(todo).subscribe();
   }
 
-  // Navigiert zur Detailansicht der Fragen
+    // Navigate to the full questions list page
   goToFragen() {
     this.router.navigate(['welcome/tutor/questions']);
   }

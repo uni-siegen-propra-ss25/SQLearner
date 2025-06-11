@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';  // <-- Router importieren
+import { Router } from '@angular/router';  
 import { QuestionService } from 'app/features/welcome/services/question.service';
 
 @Component({
@@ -8,17 +8,19 @@ import { QuestionService } from 'app/features/welcome/services/question.service'
   styleUrls: ['./beantwortet.component.scss'],
 })
 export class BeantwortetComponent implements OnInit {
+  // List of answered questions (not archived or deleted)
   beantworteteFragen: any[] = [];
 
 constructor(
   private questionService: QuestionService,
-  private router: Router  // Router hier injizieren
+  private router: Router  
 ) {}
 
   ngOnInit(): void {
     this.ladeBeantworteteFragen();
   }
 
+  // Load questions that are answered, but not archived or deleted
   ladeBeantworteteFragen(): void {
     this.questionService.getAll().subscribe((data) => {
       this.beantworteteFragen = data.filter(
@@ -53,7 +55,7 @@ constructor(
     this.beantworteteFragen = this.beantworteteFragen.filter(f => f.id !== frageId);
   }
 
-  // Neue Methode für Zurück-Button
+  // Navigation back to tutor questions overview
   zurueck(): void {
     this.router.navigate(['/welcome/tutor/questions']);
   }

@@ -1,19 +1,20 @@
 <div class="fragenforum-container">
 
-  <!-- Kopfbereich mit App-Titel und Beschreibung -->
+  <!-- Header area with app title and description -->
   <div class="fragenforum-header">
     <h1>SQLearner</h1>
-    <p>Fragenforum – Stellen Sie dem Tutor Fragen</p>
+    <p>Question Forum – Ask the tutor questions</p>
 
-    <!-- Zurück-Button unten links -->
-  <button class="back-button" mat-button (click)="goBack()">
-    Zurück zur Startseite
-  </button>
-</div>
+    <!-- Back button at the bottom left -->
+    <button class="back-button" mat-button (click)="goBack()">
+      Back to Home
+    </button>
+  </div>
 
-  <!-- Bereich für alle Nachrichten -->
+  <!-- Chat message area -->
   <div class="chat-messages">
     <ng-container *ngFor="let q of questions">
+      <!-- Student message -->
       <div class="message from-student">
         <div class="message-text">{{ q.frage }}</div>
         <div class="message-info">
@@ -24,23 +25,22 @@
         </div>
       </div>
 
+      <!-- Tutor answer if exists -->
       <div *ngIf="q.antwort" class="message from-tutor">
         <div class="message-text">{{ q.antwort }}</div>
         <div class="message-info">
-          <span class="timestamp">Tutorantwort</span>
+          <span class="timestamp">Tutor response</span>
         </div>
       </div>
     </ng-container>
   </div>
 
-  <!-- Eingabefeld für neue Frage -->
+  <!-- Input field for new questions -->
   <div class="chat-input">
     <mat-form-field appearance="fill" class="input-field">
-      <mat-label>Deine Frage</mat-label>
+      <mat-label>Your question</mat-label>
       <input matInput [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" />
     </mat-form-field>
-
-    <button mat-raised-button color="primary" (click)="sendMessage()">Senden</button>
+    <button mat-raised-button color="primary" (click)="sendMessage()">Send</button>
   </div>
-
 </div>

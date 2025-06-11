@@ -10,7 +10,7 @@
     </div>
   </div>
   
-  <!-- Liste der archivierten Fragen -->
+   <!-- List of archived questions -->
   <div class="archiv-liste" *ngIf="fragen.length > 0; else leer">
     <div class="archiv-item" *ngFor="let frage of fragen">
       <div class="frage-info">
@@ -20,19 +20,19 @@
         <p class="antwort-text" *ngIf="frage.antwort"><strong>Antwort:</strong> {{ frage.antwort }}</p>
       </div>
 
-      <!-- Aktionen: Wiederherstellen / Löschen -->
+      <!-- Actions: Restore / Delete permanently -->
       <div class="frage-aktionen">
         <button mat-icon-button color="primary" (click)="wiederherstellen(frage)">
           <mat-icon>restore</mat-icon>
         </button>
-        <button mat-icon-button color="warn" (click)="endgueltigLoeschen(frage)">
+        <button mat-icon-button color="warn" (click)="inPapierkorbVerschieben(frage)">
           <mat-icon>delete_forever</mat-icon>
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Fallback bei leerer Liste -->
+  <!-- Fallback when archive is empty -->
   <ng-template #leer>
     <p class="leertext">Das Archiv ist leer 📦</p>
   </ng-template>

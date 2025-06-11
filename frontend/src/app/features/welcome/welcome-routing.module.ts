@@ -61,7 +61,7 @@ const routes: Routes = [
   },
   {
   path: 'student/questions',
-  component: FragenChatComponent,  // Muss noch erstellt werden
+  component: FragenChatComponent,  
   canActivate: [RoleGuard],
   data: { allowedRoles: [Role.STUDENT] },
   },

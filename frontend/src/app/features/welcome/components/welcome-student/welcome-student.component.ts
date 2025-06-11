@@ -4,24 +4,52 @@ import { HintService } from 'app/features/welcome/services/hint.service';
 import { TodoService, Todo } from 'app/features/welcome/services/todo.service';
 import { QuestionService, Question } from 'app/features/welcome/services/question.service';
 
-// Interne Datenstruktur für letzte Nachricht im Fragenforum
+/**
+ * Chat message interface used to represent a student or tutor message.
+ */
 interface ChatMessage {
   from: 'student' | 'tutor';
   text: string;
   timestamp: Date;
 }
 
+/**
+ * Component for the welcome page shown to students.
+ * Displays tutor hints, to-do list, and the latest forum message.
+ */
 @Component({
   selector: 'app-welcome-student',
   templateUrl: './welcome-student.component.html',
   styleUrls: ['./welcome-student.component.scss'],
 })
 export class WelcomeStudentComponent implements OnInit {
-  todos: Todo[] = [];              // Liste offener Aufgaben
-  newTodo = '';                    // Eingabefeld für neue Aufgabe
-  hinweise: string[] = [];         // Hinweise vom Tutor
-  lastMessage?: ChatMessage;       // Letzte Nachricht im Fragenforum
+  /**
+   * List of current to-dos for the student.
+   */
+  todos: Todo[] = [];
 
+  /**
+   * The value of the new to-do input field.
+   */
+  newTodo = '';
+
+  /**
+   * List of hints provided by the tutor.
+   */
+  hinweise: string[] = [];
+
+  /**
+   * Most recent question or answer message from the forum.
+   */
+  lastMessage?: ChatMessage;
+
+  /**
+   * Creates component and injects required services.
+   * @param router Angular router for navigation
+   * @param hintService Service to fetch tutor hints
+   * @param todoService Service to manage to-do items
+   * @param questionService Service to fetch forum questions
+   */
   constructor(
     private router: Router,
     private hintService: HintService,
@@ -29,23 +57,28 @@ export class WelcomeStudentComponent implements OnInit {
     private questionService: QuestionService
   ) {}
 
+  /**
+   * Lifecycle method called once after component initialization.
+   * Loads hints, todos, and latest forum message.
+   */
   ngOnInit(): void {
-    // Hinweise vom Server laden
+    // Load hints from the server
     this.hintService.getHints().subscribe((hints) => {
       this.hinweise = hints.map(h => h.text);
     });
 
-    // To-dos vom Server laden
+    // Load to-dos from the server
     this.todoService.getTodos().subscribe((data) => {
       this.todos = data;
     });
 
-    // Letzte Frage oder Antwort im Forum laden
+    // Load the latest chat message from forum (question/answer)
     this.loadLastMessage();
   }
 
   /**
-   * Neue Aufgabe anlegen (wenn Eingabe nicht leer ist)
+   * Adds a new to-do item to the list.
+   * Only works if the input is not empty after trimming.
    */
   addTodo(): void {
     const trimmed = this.newTodo.trim();
@@ -58,7 +91,9 @@ export class WelcomeStudentComponent implements OnInit {
   }
 
   /**
-   * Aufgabe löschen (Index aus Liste + Server löschen)
+   * Removes a to-do item by its index.
+   * Also deletes the item from the server.
+   * @param index Index of the to-do in the list
    */
   removeTodo(index: number): void {
     const todo = this.todos[index];
@@ -68,14 +103,16 @@ export class WelcomeStudentComponent implements OnInit {
   }
 
   /**
-   * Status "erledigt/nicht erledigt" einer Aufgabe ändern
+   * Toggles the 'done' state of a to-do item and updates it on the server.
+   * @param todo To-do item to update
    */
   toggleDone(todo: Todo): void {
     this.todoService.updateTodo(todo).subscribe();
   }
 
   /**
-   * Letzte Nachricht (Frage oder Antwort) aus dem Forum laden
+   * Loads the most recent student or tutor message from the forum.
+   * Filters out archived or deleted questions and maps to chat messages.
    */
   loadLastMessage(): void {
     this.questionService.getAll().subscribe((data: Question[]) => {
@@ -97,7 +134,6 @@ export class WelcomeStudentComponent implements OnInit {
         ])
         .flat();
 
-      // Die letzte chronologische Nachricht anzeigen
       if (chat.length > 0) {
         chat.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
         this.lastMessage = chat[chat.length - 1];
@@ -108,7 +144,7 @@ export class WelcomeStudentComponent implements OnInit {
   }
 
   /**
-   * Weiterleitung zum Fragenforum
+   * Navigates the user to the forum page to ask a new question.
    */
   goToFragen(): void {
     this.router.navigate(['welcome/student/questions']);

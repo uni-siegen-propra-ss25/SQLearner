@@ -10,7 +10,7 @@
     </div>
   </div>
   
-  <!-- Fragenliste -->
+  <!-- List of answered questions -->
   <div class="archiv-liste" *ngIf="beantworteteFragen.length > 0; else leer">
     <div class="archiv-item" *ngFor="let frage of beantworteteFragen">
       <div class="frage-info">
@@ -20,13 +20,10 @@
         <p class="antwort-text"><strong>Antwort:</strong> {{ frage.antwort }}</p>
       </div>
 
-      <!-- Aktionsbuttons -->
+      <!-- When no answered questions exist -->
       <div class="frage-aktionen">
         <button mat-icon-button color="primary" (click)="insArchivVerschieben(frage)">
           <mat-icon>archive</mat-icon>
-        </button>
-        <button mat-icon-button color="accent" (click)="markieren(frage)">
-          <mat-icon>push_pin</mat-icon>
         </button>
         <button mat-icon-button color="warn" (click)="inPapierkorbVerschieben(frage)">
           <mat-icon>delete</mat-icon>
