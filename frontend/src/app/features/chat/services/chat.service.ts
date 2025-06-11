@@ -32,23 +32,7 @@ export class ChatService {
     addMessage(message: Message) {
         const currentMessages = this.messagesSubject.value;
         this.messagesSubject.next([...currentMessages, message]);
-    }
-
-    clearChat() {
+    }    clearChat() {
         this.messagesSubject.next([]);
-    }
-
-    /**
-     * Requests AI feedback for a SQL query from a specific exercise.
-     *
-     * @param exerciseId - The ID of the exercise
-     * @param query - The SQL query to get feedback for
-     * @returns Observable resolving to the AI feedback message
-     */
-    getSqlQueryFeedback(exerciseId: number, query: string): Observable<Message> {
-        return this.http.post<Message>(`${this.baseUrl}/sql-feedback`, {
-            exerciseId,
-            query,
-        });
     }
 }
