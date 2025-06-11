@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { QuestionService, Question } from 'app/features/welcome/services/question.service';
+import { Router } from '@angular/router';  // <-- Router importieren
 
 @Component({
   selector: 'app-archiv',
@@ -9,8 +10,11 @@ import { QuestionService, Question } from 'app/features/welcome/services/questio
 export class ArchivComponent implements OnInit {
   // Liste archivierter, aber nicht gelöschter Fragen
   fragen: Question[] = [];
-
-  constructor(private questionService: QuestionService) {}
+  
+constructor(
+  private questionService: QuestionService,
+  private router: Router  // Router hier injizieren
+) {}
 
   ngOnInit(): void {
     // Beim Start: Lade archivierte Fragen
@@ -38,6 +42,10 @@ export class ArchivComponent implements OnInit {
         this.ladeArchivierteFragen();
       });
     }
+  }
+    // Neue Methode für Zurück-Button
+  zurueck(): void {
+    this.router.navigate(['/welcome/tutor/questions']);
   }
 }
 

@@ -1,13 +1,18 @@
 <div class="beantwortet-container">
   <!-- Header -->
   <div class="beantwortet-header">
-    <h1>Beantwortete Fragen</h1>
-    <p>Verwalte alle beantworteten, nicht archivierten Fragen</p>
-  </div>
+    <h1>SQLearner</h1>
+    <p>Beantwortete Fragen - Verwalten Sie das Fragenforum</p>
 
+    <div class="zurueck-link" (click)="zurueck()">
+      <mat-icon class="klickbares-icon">arrow_back</mat-icon>
+      <span>Zurück</span>
+    </div>
+  </div>
+  
   <!-- Fragenliste -->
-  <div class="beantwortet-liste" *ngIf="beantworteteFragen.length > 0; else leer">
-    <div class="beantwortet-item" *ngFor="let frage of beantworteteFragen">
+  <div class="archiv-liste" *ngIf="beantworteteFragen.length > 0; else leer">
+    <div class="archiv-item" *ngFor="let frage of beantworteteFragen">
       <div class="frage-info">
         <strong>{{ frage.student_name }}</strong>
         ({{ frage.erstellt_am | date:'dd.MM.yyyy HH:mm' }})

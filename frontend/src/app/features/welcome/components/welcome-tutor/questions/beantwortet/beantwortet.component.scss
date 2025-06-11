@@ -1,41 +1,113 @@
 // Importiert gemeinsame Styles aus dem Archiv
 @import '../archiv/archiv.component.scss';
 
-// Kopfbereich für beantwortete Fragen
+// Hauptcontainer für beantwortete Fragen
+.beantwortet-container {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', sans-serif;
+}
+
 .beantwortet-header {
-  background-color: #b3cbbf; // Grünton als Zeichen für Erledigt
-  padding: 1rem;
+  background-color: #8fa8b9;
+  padding: 1.5rem;
+  color: #000;
+  border-radius: 8px;
+  margin-bottom: 2rem;
   text-align: center;
-  border-radius: 8px 8px 0 0; // Obere Ecken abgerundet
+
+  h1 {
+    margin: 0;
+    font-size: 2rem;
+  }
+
+  p {
+    margin: 0.5rem 0 0;
+    font-size: 1.1rem;
+  }
+
+    .zurueck-link {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    color: #1976d2; // Blau passend zum Material Design
+
+    .klickbares-icon {
+      font-size: 24px;
+      color: #1976d2;
+    }
+
+    span {
+      font-size: 1rem;
+      font-weight: 500;
+      color: #1976d2;
+      user-select: none;
+    }
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
 
 // Liste der beantworteten Fragen
 .archiv-liste {
-  padding: 1rem;
-  background-color: #f7faf3; // Sehr helles Grün/Beige
-  border-radius: 0 0 8px 8px; // Untere Ecken abgerundet
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
 }
 
-// Einzelne Frage-Antwort-Einheit
+// Einzelnes Frage-Antwort-Element
 .archiv-item {
-  background-color: white;
-  border-radius: 6px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f5f5f5;
   padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-// Header mit Frage-Titel und Aktionen (Icons)
+// Header mit Frage-Titel und Aktionen
 .item-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 0.5rem;
 }
 
-// Buttonbereich für Aktionen (z. B. Archivieren, Löschen)
+// Stil für die Frage (hervorgehoben)
+.frage {
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.3rem;
+  text-align: left;
+}
+
+// Stil für die Antwort (kursiv, leicht abgesetzt)
+.antwort {
+  font-style: italic;
+  color: #444;
+  margin-top: 0.3rem;
+  text-align: left;
+}
+
+// Zeitstempel für Frage/Antwort
+.zeitstempel {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+// Aktionen-Buttonbereich (z. B. Archivieren, Löschen)
 .aktionen {
   display: flex;
-  gap: 0.5rem; // Abstand zwischen den Buttons
+  gap: 0.5rem;
 }
 
 // Allgemeiner Stil für Icon-Buttons
@@ -48,28 +120,23 @@
   align-items: center;
 }
 
-// Größe der Icons in den Buttons
+// Größe der Icons
 .icon-button img {
   width: 24px;
   height: 24px;
 }
 
-// Stil für die Frage (stark hervorgehoben)
-.frage {
-  margin-top: 0.5rem;
-  font-weight: 600;
+// Text bei leerer Liste
+.leertext {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #888;
+  margin-top: 3rem;
 }
-
-// Stil für die Antwort (kursiv, abgesetzt)
-.antwort {
-  margin-top: 0.5rem;
-  font-style: italic;
-  color: #444;
-}
-
-// Zeitangabe für Frage/Antwort
-.zeitstempel {
-  margin-top: 0.5rem;
-  font-size: 0.85rem;
-  color: #666;
+.frage-aktionen {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
 }

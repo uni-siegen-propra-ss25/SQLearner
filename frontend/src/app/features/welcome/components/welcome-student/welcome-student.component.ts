@@ -111,6 +111,6 @@ export class WelcomeStudentComponent implements OnInit {
    * Weiterleitung zum Fragenforum
    */
   goToFragen(): void {
-    this.router.navigate(['welcome/student/fragen']);
+    this.router.navigate(['welcome/student/questions']);
   }
 }

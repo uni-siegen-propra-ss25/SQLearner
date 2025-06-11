@@ -7,6 +7,7 @@
 }
 
 // Kopfbereich mit Titel und Untertitel
+// Kopfbereich mit Titel und Untertitel
 .fragenforum-header {
   background-color: #cfdae1;
   padding: 1.5rem;
@@ -14,6 +15,7 @@
   border-radius: 8px;
   margin-bottom: 2rem;
   text-align: center;
+  position: relative;
 
   h1 {
     margin: 0;
@@ -24,7 +26,20 @@
     margin: 0.5rem 0 0;
     font-size: 1.1rem;
   }
+
+  // Zurück-zur-Startseite Button im Headerbereich (richtig verschoben!)
+  .back-button {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    font-size: 0.85rem;
+    padding: 0.25rem 0.75rem;
+    min-width: 40px;
+    min-height: 36px;
+    line-height: 1;
+  }
 }
+
 
 // Container für alle Chatnachrichten
 .chat-messages {
@@ -92,9 +107,4 @@
     flex-grow: 1;
   }
 
-  // Styling für Senden- und Datei-Buttons
-  button {
-    min-width: 40px;
-    min-height: 40px;
-  }
 }

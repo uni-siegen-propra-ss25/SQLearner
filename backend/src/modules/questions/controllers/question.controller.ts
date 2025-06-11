@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Param, Patch } from '@nestjs/common';
 import { QuestionService } from '../services/question.service';
 import { CreateQuestionDto } from '../dto/create-question.dto';
+import { Delete } from '@nestjs/common';
 
 @Controller('questions') // Routenprefix: alle Endpunkte starten mit /questions
 export class QuestionController {
@@ -44,8 +45,21 @@ export class QuestionController {
   }
 
   // PATCH /questions/:id/delete → Frage "löschen" (Soft Delete)
-  @Patch(':id/delete')
-  delete(@Param('id') id: string) {
-    return this.questionService.delete(+id);
+@Patch(':id/delete')
+patchGeloescht(@Param('id') id: string, @Body('ist_geloescht') ist_geloescht: boolean) {
+  return this.questionService.updateGeloescht(+id, ist_geloescht);
+}
+
+
+// GET /questions/papierkorb → Alle gelöschten Fragen
+@Get('papierkorb')
+findGeloeschte() {
+  console.log('📦 Papierkorb-Endpunkt wurde aufgerufen');
+  return this.questionService.findGeloeschte();
+}
+  @Delete(':id')
+  async hardDelete(@Param('id') id: string) {
+    await this.questionService.hardDelete(+id);
+    return { message: 'Frage wurde endgültig gelöscht' };
   }
 }

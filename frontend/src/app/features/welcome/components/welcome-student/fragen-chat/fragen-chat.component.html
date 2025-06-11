@@ -1,59 +1,46 @@
-<!-- Hauptcontainer für den Fragen-Chat -->
 <div class="fragenforum-container">
 
   <!-- Kopfbereich mit App-Titel und Beschreibung -->
   <div class="fragenforum-header">
     <h1>SQLearner</h1>
     <p>Fragenforum – Stellen Sie dem Tutor Fragen</p>
-  </div>
+
+    <!-- Zurück-Button unten links -->
+  <button class="back-button" mat-button (click)="goBack()">
+    Zurück zur Startseite
+  </button>
+</div>
 
   <!-- Bereich für alle Nachrichten -->
   <div class="chat-messages">
     <ng-container *ngFor="let q of questions">
-
-      <!-- Nachricht vom Studenten -->
       <div class="message from-student">
         <div class="message-text">{{ q.frage }}</div>
         <div class="message-info">
-          <!-- Zeitstempel der Frage -->
           <span class="timestamp">{{ q.erstellt_am | date: 'dd.MM.yyyy, HH:mm' }}</span>
-          <!-- Löschen-Button -->
           <button (click)="deleteMessage(q)" mat-icon-button>
             <mat-icon>delete</mat-icon>
           </button>
         </div>
       </div>
 
-      <!-- Antwort des Tutors, wenn vorhanden -->
       <div *ngIf="q.antwort" class="message from-tutor">
         <div class="message-text">{{ q.antwort }}</div>
         <div class="message-info">
           <span class="timestamp">Tutorantwort</span>
         </div>
       </div>
-
     </ng-container>
   </div>
 
   <!-- Eingabefeld für neue Frage -->
   <div class="chat-input">
-
-    <!-- Textfeld für neue Nachrichten -->
     <mat-form-field appearance="fill" class="input-field">
       <mat-label>Deine Frage</mat-label>
       <input matInput [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" />
     </mat-form-field>
 
-    <!-- Unsichtbares Datei-Input, wird durch Button geöffnet -->
-    <input type="file" hidden #fileInput (change)="handleFileUpload($event)" />
-    
-    <!-- Button zum Anhängen einer Datei -->
-    <button mat-icon-button (click)="fileInput.click()">
-      <mat-icon>attach_file</mat-icon>
-    </button>
-
-    <!-- Button zum Senden der Nachricht -->
     <button mat-raised-button color="primary" (click)="sendMessage()">Senden</button>
-
   </div>
+
 </div>

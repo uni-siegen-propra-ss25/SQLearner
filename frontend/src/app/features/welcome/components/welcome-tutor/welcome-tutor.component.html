@@ -16,7 +16,7 @@
       <mat-card-content>
         <ul class="hinweis-liste">
           <li *ngFor="let hint of hints; let i = index" class="einzelner-hinweis">
-            <mat-icon color="warn">warning</mat-icon>
+              <mat-icon class="warn-icon">warning</mat-icon>
             <span class="hinweis-text">{{ hint.text }}</span>
             <button mat-icon-button color="warn" (click)="removeHint(i)">
               <mat-icon>delete</mat-icon>

@@ -10,6 +10,9 @@
       <a routerLink="/welcome/tutor/beantwortet">Beantwortet</a>
       <a routerLink="/welcome/tutor/archiv">Archiv</a>
       <a routerLink="/welcome/tutor/papierkorb">Papierkorb</a>
+      <a class="back-button-tutor" routerLink="/welcome/tutor">
+        <mat-icon>arrow_back</mat-icon> Startseite
+      </a>
     </div>
   </div>
 
@@ -61,12 +64,9 @@
       <h2>Antwort auf: {{ ausgewaehlteQuestion.student_name }}</h2>
       <textarea [(ngModel)]="antwortText" placeholder="Antwort schreiben..."></textarea>
 
-      <input type="file" (change)="anhangHinzufuegen($event)" />
-      <div class="anhang-info" *ngIf="anhangName">📎 Datei angehängt: {{ anhangName }}</div>
-
       <div class="antwort-aktionen">
-        <button (click)="antwortAbschicken()">Antwort senden</button>
-        <button class="abbrechen" (click)="antwortAbbrechen()">Abbrechen</button>
+         <button (click)="antwortAbschicken()">Antwort senden</button>
+         <button class="abbrechen" (click)="antwortAbbrechen()">Abbrechen</button>
       </div>
     </div>
   </div>

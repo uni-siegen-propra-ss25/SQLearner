@@ -88,9 +88,16 @@ export class QuestionComponent implements OnInit {
   loeschen(frage: any, event: Event) {
     event.preventDefault();
     this.questionService.löschen(frage.id).subscribe(() => {
-      frage.ist_geloescht = true;
-      this.questions = this.questions.filter((f) => f.id !== frage.id);
-    });
+  // Frage wurde als gelöscht markiert – optional könntest du eine Bestätigung zeigen
+  console.log(`Frage ${frage.id} wurde in den Papierkorb verschoben.`);
+  
+  // Aus aktueller Liste entfernen
+  this.questions = this.questions.filter((f) => f.id !== frage.id);
+  
+  // Optional: falls angepinnt war, auch dort entfernen
+  this.angepinnt = this.angepinnt.filter((f) => f.id !== frage.id);
+});
+
   }
 
   // Frage von der Markierung entfernen

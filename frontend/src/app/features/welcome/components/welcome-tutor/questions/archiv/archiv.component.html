@@ -1,10 +1,15 @@
 <div class="archiv-container">
-  <!-- Kopfbereich mit Titel -->
+  <!-- Header -->
   <div class="archiv-header">
     <h1>SQLearner</h1>
     <p>Archiv - Archivierte Fragen verwalten</p>
-  </div>
 
+    <div class="zurueck-link" (click)="zurueck()">
+      <mat-icon class="klickbares-icon">arrow_back</mat-icon>
+      <span>Zurück</span>
+    </div>
+  </div>
+  
   <!-- Liste der archivierten Fragen -->
   <div class="archiv-liste" *ngIf="fragen.length > 0; else leer">
     <div class="archiv-item" *ngFor="let frage of fragen">

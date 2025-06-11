@@ -158,3 +158,10 @@ button[mat-icon-button] {
 .mat-card-actions {
   flex-shrink: 0;
 }
+
+.warn-icon {
+  color: #e0d35f; // typisches Gelb für Warnungen (Material Yellow 500)
+  margin-right: 8px; // mehr Abstand zwischen Icon und Text
+  vertical-align: middle; // schönere Ausrichtung zum Text
+  font-size: 24px; // Größe ggf. anpassen
+}

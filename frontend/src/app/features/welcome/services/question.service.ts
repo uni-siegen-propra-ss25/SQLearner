@@ -66,4 +66,8 @@ export class QuestionService {
   hardDelete(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
+
+  getGeloeschte(): Observable<Question[]> {
+  return this.http.get<Question[]>(`${this.apiUrl}/papierkorb`);
+  }
 }
