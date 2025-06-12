@@ -25,16 +25,14 @@
             {{ option.text }}
           </mat-radio-button>
         </div>
-      </mat-radio-group>      <!-- Multiple Choice -->
-      <div *ngIf="exercise.type === ExerciseType.MULTIPLE_CHOICE" class="multiple-choice">
+      </mat-radio-group>      <!-- Multiple Choice -->      <div *ngIf="exercise.type === ExerciseType.MULTIPLE_CHOICE" class="multiple-choice">
         <div
           *ngFor="let option of exercise.answers"
           class="option"
-          (click)="option.id && toggleOption(option.id)"
         >
           <mat-checkbox
             [checked]="selectedOptions.includes(option.id!)"
-            (change)="toggleOption(option.id!)"
+            (change)="option.id && toggleOption(option.id!)"
           >
             {{ option.text }}
           </mat-checkbox>

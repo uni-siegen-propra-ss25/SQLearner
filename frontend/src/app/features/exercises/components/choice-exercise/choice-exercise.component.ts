@@ -24,9 +24,7 @@ export class ChoiceExerciseComponent {
         private submissionService: SubmissionService,
         private snackBar: MatSnackBar,
         private progressService: ProgressService
-    ) {}
-
-    toggleOption(optionId: number): void {
+    ) {}    toggleOption(optionId: number): void {
         if (this.isCorrectAnswer) return; // Only prevent changes if answer was correct
         
         const index = this.selectedOptions.indexOf(optionId);
@@ -36,7 +34,10 @@ export class ChoiceExerciseComponent {
             if (this.exercise.type === ExerciseType.SINGLE_CHOICE) {
                 this.selectedOptions = [optionId];
             } else {
-                this.selectedOptions.push(optionId);
+                // Vermeide Duplikate bei Multiple-Choice
+                if (!this.selectedOptions.includes(optionId)) {
+                    this.selectedOptions.push(optionId);
+                }
             }
         }
     }
@@ -46,9 +47,10 @@ export class ChoiceExerciseComponent {
         if (this.exercise.type === ExerciseType.SINGLE_CHOICE && this.selectedOptions.length > 1)
             return;
 
-        this.isSubmitting = true;
+        this.isSubmitting = true;        // Sortiere die ausgewählten IDs für konsistente Verarbeitung
+        const sortedOptions = [...this.selectedOptions].sort((a, b) => a - b);
         this.submissionService
-            .submitAnswer(this.exercise.id, this.selectedOptions.join(','))
+            .submitAnswer(this.exercise.id, sortedOptions.join(','))
             .subscribe({
                 next: (submission) => {
                     this.isSubmitting = false;
