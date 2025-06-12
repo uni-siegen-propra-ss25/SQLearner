@@ -1,5 +1,5 @@
 <!-- Main exercise card container with click navigation -->
-<mat-card class="exercise-card" (click)="onCardClick()" [class.clickable]="!isTutor" [class.completed]="isCompleted || isLocallyCompleted()">
+<mat-card class="exercise-card" (click)="onCardClick()" [class.clickable]="!isTutor" [class.completed]="!isTutor && (isCompleted || isLocallyCompleted())">
   <!-- Card header with title, badges, and action buttons -->
   <mat-card-header>
     <div class="header-content">
@@ -9,7 +9,6 @@
           <h2 class="exercise-title">
             {{ exercise.title }}
           </h2>
-          <mat-icon *ngIf="isCompleted || isLocallyCompleted()" class="completed-icon" matTooltip="Erledigt">check_circle</mat-icon>
         </div>
         <div class="badges">
           <!-- Difficulty badge with dynamic color -->
@@ -28,8 +27,8 @@
       </div>
       
       <!-- Action buttons section -->
-      <div class="action-buttons">
-        <!-- Bookmark button for students only -->
+      <div class="action-buttons" style="display: flex; align-items: center; gap: 0px; margin-left: auto;">
+        <mat-icon *ngIf="!isTutor && (isCompleted || isLocallyCompleted())" class="completed-icon" matTooltip="Erledigt">check_circle</mat-icon>
         <button
           *ngIf="!isTutor"
           mat-icon-button
@@ -41,8 +40,8 @@
         >
           <mat-icon>{{ isBookmarked ? 'bookmark' : 'bookmark_border' }}</mat-icon>
         </button>
-        
-        <!-- Edit and delete buttons for tutors only -->
+        <mat-icon *ngIf="isTutor && isBookmarked" class="bookmark-icon" matTooltip="Gemerkte Aufgabe">bookmark</mat-icon>
+        <!-- Edit und Delete Buttons für Tutoren -->
         <ng-container *ngIf="isTutor">
           <button
             mat-icon-button
