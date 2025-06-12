@@ -41,24 +41,38 @@ const routes: Routes = [
     canActivate: [RoleGuard],
     data: { allowedRoles: [Role.TUTOR] },
   },
+
   {
-    path: 'tutor/papierkorb',
-    component: PapierkorbComponent,
-    canActivate: [RoleGuard],
-    data: { allowedRoles: [Role.TUTOR] },
+  path: 'tutor/papierkorb',
+  redirectTo: 'tutor/trash',
+  pathMatch: 'full'
   },
+  {
+  path: 'tutor/trash',
+  component: PapierkorbComponent,
+  canActivate: [RoleGuard],
+  data: { allowedRoles: [Role.TUTOR] },
+  },
+
   {
     path: 'tutor/archiv',
     component: ArchivComponent,
     canActivate: [RoleGuard],
     data: { allowedRoles: [Role.TUTOR] },
   },
+
   {
-    path: 'tutor/beantwortet',
-    component: BeantwortetComponent,
-    canActivate: [RoleGuard],
-    data: { allowedRoles: [Role.TUTOR] },
+  path: 'tutor/beantwortet',
+  redirectTo: 'tutor/answered',
+  pathMatch: 'full'
   },
+  {
+  path: 'tutor/answered',
+  component: BeantwortetComponent,
+  canActivate: [RoleGuard],
+  data: { allowedRoles: [Role.TUTOR] },
+  },
+
   {
   path: 'student/questions',
   component: FragenChatComponent,  

@@ -8,7 +8,7 @@
 
 // Header styling for trash bin page
 .papierkorb-header {
-  background-color: #8fa8b9; // Reddish trash bin color
+  background-color: #8fa8b9;
   padding: 1.5rem;
   color: #000;
   border-radius: 8px;
@@ -17,59 +17,61 @@
 
   h1 {
     margin: 0;
-    font-size: 2rem; 
+    font-size: 2rem;
   }
 
   p {
     margin: 0.5rem 0 0;
-    font-size: 1.1rem; 
+    font-size: 1.1rem;
   }
-      .zurueck-link {
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-    color: #1976d2; 
+}
 
-    .klickbares-icon {
-      font-size: 24px;
-      color: #1976d2;
-    }
+.zurueck-link {
+  position: fixed;
+  bottom: 20px;
+  left: 130px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  color: #1976d2;
+  z-index: 1000;
 
-    span {
-      font-size: 1rem;
-      font-weight: 500;
-      color: #1976d2;
-      user-select: none;
-    }
+  .klickbares-icon {
+    font-size: 24px;
+    color: #1976d2;
+  }
 
-    &:hover {
-      text-decoration: underline;
-    }
+  span {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #1976d2;
+    user-select: none;
+  }
+
+  &:hover {
+    text-decoration: underline;
   }
 }
 
 .papierkorb-liste {
   display: flex;
-  flex-direction: column; // Sorted
-  gap: 1.2rem; 
+  flex-direction: column;
+  gap: 1.2rem;
 }
 
 .papierkorb-item {
   display: flex;
-  justify-content: space-between; 
-  align-items: center; 
-  background: #f5f5f5; 
+  justify-content: space-between;
+  align-items: center;
+  background: #f5f5f5;
   padding: 1rem;
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); //Shadow
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .frage-info {
-  flex: 1; 
+  flex: 1;
   color: #333;
 
   p {
@@ -79,7 +81,7 @@
 }
 
 .frage-aktionen button {
-  margin-left: 0.5rem; // Distance
+  margin-left: 0.5rem;
 }
 
 .leertext {

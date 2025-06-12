@@ -26,32 +26,33 @@
     margin: 0.5rem 0 0;
     font-size: 1.1rem;
   }
+}
 
-    .zurueck-link {
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-    color: #1976d2; // Blue matching Material Design
+.zurueck-link {
+  position: fixed;
+  bottom: 20px;
+  left: 130px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  color: #1976d2;
+  z-index: 1000;
 
-    .klickbares-icon {
-      font-size: 24px;
-      color: #1976d2;
-    }
+  .klickbares-icon {
+    font-size: 24px;
+    color: #1976d2;
+  }
 
-    span {
-      font-size: 1rem;
-      font-weight: 500;
-      color: #1976d2;
-      user-select: none;
-    }
+  span {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #1976d2;
+    user-select: none;
+  }
 
-    &:hover {
-      text-decoration: underline;
-    }
+  &:hover {
+    text-decoration: underline;
   }
 }
 
