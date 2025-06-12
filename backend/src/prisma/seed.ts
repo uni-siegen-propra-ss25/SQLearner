@@ -64,24 +64,6 @@ export async function main() {
     },
   });
 
-  // Initialize system settings
-  const settingsToCreate = [
-    {
-      name: 'OPENAI_API_KEY',
-      value: '',
-      description: 'OpenAI API Key for the chat functionality'
-    }
-    // Add other default settings here as needed
-  ];
-
-  for (const setting of settingsToCreate) {
-    await prisma.settings.upsert({
-      where: { name: setting.name },
-      update: {},  // Don't update if exists
-      create: setting,
-    });
-  }
-
   console.log({
     message: 'Seed completed successfully',
     users: {

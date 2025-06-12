@@ -10,7 +10,6 @@ import { DatabasesModule } from './modules/databases/databases.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { ProgressModule } from './modules/progress/progress.module';
 import { BookmarksModule } from './modules/bookmarks/bookmarks.module';
-import { SettingsModule } from './modules/settings/settings.module';
 
 @Module({
     imports: [
@@ -26,7 +25,6 @@ import { SettingsModule } from './modules/settings/settings.module';
         ChatModule,
         ProgressModule,
         BookmarksModule,
-        SettingsModule,     
-        ],
+    ],
 })
 export class AppModule {}
