@@ -1,193 +1,264 @@
+// Main exercise card styling
 .exercise-card {
-  margin: 12px 0;
-  border-radius: 16px;
-  background-color: white;
-  transition: all 0.2s ease-in-out;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  position: relative;
-  overflow: hidden;
+  margin: 12px 0; // Vertical spacing between cards
+  border-radius: 16px; // Rounded corners
+  background-color: white; // Light theme background
+  transition: all 0.2s ease-in-out; // Smooth animations
+  border: 1px solid rgba(0, 0, 0, 0.08); // Subtle border
+  position: relative; // For positioning child elements
+  overflow: hidden; // Prevent content overflow
+  margin-bottom: 1rem;
+  border-left: 4px solid transparent;
+  transition: all 0.3s ease;
 
+  // Hover effects for better interactivity
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-    border-color: rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px); // Slight lift effect
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08); // Enhanced shadow
+    border-color: rgba(0, 0, 0, 0.12); // Darker border
   }
 
+  // Dragging state styling
   &.dragging {
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
-    transform: scale(1.02);
-    opacity: 0.9;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15); // Stronger shadow
+    transform: scale(1.02); // Slight scale increase
+    opacity: 0.9; // Subtle transparency
   }
 
+  // Clickable state for student cards
   &.clickable {
-    cursor: pointer;
-    transition: box-shadow 0.2s;
+    cursor: pointer; // Pointer cursor
+    transition: box-shadow 0.2s; // Smooth transition
 
     &:hover {
-      box-shadow: 0 4px 16px rgba(33, 150, 243, 0.12);
-      border-color: #2196f3;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  &.completed {
+    border-left-color: #4CAF50;
+    background-color: rgba(76, 175, 80, 0.05);
+  }
+}
+
+// Card header styling
+mat-card-header {
+  padding: 20px 20px 0; // Custom padding
+  margin-bottom: 0; // Remove default margin
+
+  .header-content {
+    display: flex; // Flexbox layout
+    justify-content: space-between; // Space between title and actions
+    align-items: flex-start; // Align to top
+    width: 100%; // Full width
+  }
+
+  .title-section {
+    flex: 1; // Take available space
+    margin-right: 16px; // Space from action buttons
+  }
+
+  mat-card-title {
+    font-size: 1.25rem; // Larger title font
+    font-weight: 600; // Semi-bold weight
+    margin-bottom: 8px; // Space below title
+    color: rgba(0, 0, 0, 0.87); // Dark text color
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .completion-icon {
+      color: #4caf50;
+      font-size: 20px;
+      height: 20px;
+      width: 20px;
     }
   }
 }
 
-mat-card-header {
-  padding: 20px 20px 0;
-  margin-bottom: 0;
-
-  .header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    width: 100%;
-  }
-
-  .title-section {
-    flex: 1;
-    margin-right: 16px;
-  }
-
-  mat-card-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 16px;
-    color: rgba(0, 0, 0, 0.87);
-  }
-}
-
+// Badge container and styling
 .badges {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
+  display: flex; // Horizontal layout
+  gap: 12px; // Space between badges
+  align-items: center; // Center alignment
+  flex-wrap: wrap; // Allow wrapping
 }
 
+// Difficulty badge styling
 .difficulty-badge {
-  padding: 4px 12px;
-  border-radius: 20px;
-  color: white;
-  font-size: 0.8rem;
-  font-weight: 500;
-  text-transform: lowercase;
-  letter-spacing: 0.02em;
-  display: flex;
-  align-items: center;
+  padding: 4px 12px; // Internal padding
+  border-radius: 20px; // Pill shape
+  color: white; // White text
+  font-size: 0.8rem; // Smaller font
+  font-weight: 500; // Medium weight
+  text-transform: lowercase; // Lowercase text
+  letter-spacing: 0.02em; // Slight letter spacing
+  display: flex; // Flex layout
+  align-items: center; // Center content
 }
 
+// Exercise type badge styling
 .type-badge {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  border-radius: 20px;
-  background-color: rgba(0, 0, 0, 0.05);
-  color: rgba(0, 0, 0, 0.7);
-  font-size: 0.8rem;
-  font-weight: 500;
+  display: flex; // Flex layout
+  align-items: center; // Center alignment
+  gap: 6px; // Space between icon and text
+  padding: 4px 12px; // Internal padding
+  border-radius: 20px; // Pill shape
+  background-color: rgba(0, 0, 0, 0.05); // Light background
+  color: rgba(0, 0, 0, 0.7); // Dark text
+  font-size: 0.8rem; // Smaller font
+  font-weight: 500; // Medium weight
 
   mat-icon {
-    font-size: 16px;
+    font-size: 16px; // Icon size
     width: 16px;
     height: 16px;
   }
 }
 
+// Action buttons container
 .action-buttons {
-  display: flex;
-  gap: 8px;
+  display: flex; // Horizontal layout
+  gap: 8px; // Space between buttons
+  
+  // Bookmark button specific styling
+  .bookmark-button {
+    transition: all 0.2s ease-in-out; // Smooth transitions
+    
+    &:hover {
+      transform: scale(1.1); // Scale on hover
+    }
+    
+    &:disabled {
+      opacity: 0.6; // Disabled state
+    }
+    
+    mat-icon {
+      transition: color 0.2s ease-in-out; // Color transition
+    }
+  }
 }
 
+// Card content styling
 mat-card-content {
-  padding: 20px;
-  padding-top: 16px;
+  padding: 20px; // Standard padding
+  padding-top: 16px; // Less top padding
 }
 
+// Exercise description styling
 .exercise-description {
-  color: rgba(0, 0, 0, 0.7);
-  font-size: 0.95rem;
-  line-height: 1.6;
-  margin-bottom: 24px;
+  color: rgba(0, 0, 0, 0.7); // Muted text color
+  font-size: 0.95rem; // Slightly smaller font
+  line-height: 1.6; // Better readability
+  margin-bottom: 24px; // Space below description
 }
 
+// Metadata section styling
 .exercise-metadata {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  display: flex; // Horizontal layout
+  flex-wrap: wrap; // Allow wrapping
+  gap: 16px; // Space between items
+  padding-top: 16px; // Top padding
+  border-top: 1px solid rgba(0, 0, 0, 0.08); // Top border
 }
 
+// Individual metadata item styling
 .metadata-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: rgba(0, 0, 0, 0.6);
-  font-size: 0.85rem;
+  display: flex; // Horizontal layout
+  align-items: center; // Center alignment
+  gap: 6px; // Space between icon and text
+  color: rgba(0, 0, 0, 0.6); // Muted text color
+  font-size: 0.85rem; // Small font size
 
   mat-icon {
-    font-size: 18px;
+    font-size: 18px; // Icon size
     width: 18px;
     height: 18px;
   }
 }
 
+// Drag handle for reordering
 .drag-handle {
-  position: absolute;
-  top: 50%;
-  right: 0;
-  transform: translateY(-50%);
-  padding: 8px;
-  cursor: move;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  color: rgba(0, 0, 0, 0.3);
+  position: absolute; // Absolute positioning
+  top: 50%; // Center vertically
+  right: 0; // Right edge
+  transform: translateY(-50%); // Center transform
+  padding: 8px; // Click area
+  cursor: move; // Move cursor
+  opacity: 0; // Hidden by default
+  transition: opacity 0.2s ease; // Fade transition
+  color: rgba(0, 0, 0, 0.3); // Muted color
 
   &:hover {
-    color: rgba(0, 0, 0, 0.6);
+    color: rgba(0, 0, 0, 0.6); // Darker on hover
   }
 }
 
+// Show drag handle on card hover
 .exercise-card:hover .drag-handle {
-  opacity: 1;
+  opacity: 1; // Show handle
 }
 
 // Dark theme adjustments
 :host-context(.dark-theme) {
   .exercise-card {
-    background-color: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.05); // Dark background
+    border-color: rgba(255, 255, 255, 0.1); // Light border
 
     &:hover {
-      border-color: rgba(255, 255, 255, 0.15);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      border-color: rgba(255, 255, 255, 0.15); // Lighter border
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); // Stronger shadow
     }
   }
 
+  // Dark theme text colors
   mat-card-title {
-    color: rgba(255, 255, 255, 0.87);
+    color: rgba(255, 255, 255, 0.87); // Light text
   }
 
   .type-badge {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 255, 255, 0.1); // Light background
+    color: rgba(255, 255, 255, 0.7); // Light text
   }
 
   .exercise-description {
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.7); // Light text
   }
 
   .exercise-metadata {
-    border-top-color: rgba(255, 255, 255, 0.1);
+    border-top-color: rgba(255, 255, 255, 0.1); // Light border
   }
 
   .metadata-item {
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.6); // Light text
   }
 
   .drag-handle {
-    color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.3); // Light color
 
     &:hover {
-      color: rgba(255, 255, 255, 0.6);
+      color: rgba(255, 255, 255, 0.6); // Lighter on hover
     }
   }
+}
+
+.exercise-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.exercise-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.completed-icon {
+  color: #4CAF50;
+  font-size: 1.5rem;
+  margin-right: 2rem;
 }

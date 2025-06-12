@@ -1,0 +1,39 @@
+<div class="beantwortet-container">
+  <!-- Header -->
+  <div class="beantwortet-header">
+    <h1>SQLearner</h1>
+    <p>Beantwortete Fragen - Verwalten Sie das Fragenforum</p>
+
+    <div class="zurueck-link" (click)="zurueck()">
+      <mat-icon class="klickbares-icon">arrow_back</mat-icon>
+      <span>Zurück</span>
+    </div>
+  </div>
+  
+  <!-- List of answered questions -->
+  <div class="archiv-liste" *ngIf="beantworteteFragen.length > 0; else leer">
+    <div class="archiv-item" *ngFor="let frage of beantworteteFragen">
+      <div class="frage-info">
+        <strong>{{ frage.student_name }}</strong>
+        ({{ frage.erstellt_am | date:'dd.MM.yyyy HH:mm' }})
+        <p class="frage-text">„{{ frage.frage }}“</p>
+        <p class="antwort-text"><strong>Antwort:</strong> {{ frage.antwort }}</p>
+      </div>
+
+      <!-- When no answered questions exist -->
+      <div class="frage-aktionen">
+        <button mat-icon-button color="primary" (click)="insArchivVerschieben(frage)">
+          <mat-icon>archive</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="inPapierkorbVerschieben(frage)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Wenn keine beantworteten Fragen -->
+  <ng-template #leer>
+    <p class="leertext">Keine beantworteten Fragen vorhanden ✅</p>
+  </ng-template>
+</div>

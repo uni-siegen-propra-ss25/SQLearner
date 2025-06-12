@@ -1,7 +1,10 @@
 <div class="query-exercise">
   <mat-card-content>
     <div class="exercise-header">
-      <h2 class="exercise-title">{{ exercise.title }}</h2>
+      <h2 class="exercise-title">
+        {{ exercise.title }}
+        <mat-icon *ngIf="isCorrectAnswer" class="completed-icon">check_circle</mat-icon>
+      </h2>
       <div class="database-info" *ngIf="exercise.database">
         <mat-icon>storage</mat-icon>
         <span>
@@ -50,7 +53,7 @@
           mat-flat-button
           color="primary"
           [disabled]="!sqlQuery.trim() || isLoading"
-          (click)="submitQuery()"
+          (click)="submitAnswer()"
           matTooltip="Reicht deine Lösung ein. Die KI überprüft, ob deine Query das gewünschte Ergebnis liefert."
         >
           <mat-icon>send</mat-icon>

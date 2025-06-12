@@ -7,12 +7,14 @@ import { WelcomeRedirectComponent } from './components/welcome-redirect/welcome-
 import { MaterialModule } from 'app/material.module'; 
 import { FormsModule } from '@angular/forms'; 
 import { WelcomeComponent } from 'app/features/welcome/welcome.component';
-import { AufgabeComponent } from 'app/features/welcome/components/welcome-tutor/aufgaben/aufgaben.component';
-import { FragenComponent } from 'app/features/welcome/components/welcome-tutor/fragen/fragen.component';
-import { PapierkorbComponent } from './components/welcome-tutor/fragen/papierkorb/papierkorb.component';
-import { ArchivComponent } from './components/welcome-tutor/fragen/archiv/archiv.component';
-import { BeantwortetComponent } from './components/welcome-tutor/fragen/beantwortet/beantwortet.component';
+import { HttpClientModule } from '@angular/common/http';
 
+import { QuestionComponent } from 'app/features/welcome/components/welcome-tutor/questions/question.component';
+import { PapierkorbComponent } from './components/welcome-tutor/questions/papierkorb/papierkorb.component';
+import { ArchivComponent } from './components/welcome-tutor/questions/archiv/archiv.component';
+import { BeantwortetComponent } from './components/welcome-tutor/questions/beantwortet/beantwortet.component';
+
+import { FragenChatComponent } from './components/welcome-student/fragen-chat/fragen-chat.component';
 
 @NgModule({
   declarations: [
@@ -20,17 +22,18 @@ import { BeantwortetComponent } from './components/welcome-tutor/fragen/beantwor
     WelcomeStudentComponent,
     WelcomeRedirectComponent,
     WelcomeComponent,
-    AufgabeComponent,  
-    FragenComponent,   
+    QuestionComponent,   
     PapierkorbComponent,
     ArchivComponent,
     BeantwortetComponent,
+    FragenChatComponent,
   ],
   imports: [
     CommonModule,
     WelcomeRoutingModule,
     FormsModule,
     MaterialModule,
+    HttpClientModule,
   ],
 })
 export class WelcomeModule {}

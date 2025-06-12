@@ -1,138 +1,104 @@
-<!-- Willkommensnachricht --> 
+<!-- Greeting section at the top of the page -->
 <div class="welcome-container">
   <h1>Willkommen bei SQLearner</h1>
   <p>Ihre Plattform zum Lernen und Üben von SQL</p>
 </div>
 
-<!-- Hauptlayout -->
+<!-- Main content area -->
 <div class="main-content">
-  <!-- Linke Spalte -->
-  <div class="left-column">
-    <!-- Fortschritt -->
-    <mat-card class="box fortschritt-box">
-      <h3>Fortschritt der Studierenden</h3>
 
-      <mat-form-field appearance="fill" class="dropdown">
-        <mat-label>Kurs wählen</mat-label>
-        <mat-select>
-          <mat-option value="sql">SQL</mat-option>
-          <mat-option value="xml">XML</mat-option>
-          <mat-option value="rd">Rationale Datenbank</mat-option>
-        </mat-select>
-      </mat-form-field>
+  <!-- Top row containing two side-by-side boxes -->
+  <div class="top-row">
 
-      <div class="fortschritt-daten">
-        <p><strong>Durchschnitt:</strong> 75%</p>
-        <div class="bar average" style="width: 75%"></div>
+    <!-- Hint box for students -->
+    <mat-card class="box hint-box">
+      <mat-card-title>Hinweise für Studierende</mat-card-title>
+      <mat-card-content>
+        <ul class="hinweis-liste">
+          <!-- Loop through all hints, displaying each with a warning icon, text, and a delete button -->
+          <li *ngFor="let hint of hints; let i = index" class="einzelner-hinweis">
+              <mat-icon class="warn-icon">warning</mat-icon>
+            <span class="hinweis-text">{{ hint.text }}</span>
+            <button mat-icon-button color="warn" (click)="removeHint(i)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </li>
+        </ul>
+        <!-- Message shown if no hints exist -->
+        <p *ngIf="hints.length === 0" class="keine-eintraege">Erstellen Sie einen Hinweis</p>
+      </mat-card-content>
 
-        <p><strong>Korrekt beantwortet:</strong> 60%</p>
-        <div class="bar correct" style="width: 60%"></div>
-
-        <p><strong>Unvollständig beantwortet:</strong> 10%</p>
-        <div class="bar medium" style="width: 10%"></div>
-
-        <p><strong>Falsch beantwortet:</strong> 5%</p>
-        <div class="bar wrong" style="width: 5%"></div>
-
-        <div class="tendenz">
-          <span>Leistung: [ steigend ]</span>
-          <mat-icon>trending_up</mat-icon>
-        </div>
-      </div>
-
-      <div class="button-row">
-        <button mat-button class="flach-button" routerLink="/fortschritt">Details ansehen</button>
-      </div>
+      <!-- Input field to add a new hint -->
+      <mat-card-actions class="hint-add">
+        <mat-form-field appearance="fill" class="hint-input">
+          <mat-label>Neuen Hinweis hinzufügen...</mat-label>
+          <input matInput [(ngModel)]="newHint" (keyup.enter)="addHint()" />
+        </mat-form-field>
+        <button mat-icon-button color="primary" (click)="addHint()">
+          <mat-icon>arrow_upward</mat-icon>
+        </button>
+      </mat-card-actions>
     </mat-card>
 
-    <!-- Fragen -->
-    <div class="box">
-      <h3>Fragen der Studierenden</h3>
-      <div class="fragenliste">
-        <div class="frage-item" *ngFor="let frage of fragen">
-          <i class="fas fa-envelope icon"></i>
-          <span class="frage-text">
-            <strong>{{ frage.name }}</strong>
-            <span class="datum">({{ frage.datum }})</span>:
-            <span class="inhalt">„{{ frage.text }}“</span>
-          </span>
+    <!-- Personal to-do list box -->
+    <mat-card class="box todo-box">
+      <mat-card-title>Meine To-dos</mat-card-title>
+      <mat-card-content>
+        <ul>
+          <!-- Loop through all to-dos, showing checkbox to mark done and delete button -->
+          <li *ngFor="let task of todos; let i = index" class="todo-item">
+            <mat-checkbox [(ngModel)]="task.done" (change)="toggleDone(task)">
+              {{ task.text }}
+            </mat-checkbox>
+            <button mat-icon-button color="warn" (click)="removeTodo(i)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </li>
+        </ul>
+        <!-- Message shown if no to-dos exist -->
+        <p *ngIf="todos.length === 0" class="keine-eintraege">Ergänzen Sie Ihre To-do-Liste</p>
+
+        <!-- Input to add a new to-do -->
+        <div class="todo-add">
+          <mat-form-field appearance="fill" class="todo-input">
+            <mat-label>Neue Aufgabe hinzufügen...</mat-label>
+            <input matInput [(ngModel)]="newTodo" (keyup.enter)="addTodo()" />
+          </mat-form-field>
+          <button mat-icon-button color="primary" (click)="addTodo()">
+            <mat-icon>arrow_upward</mat-icon>
+          </button>
         </div>
-      </div>
-
-      <div class="button-row fragen-buttons">
-        <button mat-button class="flach-button" (click)="goToFragen()">Alle anzeigen</button>
-      </div>
-    </div>
-
-    <!-- Aufgaben -->
-    <mat-card class="box aufgaben-box">
-      <h3>Aufgaben erstellen und hochladen</h3>
-
-      <table
-        mat-table
-        [dataSource]="aufgaben"
-        class="mat-elevation-z8 transparent-table"
-        style="width: 100%"
-      >
-        <!-- Titel Spalte -->
-        <ng-container matColumnDef="titel">
-          <th mat-header-cell *matHeaderCellDef>Titel</th>
-          <td mat-cell *matCellDef="let aufgabe">{{ aufgabe.titel }}</td>
-        </ng-container>
-
-        <!-- Typ Spalte -->
-        <ng-container matColumnDef="typ">
-          <th mat-header-cell *matHeaderCellDef>Typ</th>
-          <td mat-cell *matCellDef="let aufgabe">{{ aufgabe.typ }}</td>
-        </ng-container>
-
-        <!-- Kategorie Spalte -->
-        <ng-container matColumnDef="kategorie">
-          <th mat-header-cell *matHeaderCellDef>Kategorie</th>
-          <td mat-cell *matCellDef="let aufgabe">{{ aufgabe.kategorie }}</td>
-        </ng-container>
-
-        <!-- Erstelldatum Spalte -->
-        <ng-container matColumnDef="datum">
-          <th mat-header-cell *matHeaderCellDef>Erstelldatum</th>
-          <td mat-cell *matCellDef="let aufgabe">{{ aufgabe.datum }}</td>
-        </ng-container>
-
-        <!-- Header und Row Definition -->
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-      </table>
-
-      <div class="button-row">
-        <button mat-icon-button color="primary" (click)="goToAufgaben()">
-          <mat-icon style="color: rgb(61, 104, 150)">add</mat-icon>
-        </button>
-      </div>
+      </mat-card-content>
     </mat-card>
   </div>
 
-  <!-- Rechte Spalte -->
-  <div class="right-column">
-  <mat-card class="hinweise-box">
-    <h3>Hinweise</h3>
+  <!-- Bottom row with the latest student questions -->
+  <div class="bottom-row">
+    <mat-card class="box question-box">
+      <mat-card-title>Fragen der Studierenden</mat-card-title>
+      <mat-card-content>
+        <div class="fragenliste">
+          <!-- Conditionally display questions if any exist; otherwise show fallback message -->
+          <ng-container *ngIf="fragen.length > 0; else keineFragen">
+            <!-- Show up to 3 most recent questions -->
+            <div *ngFor="let frage of fragen.slice(0, 3)" class="frage-item">
+              <div class="frage-details">
+                <strong>{{ frage.student_name }}</strong><br>
+                <small>{{ frage.erstellt_am | date: 'dd.MM.yyyy, HH:mm' }}</small>
+                <p class="frage-text">{{ frage.frage }}</p>
+              </div>
+            </div>
+          </ng-container>
+          <ng-template #keineFragen>
+            <p class="keine-fragen">Sie haben noch keine Fragen</p>
+          </ng-template>
+        </div>
+      </mat-card-content>
 
-    <mat-form-field appearance="fill" class="hinweis-input">
-      <mat-label>Neuer Hinweis</mat-label>
-      <input matInput [(ngModel)]="newHinweis" name="hinweis" />
-    </mat-form-field>
-
-    <div class="hinweis-button-container">
-      <button mat-button color="primary" (click)="addHinweis()">Hinzufügen</button>
-    </div>
-
-    <div class="hinweis-liste">
-      <mat-card *ngFor="let hinweis of hinweise; let i = index" class="einzelner-hinweis">
-        {{ hinweis }}
-        <button mat-icon-button color="warn" (click)="removeHinweis(i)">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </mat-card>
-    </div>
-  </mat-card>
+      <!-- Button linking to the full questions list -->
+      <mat-card-actions class="fragen-actions">
+        <button mat-button color="primary" (click)="goToFragen()">Alle anzeigen</button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
 </div>
-</div> 

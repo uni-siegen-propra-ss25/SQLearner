@@ -1,211 +1,176 @@
+// Container for the welcome section (title and description)
 .welcome-container {
   padding: 2rem;
   text-align: center;
   max-width: 800px;
   margin: 0 auto;
+
+  h1 {
+    margin-bottom: 1rem;
+    color: var(--text-color); // Uses CSS variable for text color
+  }
+
+  p {
+    color: var(--text-color);
+    font-size: 1.2rem;
+  }
 }
 
-.welcome-container h1 {
-  margin-bottom: 1rem;
-  color: var(--text-color);
-}
-
-.welcome-container p {
-  color: var(--text-color);
-  font-size: 1.2rem;
-}
-
-/* Layout */
+// Main content area layout with vertical stacking and spacing
 .main-content {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start; /* WICHTIG: sorgt für obere Ausrichtung */
-  margin: 24px;
+  flex-direction: column;
   gap: 24px;
+  margin: 24px auto;
+  max-width: 1200px;
 }
 
-.left-column {
-  width: 60%;
+// Top row containing boxes side-by-side, wrapping on smaller screens
+.top-row {
   display: flex;
-  flex-direction: column;
-  gap: 20px;
+  gap: 24px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
-.right-column {
-  width: 35%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start; /* Inhalt oben ausrichten */
-}
-
-/* Gemeinsamer Stil für alle Boxen */
-.box,
-.hinweise-box,
-.aufgaben-box {
-  background-color: #e7e7e9; /* hellblauer Hintergrund */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  padding: 16px;
-}
-
-/* Buttons */
-.button-row {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 16px;
-}
-
-/* Hinweise */
-.hinweis-input {
+// Bottom row for the questions box, full width
+.bottom-row {
   width: 100%;
 }
 
-.hinweis-button-container {
+// General styling for all boxes (replacement for mat-card)
+.box {
+  background-color: #e7e7e9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 16px;
+  flex: 1 1 45%; // flexible sizing with minimum 45% width
+  min-width: 300px;
+  display: flex;
+  flex-direction: column;
+}
+
+// Common header styling inside hint, todo, and question boxes
+.hint-box,
+.todo-box,
+.question-box {
+  mat-card-title {
+    margin-bottom: 8px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 8px;
+  }
+}
+
+// Styling for hint and todo lists (remove default list styling)
+.hinweis-liste,
+.todo-box ul {
+  padding-left: 0;
+  list-style: none;
+}
+
+// Layout for individual hint and todo items: flexbox for alignment and spacing
+.einzelner-hinweis,
+.todo-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+// Area for the hint text to take available space
+.hinweis-text {
+  flex: 1;
+}
+
+// Input area containing input field and add button with spacing
+.todo-add,
+.hint-add {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+// Input fields grow to fill available space
+.todo-input,
+.hint-input {
+  flex: 1;
+}
+
+// Margin for icon buttons (e.g., delete trash icons)
+button[mat-icon-button] {
+  margin-left: 0.5rem;
+}
+
+// Style for placeholder text when lists are empty
+.keine-eintraege {
+  color: #888;
+  font-style: italic;
+  text-align: center;
+  margin: 1rem 0;
+}
+
+// Question list container with max height and scroll overflow
+.fragenliste {
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 1rem 0;
+  text-align: left;
+}
+
+// Individual question items separated by dashed borders
+.frage-item {
+  border-bottom: 1px dashed #ccc;
+  padding: 1rem 0;
+  text-align: left;
+}
+
+// Container for question details, centered and limited width
+.frage-details {
+  max-width: 100%;         
+  margin: 0;               
+  padding-left: 0.5rem;    
+  text-align: left;        
+}
+
+
+// Styling for the actual question text
+.frage-text {
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  color: #333;
+  text-align: left;
+}
+
+// Placeholder text styling when no questions are available
+.keine-fragen {
+  color: #888;
+  font-style: italic;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+// Container for the bottom-right aligned button in the questions box
+.fragen-actions {
   display: flex;
   justify-content: flex-end;
-  margin-top: 8px;
+  padding-top: 0.5rem;
+  margin-top: auto;
 }
 
-.hinweis-liste {
-  margin-top: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+// Flexbox fixes for mat-card content and actions to ensure proper scrolling and layout
+.mat-card-content {
+  flex: 1 1 auto;
+  overflow-y: auto;
 }
 
-.einzelner-hinweis {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.mat-card-actions {
+  flex-shrink: 0;
 }
 
-/* Fortschritt */
-.fortschritt-box {
-  font-size: 14px;
-}
-
-.fortschritt-daten {
-  margin: 12px 0;
-}
-
-.tendenz {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-/* Aufgaben */
-.aufgaben-box {
-  min-height: 180px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-/* Fragenliste */
-.fragenliste {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.frage-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 15px;
-  color: var(--text-color);
-}
-
-.frage-item .icon {
-  font-size: 18px;
-  color: #3f51b5;
-}
-
-.frage-text .datum {
-  color: black;
-  font-style: normal;
-  margin-left: 4px;
-}
-
-.frage-text .inhalt {
-  margin-left: 4px;
-}
-
-/* Blaue Buttons */
-.flach-button {
-  color: #1e88e5;
-  font-weight: normal;
-  text-transform: none;
-  background: none;
-  border: none;
-  padding: 6px 12px;
-  font-size: 15px;
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-.flach-button:hover {
-  text-decoration: underline;
-  background: transparent;
-  color: #1565c0;
-}
-.bar {
-  height: 10px;
-  border-radius: 5px;
-  margin: 4px 0 12px 0;
-}
-
-.bar.average {
-  background-color: #64b5f6; // Hellblau
-}
-
-.bar.correct {
-  background-color: #81c784; // Grün
-}
-
-.bar.medium {
-  background-color: #fff176; // Gelb
-}
-
-.bar.wrong {
-  background-color: #e57373; // Rot
-}
-
-.aufgabenliste {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.aufgabe-item {
-  font-size: 15px;
-  color: var(--text-color);
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
-
-.aufgabe-item .datum {
-  color: black;
-  font-style: normal;
-}
-
-.transparent-table {
-  background-color: transparent !important; /* Hintergrund weg */
-  box-shadow: none !important; /* Schatten entfernen */
-  color: inherit; /* Textfarbe übernehmen */
-}
-
-.transparent-table th.mat-header-cell {
-  background-color: transparent !important; /* Header ebenfalls transparent */
-  color: inherit;
-  font-weight: 600;
-}
-
-.transparent-table td.mat-cell {
-  background-color: transparent !important;
-  color: inherit;
+// Styling the warning icon with typical yellow color and spacing for alignment
+.warn-icon {
+  color: #e0d35f; // Typical yellow (Material Yellow 500)
+  margin-right: 8px; // Spacing between icon and text
+  vertical-align: middle; // Better vertical alignment with text
+  font-size: 24px; // Icon size adjustment
 }

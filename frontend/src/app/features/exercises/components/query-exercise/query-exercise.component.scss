@@ -1,15 +1,25 @@
 .query-exercise {
   // Header styles
   .exercise-header {
-    margin-bottom: 24px;
+    margin-bottom: 1rem;
     display: flex;
     flex-direction: column;
     gap: 8px;
 
     .exercise-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
       margin: 0;
       font-size: 1.5rem;
-      font-weight: 500;
+      color: #333;
+    }
+
+    .completed-icon {
+      color: #4CAF50;
+      font-size: 1.5rem;
+      width: 1.5rem;
+      height: 1.5rem;
     }
 
     .database-info {

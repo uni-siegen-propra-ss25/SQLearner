@@ -30,6 +30,7 @@ export interface ChapterProgress {
     completedExercises: number;
     completionPercentage: number;
     isCompleted?: boolean;
+    exercises?: ProgressData[];
 }
 
 export interface UserProgressSummary {

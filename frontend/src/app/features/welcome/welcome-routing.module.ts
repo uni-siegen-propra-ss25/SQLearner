@@ -7,12 +7,12 @@ import { RoleGuard } from '../../core/guards/role.guard';
 import { WelcomeRedirectComponent } from './components/welcome-redirect/welcome-redirect.component';
 import { WelcomeComponent } from 'app/features/welcome/welcome.component';
 
+import { QuestionComponent } from './components/welcome-tutor/questions/question.component';
+import { PapierkorbComponent } from './components/welcome-tutor/questions/papierkorb/papierkorb.component';
+import { ArchivComponent } from './components/welcome-tutor/questions/archiv/archiv.component';
+import { BeantwortetComponent } from './components/welcome-tutor/questions/beantwortet/beantwortet.component';
 
-import { AufgabeComponent } from './components/welcome-tutor/aufgaben/aufgaben.component';
-import { FragenComponent } from './components/welcome-tutor/fragen/fragen.component';
-import { PapierkorbComponent } from './components/welcome-tutor/fragen/papierkorb/papierkorb.component';
-import { ArchivComponent } from './components/welcome-tutor/fragen/archiv/archiv.component';
-import { BeantwortetComponent } from './components/welcome-tutor/fragen/beantwortet/beantwortet.component';
+import { FragenChatComponent } from './components/welcome-student/fragen-chat/fragen-chat.component';
 
 const routes: Routes = [
   {
@@ -36,34 +36,48 @@ const routes: Routes = [
     data: { allowedRoles: [Role.TUTOR] },
   },
   {
-    path: 'tutor/aufgaben',
-    component: AufgabeComponent,
+    path: 'tutor/questions',
+    component: QuestionComponent,
     canActivate: [RoleGuard],
     data: { allowedRoles: [Role.TUTOR] },
+  },
+
+  {
+  path: 'tutor/papierkorb',
+  redirectTo: 'tutor/trash',
+  pathMatch: 'full'
   },
   {
-    path: 'tutor/fragen',
-    component: FragenComponent,
-    canActivate: [RoleGuard],
-    data: { allowedRoles: [Role.TUTOR] },
+  path: 'tutor/trash',
+  component: PapierkorbComponent,
+  canActivate: [RoleGuard],
+  data: { allowedRoles: [Role.TUTOR] },
   },
-  {
-    path: 'tutor/papierkorb',
-    component: PapierkorbComponent,
-    canActivate: [RoleGuard],
-    data: { allowedRoles: [Role.TUTOR] },
-  },
+
   {
     path: 'tutor/archiv',
     component: ArchivComponent,
     canActivate: [RoleGuard],
     data: { allowedRoles: [Role.TUTOR] },
   },
+
   {
-    path: 'tutor/beantwortet',
-    component: BeantwortetComponent,
-    canActivate: [RoleGuard],
-    data: { allowedRoles: [Role.TUTOR] },
+  path: 'tutor/beantwortet',
+  redirectTo: 'tutor/answered',
+  pathMatch: 'full'
+  },
+  {
+  path: 'tutor/answered',
+  component: BeantwortetComponent,
+  canActivate: [RoleGuard],
+  data: { allowedRoles: [Role.TUTOR] },
+  },
+
+  {
+  path: 'student/questions',
+  component: FragenChatComponent,  
+  canActivate: [RoleGuard],
+  data: { allowedRoles: [Role.STUDENT] },
   },
 ];
 

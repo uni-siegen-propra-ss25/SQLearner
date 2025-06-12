@@ -4,6 +4,7 @@ import { ExercisesService } from './services/exercises.service';
 import { PrismaModule } from '../../prisma/prisma.module';
 import { TopicsModule } from '../topics/topics.module';
 import { DatabasesModule } from '../databases/databases.module';
+import { ProgressModule } from '../progress/progress.module';
 
 /**
  * Exercises Module manages all exercise-related functionality.
@@ -22,7 +23,7 @@ import { DatabasesModule } from '../databases/databases.module';
  * @module ExercisesModule
  */
 @Module({
-    imports: [PrismaModule, TopicsModule, DatabasesModule],
+    imports: [PrismaModule, TopicsModule, DatabasesModule, ProgressModule],
     controllers: [ExercisesController],
     providers: [ExercisesService],
     exports: [ExercisesService],

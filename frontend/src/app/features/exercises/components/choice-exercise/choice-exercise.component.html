@@ -1,6 +1,11 @@
 <div class="choice-exercise">
   <mat-card-content>
-    <h2 class="exercise-title">{{ exercise.title }}</h2>
+    <div class="exercise-header">
+      <h2 class="exercise-title">
+        {{ exercise.title }}
+        <mat-icon *ngIf="isCorrectAnswer" class="completed-icon">check_circle</mat-icon>
+      </h2>
+    </div>
     <p class="exercise-description">{{ exercise.description }}</p>
 
     <div class="options-container">
@@ -20,9 +25,7 @@
             {{ option.text }}
           </mat-radio-button>
         </div>
-      </mat-radio-group>
-
-      <!-- Multiple Choice -->
+      </mat-radio-group>      <!-- Multiple Choice -->
       <div *ngIf="exercise.type === ExerciseType.MULTIPLE_CHOICE" class="multiple-choice">
         <div
           *ngFor="let option of exercise.answers"
@@ -37,17 +40,16 @@
           </mat-checkbox>
         </div>
       </div>
-    </div>
-
-    <div class="actions">
-      <button
+    </div>    <div class="actions">      <button
         mat-flat-button
         color="primary"
-        [disabled]="selectedOptions.length === 0 || isSubmitting"
+        [disabled]="selectedOptions.length === 0 || isSubmitting || isCorrectAnswer"
         (click)="submitAnswer()"
       >
-        <mat-icon>{{ isSubmitting ? 'hourglass_empty' : 'check' }}</mat-icon>
-        {{ isSubmitting ? 'Submitting...' : 'Submit Answer' }}
+        <mat-icon>{{ isSubmitting ? 'hourglass_empty' : (isCorrectAnswer ? 'check_circle' : 'check') }}</mat-icon>
+        <span *ngIf="!isSubmitting && !isCorrectAnswer">Submit Answer</span>
+        <span *ngIf="isSubmitting">Submitting...</span>
+        <span *ngIf="isCorrectAnswer">Correct Answer!</span>
       </button>
     </div>
 

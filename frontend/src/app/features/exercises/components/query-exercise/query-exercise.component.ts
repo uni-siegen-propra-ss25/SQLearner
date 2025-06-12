@@ -1,8 +1,9 @@
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, Input, ViewChild, Output, EventEmitter } from '@angular/core';
 import { Exercise } from '../../../roadmap/models/exercise.model';
 import { SubmissionService } from '../../services/submission.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SqlEditorComponent } from '../../../../shared/components/sql-editor/sql-editor.component';
+import { ProgressService } from '../../../progress/services/progress.service';
 
 @Component({
     selector: 'app-query-exercise',
@@ -20,15 +21,19 @@ export class QueryExerciseComponent {
     feedback: string | null = null;
     currentView: 'schema' | 'result' = 'result';
     isDarkMode = false; // Should be synced with your app's theme service
+    isCorrectAnswer = false;
 
     // Pagination variables
     pageSize = 10;
     pageSizeOptions = [5, 10, 25, 100];
     pageIndex = 0;
     
+    @Output() completed = new EventEmitter<number>();
+    
     constructor(
         private submissionService: SubmissionService,
         private snackBar: MatSnackBar,
+        private progressService: ProgressService
     ) {}
 
     onSqlChange(newValue: string) {
@@ -69,14 +74,20 @@ export class QueryExerciseComponent {
         });
     }
 
-    submitQuery(): void {
-        if (!this.sqlQuery.trim()) return;
+    submitAnswer(): void {
+        if (!this.sqlQuery.trim() || this.isLoading) return;
 
         this.isLoading = true;
         this.submissionService.submitAnswer(this.exercise.id, this.sqlQuery).subscribe({
             next: (submission) => {
                 this.isLoading = false;
+                this.isCorrectAnswer = submission.isCorrect;
                 this.snackBar.open('Answer submitted successfully', 'Close', { duration: 3000 });
+
+                if (submission.isCorrect) {
+                    this.progressService.updateExerciseProgress(this.exercise.id, true).subscribe();
+                    this.completed.emit(this.exercise.id);
+                }
 
                 if (submission.id) {
                     this.loadFeedback(submission.id);

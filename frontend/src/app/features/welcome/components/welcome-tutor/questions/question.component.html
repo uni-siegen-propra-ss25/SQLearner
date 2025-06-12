@@ -1,0 +1,73 @@
+<div class="container">
+   <!-- Header section with title and navigation -->
+  <div class="header">
+    <div class="title-section">
+      <h1>SQLearner</h1>
+      <p>Fragen der Studierenden</p>
+    </div>
+    <div class="nav-links">
+      <!-- Navigation links to answered, archived and deleted questions -->
+      <a routerLink="/welcome/tutor/beantwortet">Beantwortet</a>
+      <a routerLink="/welcome/tutor/archiv">Archiv</a>
+      <a routerLink="/welcome/tutor/papierkorb">Papierkorb</a>
+      <a class="back-button-tutor" routerLink="/welcome/tutor">
+        <mat-icon>arrow_back</mat-icon> Startseite
+      </a>
+    </div>
+  </div>
+
+  <!-- Main content with question list and pinned questions -->
+  <div class="main-content">
+    <!-- Left column: unanswered questions -->
+    <div class="fragen-container">
+      <p class="unread">
+        <ng-container *ngIf="ungeleseneNachrichten === 0">
+          Sie haben <strong>keine</strong> unbeantwortete Frage
+        </ng-container>
+        <ng-container *ngIf="ungeleseneNachrichten === 1">
+          Sie haben <strong>eine</strong> unbeantwortete Frage
+        </ng-container>
+        <ng-container *ngIf="ungeleseneNachrichten > 1">
+          Sie haben <strong>{{ ungeleseneNachrichten }}</strong> unbeantwortete Fragen
+        </ng-container>
+      </p>
+
+      <!-- Each question with action links -->
+      <div class="frage-box" *ngFor="let question of questions">
+        <p class="frage-text">
+          <mat-icon class="icon">mail</mat-icon>
+          {{ question.student_name }} ({{ question.erstellt_am | date:'dd.MM.yyyy HH:mm' }}): „{{ question.frage }}“
+        </p>
+        <div class="aktionen">
+          <a href="#" (click)="anpinnen(question, $event)">Markieren</a>
+          <a href="#" (click)="archivieren(question, $event)">Archivieren</a>
+          <a href="#" (click)="beantworten(question, $event)">Beantworten</a>
+          <a href="#" (click)="loeschen(question, $event)">Löschen</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right column: pinned questions -->
+    <div class="angepinnt-box">
+      <h3>Markiert</h3>
+      <div *ngIf="angepinnt.length === 0" class="leertext">Keine markierten Nachrichten</div>
+      <div *ngFor="let question of angepinnt" class="angeheftet-frage">
+        <p>{{ question.student_name }} ({{ question.erstellt_am | date:'dd.MM.yyyy HH:mm' }}): „{{ question.frage }}“</p>
+        <a href="#" (click)="entferneAngepinnt(question, $event)">Entfernen</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for answering a question -->
+  <div class="antwort-modal" *ngIf="ausgewaehlteQuestion">
+    <div class="antwort-box">
+      <h2>Antwort auf: {{ ausgewaehlteQuestion.student_name }}</h2>
+      <textarea [(ngModel)]="antwortText" placeholder="Antwort schreiben..."></textarea>
+
+      <div class="antwort-aktionen">
+         <button (click)="antwortAbschicken()">Antwort senden</button>
+         <button class="abbrechen" (click)="antwortAbbrechen()">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+</div>

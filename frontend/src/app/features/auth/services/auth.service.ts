@@ -48,8 +48,12 @@ export class AuthService {
         return this.http.post<LoginResponse>(`${this.baseUrl}/login`, data, this.httpOptions).pipe(
             tap((res) => {
                 this.saveToken(res.accessToken);
+                const user = this.getUserFromToken();
                 this._logStatusSubject$.next(true);
                 this._userSubject$.next(this.getUserFromToken());
+              if (user?.role) {
+                localStorage.setItem('role', user.role);
+                }
             }),
         );
     }

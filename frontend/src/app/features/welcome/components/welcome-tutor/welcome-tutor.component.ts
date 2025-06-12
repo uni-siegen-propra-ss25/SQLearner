@@ -1,6 +1,11 @@
+// Import core Angular features and routing service
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { HinweisService } from 'app/features/welcome/services/hinweis.service'; 
+
+// Import von Services und Datenmodellen für Hinweise, To-dos und Fragen
+import { HintService, Hint } from 'app/features/welcome/services/hint.service';
+import { TodoService, Todo } from 'app/features/welcome/services/todo.service';
+import { QuestionService, Question } from 'app/features/welcome/services/question.service';
 
 @Component({
   selector: 'app-welcome-tutor',
@@ -8,46 +13,106 @@ import { HinweisService } from 'app/features/welcome/services/hinweis.service';
   styleUrls: ['./welcome-tutor.component.scss'],
 })
 export class WelcomeTutorComponent implements OnInit {
-  newHinweis: string = '';
-  hinweise: string[] = [];
 
-  fragen = [
-    { name: 'Max M.', datum: '12.05', text: 'Könnte man ein Beispiel zu Aggregatfunktionen machen?' },
-    { name: 'Lisa S.', datum: '11.05', text: 'Ist der NATURAL JOIN prüfungsrelevant?' },
-    { name: 'Jonas T.', datum: '10.05', text: 'Wie genau funktioniert Relationale Division?' },
-  ];
+  // Model for new hint input field
+  newHint = '';
+  // Array to store all current hints
+  hints: Hint[] = [];
 
-  displayedColumns: string[] = ['titel', 'typ', 'kategorie', 'datum'];
-  aufgaben = [
-    { titel: 'GartenCenter', typ: 'SQL-Abfrage', kategorie: 'SQL', datum: '2025-05-01' },
-    { titel: 'XML Basics', typ: 'Einzel-Abfrage ', kategorie: 'XML', datum: '2025-05-05' },
-    { titel: 'KinoBesuch', typ: 'SQL-Abfrage', kategorie: 'SQL', datum: '2025-05-10' },
-  ];
+  // Model for new todo input field
+  newTodo = '';
+  // Array to store all current todos
+  todos: Todo[] = [];
 
-  constructor(private router: Router, private hinweisService: HinweisService) {}
+  // Array to store student questions
+  fragen: Question[] = [];
 
+  constructor(
+    private router: Router,
+    private hintService: HintService,
+    private todoService: TodoService,
+    private questionService: QuestionService
+  ) {}
+
+  // Lifecycle hook: runs when component initializes, loading data from backend
   ngOnInit() {
-    this.hinweise = this.hinweisService.getHinweise();
+    this.loadHints();
+    this.loadTodos();
+    this.loadFragen();
   }
 
-  addHinweis() {
-    if (this.newHinweis.trim()) {
-      this.hinweisService.addHinweis(this.newHinweis.trim());
-      this.newHinweis = '';
-      this.hinweise = this.hinweisService.getHinweise(); // Aktualisiere lokale Liste
+  // Fetch all hints from the backend service and assign to local array
+  loadHints() {
+    this.hintService.getHints().subscribe((data) => {
+      this.hints = data;
+    });
+  }
+
+  // Fetch all todos from the backend service
+  loadTodos() {
+    this.todoService.getTodos().subscribe((data) => {
+      this.todos = data;
+    });
+  }
+
+  // Fetch latest student questions from backend service
+  loadFragen() {
+    this.questionService.getAll().subscribe((fragen: Question[]) => {
+    this.fragen = fragen
+    .filter(f =>
+    !f.ist_archiviert &&
+    !f.ist_geloescht &&
+    !f.ist_beantwortet &&
+    !f.ist_angepinnt
+  )
+  .sort((a, b) => new Date(b.erstellt_am).getTime() - new Date(a.erstellt_am).getTime());
+    });
+  }
+  // Add a new hint if input is not empty; then reset input and reload list
+  addHint() {
+    const text = this.newHint.trim();
+    if (text) {
+      this.hintService.addHint(text).subscribe((hint) => {
+        this.hints.push(hint);
+        this.newHint = ''; 
+      });
     }
   }
 
-  removeHinweis(index: number) {
-    this.hinweisService.removeHinweis(index);
-    this.hinweise = this.hinweisService.getHinweise(); // Aktualisiere lokale Liste
+  // Remove hint by index from the list, then reload hints from backend
+  removeHint(index: number) {
+    const id = this.hints[index].id;
+    this.hintService.deleteHint(id).subscribe(() => {
+      this.hints.splice(index, 1);
+    });
   }
 
-  goToAufgaben() {
-    this.router.navigate(['welcome/tutor/aufgaben']);
+    // Add a new todo task if input is not empty; then reset input and reload list
+  addTodo() {
+    const text = this.newTodo.trim();
+    if (text) {
+      this.todoService.addTodo({ text, done: false }).subscribe((todo) => {
+        this.todos.push(todo);
+        this.newTodo = '';
+      });
+    }
   }
 
+    // Remove todo by index, then reload todo list
+  removeTodo(index: number) {
+    const id = this.todos[index].id;
+    this.todoService.deleteTodo(id).subscribe(() => {
+      this.todos.splice(index, 1);
+    });
+  }
+
+   // Toggle done status of a todo item and update it via service
+  toggleDone(todo: Todo) {
+    this.todoService.updateTodo(todo).subscribe();
+  }
+
+    // Navigate to the full questions list page
   goToFragen() {
-    this.router.navigate(['welcome/tutor/fragen']);
+    this.router.navigate(['welcome/tutor/questions']);
   }
 }

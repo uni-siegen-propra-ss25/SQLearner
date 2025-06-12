@@ -1,0 +1,133 @@
+// Import common styles from archive component
+@import '../archiv/archiv.component.scss';
+
+// Main container for answered questions page
+.beantwortet-container {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.beantwortet-header {
+   background-color: #8fa8b9;
+  padding: 1.5rem;
+  color: #000;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  text-align: center;
+
+  h1 {
+    margin: 0;
+    font-size: 2rem;
+  }
+
+  p {
+    margin: 0.5rem 0 0;
+    font-size: 1.1rem;
+  }
+}
+
+.zurueck-link {
+  position: fixed;
+  bottom: 20px;
+  left: 130px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  color: #1976d2;
+  z-index: 1000;
+
+  .klickbares-icon {
+    font-size: 24px;
+    color: #1976d2;
+  }
+
+  span {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #1976d2;
+    user-select: none;
+  }
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.archiv-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.archiv-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f5f5f5;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.frage {
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.3rem;
+  text-align: left;
+}
+
+.antwort {
+  font-style: italic;
+  color: #444;
+  margin-top: 0.3rem;
+  text-align: left;
+}
+
+.zeitstempel {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.aktionen {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.icon-button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+}
+
+.icon-button img {
+  width: 24px;
+  height: 24px;
+}
+
+.leertext {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #888;
+  margin-top: 3rem;
+}
+.frage-aktionen {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}

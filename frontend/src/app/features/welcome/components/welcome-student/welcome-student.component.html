@@ -1,65 +1,97 @@
-<!-- Willkommensnachricht -->
+<!-- Welcome section with greeting and description -->
 <div class="welcome-container">
   <h1>Willkommen bei SQLearner</h1>
-  <p>Ihre Plattform zum Lernen und Üben von SQL</p>
+  <p>Your platform to learn and practice SQL</p>
 </div>
 
-<!-- Hauptlayout -->
+<!-- Main content layout container -->
 <div class="main-content">
-  <!-- Oberer Bereich: Hinweis + To-do -->
+
+  <!-- Top row with hints and to-do list side by side -->
   <div class="top-row">
-<!-- Hinweisbox -->
-<mat-card class="box hint-box">
-  <mat-card-title>Hinweise des Tutors</mat-card-title>
-  <mat-card-content>
-<ul class="hinweis-liste">
-  <li *ngFor="let hinweis of hinweise">
-    ⚠️ {{ hinweis }}
-  </li>
-</ul>
-  <p *ngIf="hinweise.length === 0" class="keine-hinweise">Keine Hinweise vorhanden.</p>
-  </mat-card-content>
-</mat-card>
 
-<!-- To-do-Liste -->
-<mat-card class="box todo-box">
-  <mat-card-title>Meine To-dos</mat-card-title>
-  <mat-card-content>
-    <ul>
-      <li *ngFor="let task of todos; let i = index" class="todo-item">
-        <mat-checkbox [(ngModel)]="task.done">{{ task.text }}</mat-checkbox>
-        <button mat-icon-button color="warn" (click)="removeTodo(i)">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </li>
-    </ul>
-    <div class="todo-add">
-      <mat-form-field appearance="fill" class="todo-input">
-        <mat-label>Neue Aufgabe hinzufügen...</mat-label>
-        <input matInput [(ngModel)]="newTodo" (keyup.enter)="addTodo()" />
-      </mat-form-field>
-      <button mat-icon-button color="primary" (click)="addTodo()">
-        <mat-icon>arrow_upward</mat-icon>
-      </button>
-    </div>
-  </mat-card-content>
-</mat-card>
-
-
-  <!-- Unterer Bereich: Fragen -->
-  <div class="bottom-row">
-    <mat-card class="box question-box">
-      <mat-card-title>Fragenforum</mat-card-title>
+    <!-- Tutor hints card -->
+    <mat-card class="box hint-box">
+      <mat-card-title>Hinweise des Tutors</mat-card-title>
       <mat-card-content>
-        <ul>
-          <li *ngFor="let question of questions" class="question-item">
-            <mat-icon color="primary">help_outline</mat-icon>
-            {{ question }}
+        <!-- List of available hints -->
+        <ul class="hinweis-liste">
+          <li *ngFor="let hinweis of hinweise">
+            ⚠️ {{ hinweis }}
           </li>
         </ul>
+
+        <!-- Message when no hints are available -->
+        <p *ngIf="hinweise.length === 0" class="keine-hinweise">
+          Es gibt keine neuen Hinweise
+        </p>
       </mat-card-content>
+    </mat-card>
+
+    <!-- Student to-do list card -->
+    <mat-card class="box todo-box">
+      <mat-card-title>Meine To-dos</mat-card-title>
+      <mat-card-content>
+
+        <!-- To-do items list -->
+        <ul>
+          <li *ngFor="let task of todos; let i = index" class="todo-item">
+            <!-- Checkbox for done status -->
+            <mat-checkbox [(ngModel)]="task.done" (change)="toggleDone(task)">
+              {{ task.text }}
+            </mat-checkbox>
+
+            <!-- Button to delete the task -->
+            <button mat-icon-button color="warn" (click)="removeTodo(i)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </li>
+        </ul>
+
+        <!-- Input field to add new to-dos -->
+        <div class="todo-add">
+          <mat-form-field appearance="fill" class="todo-input">
+            <mat-label>Füge eine neue Aufgabe hinzu</mat-label>
+            <input matInput [(ngModel)]="newTodo" (keyup.enter)="addTodo()" />
+          </mat-form-field>
+
+          <!-- Button to add the task -->
+          <button mat-icon-button color="primary" (click)="addTodo()">
+            <mat-icon>arrow_upward</mat-icon>
+          </button>
+        </div>
+
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+
+  <!-- Bottom row with forum preview -->
+  <div class="bottom-row">
+    <mat-card class="box question-box">
+      <mat-card-title>Das Fragenforum</mat-card-title>
+      <mat-card-content>
+
+        <!-- Last forum message preview (question or answer) -->
+        <div *ngIf="lastMessage; else noMessages" class="last-message">
+          <div class="message-header">
+            <strong>{{ lastMessage.from === 'tutor' ? 'Tutor' : 'Student' }}</strong>
+            <span class="timestamp">{{ lastMessage.timestamp | date: 'dd.MM.yyyy, HH:mm' }}</span>
+          </div>
+          <p>{{ lastMessage.text }}</p>
+        </div>
+
+        <!-- Message when there are no questions/answers -->
+          <ng-template #noMessages>
+             <div class="placeholder-box">
+                <p class="placeholder-text">Das Fragenforum ist leer</p>
+              </div>
+          </ng-template>
+      </mat-card-content>
+
+      <!-- Button to navigate to full forum -->
       <mat-card-actions align="end">
-        <button mat-button color="primary" (click)="goToFragen()">Frage stellen</button>
+        <button mat-button color="primary" (click)="goToFragen()">Stelle eine Frage</button>
       </mat-card-actions>
     </mat-card>
   </div>

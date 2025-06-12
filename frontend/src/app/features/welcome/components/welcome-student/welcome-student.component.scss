@@ -1,3 +1,4 @@
+// Container for the welcome message at the top
 .welcome-container {
   padding: 2rem;
   text-align: center;
@@ -5,16 +6,15 @@
   margin: 0 auto;
 
   h1 {
-    margin-bottom: 1rem;
-    color: var(--text-color);
+    color: var(--text-color); // Use consistent text color
   }
 
   p {
-    color: var(--text-color);
     font-size: 1.2rem;
   }
 }
 
+// Main content layout container
 .main-content {
   display: flex;
   flex-direction: column;
@@ -23,17 +23,20 @@
   max-width: 1200px;
 }
 
+// Row that holds hint and to-do cards
 .top-row {
   display: flex;
-  gap: 24px;
   flex-wrap: wrap;
+  gap: 24px;
   justify-content: center;
 }
 
+// Row that holds the forum card
 .bottom-row {
   width: 100%;
 }
 
+// Base styling for all content boxes (cards)
 .box {
   background-color: #e7e7e9;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -42,66 +45,85 @@
   min-width: 300px;
 }
 
+// To-do box list styling
 .todo-box ul {
-  padding-left: 0;
   list-style: none;
+  padding-left: 0;
 }
 
+// Individual to-do item layout
 .todo-item {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 0.5rem;
 }
 
+// Layout for the to-do input section
 .todo-add {
   display: flex;
-  align-items: center;
   gap: 0.5rem;
   margin-top: 1rem;
 }
 
+// Input field should expand to available space
 .todo-input {
   flex: 1;
 }
 
-.question-box ul {
-  list-style: none;
-  padding: 0;
-}
-
-.question-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 0;
-  border-bottom: 1px solid #ccc;
-}
-// Mehr Abstand unter Hinweis-Titel
-.hint-box .hint-text {
-  margin-top: 12px; 
-  line-height: 1.6;
-}
-
-.todo-add button mat-icon {
-  font-size: 24px;
-}
-
+// Styling for the list of tutor hints
 .hinweis-liste {
   list-style: none;
-  padding-left: 0;
-  margin: 0;
+  padding: 0;
+
+  li {
+    margin-bottom: 10px;
+    font-size: 16px;
+  }
 }
 
-.hinweis-liste li {
-  margin-bottom: 10px;
-  font-size: 16px;
-}
-
+// Text displayed when there are no hints
 .keine-hinweise {
-  color: #888;
   text-align: center;
   font-style: italic;
-  margin-top: 80px;;     // mehr Abstand
-  display: block;
+  color: #888;
+  margin-top: 80px;
+}
+
+// Container for the latest message preview
+.last-message {
+  background-color: #cac7ca;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-top: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: inline-block;
+  max-width: 100%;
+}
+
+// Header for the last message (name + timestamp)
+.message-header {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 4px;
+}
+
+// Timestamp styling
+.timestamp {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+// Styling for card titles
+mat-card-title {
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+.placeholder-text {
+  color: #888; // grau
+  font-style: italic; // schräg
+  font-size: 1rem;
+  text-align: center;
 }

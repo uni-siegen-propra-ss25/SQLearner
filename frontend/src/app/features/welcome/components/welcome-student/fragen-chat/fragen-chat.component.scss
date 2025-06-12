@@ -1,0 +1,107 @@
+// Main container for the question forum
+.fragenforum-container {
+  padding: 2rem;
+  max-width: 80vw;
+  margin: 0 auto;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+// Header section with title and subtitle
+.fragenforum-header {
+  background-color: #cfdae1;
+  padding: 1.5rem;
+  color: rgb(0, 0, 0);
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  text-align: center;
+  position: relative;
+
+  h1 {
+    margin: 0;
+    font-size: 2rem;
+  }
+
+  p {
+    margin: 0.5rem 0 0;
+    font-size: 1.1rem;
+  }
+
+  // Back button placed in bottom left corner
+  .back-button {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    font-size: 0.85rem;
+    padding: 0.25rem 0.75rem;
+    min-width: 40px;
+    min-height: 36px;
+    line-height: 1;
+  }
+}
+
+// Container for all chat messages
+.chat-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem; // Spacing between messages
+  background-color: #f1f1f1;
+  padding: 1rem;
+  border-radius: 8px;
+  height: 400px; // Fixed height with scroll
+  overflow-y: auto;
+
+  // Common styling for message bubbles
+  .message {
+    padding: 0.75rem 1rem;
+    border-radius: 1rem;
+    max-width: 70%;
+    position: relative;
+    word-wrap: break-word;
+  }
+
+  // Student messages (right aligned, green)
+  .from-student {
+    align-self: flex-end;
+    background-color: #b8f0cd;
+    border-bottom-right-radius: 0;
+  }
+
+  // Tutor messages (left aligned, gray)
+  .from-tutor {
+    align-self: flex-start;
+    background-color: #e2e2e2;
+    border-bottom-left-radius: 0;
+  }
+
+  // Text inside the message bubble
+  .message-text {
+    font-size: 1rem;
+  }
+
+  // Footer for message (timestamp, delete)
+  .message-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: #555;
+    margin-top: 0.5rem;
+
+    button {
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+  }
+}
+
+// Input section below chat area
+.chat-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  // Input field expands to fill available space
+  .input-field {
+    flex-grow: 1;
+  }
+}

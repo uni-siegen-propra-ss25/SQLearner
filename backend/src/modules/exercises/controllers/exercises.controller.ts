@@ -9,6 +9,7 @@ import {
     HttpCode,
     HttpStatus,
     NotFoundException,
+    UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { ExercisesService } from '../services/exercises.service';
@@ -18,6 +19,9 @@ import { CreateExerciseDto } from '../models/create-exercise.dto';
 import { UpdateExerciseDto } from '../models/update-exercise.dto';
 import { Role } from '@prisma/client';
 import { Roles } from 'src/common/decorators/role.decorator';
+import { JwtAuthGuard } from '../../../common/guards/jwt-auth/jwt-auth.guard';
+import { RolesGuard } from '../../../common/guards/role/role.guard';
+import { GetUser } from '../../../common/decorators/get-user.decorator';
 
 /**
  * Controller managing exercise-related operations within topics.
@@ -132,6 +136,30 @@ export class ExercisesController {
     async removeExercise(@Param('id') id: number): Promise<void> {
         await this.exercisesService.removeExercise(id);
         return;
+    }    /**
+     * Submits an answer for an exercise (choice or text-based).
+     * Requires authentication and evaluates the answer for correctness.
+     *
+     * @param id - The ID of the exercise to submit answer for
+     * @param body - The answer submission data
+     * @param userId - The authenticated user's ID
+     * @returns Promise resolving to the submission result
+     * @throws NotFoundException if the exercise does not exist
+     */
+    @Post(':id/submissions')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.STUDENT)
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Submit an answer for an exercise' })
+    @ApiParam({ name: 'id', description: 'Exercise ID' })
+    @ApiResponse({ status: 200, description: 'Answer submitted successfully' })
+    @ApiResponse({ status: 404, description: 'Exercise not found' })
+    async submitAnswer(
+        @Param('id') id: number,
+        @Body() body: { answerText: string },
+        @GetUser('id') userId: number,
+    ): Promise<{ id: number; exerciseId: number; userId: number; answerText: string; isCorrect: boolean; feedback?: string; createdAt: Date }> {
+        return this.exercisesService.submitAnswer(id, body.answerText, userId);
     }
 
     /**

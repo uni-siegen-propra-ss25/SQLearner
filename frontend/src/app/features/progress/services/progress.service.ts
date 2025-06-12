@@ -43,8 +43,7 @@ export class ProgressService {
      * Retrieves the authenticated user's comprehensive progress summary.
      * Fetches overall completion statistics, chapter-specific progress, and difficulty breakdowns.
      * 
-     * @returns {Observable<UserProgressSummary>} Observable containing complete progress data including total exercises, completion percentage, chapter progress, and difficulty statistics
-     * @throws {Error} When API request fails or user is not authenticated
+     * @returns {Observable<UserProgressSummary>} Observable containing progress data
      */
     getUserProgress(): Observable<UserProgressSummary> {
         return this.http
@@ -57,8 +56,7 @@ export class ProgressService {
      * Only accessible by tutors and admins.
      * 
      * @param {number} userId - The ID of the user to get progress for
-     * @returns {Observable<UserProgressSummary>} Observable containing complete progress data for the specified user
-     * @throws {Error} When API request fails or user is not authorized
+     * @returns {Observable<UserProgressSummary>} Observable containing progress data
      */
     getUserProgressById(userId: number): Observable<UserProgressSummary> {
         return this.http
@@ -67,13 +65,23 @@ export class ProgressService {
     }
 
     /**
+     * Retrieves progress summaries for all users.
+     * Only accessible by tutors and admins.
+     * 
+     * @returns {Observable<UserProgressSummary[]>} Observable containing array of progress summaries
+     */
+    getAllUsersProgress(): Observable<UserProgressSummary[]> {
+        return this.http
+            .get<UserProgressSummary[]>(`${this.baseUrl}/users`)
+            .pipe(catchError((error) => this.handleError(error)));
+    }
+
+    /**
      * Updates the progress status for a specific exercise when a user completes an attempt.
-     * Sends completion status to the backend to track learning progress and statistics.
      * 
      * @param {number} exerciseId - The unique identifier of the exercise being updated
      * @param {boolean} isPassed - Whether the user successfully completed the exercise
-     * @returns {Observable<void>} Observable that completes when the progress update is successful
-     * @throws {Error} When API request fails, exercise doesn't exist, or user is not authenticated
+     * @returns {Observable<void>} Observable that completes when update is successful
      */
     updateExerciseProgress(exerciseId: number, isPassed: boolean): Observable<void> {
         return this.http

@@ -1,0 +1,46 @@
+<div class="fragenforum-container">
+
+  <!-- Header area with app title and description -->
+  <div class="fragenforum-header">
+    <h1>SQLearner</h1>
+    <p>Fragenforum – Stellen Sie dem Tutor Fragen</p>
+
+    <!-- Back button at the bottom left -->
+    <button class="back-button" mat-button (click)="goBack()">
+      Zurück zur Startseite
+    </button>
+  </div>
+
+  <!-- Chat message area -->
+  <div class="chat-messages">
+    <ng-container *ngFor="let q of questions">
+      <!-- Student message -->
+      <div class="message from-student">
+        <div class="message-text">{{ q.frage }}</div>
+        <div class="message-info">
+          <span class="timestamp">{{ q.erstellt_am | date: 'dd.MM.yyyy, HH:mm' }}</span>
+          <button (click)="deleteMessage(q)" mat-icon-button>
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tutor answer if exists -->
+      <div *ngIf="q.antwort" class="message from-tutor">
+        <div class="message-text">{{ q.antwort }}</div>
+        <div class="message-info">
+          <span class="timestamp">Tutor response</span>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+
+  <!-- Input field for new questions -->
+  <div class="chat-input">
+    <mat-form-field appearance="fill" class="input-field">
+      <mat-label>Your question</mat-label>
+      <input matInput [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" />
+    </mat-form-field>
+    <button mat-raised-button color="primary" (click)="sendMessage()">Send</button>
+  </div>
+</div>
