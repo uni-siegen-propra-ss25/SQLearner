@@ -120,10 +120,9 @@ export class SqlEvaluationService {
         } else if (!comparison.rowCountMatch) {
             category = EvaluationCategory.WRONG_ROW_COUNT;
             feedback = 'Die Anzahl der Zeilen ist nicht korrekt.';
-            isCorrect = false;
-        } else {
+            isCorrect = false;        } else {
             category = EvaluationCategory.WRONG_DATA;
-            feedback = `Die Daten sind nicht korrekt. ${Math.round(comparison.dataAccuracy * 100)}% der Werte stimmen.`;
+            feedback = 'Die Daten sind nicht korrekt.';
             isCorrect = false;
         }
 

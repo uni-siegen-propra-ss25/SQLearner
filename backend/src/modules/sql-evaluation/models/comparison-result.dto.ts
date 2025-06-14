@@ -2,7 +2,7 @@ export interface ComparisonResult {
     isExactMatch: boolean;
     columnsMatch: boolean;
     rowCountMatch: boolean;
-    dataAccuracy: number; // 0.0 - 1.0
+    dataMatches: boolean;
     differences: ComparisonDifference[];
 }
 
