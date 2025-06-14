@@ -227,3 +227,29 @@ model Progress {
 
   @@unique([userId, exerciseId])
 }
+
+model fragen {
+  id              Int      @id @default(autoincrement())
+  student_name    String
+  frage           String
+  antwort         String?
+  antwort_von     String?
+  erstellt_am     DateTime @db.Timestamp(6)
+  ist_archiviert  Boolean
+  ist_angepinnt   Boolean
+  ist_geloescht   Boolean
+  ist_beantwortet Boolean
+}
+
+model hint {
+  id   Int    @id @default(autoincrement())
+  text String
+}
+
+model todos {
+  id   Int     @id @default(autoincrement())
+  text String
+  done Boolean @default(false)
+  role String?
+}
+
