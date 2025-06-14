@@ -16,13 +16,7 @@ export class SubmissionService {
         return this.http.post<Submission>(`${this.baseUrl}/exercises/${exerciseId}/submissions`, {
             answerText: answer,
         });
-    }
-
-    runQuery(exerciseId: number, query: string): Observable<any> {
+    }    runQuery(exerciseId: number, query: string): Observable<any> {
         return this.http.post<any>(`${this.baseUrl}/exercises/${exerciseId}/run-query`, { query });
-    }
-
-    getFeedback(submissionId: number): Observable<string> {
-        return this.http.get<string>(`${this.baseUrl}/submissions/${submissionId}/feedback`);
     }
 }

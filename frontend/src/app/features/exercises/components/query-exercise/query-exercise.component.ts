@@ -77,20 +77,24 @@ export class QueryExerciseComponent {
     submitAnswer(): void {
         if (!this.sqlQuery.trim() || this.isLoading) return;
 
-        this.isLoading = true;
-        this.submissionService.submitAnswer(this.exercise.id, this.sqlQuery).subscribe({
+        this.isLoading = true;        this.submissionService.submitAnswer(this.exercise.id, this.sqlQuery).subscribe({
             next: (submission) => {
                 this.isLoading = false;
                 this.isCorrectAnswer = submission.isCorrect;
-                this.snackBar.open('Answer submitted successfully', 'Close', { duration: 3000 });
+                
+                // Display feedback from submission response (same as choice-exercise)
+                const message = submission.feedback || 'Answer submitted successfully';
+                this.snackBar.open(message, 'Close', { duration: 4000 });
 
                 if (submission.isCorrect) {
                     this.progressService.updateExerciseProgress(this.exercise.id, true).subscribe();
                     this.completed.emit(this.exercise.id);
                 }
 
-                if (submission.id) {
-                    this.loadFeedback(submission.id);
+                // Store feedback for potential display in UI
+                if (submission.feedback) {
+                    this.feedback = submission.feedback;
+                    this.showFeedback = true;
                 }
             },
             error: (error) => {
@@ -99,20 +103,7 @@ export class QueryExerciseComponent {
                     duration: 3000,
                 });
             },
-        });
-    }
-
-    private loadFeedback(submissionId: number): void {
-        this.submissionService.getFeedback(submissionId).subscribe({
-            next: (feedback) => {
-                this.feedback = feedback;
-                this.showFeedback = true;
-            },
-            error: () => {
-                this.feedback = 'Feedback is being generated...';
-            },
-        });
-    }
+        });    }
 
     toggleFeedback(): void {
         this.showFeedback = !this.showFeedback;
