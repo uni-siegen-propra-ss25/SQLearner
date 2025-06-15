@@ -1,24 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Data, Router } from '@angular/router';
 import { DatabaseService } from '../../services/database.service';
-import { Database } from '../../models/database.model';
+import { TableService } from '../../services/table.service';
+import { Database, DatabaseTable } from '../../models/database.model';
 import { MatDialog } from '@angular/material/dialog';
-import { DatabaseEditDialogComponent } from '../../dialogs/edit-database-dialog/database-edit-dialog.component';
+import { DatabaseEditDialogComponent } from '../../dialogs/database-edit-dialog/database-edit-dialog.component';
 import { AuthService } from 'app/features/auth/services/auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-
-export interface Table {
-    id: number;
-    name: string;
-    description?: string;
-    createSql: string;
-    columns: Array<{
-        name: string;
-        type: string;
-    }>;
-    columnCount?: number;
-    createdAt: Date;
-}
 
 @Component({
     selector: 'app-database-detail',
@@ -27,13 +15,14 @@ export interface Table {
 })
 export class DatabaseDetailComponent implements OnInit {
     database: Database | null = null;
-    tables: Table[] = [];
+    tables: DatabaseTable[] = [];
     isTutor = false;
 
     constructor(
         private route: ActivatedRoute,
         private router: Router,
         private databaseService: DatabaseService,
+        private tableService: TableService,
         private dialog: MatDialog,
         private authService: AuthService,
         private snackBar: MatSnackBar
@@ -66,9 +55,9 @@ export class DatabaseDetailComponent implements OnInit {
     loadTables() {
         const id = this.route.snapshot.paramMap.get('id');
         if (id) {
-            this.databaseService.getTables(Number(id)).subscribe({
-                next: (tables) => {
-                    this.tables = tables.map(table => ({
+            this.tableService.getTables(Number(id)).subscribe({
+                next: (tables: DatabaseTable[]) => {
+                    this.tables = tables.map((table: DatabaseTable) => ({
                         ...table,
                         columnCount: table.columns.length
                     }));
@@ -102,7 +91,7 @@ export class DatabaseDetailComponent implements OnInit {
         });
     }
 
-    viewTable(table: Table) {
+    viewTable(table: DatabaseTable) {
         if (!this.database) return;
         this.router.navigate(['/databases', this.database.id, 'tables', table.id]);
     }

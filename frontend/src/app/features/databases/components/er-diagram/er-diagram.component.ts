@@ -69,11 +69,14 @@ export class ErDiagramComponent implements OnInit, OnChanges {
         tableNames.forEach(tableName => {
             diagram += `    ${tableName} {\n`;
             
-            // Add columns as attributes
-            this.queryResult!.columns.forEach(column => {
-                const type = this.inferColumnType(this.queryResult!.rows, column);
-                diagram += `        ${type} ${column}\n`;
-            });
+            // Add only columns that belong to this table
+            this.queryResult!.columns
+                .filter(column => column.startsWith(`${tableName}.`))
+                .forEach(column => {
+                    const columnName = column.split('.')[1]; // Get the actual column name
+                    const type = this.inferColumnType(this.queryResult!.rows, column);
+                    diagram += `        ${type} ${columnName}\n`;
+                });
             
             diagram += '    }\n';
         });
@@ -107,11 +110,11 @@ export class ErDiagramComponent implements OnInit, OnChanges {
         return Array.from(tableNames);
     }
 
-    private inferColumnType(rows: any[], column: string): string {
+    private inferColumnType(rows: Record<string, any>[], column: string): string {
         if (rows.length === 0) return 'string';
         
-        const value = rows[0][column];
-        if (value === null) return 'string';
+        const value = rows[0][column.split('.')[1]]; // Use only column name without table prefix
+        if (value === null || value === undefined) return 'string';
         
         if (typeof value === 'number') {
             return Number.isInteger(value) ? 'int' : 'float';

@@ -1,33 +1,33 @@
 <div class="database-detail-container">
     <div class="header">
-        <button mat-icon-button (click)="onBack()" class="back-button">
-            <mat-icon>arrow_back</mat-icon>
-        </button>
-        <h1>{{ database?.name }}</h1>
-        <div class="actions" *ngIf="isTutor">
-            <button mat-raised-button color="primary" (click)="openEditDialog()">
+        <div class="header-main">
+            <div class="header-content">
+                <h1>{{ database?.name }}</h1>
+                <p class="description">{{ database?.description || 'Keine Beschreibung verfügbar' }}</p>
+                <div class="meta-info">
+                    <span><mat-icon>calendar_today</mat-icon> {{ database?.createdAt | date:'medium' }}</span>
+                    <span><mat-icon>table_chart</mat-icon> {{ tables.length || 0 }} Tabellen</span>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <button mat-icon-button (click)="onBack()" class="back-button">
+                <mat-icon>arrow_back</mat-icon>
+            </button>
+            <button *ngIf="isTutor" mat-raised-button color="primary" (click)="openEditDialog()">
                 <mat-icon>edit</mat-icon>
                 Datenbank bearbeiten
             </button>
         </div>
     </div>
 
-    <div class="content-grid">
-        <!-- Linke Spalte: Datenbank-Info -->
-        <div class="database-info">
-            <h2>Datenbank-Details</h2>
-            <div class="info-row">
-                <strong>Beschreibung:</strong>
-                <p>{{ database?.description || 'Keine Beschreibung verfügbar' }}</p>
-            </div>
-            <div class="info-row">
-                <strong>Erstellt am:</strong>
-                <p>{{ database?.createdAt | date:'medium' }}</p>
-            </div>
-            <div class="info-row">
-                <strong>Tabellen:</strong>
-                <p>{{ tables?.length || 0 }}</p>
-            </div>
-        </div>
+    <!-- Table Viewer -->
+    <div class="table-viewer-container">
+        <app-database-table-viewer
+            *ngIf="database"
+            [database]="database"
+            [tables]="tables"
+            [isTutor]="isTutor">
+        </app-database-table-viewer>
     </div>
 </div>

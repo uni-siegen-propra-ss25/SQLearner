@@ -1,0 +1,135 @@
+<div class="database-table-viewer">
+    <!-- Left sidebar with table list -->
+    <div class="table-list">
+        <div class="title-row">
+            <h3>Tables</h3>
+            <button mat-icon-button color="primary" (click)="openCreateTableDialog()" *ngIf="isTutor">
+                <mat-icon>add</mat-icon>
+            </button>
+        </div>
+        
+        <div class="table-item" 
+            *ngFor="let table of tables"
+            [class.selected]="table === selectedTable"
+            (click)="selectTable(table)">
+            <div class="table-item-content">
+                <mat-icon>table_chart</mat-icon>
+                <span>{{ table.name }}</span>
+            </div>
+            <div class="table-actions" *ngIf="isTutor">
+                <button mat-icon-button 
+                    matTooltip="Tabelle bearbeiten"
+                    (click)="openEditTableDialog(); $event.stopPropagation()">
+                    <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button 
+                    color="warn" 
+                    matTooltip="Tabelle löschen"
+                    (click)="deleteTable(); $event.stopPropagation()">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right content area -->
+    <div class="table-content" *ngIf="selectedTable">
+        <div class="table-header">
+            <div class="header-left">
+                <h2>{{ selectedTable.name }}</h2>
+                <span class="row-count" *ngIf="filteredData">
+                    {{ totalRows }} row(s)
+                </span>
+            </div>
+
+            <div class="actions">
+                <mat-form-field appearance="outline" class="search-field">
+                    <mat-label>Search records</mat-label>
+                    <input matInput [(ngModel)]="searchQuery" (ngModelChange)="filterData()" placeholder="Search...">
+                    <button *ngIf="searchQuery" matSuffix mat-icon-button aria-label="Clear" (click)="searchQuery=''; filterData()">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </mat-form-field>
+
+                <button mat-stroked-button [matMenuTriggerFor]="filterMenu">
+                    <mat-icon>filter_list</mat-icon>
+                    Filter
+                </button>
+
+                <button mat-icon-button [matMenuTriggerFor]="tableMenu" *ngIf="isTutor">
+                    <mat-icon>more_vert</mat-icon>
+                </button>
+            </div>
+        </div>
+
+       
+
+        <div class="table-data">
+            <mat-progress-bar mode="indeterminate" *ngIf="isLoading"></mat-progress-bar>
+            
+            <table *ngIf="filteredData?.length && !isLoading" class="data-table">
+                <thead>
+                    <tr>
+                        <th *ngFor="let col of displayedColumns">{{ col }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let row of filteredData">
+                        <td *ngFor="let col of displayedColumns">{{ row[col] }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="no-data" *ngIf="!filteredData?.length && !isLoading">
+                <mat-icon>table_chart</mat-icon>
+                <p>No data matches your filter</p>
+                <button mat-raised-button color="primary" (click)="searchQuery=''; selectedFilter='all'; filterData()">
+                    Clear filters
+                </button>
+            </div>
+
+            <mat-paginator
+                *ngIf="totalRows > 0"
+                [length]="totalRows"
+                [pageSize]="pageSize"
+                [pageSizeOptions]="pageSizeOptions"
+                [pageIndex]="currentPage"
+                (page)="onPageChange($event)"
+                aria-label="Select page">
+            </mat-paginator>
+        </div>
+    </div>
+
+    <div class="empty-state" *ngIf="!selectedTable">
+        <mat-icon>table_chart</mat-icon>
+        <h3>Select a table to view its data</h3>
+    </div>
+</div>
+
+<!-- Action menus -->
+<mat-menu #filterMenu="matMenu">
+    <button mat-menu-item (click)="selectedFilter = 'all'; filterData()">
+        <mat-icon>all_inclusive</mat-icon>
+        <span>Show all</span>
+    </button>
+    <button mat-menu-item (click)="selectedFilter = 'null'; filterData()">
+        <mat-icon>block</mat-icon>
+        <span>Show only NULL</span>
+    </button>
+    <button mat-menu-item (click)="selectedFilter = 'not_null'; filterData()">
+        <mat-icon>check_circle</mat-icon>
+        <span>Show only not NULL</span>
+    </button>
+</mat-menu>
+
+<mat-menu #tableMenu="matMenu">
+    <button mat-menu-item (click)="openAddDataDialog()">
+        <mat-icon>add_circle</mat-icon>
+        <span>Add Row</span>
+    </button>
+    <mat-divider></mat-divider>
+    <button mat-menu-item (click)="truncateTable()" color="warn">
+        <mat-icon>clear_all</mat-icon>
+        <span>Delete All Rows</span>
+    </button>
+</mat-menu>

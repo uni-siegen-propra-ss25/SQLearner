@@ -4,9 +4,9 @@ import { Router } from '@angular/router';
 import { AuthService } from 'app/features/auth/services/auth.service';
 import { Database } from '../../models/database.model';
 import { DatabaseService } from '../../services/database.service';
-import { DatabaseUploadDialogComponent } from '../../dialogs/upload-database-dialog/database-upload-dialog.component';
-import { DatabaseCreateDialogComponent } from '../../dialogs/create-database-dialog/database-create-dialog.component';
-import { DatabaseEditDialogComponent } from '../../dialogs/edit-database-dialog/database-edit-dialog.component';
+import { DatabaseUploadDialogComponent } from '../../dialogs/database-upload-dialog/database-upload-dialog.component';
+import { DatabaseCreateDialogComponent } from '../../dialogs/database-create-dialog/database-create-dialog.component';
+import { DatabaseEditDialogComponent } from '../../dialogs/database-edit-dialog/database-edit-dialog.component';
 
 @Component({
     selector: 'app-database-list',
