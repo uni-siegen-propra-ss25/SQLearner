@@ -42,12 +42,18 @@ export class QueryExecutorService {
         // 3. Execute with timeout
         const startTime = performance.now();
           try {
-            const result = await Promise.race([
+            const rawResult = await Promise.race([
                 this.databasesService.runQuery(databaseId, sanitizedQuery),
                 this.createTimeoutPromise()
             ]);
 
             const executionTime = performance.now() - startTime;
+
+            // Adapt rawResult to expected format
+            const result = {
+                columns: rawResult.fields ? rawResult.fields.map((f: { name: string }) => f.name) : [],
+                rows: rawResult.rows
+            };
             
             // 4. Validate result
             this.validateResult(result);

@@ -245,8 +245,14 @@ export class ExercisesService {    /**
             throw new NotFoundException('Exercise has no associated database');
         }        
         
-        return this.databasesService.runQuery(exercise.database.id, query);
-    }    /**
+        const result = await this.databasesService.runQuery(exercise.database.id, query);
+        return {
+            columns: result.fields ? result.fields.map((f: any) => f.name) : [],
+            rows: result.rows,
+        };
+    }    
+    
+    /**
      * Submits an answer for exercises.
      * Evaluates the answer for correctness and saves progress to database.
      * Supports SQL Query, Single Choice, and Multiple Choice exercises.

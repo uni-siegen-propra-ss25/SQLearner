@@ -61,8 +61,7 @@ model User {
   submissions  Submission[]
   progress     Progress[]
   bookmarks    Bookmark[]
-
-  Database Database[]
+  databases    Database[]    // Databases created by this user
   messages ChatMessage[]
 }
 
@@ -93,23 +92,73 @@ model ChatMessage {
 
 /// Imported or self-created database definitions
 model Database {
-  id          Int       @id @default(autoincrement())
-  name        String
-  description String?
+  id            Int       @id @default(autoincrement())
+  name          String
+  description   String?
+  ownerId       Int      // ID of the tutor who created the database
+  schemaSql     String?    // original SQL dump - full CREATE TABLE / INSERT statements
+  exampleQueries String?   // example SQL queries for this database (JSON array of queries)
 
-  schemaSql   String?    // original SQL dump - full CREATE TABLE / INSERT statements
-  exampleQueries String? // example SQL queries for this database (JSON array of queries)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 
-  // TODO: check if this is needed
-  ownerId Int
-  owner   User @relation(fields: [ownerId], references: [id])
-
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-
-  exercises   Exercise[]
+  owner         User       @relation(fields: [ownerId], references: [id])
+  exercises     Exercise[]
+  tables        DatabaseTable[]
 }
 
+/// Database tables
+model DatabaseTable {
+  id          Int       @id @default(autoincrement())
+  databaseId  Int
+  name        String
+  description String?
+  createSql   String
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  database    Database @relation(fields: [databaseId], references: [id], onDelete: Cascade)
+  columns     DatabaseColumn[]
+  data        DatabaseTableData[]
+
+  @@unique([databaseId, name])
+  @@index([databaseId, order])
+}
+
+/// Database columns
+model DatabaseColumn {
+  id            Int           @id @default(autoincrement())
+  tableId       Int
+  name          String
+  type          String
+  nullable      Boolean       @default(false)
+  defaultValue  String?
+  primaryKey    Boolean       @default(false)
+  autoIncrement Boolean       @default(false)
+  order         Int          @default(0)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  table         DatabaseTable @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  data          DatabaseTableData[]
+
+  @@unique([tableId, name])
+  @@index([tableId, order])
+}
+
+/// Data stored in database tables
+model DatabaseTableData {
+  id        Int           @id @default(autoincrement())
+  tableId   Int
+  columnId  Int
+  value     String?
+  order     Int          @default(0)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  table     DatabaseTable @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  column    DatabaseColumn @relation(fields: [columnId], references: [id], onDelete: Cascade)
+
+  @@index([tableId, columnId, order])
+}
 
 /// Top-level grouping of chapters (e.g. "Relational Algebra", "Joins")
 model Chapter{
@@ -186,18 +235,6 @@ model Submission {
   session        DbSession?
 }
 
-/// Isolated DB session/container for SQL execution
-model DbSession {
-  id            Int      @id @default(autoincrement())
-  submissionId  Int      @unique
-  containerId   String      // e.g. Docker container name or ID
-  status        String      // "running" | "finished" | "failed"
-  startedAt     DateTime    @default(now())
-  endedAt       DateTime?
-
-  submission    Submission  @relation(fields: [submissionId], references: [id])
-}
-
 /// Bookmark that a user sets on an exercise to revisit later
 model Bookmark {
   id          Int       @id @default(autoincrement())
@@ -228,6 +265,18 @@ model Progress {
   @@unique([userId, exerciseId])
 }
 
+/// Isolated DB session/container for SQL execution
+model DbSession {
+  id            Int      @id @default(autoincrement())
+  submissionId  Int      @unique
+  containerId   String      // e.g. Docker container name or ID
+  status        String      // "running" | "finished" | "failed"
+  startedAt     DateTime    @default(now())
+  endedAt       DateTime?
+
+  submission    Submission  @relation(fields: [submissionId], references: [id])
+}
+
 model fragen {
   id              Int      @id @default(autoincrement())
   student_name    String
@@ -252,4 +301,3 @@ model todos {
   done Boolean @default(false)
   role String?
 }
-
