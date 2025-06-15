@@ -6,6 +6,8 @@ import { TableService } from '../../services/table.service';
 import { ConfirmDialogComponent } from '../../dialogs/confirm-dialog/confirm-dialog.component';
 import { TableCreateDialogComponent } from '../../dialogs/table-create-dialog/table-create-dialog.component';
 import { TableEditDialogComponent } from '../../dialogs/table-edit-dialog/table-edit-dialog.component';
+import { DataCreateDialogComponent } from '../../dialogs/data-create-dialog/data-create-dialog.component';
+import { DataEditDialogComponent } from '../../dialogs/data-edit-dialog/data-edit-dialog.component';
 
 @Component({
   selector: 'app-database-table-viewer',
@@ -162,8 +164,41 @@ export class DatabaseTableViewerComponent implements OnInit {
     });
   }
 
-  openAddDataDialog() {
-    // TODO: Implement dialog for adding data
+  openAddDataDialog(): void {
+    if (!this.selectedTable || !this.database) return;
+    
+    const dialogRef = this.dialog.open(DataCreateDialogComponent, {
+      width: '800px',
+      data: {
+        databaseId: this.database.id,
+        table: this.selectedTable
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadTableData();
+      }
+    });
+  }
+
+  openEditDataDialog(rowData: any): void {
+    if (!this.selectedTable || !this.database) return;
+    
+    const dialogRef = this.dialog.open(DataEditDialogComponent, {
+      width: '800px',
+      data: {
+        databaseId: this.database.id,
+        table: this.selectedTable,
+        rowData: rowData
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadTableData();
+      }
+    });
   }
 
   async truncateTable() {
@@ -194,36 +229,131 @@ export class DatabaseTableViewerComponent implements OnInit {
     });
   }
 
-  async deleteTable() {
-    if (!this.selectedTable) return;
-    
+  async deleteTable(table: DatabaseTable) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
       data: {
         title: 'Tabelle löschen',
-        message: `Möchten Sie wirklich die Tabelle "${this.selectedTable.name}" löschen? Diese Aktion kann nicht rückgängig gemacht werden.`,
+        message: `Möchten Sie wirklich die Tabelle "${table.name}" löschen? Diese Aktion kann nicht rückgängig gemacht werden.`,
         confirmText: 'Löschen'
       }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.tableService.deleteTable(this.database.id, this.selectedTable!.id).subscribe({
-        next: () => {
-          const index = this.tables.findIndex(t => t.id === this.selectedTable?.id);
-          if (index > -1) {
-            this.tables.splice(index, 1);
+        this.tableService.deleteTable(this.database.id, table.id).subscribe({
+          next: () => {
+            const index = this.tables.findIndex(t => t.id === table.id);
+            if (index > -1) {
+              this.tables.splice(index, 1);
+            }
+            
+            // If we deleted the currently selected table, select a new one
+            if (this.selectedTable?.id === table.id) {
+              this.selectedTable = this.tables[0];
+              if (this.selectedTable) {
+                this.loadTableData();
+              }
+            }
+
+            this.snackBar.open('Tabelle wurde gelöscht', 'Schließen', { duration: 3000 });
+          },
+          error: (error) => {
+            console.error('Error deleting table:', error);
+            this.snackBar.open(
+              'Fehler beim Löschen der Tabelle: ' + 
+              (error.error?.message || error.message || 'Unbekannter Fehler'), 
+              'Schließen', 
+              { duration: 5000 }
+            );
           }
-          this.selectedTable = this.tables[0];
-          if (this.selectedTable) {
+        });
+      }
+    });
+  }
+
+  deleteRow(rowData: any): void {
+    if (!this.selectedTable || !this.database) return;
+
+    const pkColumn = this.selectedTable.columns.find(col => col.isPrimaryKey);
+    if (!pkColumn) {
+      this.snackBar.open('Keine Primärschlüsselspalte gefunden', 'OK', { duration: 3000 });
+      return;
+    }
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Datensatz löschen',
+        message: 'Möchten Sie diesen Datensatz wirklich löschen?',
+        confirmButtonText: 'Löschen',
+        cancelButtonText: 'Abbrechen'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const pkValue = rowData[pkColumn.name];
+        
+        this.tableService.deleteTableRow(
+          this.database.id,
+          this.selectedTable!.id,
+          pkColumn.name,
+          pkValue
+        ).subscribe({
+          next: () => {
+            this.snackBar.open('Datensatz erfolgreich gelöscht', 'OK', { duration: 3000 });
             this.loadTableData();
+          },
+          error: (error: unknown) => {
+            console.error('Error deleting row:', error);
+            this.snackBar.open('Fehler beim Löschen des Datensatzes', 'OK', { duration: 3000 });
           }
-        },
-        error: (error) => {
-          console.error('Error deleting table:', error);
-          // TODO: Show error message
-        }
-      });
+        });
+      }
+    });
+  }
+
+  deleteSelectedRows(rows: any[]): void {
+    if (!this.selectedTable || !this.database || rows.length === 0) return;
+
+    const pkColumn = this.selectedTable.columns.find(col => col.isPrimaryKey);
+    if (!pkColumn) {
+      this.snackBar.open('Keine Primärschlüsselspalte gefunden', 'OK', { duration: 3000 });
+      return;
+    }
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Mehrere Datensätze löschen',
+        message: `Möchten Sie die ausgewählten ${rows.length} Datensätze wirklich löschen?`,
+        confirmButtonText: 'Löschen',
+        cancelButtonText: 'Abbrechen'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const deletePromises = rows.map(row => {
+          const pkValue = row[pkColumn.name];
+          return this.tableService.deleteTableRow(
+            this.database.id,
+            this.selectedTable!.id,
+            pkColumn.name,
+            pkValue
+          ).toPromise();
+        });
+
+        Promise.all(deletePromises)
+          .then(() => {
+            this.snackBar.open(`${rows.length} Datensätze erfolgreich gelöscht`, 'OK', { duration: 3000 });
+            this.loadTableData();
+          })
+          .catch(error => {
+            console.error('Error deleting rows:', error);
+            this.snackBar.open('Fehler beim Löschen der Datensätze', 'OK', { duration: 3000 });
+          });
       }
     });
   }

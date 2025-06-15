@@ -7,12 +7,11 @@ import {
     Body,
     Param,
     UseGuards,
-    UseInterceptors,
     UploadedFile,
     ParseIntPipe,
+    UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { CreateDatabaseDto } from '../models/create-database.dto';
 import { UpdateDatabaseDto } from '../models/update-database.dto';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth/jwt-auth.guard';
@@ -27,6 +26,7 @@ import { DatabaseImportService } from '../services/database-import.service';
 import { RunQueryDto } from '../models/query.dto';
 import { CreateTableDto, TableColumnDto, UpdateTableDto } from '../models/table.dto';
 import { InsertTableDataDto } from '../models/table-data.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 /**
  * Controller managing database operations for the SQL learning system.
@@ -51,10 +51,22 @@ export class DatabasesController {
 
     @Post('upload')
     @Roles(Role.TUTOR)
-    @UseInterceptors(FileInterceptor('file'))
     @ApiConsumes('multipart/form-data')
+    @UseInterceptors(FileInterceptor('file'))
     @ApiOperation({ summary: 'Upload SQL file to create database' })
     @ApiResponse({ status: 201, description: 'SQL file uploaded and database created successfully' })
+    @ApiBody({
+      schema: {
+        type: 'object',
+        properties: {
+          file: {
+            type: 'string',
+            format: 'binary',
+            description: 'SQL file to upload',
+          },
+        },
+      },
+    })
     async uploadSqlFile(
         @UploadedFile() file: Express.Multer.File,
         @GetUser('id') userId: number,
@@ -138,7 +150,7 @@ export class DatabasesController {
         @GetUser('id') userId: number,
         @GetUser('role') userRole: Role,
     ) {
-        return this.tablesService.createTable(databaseId, dto, userId, userRole);
+        return await this.tablesService.createTable(databaseId, dto, userId, userRole);
     }
 
     @Get(':id/tables')

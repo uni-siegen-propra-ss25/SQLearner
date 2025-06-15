@@ -56,15 +56,48 @@ export class TableService {
     }
 
     insertTableData(databaseId: number, tableId: number, dto: TableDataDto): Observable<void> {
+        // Ensure the data is properly formatted for class-transformer
+        const formattedData = {
+            tableName: dto.tableName,
+            columns: dto.columns,
+            values: dto.values.map(row => Array.isArray(row) ? row : [row])
+        };
+        
         return this.http.post<void>(
             `${this.apiUrl}/${databaseId}/tables/${tableId}/data`,
-            dto
+            formattedData
         );
     }
 
     truncateTable(databaseId: number, tableId: number): Observable<void> {
         return this.http.delete<void>(
             `${this.apiUrl}/${databaseId}/tables/${tableId}/data`
+        );
+    }
+
+    // Row-level operations
+    updateTableRow(
+        databaseId: number,
+        tableId: number,
+        pkColumn: string,
+        pkValue: any,
+        data: any
+    ): Observable<void> {
+        return this.http.patch<void>(
+            `${this.apiUrl}/${databaseId}/tables/${tableId}/data/${encodeURIComponent(pkValue)}`,
+            { data, pkColumn }
+        );
+    }
+
+    deleteTableRow(
+        databaseId: number,
+        tableId: number,
+        pkColumn: string,
+        pkValue: any
+    ): Observable<void> {
+        return this.http.delete<void>(
+            `${this.apiUrl}/${databaseId}/tables/${tableId}/data/${encodeURIComponent(pkValue)}`,
+            { params: { pkColumn } }
         );
     }
 }

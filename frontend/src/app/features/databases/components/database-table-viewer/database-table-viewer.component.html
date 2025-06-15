@@ -25,7 +25,7 @@
                 <button mat-icon-button 
                     color="warn" 
                     matTooltip="Tabelle löschen"
-                    (click)="deleteTable(); $event.stopPropagation()">
+                    (click)="deleteTable(table); $event.stopPropagation()">
                     <mat-icon>delete</mat-icon>
                 </button>
             </div>
@@ -43,6 +43,13 @@
             </div>
 
             <div class="actions">
+                <button mat-icon-button color="primary" 
+                        *ngIf="isTutor"
+                        matTooltip="Datensatz hinzufügen"
+                        (click)="openAddDataDialog()">
+                    <mat-icon>add</mat-icon>
+                </button>
+
                 <mat-form-field appearance="outline" class="search-field">
                     <mat-label>Search records</mat-label>
                     <input matInput [(ngModel)]="searchQuery" (ngModelChange)="filterData()" placeholder="Search...">
@@ -51,13 +58,8 @@
                     </button>
                 </mat-form-field>
 
-                <button mat-stroked-button [matMenuTriggerFor]="filterMenu">
+                <button mat-icon-button [matMenuTriggerFor]="filterMenu" matTooltip="Filter">
                     <mat-icon>filter_list</mat-icon>
-                    Filter
-                </button>
-
-                <button mat-icon-button [matMenuTriggerFor]="tableMenu" *ngIf="isTutor">
-                    <mat-icon>more_vert</mat-icon>
                 </button>
             </div>
         </div>
@@ -71,11 +73,22 @@
                 <thead>
                     <tr>
                         <th *ngFor="let col of displayedColumns">{{ col }}</th>
+                        <th *ngIf="isTutor">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr *ngFor="let row of filteredData">
                         <td *ngFor="let col of displayedColumns">{{ row[col] }}</td>
+                        <td *ngIf="isTutor" class="actions-cell">
+                            <button mat-icon-button matTooltip="Bearbeiten"
+                                    (click)="openEditDataDialog(row); $event.stopPropagation()">
+                                <mat-icon>edit</mat-icon>
+                            </button>
+                            <button mat-icon-button color="warn" matTooltip="Löschen"
+                                    (click)="deleteRow(row); $event.stopPropagation()">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -120,15 +133,8 @@
         <mat-icon>check_circle</mat-icon>
         <span>Show only not NULL</span>
     </button>
-</mat-menu>
-
-<mat-menu #tableMenu="matMenu">
-    <button mat-menu-item (click)="openAddDataDialog()">
-        <mat-icon>add_circle</mat-icon>
-        <span>Add Row</span>
-    </button>
-    <mat-divider></mat-divider>
-    <button mat-menu-item (click)="truncateTable()" color="warn">
+    <mat-divider *ngIf="isTutor"></mat-divider>
+    <button mat-menu-item *ngIf="isTutor" (click)="truncateTable()" color="warn">
         <mat-icon>clear_all</mat-icon>
         <span>Delete All Rows</span>
     </button>

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { Pool } from 'pg';
 import { DatabasesService } from './databases.service';
@@ -6,6 +6,7 @@ import { Role } from '@prisma/client';
 import { CreateTableDto } from '../models/table.dto';
 import { UpdateTableDto } from '../models/update-table.dto';
 import { SqlErrorException } from '../../../common/exceptions/sql-error.exception';
+import { Table } from 'typeorm';
 
 @Injectable()
 export class TablesService {
@@ -23,28 +24,75 @@ export class TablesService {
     async createTable(databaseId: number, dto: CreateTableDto, userId: number, userRole: Role | string) {
         await this.databasesService.validateUserAccess(databaseId, userId, userRole);
         
+        // Check if table exists in Prisma metadata
+        const existingTable = await this.prisma.databaseTable.findFirst({
+            where: {
+                databaseId,
+                name: dto.name
+            }
+        });
+
+        if (existingTable) {
+            throw new BadRequestException(`Table with name "${dto.name}" already exists in this database`);
+        }
+
+        // Get database info to determine the schema context
+        const database = await this.databasesService.getDatabaseById(databaseId);
+        const databaseSchema = `db_${databaseId}`;
+
+        try {
+            // Create schema if it doesn't exist (idempotent)
+            await this.pool.query(`CREATE SCHEMA IF NOT EXISTS "${databaseSchema}"`);
+
+            // Connect to the specific schema
+            await this.pool.query(`SET search_path TO "${databaseSchema}"`);
+
+            // Check if table exists in this specific schema
+            const result = await this.pool.query(`
+                SELECT EXISTS (
+                    SELECT FROM information_schema.tables 
+                    WHERE table_schema = $1
+                    AND table_type = 'BASE TABLE'
+                    AND table_name = $2
+                )
+            `, [databaseSchema, dto.name]);
+
+            if (result.rows[0].exists) {
+                console.log(`Found orphaned table "${dto.name}" in schema "${databaseSchema}", dropping it...`);
+                await this.pool.query(`DROP TABLE IF EXISTS "${databaseSchema}"."${dto.name}" CASCADE`);
+            }
+        } catch (error) {
+            console.error('Error checking table existence:', error);
+            throw new SqlErrorException(error);
+        }
+        
         const createTableSql = this.generateCreateTableSQL(dto);
         
         try {
-            // Create table in PostgreSQL
+            // Create table in PostgreSQL (in the correct schema)
+            console.log(`Creating table in schema "${databaseSchema}" with SQL:`, createTableSql);
+            await this.pool.query(`SET search_path TO "${databaseSchema}"`);
             await this.pool.query(createTableSql);
             
             // Store table metadata in Prisma
-            return await this.prisma.databaseTable.create({
+            const table = await this.prisma.databaseTable.create({
                 data: {
                     databaseId,
                     name: dto.name,
                     description: dto.description,
                     createSql: createTableSql,
                     columns: {
-                        create: dto.columns.map((col, index) => ({
+                        create: dto.columns.map(col => ({
                             name: col.name,
                             type: col.type,
                             nullable: col.nullable,
                             primaryKey: col.isPrimaryKey,
-                            autoIncrement: col.autoIncrement || false,
+                            isForeignKey: col.isForeignKey || false,
                             defaultValue: col.defaultValue,
-                            order: index
+                            autoIncrement: col.autoIncrement || false,
+                            referencesTable: col.referencesTable,
+                            referencesColumn: col.referencesColumn,
+                            order: 0
                         }))
                     }
                 },
@@ -52,6 +100,23 @@ export class TablesService {
                     columns: true
                 }
             });
+
+            // Clean the response using the interceptor
+            return {
+                name: table.name,
+                description: table.description,
+                columns: table.columns.map(col => ({
+                    name: col.name,
+                    type: col.type,
+                    nullable: col.nullable,
+                    isPrimaryKey: col.primaryKey,
+                    isForeignKey: col.isForeignKey,
+                    defaultValue: col.defaultValue,
+                    autoIncrement: col.autoIncrement,
+                    referencesTable: col.referencesTable,
+                    referencesColumn: col.referencesColumn
+                }))
+            };
         } catch (error) {
             throw new SqlErrorException(error);
         }
@@ -96,7 +161,7 @@ export class TablesService {
             }
             
             // Update table metadata in Prisma
-            return await this.prisma.databaseTable.update({
+            const updatedTable = await this.prisma.databaseTable.update({
                 where: { id: tableId },
                 data: {
                     ...(dto.name && { name: dto.name }),
@@ -104,6 +169,24 @@ export class TablesService {
                 },
                 include: { columns: true }
             });
+
+            // Transform the response to match the DTO structure
+            return {
+                id: updatedTable.id,
+                name: updatedTable.name,
+                description: updatedTable.description,
+                columns: updatedTable.columns.map(col => ({
+                    name: col.name,
+                    type: col.type,
+                    nullable: col.nullable,
+                    isPrimaryKey: col.primaryKey,
+                    isForeignKey: col.isForeignKey,
+                    defaultValue: col.defaultValue,
+                    autoIncrement: col.autoIncrement,
+                    ...(col.referencesTable && { referencesTable: col.referencesTable }),
+                    ...(col.referencesColumn && { referencesColumn: col.referencesColumn })
+                }))
+            };
         } catch (error) {
             throw new SqlErrorException(error);
         }

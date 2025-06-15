@@ -13,6 +13,8 @@ import { DatabaseUploadDialogComponent } from './dialogs/database-upload-dialog/
 import { ConfirmDialogComponent } from './dialogs/confirm-dialog/confirm-dialog.component';
 import { TableCreateDialogComponent } from './dialogs/table-create-dialog/table-create-dialog.component';
 import { TableEditDialogComponent } from './dialogs/table-edit-dialog/table-edit-dialog.component';
+import { DataCreateDialogComponent } from './dialogs/data-create-dialog/data-create-dialog.component';
+import { DataEditDialogComponent } from './dialogs/data-edit-dialog/data-edit-dialog.component';
 
 @NgModule({
     declarations: [
@@ -25,7 +27,9 @@ import { TableEditDialogComponent } from './dialogs/table-edit-dialog/table-edit
         DatabaseTableViewerComponent,
         TableCreateDialogComponent,
         TableEditDialogComponent,
-        ConfirmDialogComponent
+        ConfirmDialogComponent,
+        DataCreateDialogComponent,
+        DataEditDialogComponent
     ],
     imports: [
         CommonModule,

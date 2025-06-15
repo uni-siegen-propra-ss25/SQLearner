@@ -125,17 +125,20 @@ model DatabaseTable {
 
 /// Database columns
 model DatabaseColumn {
-  id            Int       @id @default(autoincrement())
-  tableId       Int
-  name          String
-  type          String
-  nullable      Boolean   @default(false)
-  defaultValue  String?
-  primaryKey    Boolean   @default(false)
-  autoIncrement Boolean   @default(false)
-  order         Int      @default(0)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id               Int       @id @default(autoincrement())
+  tableId          Int
+  name             String
+  type             String
+  nullable         Boolean   @default(false)
+  defaultValue     String?
+  primaryKey       Boolean   @default(false)
+  isForeignKey     Boolean   @default(false)
+  referencesTable  String?
+  referencesColumn String?
+  autoIncrement    Boolean   @default(false)
+  order            Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   // Relations
   table         DatabaseTable     @relation(fields: [tableId], references: [id], onDelete: Cascade)

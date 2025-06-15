@@ -30,8 +30,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
         // Ensure role is properly converted to Role enum
         const role = user.role as Role;
-        console.log('JWT Strategy - User role from DB:', user.role);
-        console.log('JWT Strategy - Converted role:', role);
     
         return {
             id: user.id,

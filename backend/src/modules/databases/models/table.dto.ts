@@ -5,8 +5,6 @@ import { Type } from 'class-transformer';
 // Common SQL data types with descriptions
 export enum SqlDataType {
     INT = 'INT',
-    BIGINT = 'BIGINT',
-    SMALLINT = 'SMALLINT',
     VARCHAR = 'VARCHAR',
     TEXT = 'TEXT',
     DATE = 'DATE',
@@ -84,7 +82,8 @@ export class TableColumnDto {
         default: false
     })
     @IsBoolean()
-    isForeignKey: boolean = false;
+    @IsOptional()
+    isForeignKey?: boolean = false;
 
     @ApiProperty({ 
         description: 'Default value for the column', 
@@ -96,23 +95,13 @@ export class TableColumnDto {
     defaultValue?: string;
 
     @ApiProperty({ 
-        description: 'Whether this column auto-increments (only for INT/BIGINT)', 
+        description: 'Whether this column auto-increments (only for INT)', 
         required: false,
         default: false
     })
     @IsBoolean()
     @IsOptional()
-    @ValidateIf(o => o.type === SqlDataType.INT || o.type === SqlDataType.BIGINT)
-    autoIncrement?: boolean = false;
-
-    @ApiProperty({ 
-        description: 'Referenced column for foreign keys', 
-        required: false,
-        example: 'id'
-    })
-    @IsString()
-    @ValidateIf(o => o.isForeignKey === true)
-    referencesColumn?: string;
+    autoIncrement?: boolean;
 
     @ApiProperty({ 
         description: 'Referenced table for foreign keys', 
@@ -120,11 +109,22 @@ export class TableColumnDto {
         example: 'users'
     })
     @IsString()
+    @IsOptional()
     @ValidateIf(o => o.isForeignKey === true)
     referencesTable?: string;
 
     @ApiProperty({ 
-        description: 'Column metadata for types that need additional info',
+        description: 'Referenced column for foreign keys', 
+        required: false,
+        example: 'id'
+    })
+    @IsString()
+    @IsOptional()
+    @ValidateIf(o => o.isForeignKey === true)
+    referencesColumn?: string;
+
+    @ApiProperty({
+        description: 'Column metadata for types that require it',
         required: false
     })
     @ValidateNested()
