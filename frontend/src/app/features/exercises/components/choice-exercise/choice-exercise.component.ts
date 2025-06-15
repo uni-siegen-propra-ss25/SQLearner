@@ -56,9 +56,7 @@ export class ChoiceExerciseComponent {
                     this.isSubmitting = false;
                     this.isAnswered = true;
                     this.isCorrectAnswer = submission.isCorrect;
-                    
-                    if (submission.isCorrect) {
-                        this.progressService.updateExerciseProgress(this.exercise.id, true).subscribe();
+                      if (submission.isCorrect) {
                         this.completed.emit(this.exercise.id);
                         // Markiere die Aufgabe lokal als erledigt
                         const completed = localStorage.getItem('completedExercises');
