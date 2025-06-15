@@ -27,7 +27,6 @@ export class DatabasesService {
                 name: dto.name,
                 description: dto.description,
                 schemaSql: dto.schemaSql,
-                ownerId: userId,
             },
         });
 
@@ -66,10 +65,8 @@ export class DatabasesService {
     }
 
     async updateDatabase(id: number, dto: UpdateDatabaseDto, userId: number, userRole: Role | string) {
-        const database = await this.getDatabaseById(id);
-
-        if (String(userRole).toUpperCase() !== Role.TUTOR || database.ownerId !== userId) {
-            throw new ForbiddenException('Only the creator tutor can update this database');
+        if (String(userRole).toUpperCase() !== Role.TUTOR) {
+            throw new ForbiddenException('Only tutors can update databases');
         }
 
         return this.prisma.database.update({
@@ -82,11 +79,11 @@ export class DatabasesService {
     }
 
     async deleteDatabase(id: number, userId: number, userRole: Role | string) {
-        const database = await this.getDatabaseById(id);
-
-        if (String(userRole).toUpperCase() !== Role.TUTOR || database.ownerId !== userId) {
-            throw new ForbiddenException('Only the creator tutor can delete this database');
+        if (String(userRole).toUpperCase() !== Role.TUTOR) {
+            throw new ForbiddenException('Only tutors can delete databases');
         }
+
+        const database = await this.getDatabaseById(id);
 
         // Delete database schema
         if (database.schemaSql) {
@@ -111,11 +108,11 @@ export class DatabasesService {
     }
 
     async validateUserAccess(databaseId: number, userId: number, userRole: Role | string) {
-        const database = await this.getDatabaseById(databaseId);
-        if (String(userRole).toUpperCase() !== Role.TUTOR || database.ownerId !== userId) {
-            throw new ForbiddenException('Only the creator tutor can modify this database');
+        await this.getDatabaseById(databaseId);
+        if (String(userRole).toUpperCase() !== Role.TUTOR) {
+            throw new ForbiddenException('Only tutors can modify databases');
         }
-        return database;
+        return true;
     }
 
     private isWriteOperation(query: string): boolean {

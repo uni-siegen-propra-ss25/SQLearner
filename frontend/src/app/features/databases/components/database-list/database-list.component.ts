@@ -1,0 +1,82 @@
+import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+import { AuthService } from 'app/features/auth/services/auth.service';
+import { Database } from '../../models/database.model';
+import { DatabaseService } from '../../services/database.service';
+import { DatabaseUploadDialogComponent } from '../../dialogs/upload-database-dialog/database-upload-dialog.component';
+import { DatabaseCreateDialogComponent } from '../../dialogs/create-database-dialog/database-create-dialog.component';
+import { DatabaseEditDialogComponent } from '../../dialogs/edit-database-dialog/database-edit-dialog.component';
+
+@Component({
+    selector: 'app-database-list',
+    templateUrl: './database-list.component.html',
+    styleUrls: ['./database-list.component.scss'],
+})
+export class DatabaseListComponent implements OnInit {
+    databases: Database[] = [];
+    isTutor = false;
+    displayedColumns: string[] = ['name', 'description', 'createdAt', 'actions'];
+
+    constructor(
+        private databaseService: DatabaseService,
+        private dialog: MatDialog,
+        private authService: AuthService,
+        private router: Router
+    ) {
+        this.isTutor = this.authService.isTutor();
+    }
+
+    ngOnInit(): void {
+        this.loadDatabases();
+    }
+
+    loadDatabases(): void {
+        this.databaseService.getAllDatabases().subscribe(
+            (databases) => (this.databases = databases),
+            (error) => console.error('Error loading databases:', error),
+        );
+    }
+
+    openUploadDialog(): void {
+        const dialogRef = this.dialog.open(DatabaseUploadDialogComponent);
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                this.loadDatabases();
+            }
+        });
+    }
+
+    openCreateDialog(): void {
+        const dialogRef = this.dialog.open(DatabaseCreateDialogComponent);
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                this.loadDatabases();
+            }
+        });
+    }
+
+    openEditDialog(database: Database): void {
+        const dialogRef = this.dialog.open(DatabaseEditDialogComponent, {
+            data: database,
+        });
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                this.loadDatabases();
+            }
+        });
+    }
+
+    deleteDatabase(id: number): void {
+        if (confirm('Are you sure you want to delete this database?')) {
+            this.databaseService.deleteDatabase(id).subscribe(
+                () => this.loadDatabases(),
+                (error) => console.error('Error deleting database:', error),
+            );
+        }
+    }
+
+    viewDatabase(database: Database) {
+        this.router.navigate(['/databases', database.id]);
+    }
+}

@@ -1,0 +1,66 @@
+:host {
+  display: block;
+}
+
+mat-dialog-content {
+  min-width: 400px;
+  padding: 24px;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+mat-form-field {
+  display: block;
+
+  ::ng-deep {
+    .mat-form-field-wrapper {
+      padding-bottom: 0;
+    }
+    
+    .mat-form-field-flex {
+      background-color: white;
+      border-radius: 4px;
+    }
+  }
+
+  &:last-of-type {
+    margin-bottom: 0;
+  }
+
+  textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+}
+
+mat-dialog-actions {
+  padding: 16px 24px;
+  margin-bottom: 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+
+  button {
+    min-width: 100px;
+
+    &[color='primary'] {
+      margin-left: 8px;
+    }
+  }
+}
+
+// Dark theme adjustments
+:host-context(.dark-theme) {
+  mat-form-field {
+    ::ng-deep {
+      .mat-form-field-flex {
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+    }
+  }
+
+  mat-dialog-actions {
+    border-top-color: rgba(255, 255, 255, 0.08);
+  }
+}
