@@ -3,7 +3,6 @@ import { Exercise } from '../../../roadmap/models/exercise.model';
 import { SubmissionService } from '../../services/submission.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SqlEditorComponent } from '../../../../shared/components/sql-editor/sql-editor.component';
-import { ProgressService } from '../../../progress/services/progress.service';
 
 @Component({
     selector: 'app-query-exercise',
@@ -29,11 +28,9 @@ export class QueryExerciseComponent {
     pageIndex = 0;
     
     @Output() completed = new EventEmitter<number>();
-    
-    constructor(
+      constructor(
         private submissionService: SubmissionService,
-        private snackBar: MatSnackBar,
-        private progressService: ProgressService
+        private snackBar: MatSnackBar
     ) {}
 
     onSqlChange(newValue: string) {
@@ -84,10 +81,7 @@ export class QueryExerciseComponent {
                 
                 // Display feedback from submission response (same as choice-exercise)
                 const message = submission.feedback || 'Answer submitted successfully';
-                this.snackBar.open(message, 'Close', { duration: 4000 });
-
-                if (submission.isCorrect) {
-                    this.progressService.updateExerciseProgress(this.exercise.id, true).subscribe();
+                this.snackBar.open(message, 'Close', { duration: 4000 });                if (submission.isCorrect) {
                     this.completed.emit(this.exercise.id);
                 }
 

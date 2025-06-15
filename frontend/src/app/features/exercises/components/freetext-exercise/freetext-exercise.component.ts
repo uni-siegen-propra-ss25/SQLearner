@@ -2,7 +2,6 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Exercise } from '../../../roadmap/models/exercise.model';
 import { SubmissionService } from '../../services/submission.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ProgressService } from '../../../progress/services/progress.service';
 
 @Component({
     selector: 'app-freetext-exercise',
@@ -16,12 +15,9 @@ export class FreetextExerciseComponent {
     showFeedback = false;
     feedback: string | null = null;
     isCorrectAnswer = false;
-    @Output() completed = new EventEmitter<number>();
-
-    constructor(
+    @Output() completed = new EventEmitter<number>();    constructor(
         private submissionService: SubmissionService,
-        private snackBar: MatSnackBar,
-        private progressService: ProgressService
+        private snackBar: MatSnackBar
     ) {}
 
     submitAnswer(): void {
@@ -34,11 +30,7 @@ export class FreetextExerciseComponent {
                 
                 // Display feedback from submission response (same as choice-exercise and query-exercise)
                 const message = submission.feedback || 'Answer submitted successfully';
-                this.snackBar.open(message, 'Close', { duration: 4000 });
-
-                if (submission.isCorrect) {
-                    // Aktualisiere den Fortschritt, wenn die Antwort korrekt ist
-                    this.progressService.updateExerciseProgress(this.exercise.id, true).subscribe();
+                this.snackBar.open(message, 'Close', { duration: 4000 });                if (submission.isCorrect) {
                     this.completed.emit(this.exercise.id);
                 }
 
