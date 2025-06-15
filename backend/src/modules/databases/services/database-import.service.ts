@@ -51,8 +51,7 @@ export class DatabaseImportService {
                 data: {
                     name: file.originalname.replace('.sql', ''),
                     description: 'Imported from SQL file',
-                    schemaSql: schema,
-                    ownerId: userId,
+                    schemaSql: schema
                 },
             });
 

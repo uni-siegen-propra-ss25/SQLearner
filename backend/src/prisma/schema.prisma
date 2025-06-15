@@ -61,7 +61,6 @@ model User {
   submissions  Submission[]
   progress     Progress[]
   bookmarks    Bookmark[]
-  databases    Database[]    // Databases created by this user
   messages ChatMessage[]
 }
 
@@ -95,14 +94,12 @@ model Database {
   id            Int       @id @default(autoincrement())
   name          String
   description   String?
-  ownerId       Int      // ID of the tutor who created the database
   schemaSql     String?    // original SQL dump - full CREATE TABLE / INSERT statements
   exampleQueries String?   // example SQL queries for this database (JSON array of queries)
 
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
 
-  owner         User       @relation(fields: [ownerId], references: [id])
   exercises     Exercise[]
   tables        DatabaseTable[]
 }
