@@ -8,7 +8,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 @Component({
     selector: 'app-database-edit-dialog',
     templateUrl: './database-edit-dialog.component.html',
-    styleUrls: ['./database-edit-dialog.component.scss']
+    styleUrls: ['../shared/database-dialog.scss'],
 })
 export class DatabaseEditDialogComponent {
     form: FormGroup;

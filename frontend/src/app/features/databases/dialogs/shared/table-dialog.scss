@@ -1,0 +1,178 @@
+mat-dialog-content {
+  padding: 32px !important;
+  margin: 0 !important;
+  max-height: calc(100vh - 200px) !important;
+  overflow-y: auto;
+}
+
+mat-dialog-title {
+  margin: 0 !important;
+  padding: 32px 32px 16px 32px !important;
+  font-size: 24px !important;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.87);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 32px;
+
+  .mat-mdc-form-field-subscript-wrapper {
+    padding: 0 16px;
+  }
+}
+
+.columns-container {
+  margin-top: 20px;
+
+  h3 {
+    margin-bottom: 16px;
+    color: rgba(0, 0, 0, 0.87);
+    font-size: 20px;
+    font-weight: 500;
+  }
+}
+
+.column-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  position: relative;
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  .checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 8px;
+    margin-top: 8px;
+    grid-column: 1 / -1;
+  }
+
+  .foreign-key-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 8px;
+    grid-column: 1 / -1;
+  }
+
+  .delete-button {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 36px;
+    height: 36px;
+    margin: 0;
+    padding: 6px;
+    background-color: rgba(0, 0, 0, 0.04);
+    border-radius: 50%;
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      background-color: rgba(0, 0, 0, 0.08);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+    }
+
+    mat-icon {
+      color: rgba(0, 0, 0, 0.54);
+    }
+  }
+}
+
+.add-column-button {
+  width: 100%;
+  margin-top: 16px;
+  padding: 16px;
+  border: 2px dashed rgba(0, 0, 0, 0.12);
+  background-color: transparent;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  color: rgba(0, 0, 0, 0.87);
+  font-weight: 500;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.42);
+  }
+
+  mat-icon {
+    margin-right: 8px;
+    vertical-align: middle;
+    color: rgba(0, 0, 0, 0.54);
+  }
+}
+
+.delete-button {
+  width: 36px;
+  height: 36px;
+  margin-top: 8px;
+  padding: 6px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+
+  &:not([disabled]) {
+    color: rgba(0, 0, 0, 0.54);
+
+    &:hover {
+      color: #f44336;
+      background-color: rgba(244, 67, 54, 0.12);
+      transform: scale(1.1);
+    }
+  }
+
+  &[disabled] {
+    opacity: 0.38;
+    cursor: not-allowed;
+  }
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+  }
+}
+
+mat-dialog-actions {
+  margin: 0 !important;
+  padding: 24px 32px !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  gap: 16px;
+  margin-top: 24px;
+
+  button {
+    min-width: 120px;
+    padding: 8px 24px;
+    border-radius: 4px;
+
+    &[type="submit"] {
+      margin-left: 8px;
+    }
+
+    &:not([disabled]) {
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.04);
+      }
+    }
+  }
+}
+
+// Metadata fields section
+.metadata-fields {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-top: 8px;
+}

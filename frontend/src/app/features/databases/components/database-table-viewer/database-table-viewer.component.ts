@@ -3,6 +3,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Database, DatabaseTable, TableColumn } from '../../models/database.model';
 import { TableService } from '../../services/table.service';
+import { ConfirmDialogComponent } from '../../dialogs/confirm-dialog/confirm-dialog.component';
+import { TableCreateDialogComponent } from '../../dialogs/table-create-dialog/table-create-dialog.component';
+import { TableEditDialogComponent } from '../../dialogs/table-edit-dialog/table-edit-dialog.component';
 
 @Component({
   selector: 'app-database-table-viewer',
@@ -108,41 +111,104 @@ export class DatabaseTableViewerComponent implements OnInit {
   }
 
   openCreateTableDialog() {
-    // TODO: Implement dialog
+    const dialogRef = this.dialog.open(TableCreateDialogComponent, {
+      width: '600px',
+      data: { databaseId: this.database.id }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.tableService.createTable(this.database.id, result).subscribe({
+          next: (newTable) => {
+            this.tables.push(newTable);
+            this.snackBar.open('Tabelle erfolgreich erstellt', 'OK', { duration: 3000 });
+            this.selectTable(newTable);
+          },
+          error: (error) => {
+            console.error('Error creating table:', error);
+            this.snackBar.open('Fehler beim Erstellen der Tabelle', 'OK', { duration: 3000 });
+          }
+        });
+      }
+    });
   }
 
   openEditTableDialog() {
-    // TODO: Implement dialog
+    if (!this.selectedTable) return;
+
+    const dialogRef = this.dialog.open(TableEditDialogComponent, {
+      width: '600px',
+      data: { table: this.selectedTable }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.tableService.updateTable(this.database.id, result.id, result).subscribe({
+          next: (updatedTable) => {
+            const index = this.tables.findIndex(t => t.id === updatedTable.id);
+            if (index !== -1) {
+              this.tables[index] = updatedTable;
+              this.selectedTable = updatedTable;
+            }
+            this.snackBar.open('Tabelle erfolgreich aktualisiert', 'OK', { duration: 3000 });
+            this.loadTableData();
+          },
+          error: (error) => {
+            console.error('Error updating table:', error);
+            this.snackBar.open('Fehler beim Aktualisieren der Tabelle', 'OK', { duration: 3000 });
+          }
+        });
+      }
+    });
   }
 
   openAddDataDialog() {
-    // TODO: Implement dialog
+    // TODO: Implement dialog for adding data
   }
 
   async truncateTable() {
     if (!this.selectedTable) return;
     
-    // TODO: Add confirmation dialog
-    
-    this.tableService.truncateTable(this.database.id, this.selectedTable.id)
-      .subscribe({
-        next: () => {
-          this.loadTableData();
-        },
-        error: (error) => {
-          console.error('Error truncating table:', error);
-          // TODO: Show error message
-        }
-      });
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Tabelle leeren',
+        message: `Möchten Sie wirklich alle Daten aus der Tabelle "${this.selectedTable.name}" löschen?`,
+        confirmText: 'Leeren'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.tableService.truncateTable(this.database.id, this.selectedTable!.id).subscribe({
+          next: () => {
+            this.loadTableData();
+            this.snackBar.open('Tabelle wurde geleert', 'OK', { duration: 3000 });
+          },
+          error: (error) => {
+            console.error('Error truncating table:', error);
+            this.snackBar.open('Fehler beim Leeren der Tabelle', 'OK', { duration: 3000 });
+          }
+        });
+      }
+    });
   }
 
   async deleteTable() {
     if (!this.selectedTable) return;
     
-    // TODO: Add confirmation dialog
-    
-    this.tableService.deleteTable(this.database.id, this.selectedTable.id)
-      .subscribe({
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Tabelle löschen',
+        message: `Möchten Sie wirklich die Tabelle "${this.selectedTable.name}" löschen? Diese Aktion kann nicht rückgängig gemacht werden.`,
+        confirmText: 'Löschen'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.tableService.deleteTable(this.database.id, this.selectedTable!.id).subscribe({
         next: () => {
           const index = this.tables.findIndex(t => t.id === this.selectedTable?.id);
           if (index > -1) {
@@ -158,12 +224,7 @@ export class DatabaseTableViewerComponent implements OnInit {
           // TODO: Show error message
         }
       });
-  }
-
-  getColumnType(column: TableColumn): string {
-    let type = column.type;
-    if (column.isPrimaryKey) type += ' (PK)';
-    if (column.isForeignKey) type += ' (FK)';
-    return type;
+      }
+    });
   }
 }

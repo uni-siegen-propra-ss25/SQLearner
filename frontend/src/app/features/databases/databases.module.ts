@@ -10,6 +10,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DatabaseEditDialogComponent } from './dialogs/database-edit-dialog/database-edit-dialog.component';
 import { DatabaseCreateDialogComponent } from './dialogs/database-create-dialog/database-create-dialog.component';
 import { DatabaseUploadDialogComponent } from './dialogs/database-upload-dialog/database-upload-dialog.component';
+import { ConfirmDialogComponent } from './dialogs/confirm-dialog/confirm-dialog.component';
+import { TableCreateDialogComponent } from './dialogs/table-create-dialog/table-create-dialog.component';
+import { TableEditDialogComponent } from './dialogs/table-edit-dialog/table-edit-dialog.component';
 
 @NgModule({
     declarations: [
@@ -19,7 +22,10 @@ import { DatabaseUploadDialogComponent } from './dialogs/database-upload-dialog/
         DatabaseEditDialogComponent,
         DatabaseUploadDialogComponent,
         ErDiagramComponent,
-        DatabaseTableViewerComponent
+        DatabaseTableViewerComponent,
+        TableCreateDialogComponent,
+        TableEditDialogComponent,
+        ConfirmDialogComponent
     ],
     imports: [
         CommonModule,

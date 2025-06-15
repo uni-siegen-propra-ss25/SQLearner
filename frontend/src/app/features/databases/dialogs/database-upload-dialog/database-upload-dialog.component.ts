@@ -7,7 +7,7 @@ import { Database } from '../../models/database.model';
 @Component({
     selector: 'app-upload-database-dialog',
     templateUrl: './database-upload-dialog.component.html',
-    styleUrls: ['./database-upload-dialog.component.scss'],
+    styleUrls: ['../shared/database-dialog.scss'],
 })
 export class DatabaseUploadDialogComponent {
     form: FormGroup;

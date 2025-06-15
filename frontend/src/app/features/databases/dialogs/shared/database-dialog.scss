@@ -1,35 +1,40 @@
-:host {
-  display: block;
-
-  mat-dialog-content {
-    min-width: 500px;
-    max-width: 800px;
-    padding: 24px;
-  }
+mat-dialog-title {
+  margin: 0 !important;
+  padding: 32px 32px 16px 32px !important;
+  font-size: 24px !important;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.87);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
 }
 
 .full-width {
   width: 100%;
-  margin-bottom: 20px;
-}
-
-mat-form-field {
-  display: block;
+  margin-bottom: 24px;
 
   &:last-of-type {
     margin-bottom: 0;
   }
 }
 
+mat-form-field {
+  display: block;
+  width: 100%;
+
+  .mat-mdc-form-field-subscript-wrapper {
+    padding: 0 16px;
+  }
+}
+
+// File upload styling
 .file-upload {
   margin: 24px 0;
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 20px;
+  padding: 24px;
   background: rgba(0, 0, 0, 0.02);
   border: 2px dashed rgba(0, 0, 0, 0.12);
-  border-radius: 12px;
+  border-radius: 8px;
   transition: all 0.2s ease;
 
   &:hover {
@@ -66,21 +71,32 @@ mat-form-field {
   }
 }
 
+// Action buttons styling
 mat-dialog-actions {
-  padding: 16px 24px;
-  margin: 0;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  margin: 0 !important;
+  padding: 24px 32px !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  gap: 16px;
 
   button {
-    min-width: 100px;
+    min-width: 120px;
+    padding: 8px 24px;
+    border-radius: 4px;
 
-    &[color='primary'] {
+    &[type="submit"],
+    &[color="primary"] {
       margin-left: 8px;
+    }
+
+    &:not([disabled]) {
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.04);
+      }
     }
   }
 }
 
-// Dark theme adjustments
+// Dark theme support
 :host-context(.dark-theme) {
   .file-upload {
     background: rgba(255, 255, 255, 0.03);
@@ -97,7 +113,12 @@ mat-dialog-actions {
     }
   }
 
+  mat-dialog-title {
+    color: rgba(255, 255, 255, 0.87);
+    border-bottom-color: rgba(255, 255, 255, 0.12);
+  }
+
   mat-dialog-actions {
-    border-top-color: rgba(255, 255, 255, 0.08);
+    border-top-color: rgba(255, 255, 255, 0.12);
   }
 }

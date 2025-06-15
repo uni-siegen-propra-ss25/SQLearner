@@ -45,8 +45,18 @@ export interface UpdateDatabaseDto {
 
 export interface CreateTableDto {
     name: string;
-    createSql: string;
     description?: string;
+    columns: {
+        name: string;
+        type: string;
+        nullable: boolean;
+        isPrimaryKey: boolean;
+        isForeignKey?: boolean;
+        defaultValue?: string;
+        autoIncrement?: boolean;
+        referencesTable?: string;
+        referencesColumn?: string;
+    }[];
 }
 
 export interface UpdateTableDto {
