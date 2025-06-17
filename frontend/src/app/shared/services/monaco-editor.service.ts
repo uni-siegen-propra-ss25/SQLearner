@@ -12,8 +12,16 @@ export class MonacoEditorService {
     private initializationComplete$ = new BehaviorSubject<boolean>(false);
     private activeEditors = new Set<editor.IStandaloneCodeEditor>();
     private languageFeaturesRegistered = false;
+    private monacoLoaded = false;
 
-    constructor(private ngZone: NgZone) {}
+    constructor(private ngZone: NgZone) {
+        // Configure Monaco loader
+        loader.config({
+            paths: {
+                vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs'
+            }
+        });
+    }
 
     async initMonaco(): Promise<void> {
         if (this.initialized) {
@@ -74,6 +82,13 @@ export class MonacoEditorService {
                 'editor.selectionBackground': '#404040'
             }
         });
+    }
+
+    async loadMonaco(): Promise<void> {
+        if (!this.monacoLoaded) {
+            await loader.init();
+            this.monacoLoaded = true;
+        }
     }
 
     getEditorOptions(customOptions: Partial<editor.IStandaloneEditorConstructionOptions> = {}): editor.IStandaloneEditorConstructionOptions {

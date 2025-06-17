@@ -18,7 +18,7 @@ services:
 
   migrations:
     build: ./backend
-    command: sh -c "while ! nc -z db 5432; do sleep 1; done && PGPASSWORD=postgres psql -h db -U postgres -d sqlearner -c \"DROP TABLE IF EXISTS _prisma_migrations;\" && npx prisma migrate reset --force && npx prisma migrate dev --name init"
+    command: sh -c "while ! nc -z db 5432; do sleep 1; done && npx prisma migrate deploy"
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/sqlearner?schema=public
     depends_on:
@@ -58,6 +58,12 @@ services:
       - /app/node_modules
     depends_on:
       - backend
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G
 
 volumes:
   postgres_data: 

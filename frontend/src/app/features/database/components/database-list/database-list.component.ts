@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { AuthService } from 'app/features/auth/services/auth.service';
 import { Database } from '../../models/database.model';
 import { DatabaseService } from '../../services/database.service';
 import { DatabaseUploadDialogComponent } from '../../dialogs/database-upload-dialog/database-upload-dialog.component';
 import { DatabaseCreateDialogComponent } from '../../dialogs/database-create-dialog/database-create-dialog.component';
-import { DatabaseEditDialogComponent } from '../../dialogs/database-edit-dialog/database-edit-dialog.component';
+import { DatabaseViewDialogComponent } from '../../dialogs/database-view-dialog/database-view-dialog.component';
+import { AuthService } from 'app/features/auth/services/auth.service';
 
 @Component({
     selector: 'app-database-list',
@@ -17,6 +17,7 @@ export class DatabaseListComponent implements OnInit {
     isTutor = false;
     displayedColumns: string[] = ['name', 'description', 'createdAt', 'actions'];
 
+
     constructor(
         private databaseService: DatabaseService,
         private dialog: MatDialog,
@@ -24,6 +25,7 @@ export class DatabaseListComponent implements OnInit {
     ) {
         this.isTutor = this.authService.isTutor();
     }
+
 
     ngOnInit(): void {
         this.loadDatabases();
@@ -54,14 +56,13 @@ export class DatabaseListComponent implements OnInit {
         });
     }
 
-    openEditDialog(database: Database): void {
-        const dialogRef = this.dialog.open(DatabaseEditDialogComponent, {
-            data: database,
-        });
-        dialogRef.afterClosed().subscribe((result) => {
-            if (result) {
-                this.loadDatabases();
-            }
+    viewDatabase(database: Database): void {
+        this.dialog.open(DatabaseViewDialogComponent, {
+            data: {
+                database: database
+            },
+            maxWidth: '90vw',
+            maxHeight: '90vh',
         });
     }
 
@@ -72,10 +73,5 @@ export class DatabaseListComponent implements OnInit {
                 (error) => console.error('Error deleting database:', error),
             );
         }
-    }
-
-    viewDatabase(database: Database) {
-        // TODO: Implement database visualization
-        console.log('View database:', database);
     }
 }

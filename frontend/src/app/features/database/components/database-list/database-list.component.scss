@@ -25,104 +25,113 @@
     }
   }
 
-  mat-card {
+  .database-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    padding: 8px;
+  }
+
+  .database-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
     background: white;
     border-radius: 12px;
     overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    mat-card-header {
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.02);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+
+      mat-card-title {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 500;
+        color: rgba(0, 0, 0, 0.87);
+      }
+
+      mat-card-subtitle {
+        margin: 4px 0 0 0;
+        color: rgba(0, 0, 0, 0.6);
+      }
+    }
 
     mat-card-content {
-      padding: 0;
-    }
-  }
-
-  table {
-    width: 100%;
-    background: white;
-
-    .mat-mdc-header-cell {
-      font-weight: 500;
-      color: rgba(0, 0, 0, 0.87);
-      font-size: 0.875rem;
-      padding: 20px 16px;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-    }
-
-    .mat-mdc-cell {
       padding: 16px;
-      font-size: 0.9375rem;
-      color: rgba(0, 0, 0, 0.87);
-      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-    }
+      flex-grow: 1;
 
-    .mat-mdc-row {
-      position: relative;
-      transition: background-color 0.2s;
-
-      &:hover {
-        background-color: rgba(0, 0, 0, 0.02);
-      }
-
-      &:last-child {
-        .mat-mdc-cell {
-          border-bottom: none;
-        }
+      .description {
+        margin: 0;
+        color: rgba(0, 0, 0, 0.6);
+        font-size: 0.9375rem;
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
       }
     }
 
-    .mat-column-actions {
-      display: flex;
-      width: auto;
-      white-space: nowrap;
-      padding-right: 24px;
+    mat-card-actions {
+      padding: 8px;
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+      background: rgba(0, 0, 0, 0.02);
 
       button {
-        width: 36px;
-        height: 36px;
         margin: 0 4px;
-        padding: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: background-color 0.2s;
-
-        &[color='primary'] {
-          background-color: rgba(25, 118, 210, 0.12);
-          color: #1976d2;
-
-          &:hover {
-            background-color: rgba(25, 118, 210, 0.18);
-          }
-        }
-
-        &[color='accent'] {
-          background-color: rgba(156, 39, 176, 0.12);
-          color: #9c27b0;
-
-          &:hover {
-            background-color: rgba(156, 39, 176, 0.18);
-          }
-        }
-
-        &[color='warn'] {
-          background-color: rgba(220, 53, 69, 0.12);
-          color: #dc3545;
-
-          &:hover {
-            background-color: rgba(220, 53, 69, 0.18);
-          }
-        }
-
-        mat-icon {
-          width: 24px;
-          height: 24px;
-          font-size: 24px;
-        }
       }
     }
+  }
+}
 
-    .mat-column-createdAt {
-      width: 200px;
-      color: rgba(0, 0, 0, 0.6);
+// Dark theme adjustments
+:host-context(.dark-theme) {
+  .database-container {
+    .header h1 {
+      color: rgba(255, 255, 255, 0.87);
+    }
+
+    .database-card {
+      background: #2d2d2d;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+      &:hover {
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      }
+
+      mat-card-header {
+        background: rgba(255, 255, 255, 0.05);
+        border-bottom-color: rgba(255, 255, 255, 0.08);
+
+        mat-card-title {
+          color: rgba(255, 255, 255, 0.87);
+        }
+
+        mat-card-subtitle {
+          color: rgba(255, 255, 255, 0.6);
+        }
+      }
+
+      mat-card-content {
+        .description {
+          color: rgba(255, 255, 255, 0.6);
+        }
+      }
+
+      mat-card-actions {
+        background: rgba(255, 255, 255, 0.05);
+        border-top-color: rgba(255, 255, 255, 0.08);
+      }
     }
   }
 }

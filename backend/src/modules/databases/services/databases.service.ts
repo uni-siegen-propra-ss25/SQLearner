@@ -58,7 +58,40 @@ export class DatabasesService {
             }
         } catch (error) {
             console.error('Error executing SQL schema:', error);
-            // You can add additional error handling here
+            // Delete the database record if SQL execution fails
+            await this.prisma.database.delete({
+                where: { id: database.id },
+            });
+            
+            // Re-throw the error with proper formatting
+            if (error instanceof Error && 'code' in error) {
+                const pgError = error as PostgresError;
+                const errorMap: { [key: string]: string } = {
+                    '42P01': 'Table does not exist',
+                    '42703': 'Column does not exist',
+                    '23505': 'Unique constraint violation',
+                    '23503': 'Foreign key violation',
+                    '42601': 'Syntax error in SQL schema',
+                    '28P01': 'Invalid password',
+                    '3D000': 'Database does not exist',
+                    '42501': 'Permission denied'
+                };
+
+                const errorMessage = errorMap[pgError.code] || pgError.message;
+                throw new SqlErrorException({
+                    message: `Failed to create database: ${errorMessage}`,
+                    name: pgError.name,
+                    code: pgError.code,
+                    detail: pgError.detail,
+                    stack: pgError.stack
+                });
+            }
+            
+            throw new SqlErrorException({
+                message: `Failed to create database: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                name: 'DatabaseCreationError',
+                code: 'DB_CREATE_ERROR'
+            });
         }
 
         return database;

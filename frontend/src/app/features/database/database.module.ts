@@ -10,20 +10,23 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { DatabaseRoutingModule } from './database-routing.module';
 
 import { DatabaseListComponent } from './components/database-list/database-list.component';
 import { DatabaseEditDialogComponent } from './dialogs/database-edit-dialog/database-edit-dialog.component';
 import { DatabaseCreateDialogComponent } from './dialogs/database-create-dialog/database-create-dialog.component';
 import { DatabaseUploadDialogComponent } from './dialogs/database-upload-dialog/database-upload-dialog.component';
+import { DatabaseViewDialogComponent } from './dialogs/database-view-dialog/database-view-dialog.component';
 import { ErDiagramComponent } from './components/er-diagram/er-diagram.component';
 
 @NgModule({
     declarations: [
         DatabaseListComponent,
-        DatabaseEditDialogComponent,
         DatabaseCreateDialogComponent,
+        DatabaseEditDialogComponent,
         DatabaseUploadDialogComponent,
+        DatabaseViewDialogComponent,
         ErDiagramComponent
     ],
     imports: [
@@ -39,6 +42,7 @@ import { ErDiagramComponent } from './components/er-diagram/er-diagram.component
         MatButtonToggleModule,
         MatIconModule,
         MatCardModule,
+        MatTooltipModule,
         DatabaseRoutingModule
     ],
     exports: [

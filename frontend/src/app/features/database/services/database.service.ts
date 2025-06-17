@@ -11,6 +11,7 @@ export interface QueryResult {
     rowCount?: number;
     command?: string;
     error?: string;
+    executionTime?: number;
 }
 
 @Injectable({
