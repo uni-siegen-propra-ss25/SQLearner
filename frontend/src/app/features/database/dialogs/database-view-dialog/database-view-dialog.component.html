@@ -6,7 +6,7 @@
     </button>
   </div>
 
-  <mat-dialog-content>
+  <div class="dialog-content">
     <!-- Database Info Section -->
     <div class="database-info-section">
       <div class="info-card">
@@ -19,7 +19,7 @@
             <strong>Beschreibung:</strong> {{ data.database.description }}
           </div>
           <div class="info-item">
-            <strong>Erstellt:</strong> {{ data.database.createdAt | date:'medium' }}
+            <strong>Erstellt:</strong> {{ formatDate(data.database.createdAt) }}
           </div>
           <div class="info-item">
             <strong>Datenbank ID:</strong> {{ data.database.schemaSql }}
@@ -71,7 +71,7 @@
       <div *ngIf="queryResult" class="results-section">
         <div class="results-header">
           <h3>Query Results</h3>
-          <div class="results-info" *ngIf="queryResult.rows.length > 0">
+          <div class="results-info" *ngIf="queryResult && queryResult.rows && queryResult.rows.length > 0">
             {{ queryResult.rows.length }} row{{ queryResult.rows.length !== 1 ? 's' : '' }}
             {{ queryResult.executionTime ? ' (in ' + queryResult.executionTime + 'ms)' : '' }}
           </div>
@@ -98,5 +98,5 @@
         </div>
       </div>
     </div>
-  </mat-dialog-content>
+  </div>
 </div> 

@@ -1,0 +1,155 @@
+:host {
+  display: block;
+
+  mat-dialog-content {
+    min-width: 600px;
+    max-width: 800px;
+    max-height: 80vh;
+    padding: 24px;
+  }
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.form-section {
+  margin-bottom: 24px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+
+  h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.87);
+  }
+}
+
+.columns-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.column-item {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+
+  .column-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+
+    h4 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 500;
+      color: rgba(0, 0, 0, 0.87);
+    }
+  }
+
+  .column-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .field-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+
+    &.checkboxes {
+      flex-wrap: wrap;
+      gap: 16px;
+
+      mat-checkbox {
+        margin-right: 16px;
+      }
+    }
+
+    mat-form-field {
+      flex: 1;
+      min-width: 150px;
+    }
+  }
+}
+
+.sql-preview {
+  background: #1e1e1e;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  overflow-x: auto;
+
+  pre {
+    margin: 0;
+    color: #d4d4d4;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 16px 24px;
+  margin: 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+
+  button {
+    min-width: 100px;
+
+    &[color='primary'] {
+      margin-left: 8px;
+    }
+  }
+}
+
+mat-dialog-actions {
+  padding: 16px 24px;
+  margin: 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+
+  button {
+    min-width: 100px;
+
+    &[color='primary'] {
+      margin-left: 8px;
+    }
+  }
+}
+
+// Dark theme adjustments
+:host-context(.dark-theme) {
+  .column-item {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .sql-preview {
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  mat-dialog-actions {
+    border-top-color: rgba(255, 255, 255, 0.08);
+  }
+} 

@@ -198,6 +198,13 @@ export class DatabasesService {
                     database: process.env.DB_NAME
                 });
 
+                // Terminate all connections to the database first
+                await adminPool.query(`
+                    SELECT pg_terminate_backend(pid) 
+                    FROM pg_stat_activity 
+                    WHERE datname = $1 AND pid <> pg_backend_pid()
+                `, [dbName]);
+
                 // Drop the database
                 await adminPool.query(`DROP DATABASE IF EXISTS "${dbName}"`);
                 console.log(`Database ${dbName} dropped successfully`);

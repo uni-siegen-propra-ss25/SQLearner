@@ -1,8 +1,9 @@
 import { Component, Inject, OnInit, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { DatabaseService, QueryResult } from '../../services/database.service';
 import { Database } from '../../models/database.model';
+import { CreateTableDialogComponent } from '../create-table-dialog/create-table-dialog.component';
 import * as monaco from 'monaco-editor';
 
 interface DialogData {
@@ -47,7 +48,8 @@ export class DatabaseViewDialogComponent implements OnInit, AfterViewInit {
     private dialogRef: MatDialogRef<DatabaseViewDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
     private fb: FormBuilder,
-    private databaseService: DatabaseService
+    private databaseService: DatabaseService,
+    private dialog: MatDialog
   ) {
     this.queryForm = this.fb.group({
       query: ['']
@@ -126,17 +128,23 @@ export class DatabaseViewDialogComponent implements OnInit, AfterViewInit {
   }
 
   createTable(): void {
-    const createTableQuery = `CREATE TABLE example_table (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
-  email VARCHAR(255) UNIQUE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);`;
-    
-    if (this.editor) {
-      this.editor.setValue(createTableQuery);
-    }
-    this.queryForm.patchValue({ query: createTableQuery });
+    const dialogRef = this.dialog.open(CreateTableDialogComponent, {
+      width: '800px',
+      maxHeight: '90vh'
+    });
+
+    dialogRef.afterClosed().subscribe((result: { sql: string, formData: any } | undefined) => {
+      if (result && result.sql) {
+        // Set the generated SQL in the editor
+        if (this.editor) {
+          this.editor.setValue(result.sql);
+        }
+        this.queryForm.patchValue({ query: result.sql });
+        
+        // Execute the query to create the table
+        this.executeQuery();
+      }
+    });
   }
 
   showTables(): void {
@@ -162,5 +170,17 @@ ORDER BY table_name, ordinal_position;`;
       this.editor.dispose();
     }
     this.dialogRef.close();
+  }
+
+  formatDate(date: Date): string {
+    if (!date) return '';
+    return new Date(date).toLocaleString('de-DE', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
   }
 }

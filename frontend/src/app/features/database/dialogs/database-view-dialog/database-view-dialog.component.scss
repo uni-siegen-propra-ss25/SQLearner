@@ -29,7 +29,7 @@
     }
   }
 
-  mat-dialog-content {
+  .dialog-content {
     flex: 1 1 auto;
     padding: 24px;
     overflow-y: auto;
@@ -126,7 +126,7 @@
       border-radius: 8px;
       padding: 16px;
       border: 1px solid rgba(0, 0, 0, 0.08);
-      max-height: 300px;
+      max-height: 500px;
 
       .editor-header {
         display: flex;
@@ -157,7 +157,7 @@
       }
 
       .sql-editor {
-        height: 150px;
+        height: 300px;
         border-radius: 4px;
         overflow: hidden;
         background: #1e1e1e;

@@ -38,7 +38,10 @@ textarea {
   }
 }
 
-mat-dialog-actions {
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
   padding: 16px 24px;
   margin: 0;
   border-top: 1px solid rgba(0, 0, 0, 0.08);
@@ -59,7 +62,7 @@ mat-dialog-actions {
     border-color: rgba(255, 255, 255, 0.08);
   }
 
-  mat-dialog-actions {
+  .dialog-actions {
     border-top-color: rgba(255, 255, 255, 0.08);
   }
 }
