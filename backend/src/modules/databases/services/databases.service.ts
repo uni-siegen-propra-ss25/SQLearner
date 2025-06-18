@@ -2,9 +2,10 @@ import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/commo
 import { PrismaService } from '../../../prisma/prisma.service';
 import { CreateDatabaseDto } from '../models/create-database.dto';
 import { UpdateDatabaseDto } from '../models/update-database.dto';
-import { Role } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 import { Pool } from 'pg';
 import { SqlErrorException } from '../../../common/exceptions/sql-error.exception';
+import { use } from 'passport';
 
 @Injectable()
 export class DatabasesService {
@@ -14,36 +15,6 @@ export class DatabasesService {
         this.pool = new Pool({
             connectionString: process.env.DATABASE_URL,
         });
-    }
-
-    async createDatabase(dto: CreateDatabaseDto, userId: number, userRole: Role | string) {
-        if (String(userRole).toUpperCase() !== Role.TUTOR) {
-            throw new ForbiddenException('Only tutors can create databases');
-        }
-
-        // Create a record in the Database table
-        const database = await this.prisma.database.create({
-            data: {
-                name: dto.name,
-                description: dto.description,
-                schemaSql: dto.schemaSql,
-            },
-        });
-
-        // Create database schema if provided
-        if (dto.schemaSql) {
-            try {
-                await this.pool.query(dto.schemaSql);
-            } catch (error) {
-                // Clean up the database record if schema creation fails
-                await this.prisma.database.delete({
-                    where: { id: database.id }
-                });
-                throw new SqlErrorException(error);
-            }
-        }
-
-        return database;
     }
 
     async getAllDatabases() {
@@ -64,22 +35,37 @@ export class DatabasesService {
         return database;
     }
 
-    async updateDatabase(id: number, dto: UpdateDatabaseDto, userId: number, userRole: Role | string) {
-        if (String(userRole).toUpperCase() !== Role.TUTOR) {
-            throw new ForbiddenException('Only tutors can update databases');
-        }
-
-        return this.prisma.database.update({
-            where: { id },
+    async createDatabase(file: Express.Multer.File, user: User) {
+        // Create a record in the Database table
+        const database = await this.prisma.database.create({
             data: {
-                name: dto.name,
-                description: dto.description,
+                name: file.originalname,
+                description: '',
+                schemaSql: '',
             },
         });
+
+        // Create database schema if provided
+        if (file) {
+            try {
+                await this.pool.query(file.buffer.toString());
+            } catch (error) {
+                // Clean up the database record if schema creation fails
+                await this.prisma.database.delete({
+                    where: { id: database.id }
+                });
+                throw new SqlErrorException(error);
+            }
+        }
+
+        return database;
     }
 
-    async deleteDatabase(id: number, userId: number, userRole: Role | string) {
-        if (String(userRole).toUpperCase() !== Role.TUTOR) {
+    async updateDatabase(databaseId: number, user: User, file: Express.Multer.File) {
+    }
+
+    async deleteDatabase(id: number, user: User) {
+        if (String(user.role).toUpperCase() !== Role.TUTOR) {
             throw new ForbiddenException('Only tutors can delete databases');
         }
 
@@ -105,14 +91,6 @@ export class DatabasesService {
         return this.prisma.database.delete({
             where: { id }
         });
-    }
-
-    async validateUserAccess(databaseId: number, userId: number, userRole: Role | string) {
-        await this.getDatabaseById(databaseId);
-        if (String(userRole).toUpperCase() !== Role.TUTOR) {
-            throw new ForbiddenException('Only tutors can modify databases');
-        }
-        return true;
     }
 
     private isWriteOperation(query: string): boolean {

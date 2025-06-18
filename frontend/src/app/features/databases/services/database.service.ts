@@ -44,7 +44,7 @@ export class DatabaseService {
         return this.http.delete<void>(`${this.apiUrl}/${id}`);
     }
 
-    uploadSqlFile(file: File): Observable<Database> {
+    uploadDatabase(file: File): Observable<Database> {
         const formData = new FormData();
         formData.append('file', file);
         return this.http.post<Database>(`${this.apiUrl}/upload`, formData);

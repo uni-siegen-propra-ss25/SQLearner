@@ -33,7 +33,7 @@ export class DatabaseUploadDialogComponent {
 
     onSubmit() {
         if (this.form.valid && this.selectedFile) {
-            this.databaseService.uploadSqlFile(this.selectedFile).subscribe({
+            this.databaseService.uploadDatabase(this.selectedFile).subscribe({
                 next: (database: Database) => {
                     this.dialogRef.close(database);
                 },

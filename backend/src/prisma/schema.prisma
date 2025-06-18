@@ -91,78 +91,15 @@ model ChatMessage {
 
 /// Imported or self-created database definitions
 model Database {
-  id          Int             @id @default(autoincrement())
+  id          Int          @id @default(autoincrement())
   name        String
   description String?
-  schemaSql   String?         // SQL schema definition
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+  schemaSql   String       // SQL schema definition
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 
   // Relations
   exercises   Exercise[]
-  tables      DatabaseTable[]
-}
-
-/// Tables in databases
-model DatabaseTable {
-  id          Int       @id @default(autoincrement())
-  databaseId  Int
-  name        String
-  description String?
-  createSql   String    // The CREATE TABLE statement
-  order       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  database    Database         @relation(fields: [databaseId], references: [id], onDelete: Cascade)
-  columns     DatabaseColumn[]
-  data        DatabaseTableData[]
-
-  @@unique([databaseId, name])
-  @@index([databaseId, order])
-}
-
-/// Database columns
-model DatabaseColumn {
-  id               Int       @id @default(autoincrement())
-  tableId          Int
-  name             String
-  type             String
-  nullable         Boolean   @default(false)
-  defaultValue     String?
-  primaryKey       Boolean   @default(false)
-  isForeignKey     Boolean   @default(false)
-  referencesTable  String?
-  referencesColumn String?
-  autoIncrement    Boolean   @default(false)
-  order            Int      @default(0)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  // Relations
-  table         DatabaseTable     @relation(fields: [tableId], references: [id], onDelete: Cascade)
-  data          DatabaseTableData[]
-
-  @@unique([tableId, name])
-  @@index([tableId, order])
-}
-
-/// Data stored in database tables
-model DatabaseTableData {
-  id        Int           @id @default(autoincrement())
-  tableId   Int
-  columnId  Int
-  value     String?
-  order     Int          @default(0)
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-
-  // Relations
-  table     DatabaseTable @relation(fields: [tableId], references: [id], onDelete: Cascade)
-  column    DatabaseColumn @relation(fields: [columnId], references: [id], onDelete: Cascade)
-
-  @@index([tableId, columnId, order])
 }
 
 /// Top-level grouping of chapters (e.g. "Relational Algebra", "Joins")
@@ -185,6 +122,18 @@ model Topic {
 
   chapter     Chapter   @relation(fields: [chapterId], references: [id])
   exercises   Exercise[]
+}
+
+/// Isolated DB session/container for SQL execution
+model DbSession {
+  id            Int       @id @default(autoincrement())
+  submissionId  Int       @unique
+  containerId   String       // e.g. Docker container name or ID
+  status        String       // "running" | "finished" | "failed"
+  startedAt     DateTime     @default(now())
+  endedAt       DateTime?
+
+  submission    Submission   @relation(fields: [submissionId], references: [id])
 }
 
 /// Core exercise entity
@@ -267,18 +216,6 @@ model Progress {
   exercise      Exercise  @relation(fields: [exerciseId], references: [id])
 
   @@unique([userId, exerciseId])
-}
-
-/// Isolated DB session/container for SQL execution
-model DbSession {
-  id            Int       @id @default(autoincrement())
-  submissionId  Int       @unique
-  containerId   String       // e.g. Docker container name or ID
-  status        String       // "running" | "finished" | "failed"
-  startedAt     DateTime     @default(now())
-  endedAt       DateTime?
-
-  submission    Submission   @relation(fields: [submissionId], references: [id])
 }
 
 model fragen {

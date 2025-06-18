@@ -1,9 +1,6 @@
 import { Module } from '@nestjs/common';
 import { DatabasesController } from './controllers/databases.controller';
 import { DatabasesService } from './services/databases.service';
-import { TablesService } from './services/tables.service';
-import { TableDataService } from './services/table-data.service';
-import { DatabaseImportService } from './services/database-import.service';
 import { PrismaModule } from '../../prisma/prisma.module';
 
 /**
@@ -22,16 +19,10 @@ import { PrismaModule } from '../../prisma/prisma.module';
     imports: [PrismaModule],
     controllers: [DatabasesController],
     providers: [
-        DatabasesService,
-        TablesService,
-        TableDataService,
-        DatabaseImportService
+        DatabasesService
     ],
     exports: [
-        DatabasesService,
-        TablesService,
-        TableDataService,
-        DatabaseImportService
+        DatabasesService
     ],
 })
 export class DatabasesModule {}
