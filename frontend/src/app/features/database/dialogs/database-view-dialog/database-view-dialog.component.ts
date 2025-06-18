@@ -134,8 +134,7 @@ export class DatabaseViewDialogComponent implements OnInit, AfterViewInit {
     });
 
     dialogRef.afterClosed().subscribe((result: { sql: string, formData: any } | undefined) => {
-      if (result && result.sql) {
-        // Set the generated SQL in the editor
+      if (result && result.sql) {        // Set the generated SQL in the editor
         if (this.editor) {
           this.editor.setValue(result.sql);
         }
@@ -143,6 +142,7 @@ export class DatabaseViewDialogComponent implements OnInit, AfterViewInit {
         
         // Execute the query to create the table
         this.executeQuery();
+        this.showSuccessMessage('Tabelle erfolgreich erstellt!');
       }
     });
   }
@@ -182,5 +182,23 @@ ORDER BY table_name, ordinal_position;`;
       minute: '2-digit',
       second: '2-digit'
     });
+  }
+
+  showSuccessMessage(message: string): void {
+    // Clear any existing error
+    this.error = null;
+    
+    // Set success message in query result area
+    this.queryResult = {
+      columns: [],
+      rows: [],
+      error: undefined
+    };
+    
+    // Show success message in the results section
+    setTimeout(() => {
+      this.queryResult = null;
+      this.error = null;
+    }, 3000);
   }
 }
