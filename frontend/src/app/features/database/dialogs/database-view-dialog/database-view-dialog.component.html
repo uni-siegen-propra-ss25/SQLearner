@@ -7,6 +7,42 @@
   </div>
 
   <mat-dialog-content>
+    <!-- Database Info Section -->
+    <div class="database-info-section">
+      <div class="info-card">
+        <h3>Datenbank Informationen</h3>
+        <div class="info-content">
+          <div class="info-item">
+            <strong>Name:</strong> {{ data.database.name }}
+          </div>
+          <div class="info-item" *ngIf="data.database.description">
+            <strong>Beschreibung:</strong> {{ data.database.description }}
+          </div>
+          <div class="info-item">
+            <strong>Erstellt:</strong> {{ data.database.createdAt | date:'medium' }}
+          </div>
+          <div class="info-item">
+            <strong>Datenbank ID:</strong> {{ data.database.schemaSql }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions Section -->
+    <div class="quick-actions-section">
+      <h3>Schnellaktionen</h3>
+      <div class="action-buttons">
+        <button mat-raised-button color="accent" (click)="createTable()">
+          <mat-icon>add</mat-icon>
+          Neue Tabelle erstellen
+        </button>
+        <button mat-raised-button color="primary" (click)="showTables()">
+          <mat-icon>table_chart</mat-icon>
+          Tabellen anzeigen
+        </button>
+      </div>
+    </div>
+
     <div class="query-section">
       <div class="query-editor-container">
         <div class="editor-header">

@@ -14,11 +14,9 @@
 
     <div class="sql-schema-field">
       <mat-form-field appearance="fill" class="full-width">
-        <mat-label>SQL-Schema</mat-label>
-        <textarea matInput formControlName="schemaSql" rows="10" required></textarea>
-        <mat-error *ngIf="form.get('schemaSql')?.hasError('required')">
-          SQL-Schema ist erforderlich
-        </mat-error>
+        <mat-label>Initiales SQL-Schema (optional)</mat-label>
+        <textarea matInput formControlName="schemaSql" rows="10" placeholder="CREATE TABLE users (id SERIAL PRIMARY KEY, name VARCHAR(100));"></textarea>
+        <mat-hint>Optional: SQL-Befehle zur Erstellung von Tabellen und Daten in der neuen Datenbank</mat-hint>
       </mat-form-field>
     </div>
   </mat-dialog-content>

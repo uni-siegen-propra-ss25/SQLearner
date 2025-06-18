@@ -20,7 +20,7 @@ export class DatabaseCreateDialogComponent {
         this.form = this.fb.group({
             name: ['', Validators.required],
             description: [''],
-            schemaSql: ['', Validators.required],
+            schemaSql: [''],
         });
     }
 

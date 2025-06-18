@@ -39,6 +39,63 @@
     min-height: 0;
   }
 
+  .database-info-section {
+    .info-card {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 16px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+
+      h3 {
+        margin: 0 0 12px 0;
+        font-size: 1.1rem;
+        font-weight: 500;
+        color: rgba(0, 0, 0, 0.87);
+      }
+
+      .info-content {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        .info-item {
+          display: flex;
+          gap: 8px;
+          font-size: 0.9rem;
+          color: rgba(0, 0, 0, 0.87);
+
+          strong {
+            min-width: 120px;
+            color: rgba(0, 0, 0, 0.6);
+          }
+        }
+      }
+    }
+  }
+
+  .quick-actions-section {
+    h3 {
+      margin: 0 0 12px 0;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: rgba(0, 0, 0, 0.87);
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+
+      button {
+        min-width: 180px;
+        
+        mat-icon {
+          margin-right: 8px;
+        }
+      }
+    }
+  }
+
   .database-info {
     .description {
       margin: 0 0 8px 0;

@@ -12,7 +12,7 @@ export class CreateDatabaseDto {
     @IsOptional()
     description?: string;
 
-    @ApiProperty({ description: 'The SQL schema/dump for this database', required: false })
+    @ApiProperty({ description: 'Optional initial SQL schema for this database', required: false })
     @IsString()
     @IsOptional()
     schemaSql?: string;

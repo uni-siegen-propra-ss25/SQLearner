@@ -55,18 +55,10 @@ export class DatabaseViewDialogComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    // Extract table name from schema and set initial query
-    const tableName = this.extractTableName(this.data.database.schemaSql);
-    const initialQuery = tableName ? `SELECT * FROM "${tableName}";` : 'SELECT table_name FROM information_schema.tables WHERE table_schema = \'public\' AND table_type = \'BASE TABLE\';';
+    // Set initial query to show all tables in the database
+    const initialQuery = 'SELECT table_name FROM information_schema.tables WHERE table_schema = \'public\' AND table_type = \'BASE TABLE\' ORDER BY table_name;';
     
     this.queryForm.patchValue({ query: initialQuery });
-  }
-
-  private extractTableName(schemaSql: string): string | null {
-    // Extract table name from CREATE TABLE statement
-    const createTableRegex = /CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?["']?([^"'\s(]+)["']?/i;
-    const match = schemaSql.match(createTableRegex);
-    return match ? match[1] : null;
   }
 
   ngAfterViewInit(): void {
@@ -131,6 +123,38 @@ export class DatabaseViewDialogComponent implements OnInit, AfterViewInit {
     this.queryForm.patchValue({ query: '' });
     this.queryResult = null;
     this.error = null;
+  }
+
+  createTable(): void {
+    const createTableQuery = `CREATE TABLE example_table (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(255) UNIQUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);`;
+    
+    if (this.editor) {
+      this.editor.setValue(createTableQuery);
+    }
+    this.queryForm.patchValue({ query: createTableQuery });
+  }
+
+  showTables(): void {
+    const showTablesQuery = `SELECT 
+  table_name,
+  column_name,
+  data_type,
+  is_nullable,
+  column_default
+FROM information_schema.columns 
+WHERE table_schema = 'public' 
+ORDER BY table_name, ordinal_position;`;
+    
+    if (this.editor) {
+      this.editor.setValue(showTablesQuery);
+    }
+    this.queryForm.patchValue({ query: showTablesQuery });
+    this.executeQuery();
   }
 
   close(): void {

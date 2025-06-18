@@ -45,20 +45,57 @@ export class DatabasesService {
             data: {
                 name: dto.name,
                 description: dto.description,
-                schemaSql: dto.schemaSql,
+                schemaSql: dto.schemaSql || '',
                 ownerId: userId,
             },
         });
 
         try {
-            // Execute SQL schema
-            if (dto.schemaSql) {
-                await this.pool.query(dto.schemaSql);
-                console.log('SQL schema executed successfully');
+            // Create a new PostgreSQL database
+            const dbName = `db_${database.id}_${dto.name.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
+            
+            // Connect to default database to create new database
+            const adminPool = new Pool({
+                host: process.env.DB_HOST,
+                port: parseInt(process.env.DB_PORT || '5432', 10),
+                user: process.env.DB_USER,
+                password: process.env.DB_PASSWORD,
+                database: process.env.DB_NAME
+            });
+
+            // Create the new database
+            await adminPool.query(`CREATE DATABASE "${dbName}"`);
+            console.log(`Database ${dbName} created successfully`);
+
+            // Close admin connection
+            await adminPool.end();
+
+            // Update the database record with the actual database name
+            await this.prisma.database.update({
+                where: { id: database.id },
+                data: { 
+                    schemaSql: dbName // Store the actual database name instead of SQL schema
+                }
+            });
+
+            // If there's initial schema SQL, execute it in the new database
+            if (dto.schemaSql && dto.schemaSql.trim()) {
+                const newDbPool = new Pool({
+                    host: process.env.DB_HOST,
+                    port: parseInt(process.env.DB_PORT || '5432', 10),
+                    user: process.env.DB_USER,
+                    password: process.env.DB_PASSWORD,
+                    database: dbName
+                });
+
+                await newDbPool.query(dto.schemaSql);
+                console.log('Initial SQL schema executed successfully in new database');
+                await newDbPool.end();
             }
+
         } catch (error) {
-            console.error('Error executing SQL schema:', error);
-            // Delete the database record if SQL execution fails
+            console.error('Error creating database:', error);
+            // Delete the database record if creation fails
             await this.prisma.database.delete({
                 where: { id: database.id },
             });
@@ -74,7 +111,8 @@ export class DatabasesService {
                     '42601': 'Syntax error in SQL schema',
                     '28P01': 'Invalid password',
                     '3D000': 'Database does not exist',
-                    '42501': 'Permission denied'
+                    '42501': 'Permission denied',
+                    '42P04': 'Database already exists'
                 };
 
                 const errorMessage = errorMap[pgError.code] || pgError.message;
@@ -129,13 +167,14 @@ export class DatabasesService {
             throw new ForbiddenException('Only the creator tutor can update this database');
         }
 
+        // Only update name and description, not schemaSql (which contains the database name)
+        const updateData: any = {};
+        if (dto.name !== undefined) updateData.name = dto.name;
+        if (dto.description !== undefined) updateData.description = dto.description;
+
         return this.prisma.database.update({
             where: { id },
-            data: {
-                name: dto.name,
-                description: dto.description,
-                schemaSql: dto.schemaSql,
-            },
+            data: updateData,
         });
     }
 
@@ -147,23 +186,26 @@ export class DatabasesService {
         }
 
         try {
-            // Get database SQL schema
-            const schemaSql = database.schemaSql;
-            if (schemaSql) {
-                // Extract table names from CREATE TABLE statements
-                const tableNames = this.extractTableNames(schemaSql);
-                
-                // Drop each table if it exists
-                for (const tableName of tableNames) {
-                    // Check if this is not a Prisma system table
-                    if (!tableName.startsWith('_prisma_') && !this.isSystemTable(tableName)) {
-                        await this.pool.query(`DROP TABLE IF EXISTS "${tableName}" CASCADE`);
-                    }
-                }
+            // Get database name from schemaSql field
+            const dbName = database.schemaSql;
+            if (dbName) {
+                // Connect to default database to drop the target database
+                const adminPool = new Pool({
+                    host: process.env.DB_HOST,
+                    port: parseInt(process.env.DB_PORT || '5432', 10),
+                    user: process.env.DB_USER,
+                    password: process.env.DB_PASSWORD,
+                    database: process.env.DB_NAME
+                });
+
+                // Drop the database
+                await adminPool.query(`DROP DATABASE IF EXISTS "${dbName}"`);
+                console.log(`Database ${dbName} dropped successfully`);
+                await adminPool.end();
             }
         } catch (error) {
-            console.error('Error dropping tables:', error);
-            // Continue deleting the database record even if dropping tables fails
+            console.error('Error dropping database:', error);
+            // Continue deleting the database record even if dropping database fails
         }
 
         // Delete the database record from the Database table
@@ -221,6 +263,7 @@ export class DatabasesService {
 
         const schema = file.buffer.toString();
 
+        // Create a record in the Database table
         const database = await this.prisma.database.create({
             data: {
                 name: file.originalname,
@@ -231,13 +274,55 @@ export class DatabasesService {
         });
 
         try {
-            // Execute SQL schema from file
-            if (schema) {
-                await this.pool.query(schema);
-                console.log('SQL schema from file executed successfully');
+            // Create a new PostgreSQL database
+            const dbName = `db_${database.id}_${file.originalname.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
+            
+            // Connect to default database to create new database
+            const adminPool = new Pool({
+                host: process.env.DB_HOST,
+                port: parseInt(process.env.DB_PORT || '5432', 10),
+                user: process.env.DB_USER,
+                password: process.env.DB_PASSWORD,
+                database: process.env.DB_NAME
+            });
+
+            // Create the new database
+            await adminPool.query(`CREATE DATABASE "${dbName}"`);
+            console.log(`Database ${dbName} created successfully`);
+
+            // Close admin connection
+            await adminPool.end();
+
+            // Update the database record with the actual database name
+            await this.prisma.database.update({
+                where: { id: database.id },
+                data: { 
+                    schemaSql: dbName // Store the actual database name instead of SQL schema
+                }
+            });
+
+            // Execute SQL schema from file in the new database
+            if (schema && schema.trim()) {
+                const newDbPool = new Pool({
+                    host: process.env.DB_HOST,
+                    port: parseInt(process.env.DB_PORT || '5432', 10),
+                    user: process.env.DB_USER,
+                    password: process.env.DB_PASSWORD,
+                    database: dbName
+                });
+
+                await newDbPool.query(schema);
+                console.log('SQL schema from file executed successfully in new database');
+                await newDbPool.end();
             }
+
         } catch (error) {
-            console.error('Error executing SQL schema from file:', error);
+            console.error('Error creating database from file:', error);
+            // Delete the database record if creation fails
+            await this.prisma.database.delete({
+                where: { id: database.id },
+            });
+            throw error;
         }
 
         return database;
@@ -266,6 +351,12 @@ export class DatabasesService {
             throw new NotFoundException('Database not found');
         }
 
+        // Get the actual database name from schemaSql field
+        const dbName = database.schemaSql;
+        if (!dbName) {
+            throw new NotFoundException('Database not properly initialized');
+        }
+
         // Check if query tries to modify system tables
         const affectedTables = this.extractAffectedTables(query);
         const systemTables = affectedTables.filter(table => this.isSystemTable(table));
@@ -276,7 +367,16 @@ export class DatabasesService {
             );
         }
 
-        const client = await this.pool.connect();
+        // Create a new connection pool for the specific database
+        const dbPool = new Pool({
+            host: process.env.DB_HOST,
+            port: parseInt(process.env.DB_PORT || '5432', 10),
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: dbName
+        });
+
+        const client = await dbPool.connect();
         try {
             // Start transaction for write operations
             const isWriteOperation = this.isWriteOperation(query);
@@ -331,6 +431,7 @@ export class DatabasesService {
             throw error;
         } finally {
             client.release();
+            await dbPool.end();
         }
     }
 
