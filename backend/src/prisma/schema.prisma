@@ -43,7 +43,13 @@ enum MessageSender {
   assistant
 }
 
-// Models
+/// Container status type
+enum ContainerStatus {
+  CREATING
+  RUNNING
+  FAILED
+  FINISHED
+}
 
 /// Application users
 model User {
@@ -62,6 +68,7 @@ model User {
   progress           Progress[]
   bookmarks          Bookmark[]
   messages           ChatMessage[]
+  dbSessions         DbSession[]
 }
 
 /// System settings for the application
@@ -126,14 +133,22 @@ model Topic {
 
 /// Isolated DB session/container for SQL execution
 model DbSession {
-  id            Int       @id @default(autoincrement())
-  submissionId  Int       @unique
-  containerId   String       // e.g. Docker container name or ID
-  status        String       // "running" | "finished" | "failed"
-  startedAt     DateTime     @default(now())
+  id            Int             @id @default(autoincrement())
+  submissionId  Int            
+  containerId   String          // Docker container ID
+  status        ContainerStatus @default(CREATING)
+  startedAt     DateTime        @default(now())
   endedAt       DateTime?
+  port          Int?           // Assigned port for container
+  exerciseId    Int            // Reference to exercise for schema initialization
+  userId        Int            // User who owns this session
 
-  submission    Submission   @relation(fields: [submissionId], references: [id])
+  submission    Submission      @relation(fields: [submissionId], references: [id])
+  exercise      Exercise        @relation(fields: [exerciseId], references: [id])
+  user          User           @relation(fields: [userId], references: [id])
+
+  @@index([containerId])
+  @@index([userId])
 }
 
 /// Core exercise entity
@@ -158,6 +173,7 @@ model Exercise {
   submissions     Submission[]
   bookmarks       Bookmark[]
   Progress        Progress[]
+  dbSessions      DbSession[]     // Add relation to DbSession
 }
 
 /// Single/Multiple-Choice options

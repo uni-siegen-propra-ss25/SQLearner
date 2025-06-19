@@ -20,7 +20,6 @@ import { Role, User } from '@prisma/client';
 import { DatabasesService } from '../services/databases.service';
 import { RunQueryDto } from '../models/query.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { UpdateDatabaseDto } from '../models/update-database.dto';
 
 /**
  * Controller managing database operations for the SQL learning system.
