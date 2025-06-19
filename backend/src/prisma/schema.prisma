@@ -45,10 +45,19 @@ enum MessageSender {
 
 /// Container status type
 enum ContainerStatus {
-  CREATING
-  RUNNING
-  FAILED
-  FINISHED
+  CREATING    // Initial setup
+  RUNNING     // Ready for queries
+  FAILED      // Error occurred
+  FINISHED    // Task completed
+  RESTARTING  // Being reset
+}
+
+/// Container health status
+enum ContainerHealth {
+  HEALTHY     // Container is functioning properly
+  UNHEALTHY   // Container has health check failures
+  STARTING    // Container is initializing
+  UNKNOWN     // Health status cannot be determined
 }
 
 /// Application users
@@ -64,7 +73,6 @@ model User {
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
 
-  submissions         Submission[]
   progress           Progress[]
   bookmarks          Bookmark[]
   messages           ChatMessage[]
@@ -134,21 +142,40 @@ model Topic {
 /// Isolated DB session/container for SQL execution
 model DbSession {
   id            Int             @id @default(autoincrement())
-  submissionId  Int            
-  containerId   String          // Docker container ID
+  containerId   String         // Docker container ID
   status        ContainerStatus @default(CREATING)
-  startedAt     DateTime        @default(now())
+  startedAt     DateTime       @default(now())
   endedAt       DateTime?
-  port          Int?           // Assigned port for container
-  exerciseId    Int            // Reference to exercise for schema initialization
-  userId        Int            // User who owns this session
+  
+  // Essential container details
+  port          Int?          // Assigned database port
+  host          String?       // Container host address
+  dbUser        String?       // Database credentials
+  dbPassword    String?
+  
+  // Relations
+  exerciseId    Int           // Exercise for initialization
+  userId        Int           // Session owner
+  
+  // Error tracking
+  lastError     String?       // Last error message
+  restartCount  Int          @default(0)
+  
+  // Cleanup
+  autoRemove    Boolean      @default(true)
+  timeoutMins   Int         @default(60)
 
-  submission    Submission      @relation(fields: [submissionId], references: [id])
-  exercise      Exercise        @relation(fields: [exerciseId], references: [id])
-  user          User           @relation(fields: [userId], references: [id])
+  // Relations
+  exercise      Exercise      @relation(fields: [exerciseId], references: [id])
+  user          User          @relation(fields: [userId], references: [id])
 
+  // Essential indexes
   @@index([containerId])
   @@index([userId])
+  @@index([status])
+  
+  // Ensure user can only have one active session per exercise
+  @@unique([userId, exerciseId])
 }
 
 /// Core exercise entity
@@ -170,7 +197,6 @@ model Exercise {
 
   topic           Topic           @relation(fields: [topicId], references: [id])
   answers         AnswerOption[]  @relation("ExerciseAnswers")
-  submissions     Submission[]
   bookmarks       Bookmark[]
   Progress        Progress[]
   dbSessions      DbSession[]     // Add relation to DbSession
@@ -185,23 +211,6 @@ model AnswerOption {
   order       Int       @default(0)
 
   exercise    Exercise  @relation("ExerciseAnswers", fields: [exerciseId], references: [id])
-}
-
-/// A student's submission on an exercise
-model Submission {
-  id             Int      @id @default(autoincrement())
-  userId         Int
-  exerciseId     Int
-  
-  answerText     String      // SQL text, chosen option IDs, or free text
-  isCorrect      Boolean     @default(false)
-  feedback       String?     // LLM-generated feedback
-  createdAt      DateTime    @default(now())
-
-  user          User        @relation(fields: [userId], references: [id])
-  exercise      Exercise    @relation(fields: [exerciseId], references: [id])
-
-  session       DbSession?
 }
 
 /// Bookmark that a user sets on an exercise to revisit later

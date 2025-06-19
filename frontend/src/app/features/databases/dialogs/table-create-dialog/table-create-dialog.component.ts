@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, FormArray, Validators, ValidatorFn, AbstractCon
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DatabaseTable } from '../../models/database.model';
-import { TableService } from '../../services/table.service';
 import { SqlDataType, ColumnMetadata } from '../../models/sql.model';
 
 interface TableColumn {
@@ -36,7 +35,6 @@ export class TableCreateDialogComponent {
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<TableCreateDialogComponent>,
     @Inject(MAT_DIALOG_DATA) private data: { databaseId: number },
-    private tableService: TableService,
     private snackBar: MatSnackBar
   ) {
     this.tableForm = this.fb.group({
@@ -238,22 +236,7 @@ export class TableCreateDialogComponent {
         columns
       };
 
-      this.tableService.createTable(this.data.databaseId, createTableDto).subscribe({
-        next: (result: DatabaseTable) => {
-          this.snackBar.open('Tabelle erfolgreich erstellt', 'Schließen', {
-            duration: 3000
-          });
-          this.dialogRef.close(result);
-        },
-        error: (error: any) => {
-          console.error('Error creating table:', error);
-          this.snackBar.open(
-            error.error?.message || 'Fehler beim Erstellen der Tabelle', 
-            'Schließen', 
-            { duration: 5000 }
-          );
-        }
-      });
+      // Here you would typically call a service to create the table
     }
   }
 

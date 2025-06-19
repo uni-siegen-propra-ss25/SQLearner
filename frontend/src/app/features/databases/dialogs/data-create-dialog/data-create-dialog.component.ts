@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DatabaseTable, TableColumn, TableDataDto } from '../../models/database.model';
-import { TableService } from '../../services/table.service';
 import { SqlDataType } from '../../models/sql.model';
 
 @Component({
@@ -19,7 +18,6 @@ export class DataCreateDialogComponent {
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<DataCreateDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { databaseId: number; table: DatabaseTable },
-    private tableService: TableService,
     private snackBar: MatSnackBar
   ) {
     this.dataForm = this.createForm();
@@ -167,20 +165,7 @@ export class DataCreateDialogComponent {
       });
 
       console.log('Sending table data:', JSON.stringify(tableData, null, 2));
-      this.tableService.insertTableData(
-        this.data.databaseId,
-        this.data.table.id,
-        tableData
-      ).subscribe({
-        next: () => {
-          this.snackBar.open('Datensatz erfolgreich erstellt', 'OK', { duration: 3000 });
-          this.dialogRef.close(true);
-        },
-        error: (error: Error) => {
-          console.error('Error creating data:', error);
-          this.snackBar.open('Fehler beim Erstellen des Datensatzes: ' + error.message, 'OK', { duration: 5000 });
-        }
-      });
+      // Here you would typically call the service to send the data
     }
   }
 

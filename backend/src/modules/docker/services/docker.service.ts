@@ -7,6 +7,7 @@ import { User } from '@prisma/client';
  */
 @Injectable()
 export class DockerService {
+    
     /**
      * Creates a new database container for a specific exercise and user
      * @param exerciseId - The ID of the exercise for which to create the container

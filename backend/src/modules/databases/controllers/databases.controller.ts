@@ -18,7 +18,7 @@ import { Roles } from '../../../common/decorators/role.decorator';
 import { GetUser } from '../../../common/decorators/get-user.decorator';
 import { Role, User } from '@prisma/client';
 import { DatabasesService } from '../services/databases.service';
-import { RunQueryDto } from '../models/query.dto';
+import { QueryDto } from '../models/query.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 /**
@@ -105,7 +105,7 @@ export class DatabasesController {
     @ApiResponse({ status: 400, description: 'Invalid query' })
     async runQuery(
         @Param('id', ParseIntPipe) id: number, // Session ID for the database
-        @Body() dto: RunQueryDto
+        @Body() dto: QueryDto
     ) {
         // This operation stays in DatabasesService since it's a database-level operation
         return this.databasesService.runQuery(id, dto.query);

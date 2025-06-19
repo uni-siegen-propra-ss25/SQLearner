@@ -3,6 +3,7 @@ import { PrismaService } from '../../../prisma/prisma.service';
 import { Role, User, ContainerStatus } from '@prisma/client';
 import { SqlErrorException } from '../../../common/exceptions/sql-error.exception';
 import { DockerService } from '../../docker/services/docker.service';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 
 @Injectable()
 export class DatabasesService {
@@ -39,7 +40,14 @@ export class DatabasesService {
         return writeKeywords.some(keyword => upperQuery.includes(keyword));
     }
 
-    async runQuery(databaseId: number, query: string) { //TODO: implement via session 
-        
+    async runQuery(databaseId: number, query: string) { 
+        //TODO: implement via session 
+        return {
+            columns: [],
+            fields: [],
+            rows: [],
+            rowCount: 0,
+            executionTimeMs: 0
+        };
     }
 }

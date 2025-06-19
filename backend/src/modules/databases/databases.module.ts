@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { DatabasesController } from './controllers/databases.controller';
 import { DatabasesService } from './services/databases.service';
 import { PrismaModule } from '../../prisma/prisma.module';
+import { DockerModule } from '../docker/docker.module';
 
 /**
  * Databases Module manages the SQL databases used for learning exercises.
@@ -16,7 +17,7 @@ import { PrismaModule } from '../../prisma/prisma.module';
  * @module DatabasesModule
  */
 @Module({
-    imports: [PrismaModule],
+    imports: [PrismaModule, DockerModule],
     controllers: [DatabasesController],
     providers: [
         DatabasesService

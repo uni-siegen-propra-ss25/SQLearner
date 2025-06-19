@@ -269,15 +269,7 @@ export class ExercisesService {    /**
         id: number,
         answerText: string,
         userId: number,
-    ): Promise<{
-        id: number;
-        exerciseId: number;
-        userId: number;
-        answerText: string;
-        isCorrect: boolean;
-        feedback?: string;
-        createdAt: Date;
-    }> {
+    ) {
         const exercise = await this.getExerciseById(id);
         
         // Unterstützte Aufgabentypen prüfen
@@ -287,7 +279,8 @@ export class ExercisesService {    /**
             throw new BadRequestException(
                 `Exercise type ${exercise.type} wird für Antwortauswertung nicht unterstützt. Unterstützte Typen: Single-Choice, Multiple-Choice, Query.`
             );
-        }let isCorrect = false;
+        }
+        let isCorrect = false;
         let feedback = '';        // Antwort je nach Aufgabentyp evaluieren
         if (exercise.type === ExerciseType.QUERY && exercise.querySolution) {
             try {
@@ -312,17 +305,6 @@ export class ExercisesService {    /**
             ({ isCorrect, feedback } = this.evaluateMultipleChoice(exercise, answerText));
         }
 
-        // Submission in Datenbank erstellen
-        const submission = await this.prisma.submission.create({
-            data: {
-                exerciseId: id,
-                userId,
-                answerText,
-                isCorrect,
-                feedback,
-            },
-        });
-
         // Progress aktualisieren wenn Antwort richtig ist
         if (isCorrect) {
             try {
@@ -336,15 +318,11 @@ export class ExercisesService {    /**
             }
         }
 
-        // Response formatieren (feedback als optional)
         return {
-            id: submission.id,
-            exerciseId: submission.exerciseId,
-            userId: submission.userId,
-            answerText: submission.answerText,
-            isCorrect: submission.isCorrect,
-            feedback: submission.feedback || undefined,
-            createdAt: submission.createdAt,
+            isCorrect,
+            feedback,
+            exerciseId: id,
+            userId
         };
     }
 
