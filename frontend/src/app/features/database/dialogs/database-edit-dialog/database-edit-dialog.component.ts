@@ -25,8 +25,6 @@ export class DatabaseEditDialogComponent {
     ) {
         this.form = this.fb.group({
             name: [data.name, Validators.required],
-            description: [data.description],
-            schemaSql: ['', Validators.required],
         });
 
         this.queryForm = this.fb.group({
@@ -61,28 +59,16 @@ export class DatabaseEditDialogComponent {
 
     onSubmit() {
         if (this.form.valid) {
-            // First update the schema in the database
-            this.databaseService.runQuery(this.data.id, this.form.get('schemaSql')?.value).subscribe({
-                next: () => {
-                    // Then update the record in the Database table
-                    this.databaseService.updateDatabase(this.data.id, this.form.value).subscribe({
-                        next: (database: Database) => {
-                            this.snackBar.open('Database updated successfully', 'Close', {
-                                duration: 3000
-                            });
-                            this.dialogRef.close(database);
-                        },
-                        error: (error: any) => {
-                            console.error('Error updating database:', error);
-                            this.snackBar.open(error.error.message || 'Error updating database', 'Close', {
-                                duration: 5000
-                            });
-                        }
+            this.databaseService.updateDatabase(this.data.id, { name: this.form.value.name }).subscribe({
+                next: (database: Database) => {
+                    this.snackBar.open('Database name updated successfully', 'Close', {
+                        duration: 3000
                     });
+                    this.dialogRef.close(database);
                 },
                 error: (error: any) => {
-                    console.error('Error updating schema:', error);
-                    this.snackBar.open(error.error.message || 'Error updating schema', 'Close', {
+                    console.error('Error updating database:', error);
+                    this.snackBar.open(error.error.message || 'Error updating database', 'Close', {
                         duration: 5000
                     });
                 }

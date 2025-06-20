@@ -2,30 +2,21 @@
   display: block;
 
   mat-dialog-content {
-    min-width: 800px;
-    max-width: 1200px;
+    min-width: 500px;
+    max-width: 800px;
     padding: 24px;
+    overflow-x: hidden;
+    overflow-y: visible;
   }
 }
 
 .full-width {
   width: 100%;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 mat-form-field {
   display: block;
-
-  ::ng-deep {
-    .mat-form-field-wrapper {
-      padding-bottom: 0;
-    }
-    
-    .mat-form-field-flex {
-      background-color: #f8f9fa;
-      border-radius: 4px;
-    }
-  }
 
   &:last-of-type {
     margin-bottom: 0;
@@ -54,7 +45,10 @@ textarea {
   }
 }
 
-mat-dialog-actions {
+.dialog-actions, mat-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
   padding: 16px 24px;
   margin: 0;
   border-top: 1px solid rgba(0, 0, 0, 0.08);
@@ -92,8 +86,8 @@ mat-dialog-actions {
   display: flex;
   flex-direction: column;
   gap: 24px;
-  max-height: 85vh;
-  overflow-y: auto;
+  max-height: none;
+  overflow-y: visible;
   padding: 0 8px;
 }
 

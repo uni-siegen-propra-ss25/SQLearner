@@ -6,6 +6,7 @@ import { DatabaseUploadDialogComponent } from '../../dialogs/database-upload-dia
 import { DatabaseCreateDialogComponent } from '../../dialogs/database-create-dialog/database-create-dialog.component';
 import { DatabaseViewDialogComponent } from '../../dialogs/database-view-dialog/database-view-dialog.component';
 import { AuthService } from 'app/features/auth/services/auth.service';
+import { DatabaseEditDialogComponent } from '../../dialogs/database-edit-dialog/database-edit-dialog.component';
 
 @Component({
     selector: 'app-database-list',
@@ -73,5 +74,16 @@ export class DatabaseListComponent implements OnInit {
                 (error) => console.error('Error deleting database:', error),
             );
         }
+    }
+
+    openEditDialog(database: Database): void {
+        const dialogRef = this.dialog.open(DatabaseEditDialogComponent, {
+            data: database
+        });
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                this.loadDatabases();
+            }
+        });
     }
 }

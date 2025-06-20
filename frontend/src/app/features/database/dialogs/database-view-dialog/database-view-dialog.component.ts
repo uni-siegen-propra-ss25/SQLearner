@@ -58,8 +58,7 @@ export class DatabaseViewDialogComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     // Set initial query to show all tables in the database
-    const initialQuery = 'SELECT table_name FROM information_schema.tables WHERE table_schema = \'public\' AND table_type = \'BASE TABLE\' ORDER BY table_name;';
-    
+    const initialQuery = '';
     this.queryForm.patchValue({ query: initialQuery });
   }
 

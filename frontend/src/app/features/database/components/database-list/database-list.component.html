@@ -25,6 +25,10 @@
       </mat-card-content>
 
       <mat-card-actions align="end" (click)="$event.stopPropagation()">
+        <button mat-button color="primary" (click)="openEditDialog(database)">
+          <mat-icon>edit</mat-icon>
+          Bearbeiten
+        </button>
         <button mat-button color="warn" (click)="deleteDatabase(database.id)">
           <mat-icon>delete</mat-icon>
           Löschen
