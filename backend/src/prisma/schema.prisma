@@ -73,12 +73,11 @@ model User {
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
 
-  submissions  Submission[]
-  progress     Progress[]
-  bookmarks    Bookmark[]
+  progress            Progress[]
+  bookmarks           Bookmark[]
 
-  Database Database[]
-  messages ChatMessage[]
+  dbSessions          DbSession[]
+  messages            ChatMessage[]
 }
 
 /// System settings for the application

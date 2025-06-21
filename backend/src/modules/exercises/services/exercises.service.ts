@@ -247,7 +247,7 @@ export class ExercisesService {    /**
         
         const result = await this.databasesService.runQuery(exercise.database.id, query);
         return {
-            columns: result.fields ? result.fields.map((f: any) => f.name) : [],
+            columns: result.columns ? result.columns.map((f: any) => f.name) : [],
             rows: result.rows,
         };
     }    

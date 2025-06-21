@@ -1,9 +1,13 @@
 import { Injectable, ForbiddenException, NotFoundException, Logger } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { Role, User, ContainerStatus } from '@prisma/client';
+import { Role, User, ContainerStatus, Database } from '@prisma/client';
 import { SqlErrorException } from '../../../common/exceptions/sql-error.exception';
 import { DockerService } from '../../docker/services/docker.service';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { Pool } from 'pg';
+import { DatabaseDto } from '../models/database.dto';
+import { CreateDatabaseDto } from '../models/create-database.dto';
+import { UpdateDatabaseDto } from '../models/update-database.dto';
 
 @Injectable()
 export class DatabasesService {
@@ -20,8 +24,96 @@ export class DatabasesService {
         });
     }
 
-    async createDatabase(dto: CreateDatabaseDto, userId: number, userRole: Role | string) {
-        if (String(userRole).toUpperCase() !== 'TUTOR') {
+    async getAllDatabases() {
+        
+    }
+
+    async getDatabaseById(id: number) {
+        const database = await this.prisma.database.findUnique({
+            where: { id },
+        });
+
+        if (!database) {
+            throw new NotFoundException(`Database with ID ${id} not found`);
+        }
+
+        return database;
+    }
+
+    async uploadDatabase(file: Express.Multer.File, user: User) {
+        if (user.role !== Role.TUTOR) {
+            throw new ForbiddenException('Only tutors can upload SQL files');
+        }
+
+        const schema = file.buffer.toString();
+
+        // Create a record in the Database table
+        const database = await this.prisma.database.create({
+            data: {
+                name: file.originalname,
+                description: 'Uploaded SQL file',
+                schemaSql: schema
+            },
+        });
+
+        try {
+            // Create a new PostgreSQL database
+            const dbName = `db_${database.id}_${file.originalname.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
+            
+            // Connect to default database to create new database
+            const adminPool = new Pool({
+                host: process.env.DB_HOST,
+                port: parseInt(process.env.DB_PORT || '5432', 10),
+                user: process.env.DB_USER,
+                password: process.env.DB_PASSWORD,
+                database: process.env.DB_NAME
+            });
+
+            // Create the new database
+            await adminPool.query(`CREATE DATABASE "${dbName}"`);
+            console.log(`Database ${dbName} created successfully`);
+
+            // Close admin connection
+            await adminPool.end();
+
+            // Update the database record with the actual database name
+            await this.prisma.database.update({
+                where: { id: database.id },
+                data: { 
+                    schemaSql: dbName // Store the actual database name instead of SQL schema
+                }
+            });
+
+            // Execute SQL schema from file in the new database
+            if (schema && schema.trim()) {
+                const newDbPool = new Pool({
+                    host: process.env.DB_HOST,
+                    port: parseInt(process.env.DB_PORT || '5432', 10),
+                    user: process.env.DB_USER,
+                    password: process.env.DB_PASSWORD,
+                    database: dbName
+                });
+
+                await newDbPool.query(schema);
+                console.log('SQL schema from file executed successfully in new database');
+                await newDbPool.end();
+            }
+
+        } catch (error) {
+            console.error('Error creating database from file:', error);
+            // Delete the database record if creation fails
+            await this.prisma.database.delete({
+                where: { id: database.id },
+            });
+            throw error;
+        }
+
+        return database;
+    }
+
+    async createDatabase(dto: CreateDatabaseDto, user: User) {
+        
+        if (user.role !== Role.TUTOR) {
             throw new ForbiddenException('Only tutors can create databases');
         }
 
@@ -30,8 +122,7 @@ export class DatabasesService {
             data: {
                 name: dto.name,
                 description: dto.description,
-                schemaSql: dto.schemaSql || '',
-                ownerId: userId,
+                schemaSql: dto.schemaSql || ''
             },
         });
 
@@ -120,33 +211,16 @@ export class DatabasesService {
         return database;
     }
 
-    async getAllDatabases() {
-        
-    }
-
-    async getDatabaseById(id: number) {
-        const database = await this.prisma.database.findUnique({
-            where: { id },
-        });
-
-        if (!database) {
-            throw new NotFoundException(`Database with ID ${id} not found`);
-        }
-
-        return database;
-    }
-
     async updateDatabase(
         id: number,
         dto: UpdateDatabaseDto,
-        userId: number,
-        userRole: Role | string,
+        user: User,
     ) {
-        const database = await this.getDatabaseById(id);
-
-        if (String(userRole).toUpperCase() !== 'TUTOR' || database.ownerId !== userId) {
-            throw new ForbiddenException('Only the creator tutor can update this database');
+        if (user.role !== Role.TUTOR) {
+            throw new ForbiddenException('Only tutors can update databases');
         }
+        
+        const database = await this.getDatabaseById(id);
 
         // Only update name and description, not schemaSql (which contains the database name)
         const updateData: any = {};
@@ -159,12 +233,8 @@ export class DatabasesService {
         });
     }
 
-    async deleteDatabase(id: number, userId: number, userRole: Role | string) {
+    async deleteDatabase(id: number, user: User) {
         const database = await this.getDatabaseById(id);
-
-        if (String(userRole).toUpperCase() !== 'TUTOR' || database.ownerId !== userId) {
-            throw new ForbiddenException('Only the creator tutor can delete this database');
-        }
 
         try {
             // Get database name from schemaSql field
@@ -242,78 +312,6 @@ export class DatabasesService {
             'chatmessage'
         ];
         return systemTables.includes(tableName.toLowerCase());
-    }
-
-    async uploadSqlFile(file: Express.Multer.File, userId: number, userRole: Role | string) {
-        if (String(userRole).toUpperCase() !== 'TUTOR') {
-            throw new ForbiddenException('Only tutors can upload SQL files');
-        }
-
-        const schema = file.buffer.toString();
-
-        // Create a record in the Database table
-        const database = await this.prisma.database.create({
-            data: {
-                name: file.originalname,
-                description: 'Uploaded SQL file',
-                schemaSql: schema,
-                ownerId: userId,
-            },
-        });
-
-        try {
-            // Create a new PostgreSQL database
-            const dbName = `db_${database.id}_${file.originalname.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
-            
-            // Connect to default database to create new database
-            const adminPool = new Pool({
-                host: process.env.DB_HOST,
-                port: parseInt(process.env.DB_PORT || '5432', 10),
-                user: process.env.DB_USER,
-                password: process.env.DB_PASSWORD,
-                database: process.env.DB_NAME
-            });
-
-            // Create the new database
-            await adminPool.query(`CREATE DATABASE "${dbName}"`);
-            console.log(`Database ${dbName} created successfully`);
-
-            // Close admin connection
-            await adminPool.end();
-
-            // Update the database record with the actual database name
-            await this.prisma.database.update({
-                where: { id: database.id },
-                data: { 
-                    schemaSql: dbName // Store the actual database name instead of SQL schema
-                }
-            });
-
-            // Execute SQL schema from file in the new database
-            if (schema && schema.trim()) {
-                const newDbPool = new Pool({
-                    host: process.env.DB_HOST,
-                    port: parseInt(process.env.DB_PORT || '5432', 10),
-                    user: process.env.DB_USER,
-                    password: process.env.DB_PASSWORD,
-                    database: dbName
-                });
-
-                await newDbPool.query(schema);
-                console.log('SQL schema from file executed successfully in new database');
-                await newDbPool.end();
-            }
-
-        } catch (error) {
-            console.error('Error creating database from file:', error);
-            // Delete the database record if creation fails
-            await this.prisma.database.delete({
-                where: { id: database.id },
-            });
-            throw error;
-        }
-
-        return database;
     }
 
     /**

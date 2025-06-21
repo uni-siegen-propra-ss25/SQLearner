@@ -3,8 +3,8 @@ import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Exercise, ExerciseType, Difficulty, AnswerOption } from '../../models/exercise.model';
-import { Database } from 'app/features/databases/models/database.model';
-import { DatabaseService } from 'app/features/databases/services/database.service';
+import { Database } from 'app/features/database/models/database.model';
+import { DatabaseService } from 'app/features/database/services/database.service';
 
 @Component({
     selector: 'app-exercise-dialog',

@@ -1,17 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-<<<<<<< HEAD:frontend/src/../../../databases/models/database.modelnents/database-list/database-list.component.ts
-=======../../../databases/services/database.service
-import { Router } from '@angular/router';../../../databases/dialogs/database-upload-dialog/database-upload-dialog.component
-import { AuthService } from 'app/features/auth/../../../databases/dialogs/database-create-dialog/database-create-dialog.component
->>>>>>> develop:frontend/src/app/features/databases/components/database-list/database-list.component.ts
-import { Database } from '../../models/database.model';
-import { DatabaseService } from '../../servic../../../databases/dialogs/database-edit-dialog/database-edit-dialog.component
-import { DatabaseUploadDialogComponent } from '../../dialogs/database-upload-dialog/database-upload-dialog.component';
-import { DatabaseCreateDialogComponent } from '../../dialogs/database-create-dialog/database-create-dialog.component';
-import { DatabaseViewDialogComponent } from '../../dialogs/database-view-dialog/database-view-dialog.component';
+import { Router } from '@angular/router';
 import { AuthService } from 'app/features/auth/services/auth.service';
+import { DatabaseCreateDialogComponent } from '../../dialogs/database-create-dialog/database-create-dialog.component';
 import { DatabaseEditDialogComponent } from '../../dialogs/database-edit-dialog/database-edit-dialog.component';
+import { DatabaseViewDialogComponent } from '../../dialogs/database-view-dialog/database-view-dialog.component';
+import { Database } from '../../models/database.model';
+import { DatabaseService } from '../../services/database.service';
 
 @Component({
     selector: 'app-database-list',
@@ -46,7 +41,7 @@ export class DatabaseListComponent implements OnInit {
     }
 
     openUploadDialog(): void {
-        const dialogRef = this.dialog.open(DatabaseUploadDialogComponent);
+        const dialogRef = this.dialog.open(DatabaseEditDialogComponent);
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
                 this.loadDatabases();
@@ -82,7 +77,6 @@ export class DatabaseListComponent implements OnInit {
         }
     }
 
-<<<<<<< HEAD:frontend/src/app/features/database/components/database-list/database-list.component.ts
     openEditDialog(database: Database): void {
         const dialogRef = this.dialog.open(DatabaseEditDialogComponent, {
             data: database
@@ -92,9 +86,5 @@ export class DatabaseListComponent implements OnInit {
                 this.loadDatabases();
             }
         });
-=======
-    viewDatabase(database: Database) {
-        this.router.navigate(['/databases', database.id]);
->>>>>>> develop:frontend/src/app/features/databases/components/database-list/database-list.component.ts
     }
 }

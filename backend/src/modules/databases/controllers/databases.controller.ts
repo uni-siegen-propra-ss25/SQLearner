@@ -16,10 +16,12 @@ import { JwtAuthGuard } from '../../../common/guards/jwt-auth/jwt-auth.guard';
 import { RolesGuard } from '../../../common/guards/role/role.guard';
 import { Roles } from '../../../common/decorators/role.decorator';
 import { GetUser } from '../../../common/decorators/get-user.decorator';
-import { Role, User } from '@prisma/client';
+import { Database, Role, User } from '@prisma/client';
 import { DatabasesService } from '../services/databases.service';
 import { QueryDto } from '../models/query.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { CreateDatabaseDto } from '../models/create-database.dto';
+import { UpdateDatabaseDto } from '../models/update-database.dto';
 
 /**
  * Controller managing database operations for the SQL learning system.
@@ -36,19 +38,6 @@ export class DatabasesController {
     constructor(
         private readonly databasesService: DatabasesService,
     ) {}
-
-    @Post('upload')
-    @Roles(Role.TUTOR)
-    @ApiConsumes('multipart/form-data')
-    @UseInterceptors(FileInterceptor('file'))
-    @ApiOperation({ summary: 'Upload SQL file to create database' })
-    @ApiResponse({ status: 201, description: 'SQL file uploaded and database created successfully' })
-    async uploadDatabase(
-        @UploadedFile() file: Express.Multer.File,
-        @GetUser() user: User,
-    ) {
-        return this.databasesService.createDatabase(file, user);
-    }
 
     @Get()
     @Roles(Role.TUTOR)
@@ -70,10 +59,23 @@ export class DatabasesController {
     @ApiOperation({ summary: 'Create a new empty database' })
     @ApiResponse({ status: 201, description: 'Database created successfully' })
     async createDatabase(
-        @Body() file: Express.Multer.File,
+        @Body() dto: CreateDatabaseDto,
         @GetUser() user: User,
     ) {
-        return this.databasesService.createDatabase(file, user);
+        return this.databasesService.createDatabase(dto, user);
+    }
+
+    @Post('upload')
+    @Roles(Role.TUTOR)
+    @ApiConsumes('multipart/form-data')
+    @UseInterceptors(FileInterceptor('file'))
+    @ApiOperation({ summary: 'Upload SQL file to create database' })
+    @ApiResponse({ status: 201, description: 'SQL file uploaded and database created successfully' })
+    async uploadDatabase(
+        @UploadedFile() file: Express.Multer.File,
+        @GetUser() user: User,
+    ) {
+        return this.databasesService.uploadDatabase(file, user);
     }
 
     @Put(':id')
@@ -83,9 +85,9 @@ export class DatabasesController {
     async updateDatabase(
         @Param('id', ParseIntPipe) databaseId: number,
         @GetUser() user: User,
-        @Body() file: Express.Multer.File,
+        @Body() dto: UpdateDatabaseDto, 
     ) {
-        return this.databasesService.updateDatabase(databaseId, user, file);
+        return this.databasesService.updateDatabase(databaseId, dto, user);
     }
 
     @Delete(':id')
