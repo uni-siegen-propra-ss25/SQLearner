@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DatabasesRoutingModule } from './databases-routing.module';
+import { DatabasesRoutingModule } from './database-routing.module';
 import { MaterialModule } from 'app/material.module';
 import { DatabaseListComponent } from './components/database-list/database-list.component';
-import { DatabaseDetailComponent } from './components/database-detail/database-detail.component';
-import { ErDiagramComponent } from './components/er-diagram/er-diagram.component';
+import { DatabaseDetailComponent } from '../databases/components/database-detail/database-detail.component';
+import { ErDiagramComponent } from '../databases/components/er-diagram/er-diagram.component';
 import { DatabaseTableViewerComponent } from './components/database-table-viewer/database-table-viewer.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DatabaseEditDialogComponent } from './dialogs/database-edit-dialog/database-edit-dialog.component';
@@ -39,4 +39,4 @@ import { DataEditDialogComponent } from './dialogs/data-edit-dialog/data-edit-di
         DatabasesRoutingModule
     ]
 })
-export class DatabasesModule { }
+export class DatabaseModule { }
