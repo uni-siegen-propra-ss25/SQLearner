@@ -1,0 +1,75 @@
+.database-detail-container {
+    padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 48px);
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin: 0 0 24px 0;
+        padding: 0;
+
+        .header-main {
+            flex: 1;
+            margin-right: 24px;
+
+            .header-content {
+                h1 {
+                    margin: 0 0 8px 0;
+                    font-size: 1.5rem;
+                    color: rgba(0, 0, 0, 0.87);
+                    line-height: 1;
+                }
+
+                .description {
+                    margin: 0 0 12px 0;
+                    color: rgba(0, 0, 0, 0.6);
+                    font-size: 14px;
+                    line-height: 1.5;
+                }
+
+                .meta-info {
+                    display: flex;
+                    gap: 24px;
+                    color: rgba(0, 0, 0, 0.6);
+                    font-size: 14px;
+
+                    span {
+                        display: flex;
+                        align-items: center;
+
+                        mat-icon {
+                            font-size: 18px;
+                            width: 18px;
+                            height: 18px;
+                            margin-right: 6px;
+                        }
+                    }
+                }
+            }
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+
+            button {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+        }
+    }
+
+    .table-viewer-container {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        flex: 1;
+        min-height: 0;
+    }
+}

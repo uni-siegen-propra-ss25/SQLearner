@@ -43,20 +43,35 @@ enum MessageSender {
   assistant
 }
 
-// Models
+/// Container status type
+enum ContainerStatus {
+  CREATING    // Initial setup
+  RUNNING     // Ready for queries
+  FAILED      // Error occurred
+  FINISHED    // Task completed
+  RESTARTING  // Being reset
+}
+
+/// Container health status
+enum ContainerHealth {
+  HEALTHY     // Container is functioning properly
+  UNHEALTHY   // Container has health check failures
+  STARTING    // Container is initializing
+  UNKNOWN     // Health status cannot be determined
+}
 
 /// Application users
 model User {
-  id           Int       @id @default(autoincrement())  
-  email        String    @unique
-  password     String
-  firstName    String
-  lastName     String
-  role         Role   @default(STUDENT)
-  matriculationNumber String? @unique
+  id                  Int          @id @default(autoincrement())  
+  email               String       @unique
+  password            String
+  firstName           String
+  lastName            String
+  role                Role         @default(STUDENT)
+  matriculationNumber String?      @unique
 
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
 
   submissions  Submission[]
   progress     Progress[]
@@ -64,6 +79,14 @@ model User {
 
   Database Database[]
   messages ChatMessage[]
+}
+
+/// System settings for the application
+model Settings {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  value       String   // JSON string for complex settings
+  description String? 
 }
 
 /// Chat messages between users and the AI assistant
@@ -85,41 +108,76 @@ model ChatMessage {
 
 /// Imported or self-created database definitions
 model Database {
-  id          Int       @id @default(autoincrement())
+  id          Int          @id @default(autoincrement())
   name        String
   description String?
+  schemaSql   String       // SQL schema definition
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 
-  schemaSql   String?    // original SQL dump - full CREATE TABLE / INSERT statements
-
-  ownerId Int
-  owner   User @relation(fields: [ownerId], references: [id])
-
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-
+  // Relations
   exercises   Exercise[]
 }
 
 /// Top-level grouping of chapters (e.g. "Relational Algebra", "Joins")
-model Chapter{
+model Chapter {
   id          Int       @id @default(autoincrement())
   title       String
   description String?
-  order       Int        @default(0)
+  order       Int       @default(0)
 
-  topics    Topic[]
+  topics      Topic[]
 }
 
 /// Subdivision innerhalb eines Chapters (z.B. "JOIN variants")
 model Topic {
-  id           Int          @id @default(autoincrement())
-  chapterId    Int
-  title        String
-  description  String?
-  order       Int          @default(0)
+  id          Int       @id @default(autoincrement())
+  chapterId   Int
+  title       String
+  description String?
+  order       Int       @default(0)
 
-  chapter      Chapter      @relation(fields: [chapterId], references: [id])
-  exercises    Exercise[]
+  chapter     Chapter   @relation(fields: [chapterId], references: [id])
+  exercises   Exercise[]
+}
+
+/// Isolated DB session/container for SQL execution
+model DbSession {
+  id            Int             @id @default(autoincrement())
+  containerId   String         // Docker container ID
+  status        ContainerStatus @default(CREATING)
+  startedAt     DateTime       @default(now())
+  endedAt       DateTime?
+  
+  // Essential container details
+  port          Int?          // Assigned database port
+  host          String?       // Container host address
+  dbUser        String?       // Database credentials
+  dbPassword    String?
+  
+  // Relations
+  exerciseId    Int           // Exercise for initialization
+  userId        Int           // Session owner
+  
+  // Error tracking
+  lastError     String?       // Last error message
+  restartCount  Int          @default(0)
+  
+  // Cleanup
+  autoRemove    Boolean      @default(true)
+  timeoutMins   Int         @default(60)
+
+  // Relations
+  exercise      Exercise      @relation(fields: [exerciseId], references: [id])
+  user          User          @relation(fields: [userId], references: [id])
+
+  // Essential indexes
+  @@index([containerId])
+  @@index([userId])
+  @@index([status])
+  
+  // Ensure user can only have one active session per exercise
+  @@unique([userId, exerciseId])
 }
 
 /// Core exercise entity
@@ -134,16 +192,16 @@ model Exercise {
 
   database        Database?       @relation(fields: [databaseId], references: [id])
   databaseId      Int?            // only for SQL_QUERY
-  querySolution     String?         // Direct SQL solution for SQL_QUERY type
+  querySolution   String?         // Direct SQL solution for SQL_QUERY type
 
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
 
   topic           Topic           @relation(fields: [topicId], references: [id])
   answers         AnswerOption[]  @relation("ExerciseAnswers")
-  submissions     Submission[]
   bookmarks       Bookmark[]
   Progress        Progress[]
+  dbSessions      DbSession[]     // Add relation to DbSession
 }
 
 /// Single/Multiple-Choice options
@@ -157,45 +215,15 @@ model AnswerOption {
   exercise    Exercise  @relation("ExerciseAnswers", fields: [exerciseId], references: [id])
 }
 
-/// A student's submission on an exercise
-model Submission {
-  id             Int      @id @default(autoincrement())
-
-  userId         Int
-  exerciseId     Int
-
-  answerText     String      // SQL text, chosen option IDs, or free text
-  isCorrect      Boolean     @default(false)
-  feedback       String?     // LLM-generated feedback
-  createdAt      DateTime    @default(now())
-
-  user          User      @relation(fields: [userId], references: [id])
-  exercise      Exercise  @relation(fields: [exerciseId], references: [id])
-
-  session        DbSession?
-}
-
-/// Isolated DB session/container for SQL execution
-model DbSession {
-  id            Int      @id @default(autoincrement())
-  submissionId  Int      @unique
-  containerId   String      // e.g. Docker container name or ID
-  status        String      // "running" | "finished" | "failed"
-  startedAt     DateTime    @default(now())
-  endedAt       DateTime?
-
-  submission    Submission  @relation(fields: [submissionId], references: [id])
-}
-
 /// Bookmark that a user sets on an exercise to revisit later
 model Bookmark {
   id          Int       @id @default(autoincrement())
   userId      Int
   exerciseId  Int
-  createdAt   DateTime   @default(now())
+  createdAt   DateTime  @default(now())
 
-  user        User       @relation(fields: [userId], references: [id])
-  exercise    Exercise   @relation(fields: [exerciseId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
+  exercise    Exercise  @relation(fields: [exerciseId], references: [id])
 
   @@unique([userId, exerciseId])
 }
@@ -205,14 +233,39 @@ model Progress {
   id            Int       @id @default(autoincrement())
   userId        Int
   exerciseId    Int
-  attempts      Int        @default(0)
-  lastAttemptAt DateTime   @updatedAt
+  attempts      Int       @default(0)
+  lastAttemptAt DateTime  @updatedAt
 
   isPassed      Boolean   @default(false)
   passedAt      DateTime? 
 
-  user          User       @relation(fields: [userId], references: [id])
-  exercise      Exercise   @relation(fields: [exerciseId], references: [id])
+  user          User      @relation(fields: [userId], references: [id])
+  exercise      Exercise  @relation(fields: [exerciseId], references: [id])
 
   @@unique([userId, exerciseId])
+}
+
+model fragen {
+  id              Int      @id @default(autoincrement())
+  student_name    String
+  frage           String
+  antwort         String?
+  antwort_von     String?
+  erstellt_am     DateTime @db.Timestamp(6)
+  ist_archiviert  Boolean
+  ist_angepinnt   Boolean
+  ist_geloescht   Boolean
+  ist_beantwortet Boolean
+}
+
+model hint {
+  id   Int    @id @default(autoincrement())
+  text String
+}
+
+model todos {
+  id   Int     @id @default(autoincrement())
+  text String
+  done Boolean @default(false)
+  role String?
 }

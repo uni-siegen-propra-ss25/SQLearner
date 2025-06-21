@@ -1,0 +1,133 @@
+<h2 mat-dialog-title>Neue Tabelle erstellen</h2>
+<form [formGroup]="tableForm" (ngSubmit)="onSubmit()">
+  <mat-dialog-content>
+    <!-- Table Name -->
+    <mat-form-field class="full-width">
+      <mat-label>Tabellenname</mat-label>
+      <input matInput formControlName="name" required>
+      <mat-error *ngIf="tableForm.get('name')?.errors?.['pattern']">
+        Der Name muss mit einem Buchstaben beginnen und darf nur Buchstaben, Zahlen und Unterstriche enthalten
+      </mat-error>
+      <mat-error *ngIf="tableForm.get('name')?.errors?.['required']">
+        Tabellenname ist erforderlich
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Table Description -->
+    <mat-form-field class="full-width">
+      <mat-label>Beschreibung</mat-label>
+      <textarea matInput formControlName="description" rows="2"></textarea>
+    </mat-form-field>
+
+    <!-- Columns -->
+    <div formArrayName="columns" class="columns-container">
+      <h3>Spalten</h3>
+      <div *ngFor="let column of columns.controls; let i=index" [formGroupName]="i" class="column-row">
+        <!-- Column Name -->
+        <mat-form-field>
+          <mat-label>Name</mat-label>
+          <input matInput formControlName="name" required>
+          <mat-error *ngIf="getColumnAsFormGroup(i).get('name')?.errors?.['pattern']">
+            Der Name muss mit einem Buchstaben beginnen und darf nur Buchstaben, Zahlen und Unterstriche enthalten
+          </mat-error>
+          <mat-error *ngIf="getColumnAsFormGroup(i).get('name')?.errors?.['required']">
+            Spaltenname ist erforderlich
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Data Type -->
+        <mat-form-field>
+          <mat-label>Typ</mat-label>
+          <mat-select formControlName="type" required>
+            <mat-option *ngFor="let type of sqlTypes" [value]="type">{{type}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Type Metadata -->
+        <ng-container *ngIf="showMetadataFields(getColumnAsFormGroup(i))" formGroupName="metadata">
+          <mat-form-field *ngIf="needsMetadata(getColumnAsFormGroup(i).get('type')?.value)?.maxLength">
+            <mat-label>Maximale Länge</mat-label>
+            <input matInput type="number" formControlName="maxLength" min="1" max="65535">
+            <mat-error *ngIf="getColumnAsFormGroup(i).errors?.['invalidMaxLength']">
+              Die Maximallänge muss zwischen 1 und 65535 liegen
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field *ngIf="needsMetadata(getColumnAsFormGroup(i).get('type')?.value)?.precision">
+            <mat-label>Präzision</mat-label>
+            <input matInput type="number" formControlName="precision" min="1" max="65">
+            <mat-error *ngIf="getColumnAsFormGroup(i).errors?.['invalidPrecision']">
+              Die Präzision muss zwischen 1 und 65 liegen
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field *ngIf="needsMetadata(getColumnAsFormGroup(i).get('type')?.value)?.scale">
+            <mat-label>Nachkommastellen</mat-label>
+            <input matInput type="number" formControlName="scale" min="0" max="30">
+            <mat-error *ngIf="getColumnAsFormGroup(i).errors?.['invalidScale']">
+              Die Nachkommastellen müssen zwischen 0 und 30 liegen
+            </mat-error>
+            <mat-error *ngIf="getColumnAsFormGroup(i).errors?.['scaleExceedsPrecision']">
+              Die Nachkommastellen dürfen nicht größer als die Präzision sein
+            </mat-error>
+          </mat-form-field>
+        </ng-container>
+
+        <!-- Constraints and Options -->
+        <div class="checkbox-group">
+          <mat-checkbox formControlName="isPrimaryKey">Primärschlüssel</mat-checkbox>
+          <mat-checkbox formControlName="nullable">Nullwerte erlauben</mat-checkbox>
+          <mat-checkbox formControlName="isForeignKey">Fremdschlüssel</mat-checkbox>
+          <mat-checkbox *ngIf="canBeAutoIncrement(getColumnAsFormGroup(i).get('type')?.value)"
+                      formControlName="autoIncrement">Auto-Increment</mat-checkbox>
+        </div>
+
+        <!-- Foreign Key References -->
+        <div *ngIf="getColumnAsFormGroup(i).get('isForeignKey')?.value" class="foreign-key-group">
+          <mat-form-field>
+            <mat-label>Referenzierte Tabelle</mat-label>
+            <input matInput formControlName="referencesTable" required>
+            <mat-error *ngIf="getColumnAsFormGroup(i).errors?.['referencesTableRequired']">
+              Referenzierte Tabelle ist erforderlich
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Referenzierte Spalte</mat-label>
+            <input matInput formControlName="referencesColumn" required>
+            <mat-error *ngIf="getColumnAsFormGroup(i).errors?.['referencesColumnRequired']">
+              Referenzierte Spalte ist erforderlich
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Default Value -->
+        <mat-form-field>
+          <mat-label>Standardwert</mat-label>
+          <input matInput formControlName="defaultValue">
+        </mat-form-field>
+
+        <!-- Add bottom padding to accommodate the delete button -->
+        <div style="height: 44px;"></div>
+
+        <!-- Delete Column Button -->
+        <button mat-icon-button class="delete-button" type="button" (click)="removeColumn(i)" 
+                [disabled]="columns.length <= 1"
+                matTooltip="Spalte löschen">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+      
+      <!-- Add Column Button -->
+      <button mat-stroked-button type="button" (click)="addColumn()" class="add-column-button">
+        <mat-icon>add</mat-icon> Spalte hinzufügen
+      </button>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="cancel()">Abbrechen</button>
+    <button mat-raised-button color="primary" type="submit" 
+            [disabled]="!tableForm.valid">Erstellen</button>
+  </mat-dialog-actions>
+</form>

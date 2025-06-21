@@ -1,24 +1,9 @@
-import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
+import { Injectable, ForbiddenException, NotFoundException, Logger } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { CreateDatabaseDto } from '../models/create-database.dto';
-import { UpdateDatabaseDto } from '../models/update-database.dto';
-import { Role } from '@prisma/client';
-import { Pool } from 'pg';
+import { Role, User, ContainerStatus } from '@prisma/client';
 import { SqlErrorException } from '../../../common/exceptions/sql-error.exception';
-
-// Add interface for PostgreSQL error
-interface PostgresError extends Error {
-    code: string;
-    detail?: string;
-    hint?: string;
-    position?: string;
-    where?: string;
-    schema?: string;
-    table?: string;
-    column?: string;
-    dataType?: string;
-    constraint?: string;
-}
+import { DockerService } from '../../docker/services/docker.service';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 
 @Injectable()
 export class DatabasesService {
@@ -136,11 +121,7 @@ export class DatabasesService {
     }
 
     async getAllDatabases() {
-        return this.prisma.database.findMany({
-            orderBy: {
-                createdAt: 'desc',
-            },
-        });
+        
     }
 
     async getDatabaseById(id: number) {

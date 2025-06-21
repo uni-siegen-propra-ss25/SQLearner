@@ -5,6 +5,7 @@ import { UpdateExerciseDto } from '../models/update-exercise.dto';
 import { Exercise, ExerciseType } from '@prisma/client';
 import { DatabasesService } from '../../databases/services/databases.service';
 import { ProgressService } from '../../progress/services/progress.service';
+import { SqlEvaluationService } from '../../sql-evaluation/services/sql-evaluation.service';
 
 /**
  * Service handling business logic for exercise-related operations.
@@ -15,18 +16,19 @@ import { ProgressService } from '../../progress/services/progress.service';
  * @class ExercisesService
  */
 @Injectable()
-export class ExercisesService {
-    /**
+export class ExercisesService {    /**
      * Erstellt eine neue Instanz des ExercisesService.
      * 
      * @param {PrismaService} prisma - Prisma ORM Service für Datenbankoperationen
      * @param {DatabasesService} databasesService - Service für SQL Query-Ausführung
      * @param {ProgressService} progressService - Service für Lernfortschritt-Tracking
+     * @param {SqlEvaluationService} sqlEvaluationService - Service für automatische SQL-Query-Bewertung
      */
     constructor(
         private readonly prisma: PrismaService,
         private readonly databasesService: DatabasesService,
         private readonly progressService: ProgressService,
+        private readonly sqlEvaluationService: SqlEvaluationService,
     ) {}
 
     /**
@@ -243,16 +245,21 @@ export class ExercisesService {
             throw new NotFoundException('Exercise has no associated database');
         }        
         
-        return this.databasesService.runQuery(exercise.database.id, query);
-    }
-
+        const result = await this.databasesService.runQuery(exercise.database.id, query);
+        return {
+            columns: result.fields ? result.fields.map((f: any) => f.name) : [],
+            rows: result.rows,
+        };
+    }    
+    
     /**
-     * Submits an answer for Single Choice and Multiple Choice exercises.
+     * Submits an answer for exercises.
      * Evaluates the answer for correctness and saves progress to database.
+     * Supports SQL Query, Single Choice, and Multiple Choice exercises.
      * Provides instant feedback with German messages and updates user progress for correct answers.
      *
      * @param {number} id - The ID of the exercise to submit an answer for
-     * @param {string} answerText - The answer text (selected option IDs for choice exercises)
+     * @param {string} answerText - The answer text (SQL query for QUERY exercises, selected option IDs for choice exercises)
      * @param {number} userId - The ID of the user submitting the answer
      * @returns {Promise<{id: number; exerciseId: number; userId: number; answerText: string; isCorrect: boolean; feedback?: string; createdAt: Date}>} Promise resolving to the submission record with evaluation results
      * @throws {NotFoundException} if the exercise does not exist
@@ -262,45 +269,41 @@ export class ExercisesService {
         id: number,
         answerText: string,
         userId: number,
-    ): Promise<{
-        id: number;
-        exerciseId: number;
-        userId: number;
-        answerText: string;
-        isCorrect: boolean;
-        feedback?: string;
-        createdAt: Date;
-    }> {
+    ) {
         const exercise = await this.getExerciseById(id);
         
-        // Nur Single Choice und Multiple Choice Aufgaben behandeln
+        // Unterstützte Aufgabentypen prüfen
         if (exercise.type !== ExerciseType.SINGLE_CHOICE && 
-            exercise.type !== ExerciseType.MULTIPLE_CHOICE) {
+            exercise.type !== ExerciseType.MULTIPLE_CHOICE &&
+            exercise.type !== ExerciseType.QUERY) {
             throw new BadRequestException(
-                `Exercise type ${exercise.type} wird für Antwortauswertung nicht unterstützt. Nur Single-Choice und Multiple-Choice Aufgaben werden behandelt.`
+                `Exercise type ${exercise.type} wird für Antwortauswertung nicht unterstützt. Unterstützte Typen: Single-Choice, Multiple-Choice, Query.`
             );
         }
-
         let isCorrect = false;
-        let feedback = '';
-
-        // Antwort je nach Aufgabentyp evaluieren
-        if (exercise.type === ExerciseType.SINGLE_CHOICE) {
+        let feedback = '';        // Antwort je nach Aufgabentyp evaluieren
+        if (exercise.type === ExerciseType.QUERY && exercise.querySolution) {
+            try {
+                // Automatische SQL-Bewertung
+                const evaluation = await this.sqlEvaluationService.evaluateQuery(
+                    answerText,
+                    exercise.querySolution,
+                    exercise.databaseId!
+                );
+                
+                isCorrect = evaluation.isCorrect;
+                feedback = evaluation.feedback;
+                
+            } catch (error) {
+                console.error('SQL evaluation failed:', error);
+                isCorrect = false;
+                feedback = 'Automatische Bewertung fehlgeschlagen. Ein Tutor wird Ihre Lösung prüfen.';
+            }
+        } else if (exercise.type === ExerciseType.SINGLE_CHOICE) {
             ({ isCorrect, feedback } = this.evaluateSingleChoice(exercise, answerText));
         } else if (exercise.type === ExerciseType.MULTIPLE_CHOICE) {
             ({ isCorrect, feedback } = this.evaluateMultipleChoice(exercise, answerText));
         }
-
-        // Submission in Datenbank erstellen
-        const submission = await this.prisma.submission.create({
-            data: {
-                exerciseId: id,
-                userId,
-                answerText,
-                isCorrect,
-                feedback,
-            },
-        });
 
         // Progress aktualisieren wenn Antwort richtig ist
         if (isCorrect) {
@@ -315,15 +318,11 @@ export class ExercisesService {
             }
         }
 
-        // Response formatieren (feedback als optional)
         return {
-            id: submission.id,
-            exerciseId: submission.exerciseId,
-            userId: submission.userId,
-            answerText: submission.answerText,
-            isCorrect: submission.isCorrect,
-            feedback: submission.feedback || undefined,
-            createdAt: submission.createdAt,
+            isCorrect,
+            feedback,
+            exerciseId: id,
+            userId
         };
     }
 

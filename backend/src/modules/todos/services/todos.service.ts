@@ -1,48 +1,52 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Todo } from '../todos.entity';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { todos as Todo } from '@prisma/client';
 
-/**
- * Service for managing Todo entities.
- */
+// Service to handle business logic for managing todos
 @Injectable()
 export class TodosService {
-  constructor(
-    @InjectRepository(Todo)
-    private readonly todoRepository: Repository<Todo>,
-  ) {}
+  // Inject PrismaService for database access
+  constructor(private readonly prisma: PrismaService) {}
 
-  /**
-   * Get all todos by role.
-   */
+  // Retrieve all todos based on user role (TUTOR or STUDENT)
   findAll(role: 'TUTOR' | 'STUDENT'): Promise<Todo[]> {
-    return this.todoRepository.find({ where: { role } });
+    return this.prisma.todos.findMany({
+      where: { role },
+    });
   }
 
-  /**
-   * Create a new todo item.
-   */
+  // Create a new todo for the specified role
   create(text: string, role: 'TUTOR' | 'STUDENT'): Promise<Todo> {
-    const todo = this.todoRepository.create({ text, role });
-    return this.todoRepository.save(todo);
+    return this.prisma.todos.create({
+      data: {
+        text,
+        role,
+        done: false, // Todos are initially not done
+      },
+    });
   }
 
-  /**
-   * Update the completion status of a todo.
-   */
+  // Update the 'done' status of a todo item
   async update(id: number, done: boolean): Promise<Todo> {
-    const todo = await this.todoRepository.findOneBy({ id });
+    // Find the todo by ID
+    const todo = await this.prisma.todos.findUnique({
+      where: { id },
+    });
+
+    // If the todo does not exist, throw an error
     if (!todo) throw new Error(`Todo with id ${id} not found`);
-    todo.done = done;
-    return this.todoRepository.save(todo);
+
+    // Update the 'done' status
+    return this.prisma.todos.update({
+      where: { id },
+      data: { done },
+    });
   }
 
-  /**
-   * Permanently remove a todo.
-   */
+  // Delete a todo by its ID
   async remove(id: number): Promise<void> {
-    await this.todoRepository.delete(id);
+    await this.prisma.todos.delete({
+      where: { id },
+    });
   }
 }
-

@@ -136,29 +136,43 @@ export class ExercisesController {
     async removeExercise(@Param('id') id: number): Promise<void> {
         await this.exercisesService.removeExercise(id);
         return;
-    }    /**
+    }
+
+    /**
      * Submits an answer for an exercise (choice or text-based).
      * Requires authentication and evaluates the answer for correctness.
      *
      * @param id - The ID of the exercise to submit answer for
      * @param body - The answer submission data
      * @param userId - The authenticated user's ID
-     * @returns Promise resolving to the submission result
+     * @returns Promise resolving to the submission result with feedback
      * @throws NotFoundException if the exercise does not exist
      */
-    @Post(':id/submissions')
+    @Post(':id/submit')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.STUDENT)
     @HttpCode(HttpStatus.OK)
-    @ApiOperation({ summary: 'Submit an answer for an exercise' })
+    @ApiOperation({ summary: 'Submit and evaluate an answer for an exercise' })
     @ApiParam({ name: 'id', description: 'Exercise ID' })
-    @ApiResponse({ status: 200, description: 'Answer submitted successfully' })
+    @ApiResponse({ 
+        status: 200, 
+        description: 'Answer submitted successfully',
+        schema: {
+            type: 'object',
+            properties: {
+                isCorrect: { type: 'boolean', description: 'Whether the answer was correct' },
+                feedback: { type: 'string', description: 'Feedback message about the answer' },
+                exerciseId: { type: 'number', description: 'ID of the exercise' },
+                userId: { type: 'number', description: 'ID of the user who submitted the answer' }
+            }
+        }
+    })
     @ApiResponse({ status: 404, description: 'Exercise not found' })
     async submitAnswer(
         @Param('id') id: number,
         @Body() body: { answerText: string },
         @GetUser('id') userId: number,
-    ): Promise<{ id: number; exerciseId: number; userId: number; answerText: string; isCorrect: boolean; feedback?: string; createdAt: Date }> {
+    ) {
         return this.exercisesService.submitAnswer(id, body.answerText, userId);
     }
 

@@ -8,37 +8,39 @@
     </div>
     <p class="exercise-description">{{ exercise.description }}</p>
 
-    <div class="options-container">
-      <!-- Single Choice -->
+    <div class="options-container">      <!-- Single Choice -->
       <mat-radio-group
         *ngIf="exercise.type === ExerciseType.SINGLE_CHOICE"
         [(ngModel)]="selectedOptions[0]"
         required
         aria-label="Select an answer option"
       >
-        <div
+        <label
           *ngFor="let option of exercise.answers"
-          class="option"
-          (click)="option.id && (selectedOptions[0] = option.id)"
+          class="option clickable-option"
+          [for]="'single-choice-' + option.id"
         >
-          <mat-radio-button [value]="option.id">
+          <mat-radio-button 
+            [id]="'single-choice-' + option.id"
+            [value]="option.id"
+          >
             {{ option.text }}
           </mat-radio-button>
-        </div>
-      </mat-radio-group>      <!-- Multiple Choice -->
-      <div *ngIf="exercise.type === ExerciseType.MULTIPLE_CHOICE" class="multiple-choice">
-        <div
+        </label>
+      </mat-radio-group><!-- Multiple Choice -->      <div *ngIf="exercise.type === ExerciseType.MULTIPLE_CHOICE" class="multiple-choice">
+        <label
           *ngFor="let option of exercise.answers"
-          class="option"
-          (click)="option.id && toggleOption(option.id)"
+          class="option clickable-option"
+          [for]="'multiple-choice-' + option.id"
         >
           <mat-checkbox
+            [id]="'multiple-choice-' + option.id"
             [checked]="selectedOptions.includes(option.id!)"
-            (change)="toggleOption(option.id!)"
+            (change)="option.id && toggleOption(option.id!)"
           >
             {{ option.text }}
           </mat-checkbox>
-        </div>
+        </label>
       </div>
     </div>    <div class="actions">      <button
         mat-flat-button
@@ -52,16 +54,5 @@
         <span *ngIf="isCorrectAnswer">Correct Answer!</span>
       </button>
     </div>
-
-    <!-- Feedback Section -->
-    <mat-expansion-panel *ngIf="showFeedback" class="feedback-section">
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          <mat-icon>chat</mat-icon>
-          AI Feedback
-        </mat-panel-title>
-      </mat-expansion-panel-header>
-      <p>{{ feedback || 'Loading feedback...' }}</p>
-    </mat-expansion-panel>
   </mat-card-content>
 </div>

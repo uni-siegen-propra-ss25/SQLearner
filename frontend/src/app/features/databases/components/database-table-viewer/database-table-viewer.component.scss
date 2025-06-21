@@ -1,0 +1,303 @@
+.database-table-viewer {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    height: 100%;
+    background-color: var(--surface-container-lowest);
+    overflow: hidden;
+    border: 1px solid var(--outline-variant);
+
+    .table-list {
+        padding: 0;
+        background-color: var(--surface-container-low);
+        border-right: 1px solid var(--outline-variant);
+        overflow-y: auto;
+
+        .title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            border-bottom: 1px solid var(--outline-variant);
+
+            h3 {
+                margin: 0;
+                font-size: 1rem;
+                font-weight: 500;
+                color: var(--on-surface);
+            }
+        }
+
+        .table-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid var(--outline-variant);
+            position: relative;
+
+            .table-item-content {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                flex: 1;
+
+                mat-icon {
+                    color: var(--on-surface-variant);
+                    font-size: 20px;
+                    width: 20px;
+                    height: 20px;
+                }
+
+                span {
+                    font-size: 0.875rem;
+                }
+            }
+
+            .table-actions {
+                display: flex;
+                gap: 4px;
+                opacity: 0;
+                transition: opacity 0.2s ease;
+                
+                button {
+                    width: 28px;
+                    height: 28px;
+                    line-height: 28px;
+                    padding: 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    mat-icon {
+                        font-size: 16px;
+                        width: 16px;
+                        height: 16px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                }
+            }
+
+            &:hover {
+                background-color: var(--surface-container-high);
+                
+                .table-actions {
+                    opacity: 1;
+                }
+            }
+
+            &.selected {
+                background-color: var(--primary-container);
+                color: var(--on-primary-container);
+
+                mat-icon {
+                    color: var(--on-primary-container);
+                }
+
+                &:hover {
+                    background-color: var(--primary-container);
+                }
+            }
+        }
+    }
+
+    .table-content {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow: hidden;
+
+        .table-header {
+            padding: 1rem;
+            background: var(--surface-container);
+            border-bottom: 1px solid var(--outline-variant);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+
+            .header-left {
+                h2 {
+                    margin: 0;
+                    font-size: 1.25rem;
+                    font-weight: 500;
+                }
+
+                .row-count {
+                    font-size: 0.875rem;
+                    color: var(--on-surface-variant);
+                    margin-left: 0.5rem;
+                }
+            }
+
+            .actions {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+
+                .search-field {
+                    width: 240px;
+                    margin: 0;
+
+                    ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+                        display: none;
+                    }
+                }
+            }
+        }
+
+        .table-info {
+            padding: 1rem;
+            background: var(--surface-container-lowest);
+            border-bottom: 1px solid var(--outline-variant);
+
+            p {
+                margin: 0 0 1rem;
+                color: var(--on-surface-variant);
+            }
+
+            .columns-list {
+                display: flex;
+                gap: 0.5rem;
+                flex-wrap: wrap;
+
+                .column-item {
+                    background: var(--surface-container);
+                    padding: 0.5rem 0.75rem;
+                    border-radius: 4px;
+                    font-size: 0.875rem;
+                    border: 1px solid var(--outline-variant);
+
+                    .column-type {
+                        color: var(--on-surface-variant);
+                        margin-left: 0.5rem;
+                    }
+                }
+            }
+        }
+
+        .table-data {
+            flex: 1;
+            overflow: auto;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+
+            mat-progress-bar {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+            }
+
+            .data-table {
+                width: 100%;
+                border-collapse: collapse;
+
+                th, td {
+                    padding: 0.75rem 1rem;
+                    text-align: left;
+                    font-size: 0.875rem;
+                    border-bottom: 1px solid var(--outline-variant);
+                }
+
+                th {
+                    background: var(--surface-container);
+                    font-weight: 500;
+                    color: var(--on-surface);
+                    position: sticky;
+                    top: 0;
+                    z-index: 1;
+                }
+
+                td {
+                    color: var(--on-surface);
+                    padding: 8px 16px;
+                    vertical-align: middle;
+
+                    &.actions-cell {
+                        white-space: nowrap;
+                        width: 96px;
+                        text-align: right;
+                        padding: 0 8px;
+
+                        button {
+                            opacity: 0.7;
+
+                            &:hover {
+                                opacity: 1;
+                            }
+                        }
+                    }
+                }
+
+                tbody tr {
+                    &:hover {
+                        background: var(--surface-container-high);
+
+                        .actions-cell {
+                            button {
+                                opacity: 1;
+                            }
+                        }
+                    }
+                }
+            }
+
+            .no-data {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 2rem;
+                gap: 1rem;
+                color: var(--on-surface-variant);
+
+                mat-icon {
+                    font-size: 48px;
+                    width: 48px;
+                    height: 48px;
+                    opacity: 0.5;
+                }
+
+                p {
+                    margin: 0;
+                }
+            }
+
+            mat-paginator {
+                position: sticky;
+                bottom: 0;
+                background: var(--surface-container);
+                border-top: 1px solid var(--outline-variant);
+            }
+        }
+    }
+
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        padding: 2rem;
+        color: var(--on-surface-variant);
+
+        mat-icon {
+            font-size: 48px;
+            width: 48px;
+            height: 48px;
+            opacity: 0.5;
+            margin-bottom: 1rem;
+        }
+
+        h3 {
+            margin: 0;
+            font-weight: normal;
+        }
+    }
+}

@@ -45,14 +45,11 @@ export interface AnswerOption {
     order: number;
 }
 
-export interface Submission {
-    id: number;
-    exerciseId: number;
-    userId: number;
-    answerText: string; // SQL query, chosen option IDs, or free text
+export interface Feedback {
     isCorrect: boolean;
     feedback?: string; // LLM-generated feedback
-    createdAt: Date;
+    exerciseId: number;
+    userId: number;
 }
 
 export interface Bookmark {

@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Param, Patch, Delete, Query } from '@nestjs/common';
-import { Todo } from '../todos.entity';
+import { todos as Todo } from '@prisma/client';
 import { TodosService } from '../services/todos.service';
 
 /**

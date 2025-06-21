@@ -40,6 +40,17 @@ services:
       - DB_NAME=sqlearner
       - JWT_SECRET=your_jwt_secret_key_here
       - JWT_EXPIRES_IN=1h
+    security_opt:
+      - no-new-privileges:true
+    cpu_count: 2
+    cpu_percent: 50
+    mem_limit: 512m
+    memswap_limit: 512m
+    ulimits:
+      nproc: 100
+      nofile:
+        soft: 20000
+        hard: 40000
     volumes:
       - ./backend:/app
       - /app/node_modules

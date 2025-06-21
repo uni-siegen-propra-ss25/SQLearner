@@ -1,41 +1,29 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Hint } from '../hints.entity';
+import { PrismaService } from 'src/prisma/prisma.service';
 
-/**
- * Service for managing Hint entities.
- */
+// Service that contains business logic for handling hints
 @Injectable()
 export class HintsService {
-  constructor(
-    @InjectRepository(Hint)
-    private hintRepository: Repository<Hint>,
-  ) {}
+  // Inject PrismaService to interact with the database
+  constructor(private prisma: PrismaService) {}
 
-  /**
-   * Get all stored hints.
-   * @returns List of Hint entities
-   */
-  findAll(): Promise<Hint[]> {
-    return this.hintRepository.find();
+  // Retrieve all hints from the database
+  findAll() {
+    return this.prisma.hint.findMany();
   }
 
-  /**
-   * Create and store a new hint.
-   * @param text The content of the hint
-   * @returns The newly created Hint
-   */
-  create(text: string): Promise<Hint> {
-    const hint = this.hintRepository.create({ text });
-    return this.hintRepository.save(hint);
+  // Create a new hint with the given text
+  create(text: string) {
+    return this.prisma.hint.create({
+      data: { text },
+    });
   }
 
-  /**
-   * Remove a hint by ID.
-   * @param id The ID of the hint to delete
-   */
-  remove(id: number): Promise<void> {
-    return this.hintRepository.delete(id).then(() => undefined);
+  // Delete a hint by its ID
+  async remove(id: number): Promise<void> {
+    await this.prisma.hint.delete({
+      where: { id },
+    });
   }
 }
+

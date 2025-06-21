@@ -1,0 +1,22 @@
+<h2 mat-dialog-title>Datenbank bearbeiten</h2>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <mat-dialog-content>
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" required />
+      <mat-error *ngIf="form.get('name')?.hasError('required')">Name ist erforderlich</mat-error>
+      <mat-error *ngIf="form.get('name')?.hasError('minlength')">Name muss mindestens 3 Zeichen lang sein</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Beschreibung</mat-label>
+      <textarea matInput formControlName="description" rows="3" placeholder="Optionale Beschreibung der Datenbank"></textarea>
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()">Abbrechen</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="!form.valid">Speichern</button>
+  </mat-dialog-actions>
+</form>

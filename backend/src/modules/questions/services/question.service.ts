@@ -1,86 +1,95 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Question } from '../question.entity';
+import { PrismaService } from 'src/prisma/prisma.service'; 
+import { fragen, Prisma } from '@prisma/client';
 import { CreateQuestionDto } from '../dto/create-question.dto';
 
-/**
- * Service for managing Question entities.
- */
 @Injectable()
 export class QuestionService {
-  constructor(
-    @InjectRepository(Question)
-    private questionRepository: Repository<Question>,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   /**
-   * Create a new question.
+   * Creates a new question in the database using the provided data transfer object.
+   * Sets default values for nullable fields if not provided.
    */
   create(dto: CreateQuestionDto) {
-    const question = this.questionRepository.create(dto);
-    return this.questionRepository.save(question);
+    const data: Prisma.fragenCreateInput = {
+      student_name: dto.student_name,
+      frage: dto.frage,
+      antwort: null,
+      erstellt_am: new Date(dto.erstellt_am ?? new Date().toISOString()),
+      ist_archiviert: dto.ist_archiviert ?? false,
+      ist_angepinnt: dto.ist_angepinnt ?? false,
+      ist_geloescht: dto.ist_geloescht ?? false,
+      ist_beantwortet: dto.ist_beantwortet ?? false,
+    };
+
+    return this.prisma.fragen.create({ data });
   }
 
   /**
-   * Find all non-deleted questions, sorted by date descending.
+   * Retrieves all active (non-deleted) questions sorted by creation date descending.
    */
-  findAll() {
-    return this.questionRepository.find({
-      order: { erstellt_am: 'DESC' },
+  findAll(): Promise<fragen[]> {
+    return this.prisma.fragen.findMany({
       where: { ist_geloescht: false },
+      orderBy: { erstellt_am: 'desc' },
     });
   }
 
   /**
-   * Find all soft-deleted questions.
+   * Retrieves all deleted questions (questions in the "trash").
    */
-  findGeloeschte() {
-    return this.questionRepository.find({
-      order: { erstellt_am: 'DESC' },
+  findGeloeschte(): Promise<fragen[]> {
+    return this.prisma.fragen.findMany({
       where: { ist_geloescht: true },
+      orderBy: { erstellt_am: 'desc' },
     });
   }
 
   /**
-   * Update the answer of a question.
+   * Updates the answer of a question and marks it as answered.
    */
-  updateAntwort(id: number, antwort: string) {
-    return this.questionRepository.update(id, { antwort, ist_beantwortet: true });
+  updateAntwort(id: number, antwort: string): Promise<fragen> {
+    return this.prisma.fragen.update({
+      where: { id },
+      data: { antwort, ist_beantwortet: true },
+    });
   }
 
   /**
-   * Pin or unpin a question.
+   * Updates the pinned status of a question.
    */
-  updatePin(id: number, ist_angepinnt: boolean) {
-    return this.questionRepository.update(id, { ist_angepinnt });
+  updatePin(id: number, ist_angepinnt: boolean): Promise<fragen> {
+    return this.prisma.fragen.update({
+      where: { id },
+      data: { ist_angepinnt },
+    });
   }
 
   /**
-   * Archive or unarchive a question.
+   * Updates the archived status of a question.
    */
-  updateArchiv(id: number, ist_archiviert: boolean) {
-    return this.questionRepository.update(id, { ist_archiviert });
+  updateArchiv(id: number, ist_archiviert: boolean): Promise<fragen> {
+    return this.prisma.fragen.update({
+      where: { id },
+      data: { ist_archiviert },
+    });
   }
 
   /**
-   * Soft delete a question.
+   * Updates the deleted (soft-delete) status of a question.
    */
-  delete(id: number) {
-    return this.questionRepository.update(id, { ist_geloescht: true });
+  updateGeloescht(id: number, ist_geloescht: boolean): Promise<fragen> {
+    return this.prisma.fragen.update({
+      where: { id },
+      data: { ist_geloescht },
+    });
   }
 
   /**
-   * Set soft-delete flag.
-   */
-  updateGeloescht(id: number, ist_geloescht: boolean) {
-    return this.questionRepository.update(id, { ist_geloescht });
-  }
-
-  /**
-   * Hard delete a question from the database.
+   * Permanently deletes a question from the database (hard delete).
    */
   async hardDelete(id: number): Promise<void> {
-    await this.questionRepository.delete(id);
+    await this.prisma.fragen.delete({ where: { id } });
   }
 }

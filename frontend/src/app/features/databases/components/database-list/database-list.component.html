@@ -1,0 +1,89 @@
+<div class="database-container">
+  <div class="header">
+    <h1>Databases</h1>
+    <div class="actions">
+      <button mat-raised-button color="primary" (click)="openUploadDialog()">
+        <mat-icon>upload_file</mat-icon>
+        SQL-Datei hochladen
+      </button>
+      <button mat-raised-button color="accent" (click)="openCreateDialog()">
+        <mat-icon>add</mat-icon>
+        Neue Datenbank erstellen
+      </button>
+    </div>
+  </div>
+
+  <div class="database-grid">
+    <mat-card class="database-card" *ngFor="let database of databases" (click)="viewDatabase(database)">
+      <mat-card-header>
+        <mat-card-title>{{ database.name }}</mat-card-title>
+        <mat-card-subtitle>Created: {{ database.createdAt | date:'medium' }}</mat-card-subtitle>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <p class="description">{{ database.description }}</p>
+      </mat-card-content>
+
+<<<<<<< HEAD:frontend/src/app/features/database/components/database-list/database-list.component.html
+      <mat-card-actions align="end" (click)="$event.stopPropagation()">
+        <button mat-button color="primary" (click)="openEditDialog(database)">
+          <mat-icon>edit</mat-icon>
+          Bearbeiten
+        </button>
+        <button mat-button color="warn" (click)="deleteDatabase(database.id)">
+          <mat-icon>delete</mat-icon>
+          Löschen
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+=======
+        <!-- Description Column -->
+        <ng-container matColumnDef="description">
+          <th mat-header-cell *matHeaderCellDef>Beschreibung</th>
+          <td mat-cell *matCellDef="let database">{{ database.description }}</td>
+        </ng-container>
+
+        <!-- Created At Column -->
+        <ng-container matColumnDef="createdAt">
+          <th mat-header-cell *matHeaderCellDef>Erstellt am</th>
+          <td mat-cell *matCellDef="let database">{{ database.createdAt | date: 'medium' }}</td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let database">
+            <button
+              mat-icon-button
+              color="accent"
+              (click)="openEditDialog(database); $event.stopPropagation()"
+              *ngIf="isTutor"
+              matTooltip="Bearbeiten"
+            >
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              color="warn"
+              (click)="deleteDatabase(database.id); $event.stopPropagation()"
+              *ngIf="isTutor"
+              matTooltip="Löschen"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row 
+            *matRowDef="let row; columns: displayedColumns" 
+            (click)="viewDatabase(row)"
+            class="database-row"
+            [style.cursor]="'pointer'"
+        ></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+>>>>>>> develop:frontend/src/app/features/databases/components/database-list/database-list.component.html
+</div>
