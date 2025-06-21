@@ -4,6 +4,7 @@ services:
     container_name: sqlearner-db
     ports:
       - "5433:5432"
+
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -69,6 +70,12 @@ services:
       - /app/node_modules
     depends_on:
       - backend
+    deploy:
+      resources:
+        limits:
+          memory: 6G
+        reservations:
+          memory: 3G
 
 volumes:
   postgres_data: 

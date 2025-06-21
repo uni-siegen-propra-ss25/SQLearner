@@ -1,0 +1,106 @@
+<h2 mat-dialog-title>Neue Tabelle erstellen</h2>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <mat-dialog-content>
+    <div class="form-section">
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Tabellenname</mat-label>
+        <input matInput formControlName="tableName" required />
+        <mat-error *ngIf="form.get('tableName')?.hasError('required')">
+          Tabellenname ist erforderlich
+        </mat-error>
+        <mat-error *ngIf="form.get('tableName')?.hasError('pattern')">
+          Tabellenname muss mit Buchstabe oder Unterstrich beginnen
+        </mat-error>
+        <mat-hint>Nur Buchstaben, Zahlen und Unterstriche erlaubt</mat-hint>
+      </mat-form-field>
+    </div>
+
+    <div class="form-section">
+      <div class="section-header">
+        <h3>Spalten</h3>
+        <button type="button" mat-raised-button color="accent" (click)="addColumn()">
+          <mat-icon>add</mat-icon>
+          Spalte hinzufügen
+        </button>
+      </div>
+
+      <div class="columns-container" formArrayName="columns">
+        <div class="column-item" *ngFor="let column of columns.controls; let i = index" [formGroupName]="i">
+          <div class="column-header">
+            <h4>Spalte {{ i + 1 }}</h4>
+            <button type="button" mat-icon-button color="warn" 
+                    (click)="removeColumn(i)" 
+                    [disabled]="columns.length === 1">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+
+          <div class="column-fields">
+            <div class="field-row">
+              <mat-form-field appearance="fill">
+                <mat-label>Spaltenname</mat-label>
+                <input matInput formControlName="name" required />
+                <mat-error *ngIf="column.get('name')?.hasError('required')">
+                  Spaltenname ist erforderlich
+                </mat-error>
+                <mat-error *ngIf="column.get('name')?.hasError('pattern')">
+                  Spaltenname muss mit Buchstabe oder Unterstrich beginnen
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="fill">
+                <mat-label>Datentyp</mat-label>
+                <mat-select formControlName="dataType" 
+                           (selectionChange)="onDataTypeChange(i, $event.value)" required>
+                  <mat-option *ngFor="let type of dataTypes" [value]="type">
+                    {{ type }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="fill" *ngIf="column.get('dataType')?.value === 'VARCHAR' || column.get('dataType')?.value === 'CHAR'">
+                <mat-label>Länge</mat-label>
+                <input matInput type="number" formControlName="length" min="1" />
+              </mat-form-field>
+            </div>
+
+            <div class="field-row">
+              <mat-form-field appearance="fill">
+                <mat-label>Standardwert (optional)</mat-label>
+                <input matInput formControlName="defaultValue" />
+                <mat-hint>z.B. 'text', 0, true, CURRENT_TIMESTAMP</mat-hint>
+              </mat-form-field>
+            </div>
+
+            <div class="field-row checkboxes">
+              <mat-checkbox formControlName="isNullable">
+                NULL erlaubt
+              </mat-checkbox>
+              <mat-checkbox formControlName="isPrimaryKey">
+                Primärschlüssel
+              </mat-checkbox>
+              <mat-checkbox formControlName="isUnique">
+                Eindeutig (UNIQUE)
+              </mat-checkbox>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section" *ngIf="form.valid">
+      <h3>Generierter SQL-Code</h3>
+      <div class="sql-preview">
+        <pre>{{ generateSQL() }}</pre>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <div class="dialog-actions" align="end">
+    <button mat-button type="button" (click)="onCancel()">Abbrechen</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="!form.valid">
+      Tabelle erstellen
+    </button>
+  </div>
+</form> 

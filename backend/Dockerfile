@@ -3,7 +3,7 @@ FROM node:20-alpine
 WORKDIR /app
 
 # Install netcat for database connection check
-RUN apk add --no-cache netcat-openbsd
+RUN apk add --no-cache netcat-openbsd postgresql-client
 
 # Copy package files
 COPY package*.json ./
@@ -59,4 +59,4 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
 
 # Start the application
-CMD ["sh", "-c", "while ! nc -z db 5432; do sleep 1; done && npx prisma migrate deploy && npm run start:dev"] 
+CMD ["sh", "-c", "while ! nc -z db 5432; do sleep 1; done && rm -rf ./src/prisma/migrations/* && npx prisma migrate reset --force --skip-seed && npm run start:dev"] 

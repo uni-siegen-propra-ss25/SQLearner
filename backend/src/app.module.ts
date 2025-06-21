@@ -10,7 +10,7 @@ import { DatabasesModule } from './modules/databases/databases.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { ProgressModule } from './modules/progress/progress.module';
 import { BookmarksModule } from './modules/bookmarks/bookmarks.module';
-import { SettingsModule } from './modules/settings/settings.module';
+
 
 import { TodosModule } from './modules/todos/todos.module';
 import { HintsModule } from './modules/hints/hints.module';

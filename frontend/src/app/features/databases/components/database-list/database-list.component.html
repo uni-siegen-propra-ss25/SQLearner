@@ -1,27 +1,43 @@
 <div class="database-container">
   <div class="header">
-    <h1>Datenbanken</h1>
-    <div class="actions" *ngIf="isTutor">
+    <h1>Databases</h1>
+    <div class="actions">
       <button mat-raised-button color="primary" (click)="openUploadDialog()">
-        <mat-icon>upload</mat-icon>
+        <mat-icon>upload_file</mat-icon>
         SQL-Datei hochladen
       </button>
-      <button mat-raised-button color="primary" (click)="openCreateDialog()">
+      <button mat-raised-button color="accent" (click)="openCreateDialog()">
         <mat-icon>add</mat-icon>
         Neue Datenbank erstellen
       </button>
     </div>
   </div>
 
-  <mat-card>
-    <mat-card-content>
-      <table mat-table [dataSource]="databases" class="mat-elevation-z8">
-        <!-- Name Column -->
-        <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef>Name</th>
-          <td mat-cell *matCellDef="let database">{{ database.name }}</td>
-        </ng-container>
+  <div class="database-grid">
+    <mat-card class="database-card" *ngFor="let database of databases" (click)="viewDatabase(database)">
+      <mat-card-header>
+        <mat-card-title>{{ database.name }}</mat-card-title>
+        <mat-card-subtitle>Created: {{ database.createdAt | date:'medium' }}</mat-card-subtitle>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <p class="description">{{ database.description }}</p>
+      </mat-card-content>
 
+<<<<<<< HEAD:frontend/src/app/features/database/components/database-list/database-list.component.html
+      <mat-card-actions align="end" (click)="$event.stopPropagation()">
+        <button mat-button color="primary" (click)="openEditDialog(database)">
+          <mat-icon>edit</mat-icon>
+          Bearbeiten
+        </button>
+        <button mat-button color="warn" (click)="deleteDatabase(database.id)">
+          <mat-icon>delete</mat-icon>
+          Löschen
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+=======
         <!-- Description Column -->
         <ng-container matColumnDef="description">
           <th mat-header-cell *matHeaderCellDef>Beschreibung</th>
@@ -69,4 +85,5 @@
       </table>
     </mat-card-content>
   </mat-card>
+>>>>>>> develop:frontend/src/app/features/databases/components/database-list/database-list.component.html
 </div>

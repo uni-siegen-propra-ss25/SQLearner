@@ -20,8 +20,14 @@ export class DatabaseCreateDialogComponent {
         private snackBar: MatSnackBar
     ) {
         this.form = this.fb.group({
+<<<<<<< HEAD:frontend/src/app/features/database/dialogs/database-create-dialog/database-create-dialog.component.ts
+            name: ['', Validators.required],
+            description: [''],
+            schemaSql: [''],
+=======
             name: ['', [Validators.required, Validators.minLength(3)]],
             description: ['']
+>>>>>>> develop:frontend/src/app/features/databases/dialogs/database-create-dialog/database-create-dialog.component.ts
         });
     }
 

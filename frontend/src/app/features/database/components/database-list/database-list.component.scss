@@ -1,0 +1,137 @@
+.database-container {
+  padding: 24px;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+
+    h1 {
+      margin: 0;
+      font-size: 1.5rem;
+      color: rgba(0, 0, 0, 0.87);
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+
+      button {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+    }
+  }
+
+  .database-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    padding: 8px;
+  }
+
+  .database-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    mat-card-header {
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.02);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+
+      mat-card-title {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 500;
+        color: rgba(0, 0, 0, 0.87);
+      }
+
+      mat-card-subtitle {
+        margin: 4px 0 0 0;
+        color: rgba(0, 0, 0, 0.6);
+      }
+    }
+
+    mat-card-content {
+      padding: 16px;
+      flex-grow: 1;
+
+      .description {
+        margin: 0;
+        color: rgba(0, 0, 0, 0.6);
+        font-size: 0.9375rem;
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+    }
+
+    mat-card-actions {
+      padding: 8px;
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+      background: rgba(0, 0, 0, 0.02);
+
+      button {
+        margin: 0 4px;
+      }
+    }
+  }
+}
+
+// Dark theme adjustments
+:host-context(.dark-theme) {
+  .database-container {
+    .header h1 {
+      color: rgba(255, 255, 255, 0.87);
+    }
+
+    .database-card {
+      background: #2d2d2d;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+      &:hover {
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      }
+
+      mat-card-header {
+        background: rgba(255, 255, 255, 0.05);
+        border-bottom-color: rgba(255, 255, 255, 0.08);
+
+        mat-card-title {
+          color: rgba(255, 255, 255, 0.87);
+        }
+
+        mat-card-subtitle {
+          color: rgba(255, 255, 255, 0.6);
+        }
+      }
+
+      mat-card-content {
+        .description {
+          color: rgba(255, 255, 255, 0.6);
+        }
+      }
+
+      mat-card-actions {
+        background: rgba(255, 255, 255, 0.05);
+        border-top-color: rgba(255, 255, 255, 0.08);
+      }
+    }
+  }
+}

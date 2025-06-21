@@ -1,0 +1,102 @@
+<div class="database-view-container">
+  <div class="dialog-header">
+    <h2>{{ data.database.name }}</h2>
+    <button mat-icon-button (click)="close()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="dialog-content">
+    <!-- Database Info Section -->
+    <div class="database-info-section">
+      <div class="info-card">
+        <h3>Datenbank Informationen</h3>
+        <div class="info-content">
+          <div class="info-item">
+            <strong>Name:</strong> {{ data.database.name }}
+          </div>
+          <div class="info-item" *ngIf="data.database.description">
+            <strong>Beschreibung:</strong> {{ data.database.description }}
+          </div>
+          <div class="info-item">
+            <strong>Erstellt:</strong> {{ formatDate(data.database.createdAt) }}
+          </div>
+          <div class="info-item">
+            <strong>Datenbank ID:</strong> {{ data.database.schemaSql }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions Section -->
+    <div class="quick-actions-section">
+      <h3>Schnellaktionen</h3>
+      <div class="action-buttons">
+        <button mat-raised-button color="accent" (click)="createTable()">
+          <mat-icon>add</mat-icon>
+          Neue Tabelle erstellen
+        </button>
+        <button mat-raised-button color="primary" (click)="showTables()">
+          <mat-icon>table_chart</mat-icon>
+          Tabellen anzeigen
+        </button>
+      </div>
+    </div>
+
+    <div class="query-section">
+      <div class="query-editor-container">
+        <div class="editor-header">
+          <h3>SQL Query Editor</h3>
+          <div class="editor-actions">
+            <button mat-button color="warn" (click)="clearQuery()" [disabled]="isLoading">
+              <mat-icon>clear</mat-icon>
+              Clear
+            </button>
+            <button mat-raised-button color="primary" 
+                    (click)="executeQuery()"
+                    [disabled]="!queryForm.valid || isLoading">
+              <mat-icon>play_arrow</mat-icon>
+              {{ isLoading ? 'Executing...' : 'Execute' }}
+            </button>
+          </div>
+        </div>
+        <div #editorContainer class="sql-editor"></div>
+      </div>
+
+      <div *ngIf="error" class="error-message">
+        <mat-icon>error</mat-icon>
+        {{ error }}
+      </div>
+
+      <div *ngIf="queryResult" class="results-section">
+        <div class="results-header">
+          <h3>Query Results</h3>
+          <div class="results-info" *ngIf="queryResult && queryResult.rows && queryResult.rows.length > 0">
+            {{ queryResult.rows.length }} row{{ queryResult.rows.length !== 1 ? 's' : '' }}
+            {{ queryResult.executionTime ? ' (in ' + queryResult.executionTime + 'ms)' : '' }}
+          </div>
+        </div>
+
+        <div class="results-table-container">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th *ngFor="let column of displayedColumns">{{ column }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of queryResult.rows">
+                <td *ngFor="let column of displayedColumns">{{ row[column] }}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div *ngIf="queryResult.rows.length === 0" class="no-results">
+            <mat-icon>info</mat-icon>
+            <span>No data found</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 
