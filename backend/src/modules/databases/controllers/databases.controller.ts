@@ -17,7 +17,7 @@ import { JwtAuthGuard } from '../../../common/guards/jwt-auth/jwt-auth.guard';
 import { RolesGuard } from '../../../common/guards/role/role.guard';
 import { Roles } from '../../../common/decorators/role.decorator';
 import { GetUser } from '../../../common/decorators/get-user.decorator';
-import { Role, User } from '@prisma/client';
+import { Database, Role, User } from '@prisma/client';
 import { DatabasesService } from '../services/databases.service';
 import { QueryDto } from '../models/query.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -99,8 +99,9 @@ export class DatabasesController {
         @Param('id', ParseIntPipe) databaseId: number,
         @Body() dto: UpdateDatabaseDto,
         @GetUser() user: User,
+        @Body() dto: UpdateDatabaseDto, 
     ) {
-        return this.databasesService.updateDatabase(databaseId, dto, user.id, user.role);
+        return this.databasesService.updateDatabase(databaseId, dto, user);
     }
 
     @Delete(':id')

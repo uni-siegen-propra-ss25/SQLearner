@@ -35,14 +35,18 @@ export class DatabaseListComponent implements OnInit {
     }
 
     loadDatabases(): void {
-        this.databaseService.getAllDatabases().subscribe({
-            next: (databases: Database[]) => {
-                this.databases = databases;
-            },
-            error: (error: any) => {
-                console.error('Error loading databases', error);
-                this.snackBar.open('Fehler beim Laden der Datenbanken.', 'OK', { duration: 3000 });
-            },
+        this.databaseService.getAllDatabases().subscribe(
+            (databases) => (this.databases = databases),
+            (error) => console.error('Error loading databases:', error),
+        );
+    }
+
+    openUploadDialog(): void {
+        const dialogRef = this.dialog.open(DatabaseEditDialogComponent);
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                this.loadDatabases();
+            }
         });
     }
 
@@ -114,6 +118,32 @@ export class DatabaseListComponent implements OnInit {
     }
 
     viewDatabase(database: Database): void {
-        this.router.navigate(['/databases', database.id]);
+        this.dialog.open(DatabaseViewDialogComponent, {
+            data: {
+                database: database
+            },
+            maxWidth: '90vw',
+            maxHeight: '90vh',
+        });
+    }
+
+    deleteDatabase(id: number): void {
+        if (confirm('Are you sure you want to delete this database?')) {
+            this.databaseService.deleteDatabase(id).subscribe(
+                () => this.loadDatabases(),
+                (error) => console.error('Error deleting database:', error),
+            );
+        }
+    }
+
+    openEditDialog(database: Database): void {
+        const dialogRef = this.dialog.open(DatabaseEditDialogComponent, {
+            data: database
+        });
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                this.loadDatabases();
+            }
+        });
     }
 }

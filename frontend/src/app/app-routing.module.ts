@@ -53,7 +53,7 @@ const routes: Routes = [
     {
         path: 'databases',
         loadChildren: () =>
-            import('./features/databases/databases.module').then((m) => m.DatabasesModule),
+            import('./features/database/database.module').then((m) => m.DatabasesModule),
         canActivate: [RoleGuard],
         data: {
             allowedRoles: [Role.TUTOR],
