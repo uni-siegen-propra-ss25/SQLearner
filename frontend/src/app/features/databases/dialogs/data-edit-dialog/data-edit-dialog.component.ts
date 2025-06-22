@@ -1,5 +1,5 @@
-import { Component, Inject } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, Inject, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DatabaseTable, TableColumn } from '../../models/database.model';
@@ -11,37 +11,35 @@ import { SqlDataType } from '../../models/sql.model';
   templateUrl: './data-edit-dialog.component.html',
   styleUrls: ['../shared/table-dialog.scss']
 })
-export class DataEditDialogComponent {
-  dataForm: FormGroup;
-SqlDataType: any;
+export class DataEditDialogComponent implements OnInit {
+  form!: FormGroup;
+  table: DatabaseTable;
+  rowData: any;
+  databaseId: number;
+  primaryKeyColumn: string | null = null;
+  SqlDataType: any;
   
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<DataEditDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { 
-      databaseId: number; 
-      table: DatabaseTable;
-      rowData: any;
-    },
+    @Inject(MAT_DIALOG_DATA) public data: { table: DatabaseTable, rowData: any, databaseId: number },
     private tableService: TableService,
     private snackBar: MatSnackBar
   ) {
-    this.dataForm = this.createForm();
+    this.table = data.table;
+    this.rowData = data.rowData;
+    this.databaseId = data.databaseId;
   }
 
-  private createForm(): FormGroup {
-    const group: { [key: string]: any[] } = {};
-    
-    this.data.table.columns.forEach(column => {
-      const validators = [
-        ...(!column.nullable ? [Validators.required] : []),
-        ...(this.getTypeValidators(column))
-      ];
-      
-      group[column.name] = [this.data.rowData[column.name], validators];
+  ngOnInit(): void {
+    const group: { [key: string]: any } = {};
+    this.table.columns.forEach(column => {
+      group[column.name] = [this.rowData[column.name]];
+      if (column.isPrimaryKey) {
+        this.primaryKeyColumn = column.name;
+      }
     });
-
-    return this.fb.group(group);
+    this.form = this.fb.group(group);
   }
 
   private getTypeValidators(column: TableColumn) {
@@ -84,34 +82,16 @@ SqlDataType: any;
     return validators;
   }
 
-  onSubmit() {
-    if (this.dataForm.valid) {
-      // Find the primary key column and value for WHERE clause
-      const pkColumn = this.data.table.columns.find(col => col.isPrimaryKey);
-      if (!pkColumn) {
-        this.snackBar.open('Keine Primärschlüsselspalte gefunden', 'OK', { duration: 3000 });
-        return;
-      }
-
-      const pkValue = this.data.rowData[pkColumn.name];
-      const updateData = {
-        ...this.dataForm.value,
-        [pkColumn.name]: pkValue // ensure PK is included
-      };
-
-      this.tableService.updateTableRow(
-        this.data.databaseId,
-        this.data.table.id,
-        pkColumn.name,
-        pkValue,
-        updateData
-      ).subscribe({
+  onSave(): void {
+    if (this.form.valid && this.primaryKeyColumn) {
+      const rowId = this.rowData[this.primaryKeyColumn];
+      this.tableService.updateTableRow(this.databaseId, this.table.id, rowId, this.form.value).subscribe({
         next: () => {
           this.snackBar.open('Datensatz erfolgreich aktualisiert', 'OK', { duration: 3000 });
-          this.dialogRef.close(true);
+          this.dialogRef.close(this.form.value);
         },
         error: (error) => {
-          console.error('Error updating data:', error);
+          console.error(error);
           this.snackBar.open('Fehler beim Aktualisieren des Datensatzes', 'OK', { duration: 3000 });
         }
       });
@@ -123,7 +103,7 @@ SqlDataType: any;
   }
 
   getErrorMessage(columnName: string): string {
-    const control = this.dataForm.get(columnName);
+    const control = this.form.get(columnName);
     if (!control || !control.errors) return '';
 
     if (control.errors['required']) {
@@ -144,6 +124,6 @@ SqlDataType: any;
   }
 
   isPrimaryKey(columnName: string): boolean {
-    return this.data.table.columns.some(col => col.name === columnName && col.isPrimaryKey);
+    return this.table.columns.some(col => col.name === columnName && col.isPrimaryKey);
   }
 }

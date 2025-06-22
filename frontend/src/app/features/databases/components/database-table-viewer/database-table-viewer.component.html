@@ -17,17 +17,23 @@
                 <span>{{ table.name }}</span>
             </div>
             <div class="table-actions" *ngIf="isTutor">
-                <button mat-icon-button 
-                    matTooltip="Tabelle bearbeiten"
-                    (click)="openEditTableDialog(); $event.stopPropagation()">
-                    <mat-icon>edit</mat-icon>
+                <button mat-icon-button [matMenuTriggerFor]="menu" *ngIf="selectedTable">
+                    <mat-icon>more_vert</mat-icon>
                 </button>
-                <button mat-icon-button 
-                    color="warn" 
-                    matTooltip="Tabelle löschen"
-                    (click)="deleteTable(table); $event.stopPropagation()">
-                    <mat-icon>delete</mat-icon>
-                </button>
+                <mat-menu #menu="matMenu">
+                    <button mat-menu-item *ngIf="isTutor" (click)="openEditTableDialog(selectedTable!)">
+                        <mat-icon>edit</mat-icon>
+                        <span>Tabelle bearbeiten</span>
+                    </button>
+                    <button mat-menu-item *ngIf="isTutor" (click)="truncateTable()" color="warn">
+                        <mat-icon>delete_sweep</mat-icon>
+                        <span>Tabelle leeren</span>
+                    </button>
+                    <button mat-menu-item *ngIf="isTutor" (click)="deleteTable(selectedTable!)" color="warn">
+                        <mat-icon>delete</mat-icon>
+                        <span>Tabelle löschen</span>
+                    </button>
+                </mat-menu>
             </div>
         </div>
     </div>
