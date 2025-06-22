@@ -4,6 +4,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DatabaseTable } from '../../models/database.model';
 import { SqlDataType, ColumnMetadata } from '../../models/sql.model';
+import { TableService } from '../../services/table.service';
 
 interface TableColumn {
   name: string;
@@ -35,7 +36,8 @@ export class TableCreateDialogComponent {
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<TableCreateDialogComponent>,
     @Inject(MAT_DIALOG_DATA) private data: { databaseId: number },
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private tableService: TableService
   ) {
     this.tableForm = this.fb.group({
       name: ['', [
@@ -174,69 +176,26 @@ export class TableCreateDialogComponent {
 
   onSubmit() {
     if (this.tableForm.valid) {
-      // Transform form value to match backend DTO
       const formValue = this.tableForm.value;
-      const columns: TableColumn[] = formValue.columns.map((col: any) => {
-        // Start with basic column properties
-        const column: TableColumn = {
-          name: col.name,
-          type: col.type,
-          nullable: col.nullable,
-          isPrimaryKey: col.isPrimaryKey,
-          isForeignKey: col.isForeignKey
-        };
-
-        // Only add optional properties if they have values
-        if (col.defaultValue) {
-          column.defaultValue = col.defaultValue;
-        }
-
-        // Only enable autoincrement for INTEGER types
-        if (col.type === SqlDataType.INT) {
-          if (col.autoIncrement) {
-            column.autoIncrement = true;
-          }
-        }
-
-        if (col.isForeignKey) {
-          column.referencesTable = col.referencesTable;
-          column.referencesColumn = col.referencesColumn;
-        }
-
-        // Only include metadata if it's needed for the type
-        const metadataNeeded = this.needsMetadata(col.type);
-        if (Object.keys(metadataNeeded).length > 0) {
-          const metadata: Record<string, number> = {};
-          let hasMetadata = false;
-
-          if (metadataNeeded.maxLength && col.metadata?.['maxLength']) {
-            metadata['maxLength'] = Number(col.metadata['maxLength']);
-            hasMetadata = true;
-          }
-          if (metadataNeeded.precision && col.metadata?.['precision']) {
-            metadata['precision'] = Number(col.metadata['precision']);
-            hasMetadata = true;
-          }
-          if (metadataNeeded.scale && col.metadata?.['scale']) {
-            metadata['scale'] = Number(col.metadata['scale']);
-            hasMetadata = true;
-          }
-
-          if (hasMetadata) {
-            column.metadata = metadata;
-          }
-        }
-
-        return column;
-      });
-
+      const columns = formValue.columns.map((col: any) => ({
+        ...col,
+        isForeignKey: col.isForeignKey || false,
+        autoIncrement: col.autoIncrement || false
+      }));
       const createTableDto = {
         name: formValue.name,
         description: formValue.description || undefined,
         columns
       };
-
-      // Here you would typically call a service to create the table
+      this.tableService.createTable(this.data.databaseId, createTableDto).subscribe({
+        next: (table) => {
+          this.snackBar.open('Tabelle erfolgreich erstellt', 'OK', { duration: 3000 });
+          this.dialogRef.close(table);
+        },
+        error: (error) => {
+          this.snackBar.open('Fehler beim Erstellen der Tabelle', 'OK', { duration: 3000 });
+        }
+      });
     }
   }
 

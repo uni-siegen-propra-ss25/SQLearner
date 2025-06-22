@@ -91,6 +91,18 @@ export class DatabasesController {
         return this.databasesService.updateDatabase(databaseId, dto, user.id, user.role);
     }
 
+    @Put(':id')
+    @Roles(Role.TUTOR)
+    @ApiOperation({ summary: 'Update database metadata' })
+    @ApiResponse({ status: 200, description: 'Database updated successfully' })
+    async updateDatabasePut(
+        @Param('id', ParseIntPipe) databaseId: number,
+        @Body() dto: UpdateDatabaseDto,
+        @GetUser() user: User,
+    ) {
+        return this.databasesService.updateDatabase(databaseId, dto, user.id, user.role);
+    }
+
     @Delete(':id')
     @Roles(Role.TUTOR)
     @ApiOperation({ summary: 'Delete database' })
@@ -112,5 +124,17 @@ export class DatabasesController {
     ) {
         // This operation stays in DatabasesService since it's a database-level operation
         return this.databasesService.runQuery(id, dto.query);
+    }
+
+    @Post(':id/tables')
+    @Roles(Role.TUTOR)
+    @ApiOperation({ summary: 'Create a new table in the database' })
+    @ApiResponse({ status: 201, description: 'Table created successfully' })
+    async createTable(
+        @Param('id', ParseIntPipe) databaseId: number,
+        @Body() dto: any, 
+        @GetUser() user: User,
+    ) {
+        return this.databasesService.createTable(databaseId, dto, user.id, user.role);
     }
 }

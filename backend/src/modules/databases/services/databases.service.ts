@@ -485,4 +485,39 @@ export class DatabasesService {
             }
         }
     }
+
+    async createTable(databaseId: number, dto: any, userId: number, userRole: Role | string) {
+        if (String(userRole).toUpperCase() !== 'TUTOR') {
+            throw new ForbiddenException('Only tutors can create tables');
+        }
+        // Getting the database
+        const database = await this.getDatabaseById(databaseId);
+        if (!database) {
+            throw new NotFoundException('Database not found');
+        }
+        if (database.ownerId !== userId) {
+            throw new ForbiddenException('Only the owner can create tables in this database');
+        }
+        // Generate SQL for table creation
+        const columnsSql = dto.columns.map((col: any) => {
+            let colDef = `"${col.name}" ${col.type}`;
+            if (col.isPrimaryKey) colDef += ' PRIMARY KEY';
+            if (col.autoIncrement) colDef += ' GENERATED ALWAYS AS IDENTITY';
+            if (col.nullable === false) colDef += ' NOT NULL';
+            if (col.defaultValue) colDef += ` DEFAULT ${col.defaultValue}`;
+            return colDef;
+        }).join(', ');
+        const createTableSql = `CREATE TABLE "${dto.name}" (${columnsSql})`;
+        // Execute SQL in the required database
+        const dbPool = new Pool({
+            host: process.env.DB_HOST,
+            port: parseInt(process.env.DB_PORT || '5432', 10),
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: database.schemaSql
+        });
+        await dbPool.query(createTableSql);
+        await dbPool.end();
+        return { message: 'Table created successfully' };
+    }
 }
