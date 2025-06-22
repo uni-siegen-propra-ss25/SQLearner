@@ -57,6 +57,7 @@ CREATE TABLE "Database" (
     "schemaSql" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "ownerId" INTEGER NOT NULL,
 
     CONSTRAINT "Database_pkey" PRIMARY KEY ("id")
 );
@@ -136,7 +137,7 @@ CREATE TABLE "Exercise" (
     "difficulty" "Difficulty" NOT NULL DEFAULT 'MEDIUM',
     "order" INTEGER NOT NULL DEFAULT 0,
     "databaseId" INTEGER,
-    "querySolution" TEXT,
+    "solution" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -319,3 +320,6 @@ ALTER TABLE "Progress" ADD CONSTRAINT "Progress_exerciseId_fkey" FOREIGN KEY ("e
 
 -- AddForeignKey
 ALTER TABLE "DbSession" ADD CONSTRAINT "DbSession_submissionId_fkey" FOREIGN KEY ("submissionId") REFERENCES "Submission"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Database" ADD CONSTRAINT "Database_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

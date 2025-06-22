@@ -1,9 +1,65 @@
-import { Injectable, ForbiddenException, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, ForbiddenException, NotFoundException, Logger, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { Role, User, ContainerStatus } from '@prisma/client';
 import { SqlErrorException } from '../../../common/exceptions/sql-error.exception';
 import { DockerService } from '../../docker/services/docker.service';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { Pool, PoolClient } from 'pg';
+// import { CreateDatabaseDto } from './models/create-database.dto';
+// import { UpdateDatabaseDto } from './models/update-database.dto';
+import { Client } from 'pg';
+import * as fs from 'fs';
+import * as path from 'path';
+import { QueryResult } from 'pg';
+
+
+import { ApiProperty } from '@nestjs/swagger';
+import { IsString, IsNotEmpty, IsOptional,MaxLength } from 'class-validator';
+
+export class CreateDatabaseDto {
+    @ApiProperty({ description: 'The name of the database' })
+    @IsString()
+    @IsNotEmpty()
+    name: string;
+
+    @ApiProperty({ description: 'Optional description of the database', required: false })
+    @IsString()
+    @IsOptional()
+    description?: string;
+
+    @ApiProperty({ description: 'Optional initial SQL schema for this database', required: false })
+    @IsString()
+    @IsOptional()
+    schemaSql?: string;
+}
+
+
+
+export class UpdateDatabaseDto {
+    @ApiProperty({
+        description: 'The updated name of the database.',
+        example: 'Customer Orders Database',
+        required: false,
+    })
+    @IsOptional()
+    @IsString()
+    @MaxLength(100)
+    name?: string;
+
+    @ApiProperty({
+        description: 'The updated description of the database.',
+        example: 'A database for managing customer orders and products.',
+        required: false,
+    })
+    @IsOptional()
+    @IsString()
+    @MaxLength(500)
+    description?: string;
+} 
+
+
+
+
 
 @Injectable()
 export class DatabasesService {
@@ -85,31 +141,6 @@ export class DatabasesService {
                 where: { id: database.id },
             });
             
-            // Re-throw the error with proper formatting
-            if (error instanceof Error && 'code' in error) {
-                const pgError = error as PostgresError;
-                const errorMap: { [key: string]: string } = {
-                    '42P01': 'Table does not exist',
-                    '42703': 'Column does not exist',
-                    '23505': 'Unique constraint violation',
-                    '23503': 'Foreign key violation',
-                    '42601': 'Syntax error in SQL schema',
-                    '28P01': 'Invalid password',
-                    '3D000': 'Database does not exist',
-                    '42501': 'Permission denied',
-                    '42P04': 'Database already exists'
-                };
-
-                const errorMessage = errorMap[pgError.code] || pgError.message;
-                throw new SqlErrorException({
-                    message: `Failed to create database: ${errorMessage}`,
-                    name: pgError.name,
-                    code: pgError.code,
-                    detail: pgError.detail,
-                    stack: pgError.stack
-                });
-            }
-            
             throw new SqlErrorException({
                 message: `Failed to create database: ${error instanceof Error ? error.message : 'Unknown error'}`,
                 name: 'DatabaseCreationError',
@@ -121,7 +152,7 @@ export class DatabasesService {
     }
 
     async getAllDatabases() {
-        
+        return this.prisma.database.findMany();
     }
 
     async getDatabaseById(id: number) {
@@ -391,30 +422,6 @@ export class DatabasesService {
             if (this.isWriteOperation(query)) {
                 await client.query('ROLLBACK');
             }
-
-            // Handle specific PostgreSQL errors
-            if (error instanceof Error && 'code' in error) {
-                const pgError = error as PostgresError;
-                const errorMap: { [key: string]: string } = {
-                    '42P01': 'Table does not exist',
-                    '42703': 'Column does not exist',
-                    '23505': 'Unique constraint violation',
-                    '23503': 'Foreign key violation',
-                    '42601': 'Syntax error',
-                    '28P01': 'Invalid password',
-                    '3D000': 'Database does not exist',
-                    '42501': 'Permission denied'
-                };
-
-                const errorMessage = errorMap[pgError.code] || pgError.message;
-                throw new SqlErrorException({
-                    message: errorMessage,
-                    name: pgError.name,
-                    code: pgError.code,
-                    detail: pgError.detail,
-                    stack: pgError.stack
-                });
-            }
             
             throw error;
         } finally {
@@ -460,5 +467,22 @@ export class DatabasesService {
         const writeCommands = ['INSERT', 'UPDATE', 'DELETE', 'DROP', 'ALTER', 'CREATE', 'TRUNCATE'];
         const normalizedQuery = query.trim().toUpperCase();
         return writeCommands.some(cmd => normalizedQuery.startsWith(cmd));
+    }
+
+    async runQueryInContainer(connectionDetails: any, query: string): Promise<QueryResult> {
+        let client: Client | null = null;
+        try {
+            client = new Client(connectionDetails);
+            await client.connect();
+            const result = await client.query(query);
+            return result;
+        } catch (error) {
+            console.error('Error executing query in container:', error);
+            throw new InternalServerErrorException('Failed to execute query');
+        } finally {
+            if (client) {
+                await client.end();
+            }
+        }
     }
 }

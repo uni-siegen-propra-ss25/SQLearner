@@ -11,11 +11,6 @@ import { ChatModule } from './modules/chat/chat.module';
 import { ProgressModule } from './modules/progress/progress.module';
 import { BookmarksModule } from './modules/bookmarks/bookmarks.module';
 
-
-import { TodosModule } from './modules/todos/todos.module';
-import { HintsModule } from './modules/hints/hints.module';
-import { QuestionModule } from './modules/questions/question.module';
-
 @Module({
     imports: [
         ConfigModule.forRoot({
@@ -30,10 +25,6 @@ import { QuestionModule } from './modules/questions/question.module';
         ChatModule,
         ProgressModule,
         BookmarksModule,
-        SettingsModule, 
-        TodosModule,    
-        HintsModule,
-        QuestionModule,
-        ],
+    ],
 })
 export class AppModule {}

@@ -10,6 +10,7 @@ import {
     UploadedFile,
     ParseIntPipe,
     UseInterceptors,
+    Patch,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth/jwt-auth.guard';
@@ -20,7 +21,8 @@ import { Role, User } from '@prisma/client';
 import { DatabasesService } from '../services/databases.service';
 import { QueryDto } from '../models/query.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-
+import { CreateDatabaseDto } from '../models/create-database.dto';
+import { UpdateDatabaseDto } from '../models/update-database.dto';
 /**
  * Controller managing database operations for the SQL learning system.
  * Handles:
@@ -43,11 +45,12 @@ export class DatabasesController {
     @UseInterceptors(FileInterceptor('file'))
     @ApiOperation({ summary: 'Upload SQL file to create database' })
     @ApiResponse({ status: 201, description: 'SQL file uploaded and database created successfully' })
-    async uploadDatabase(
+    uploadDatabase(
         @UploadedFile() file: Express.Multer.File,
         @GetUser() user: User,
     ) {
-        return this.databasesService.createDatabase(file, user);
+        const dto: CreateDatabaseDto = { name: file.originalname, schemaSql: file.buffer.toString() };
+        return this.databasesService.createDatabase(dto, user.id, user.role);
     }
 
     @Get()
@@ -69,23 +72,23 @@ export class DatabasesController {
     @Roles(Role.TUTOR)
     @ApiOperation({ summary: 'Create a new empty database' })
     @ApiResponse({ status: 201, description: 'Database created successfully' })
-    async createDatabase(
-        @Body() file: Express.Multer.File,
+    createDatabase(
+        @Body() dto: CreateDatabaseDto,
         @GetUser() user: User,
     ) {
-        return this.databasesService.createDatabase(file, user);
+        return this.databasesService.createDatabase(dto, user.id, user.role);
     }
 
-    @Put(':id')
-    @Roles(Role.TUTOR)
+    @Patch(':id')
+    @UseInterceptors(FileInterceptor('file'))
     @ApiOperation({ summary: 'Update database metadata' })
     @ApiResponse({ status: 200, description: 'Database updated successfully' })
-    async updateDatabase(
+    updateDatabase(
         @Param('id', ParseIntPipe) databaseId: number,
+        @Body() dto: UpdateDatabaseDto,
         @GetUser() user: User,
-        @Body() file: Express.Multer.File,
     ) {
-        return this.databasesService.updateDatabase(databaseId, user, file);
+        return this.databasesService.updateDatabase(databaseId, dto, user.id, user.role);
     }
 
     @Delete(':id')
@@ -96,7 +99,7 @@ export class DatabasesController {
         @Param('id', ParseIntPipe) id: number, // Database ID
         @GetUser() user: User,
     ) {
-        return this.databasesService.deleteDatabase(id, user);
+        return this.databasesService.deleteDatabase(id, user.id, user.role);
     }
 
     @Post(':id/query')

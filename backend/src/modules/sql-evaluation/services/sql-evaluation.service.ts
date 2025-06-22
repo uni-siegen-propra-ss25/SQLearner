@@ -29,6 +29,7 @@ export class SqlEvaluationService {
      * @param {string} studentQuery - The SQL query submitted by the student
      * @param {string} solutionQuery - The reference solution query from the tutor
      * @param {number} databaseId - The ID of the database to execute queries against
+     * @param {object} connectionDetails - Optional connection details for the database
      * @returns {Promise<EvaluationResult>} Complete evaluation with correctness, feedback, and suggestions
      * 
      * @description Evaluation process:
@@ -43,7 +44,8 @@ export class SqlEvaluationService {
      * const evaluation = await sqlEvaluator.evaluateQuery(
      *   "SELECT name FROM users WHERE age > 18",
      *   "SELECT name FROM users WHERE age >= 18",
-     *   123
+     *   123,
+     *   { host: 'localhost', port: 3306 }
      * );
      * 
      * if (evaluation.isCorrect) {
@@ -57,15 +59,16 @@ export class SqlEvaluationService {
     async evaluateQuery(
         studentQuery: string,
         solutionQuery: string,
-        databaseId: number
+        databaseId: number,
+        connectionDetails?: { host: string; port: number }
     ): Promise<EvaluationResult> {
         this.logger.log(`Starting SQL evaluation for database ${databaseId}`);
         
         try {
             // Execute both queries in parallel
             const [studentResult, solutionResult] = await Promise.all([
-                this.queryExecutor.executeQuerySafely(studentQuery, databaseId, 'student'),
-                this.queryExecutor.executeQuerySafely(solutionQuery, databaseId, 'solution')
+                this.queryExecutor.executeQuerySafely(databaseId, studentQuery, 'student', connectionDetails),
+                this.queryExecutor.executeQuerySafely(databaseId, solutionQuery, 'solution', connectionDetails)
             ]);
 
             // Compare results
