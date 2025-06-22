@@ -1,7 +1,7 @@
 <div class="database-container">
   <div class="header">
     <h1>Databases</h1>
-    <div class="actions">
+    <div class="actions" *ngIf="isTutor">
       <button mat-raised-button color="primary" (click)="openUploadDialog()">
         <mat-icon>upload_file</mat-icon>
         SQL-Datei hochladen
@@ -14,7 +14,7 @@
   </div>
 
   <div class="database-grid">
-    <mat-card class="database-card" *ngFor="let database of databases" (click)="viewDatabase(database)">
+    <mat-card class="database-card" *ngFor="let database of databases">
       <mat-card-header>
         <mat-card-title>{{ database.name }}</mat-card-title>
         <mat-card-subtitle>Created: {{ database.createdAt | date:'medium' }}</mat-card-subtitle>
@@ -63,7 +63,6 @@
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row 
               *matRowDef="let row; columns: displayedColumns" 
-              (click)="viewDatabase(row)"
               class="database-row"
               [style.cursor]="'pointer'"
           ></tr>

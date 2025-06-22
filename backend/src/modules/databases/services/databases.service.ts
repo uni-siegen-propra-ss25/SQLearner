@@ -4,10 +4,11 @@ import { Role, User, ContainerStatus, Database } from '@prisma/client';
 import { SqlErrorException } from '../../../common/exceptions/sql-error.exception';
 import { DockerService } from '../../docker/services/docker.service';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { Pool } from 'pg';
+import { Pool, Client } from 'pg';
 import { DatabaseDto } from '../models/database.dto';
 import { CreateDatabaseDto } from '../models/create-database.dto';
 import { UpdateDatabaseDto } from '../models/update-database.dto';
+import { QueryResult } from '../../sql-evaluation/models/query-result.dto';
 
 @Injectable()
 export class DatabasesService {
@@ -25,7 +26,7 @@ export class DatabasesService {
     }
 
     async getAllDatabases() {
-        
+        return this.prisma.database.findMany();
     }
 
     async getDatabaseById(id: number) {
@@ -52,7 +53,10 @@ export class DatabasesService {
             data: {
                 name: file.originalname,
                 description: 'Uploaded SQL file',
-                schemaSql: schema
+                schemaSql: schema,
+                owner: {
+                    connect: { id: user.id }
+                }
             },
         });
 
@@ -122,7 +126,10 @@ export class DatabasesService {
             data: {
                 name: dto.name,
                 description: dto.description,
-                schemaSql: dto.schemaSql || ''
+                schemaSql: dto.schemaSql || '',
+                owner: {
+                    connect: { id: user.id }
+                }
             },
         });
 
@@ -186,32 +193,16 @@ export class DatabasesService {
         return database;
     }
 
-    async getAllDatabases() {
-        return this.prisma.database.findMany();
-    }
-
-    async getDatabaseById(id: number) {
-        const database = await this.prisma.database.findUnique({
-            where: { id },
-        });
-
-        if (!database) {
-            throw new NotFoundException(`Database with ID ${id} not found`);
-        }
-
-        return database;
-    }
-
     async updateDatabase(
         id: number,
         dto: UpdateDatabaseDto,
         user: User,
     ) {
-        if (user.role !== Role.TUTOR) {
-            throw new ForbiddenException('Only tutors can update databases');
-        }
-        
         const database = await this.getDatabaseById(id);
+
+        if (user.role !== Role.ADMIN && database.ownerId !== user.id) {
+            throw new ForbiddenException('You do not have permission to update this database.');
+        }
 
         // Only update name and description, not schemaSql (which contains the database name)
         const updateData: any = {};
@@ -226,6 +217,10 @@ export class DatabasesService {
 
     async deleteDatabase(id: number, user: User) {
         const database = await this.getDatabaseById(id);
+
+        if (user.role !== Role.ADMIN && database.ownerId !== user.id) {
+            throw new ForbiddenException('You are not the owner of this database.');
+        }
 
         try {
             // Get database name from schemaSql field
@@ -248,16 +243,15 @@ export class DatabasesService {
                 `, [dbName]);
 
                 // Drop the database
-                await adminPool.query(`DROP DATABASE IF EXISTS "${dbName}"`);
+                await adminPool.query(`DROP DATABASE "${dbName}"`);
                 console.log(`Database ${dbName} dropped successfully`);
                 await adminPool.end();
             }
         } catch (error) {
-            console.error('Error dropping database:', error);
-            // Continue deleting the database record even if dropping database fails
+            console.error(`Error dropping database ${database.schemaSql}:`, error);
         }
 
-        // Delete the database record from the Database table
+        // Delete the database record
         return this.prisma.database.delete({
             where: { id },
         });
@@ -429,15 +423,31 @@ export class DatabasesService {
 
     async runQueryInContainer(connectionDetails: any, query: string): Promise<QueryResult> {
         let client: Client | null = null;
+        const startTime = Date.now();
         try {
             client = new Client(connectionDetails);
             await client.connect();
             const result = await client.query(query);
-            return result;
-        } catch (error) {
-            console.error('Error executing query in container:', error);
-            throw new InternalServerErrorException('Failed to execute query');
-        } finally {
+            const executionTimeMs = Date.now() - startTime;
+            return {
+                columns: result.fields.map(field => field.name),
+                rows: result.rows,
+                rowCount: result.rowCount ?? 0,
+                command: result.command,
+                executionTimeMs,
+            };
+        } catch (e) {
+            const executionTimeMs = Date.now() - startTime;
+            const error = e as Error;
+            return {
+                columns: [],
+                rows: [],
+                rowCount: 0,
+                executionTimeMs,
+                error: error.message,
+            };
+        }
+        finally {
             if (client) {
                 await client.end();
             }

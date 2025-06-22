@@ -36,18 +36,9 @@ export class DatabaseListComponent implements OnInit {
 
     loadDatabases(): void {
         this.databaseService.getAllDatabases().subscribe(
-            (databases) => (this.databases = databases),
-            (error) => console.error('Error loading databases:', error),
+            (databases: Database[]) => (this.databases = databases),
+            (error: any) => console.error('Error loading databases:', error),
         );
-    }
-
-    openUploadDialog(): void {
-        const dialogRef = this.dialog.open(DatabaseEditDialogComponent);
-        dialogRef.afterClosed().subscribe((result) => {
-            if (result) {
-                this.loadDatabases();
-            }
-        });
     }
 
     openCreateDialog(): void {
@@ -115,35 +106,5 @@ export class DatabaseListComponent implements OnInit {
 
     deleteDatabase(databaseId: number): void {
         this.openDeleteDialog(databaseId);
-    }
-
-    viewDatabase(database: Database): void {
-        this.dialog.open(DatabaseViewDialogComponent, {
-            data: {
-                database: database
-            },
-            maxWidth: '90vw',
-            maxHeight: '90vh',
-        });
-    }
-
-    deleteDatabase(id: number): void {
-        if (confirm('Are you sure you want to delete this database?')) {
-            this.databaseService.deleteDatabase(id).subscribe(
-                () => this.loadDatabases(),
-                (error) => console.error('Error deleting database:', error),
-            );
-        }
-    }
-
-    openEditDialog(database: Database): void {
-        const dialogRef = this.dialog.open(DatabaseEditDialogComponent, {
-            data: database
-        });
-        dialogRef.afterClosed().subscribe((result) => {
-            if (result) {
-                this.loadDatabases();
-            }
-        });
     }
 }

@@ -49,8 +49,7 @@ export class DatabasesController {
         @UploadedFile() file: Express.Multer.File,
         @GetUser() user: User,
     ) {
-        const dto: CreateDatabaseDto = { name: file.originalname, schemaSql: file.buffer.toString() };
-        return this.databasesService.createDatabase(dto, user.id, user.role);
+        return this.databasesService.uploadDatabase(file, user);
     }
 
     @Get()
@@ -76,7 +75,7 @@ export class DatabasesController {
         @Body() dto: CreateDatabaseDto,
         @GetUser() user: User,
     ) {
-        return this.databasesService.createDatabase(dto, user.id, user.role);
+        return this.databasesService.createDatabase(dto, user);
     }
 
     @Patch(':id')
@@ -88,7 +87,7 @@ export class DatabasesController {
         @Body() dto: UpdateDatabaseDto,
         @GetUser() user: User,
     ) {
-        return this.databasesService.updateDatabase(databaseId, dto, user.id, user.role);
+        return this.databasesService.updateDatabase(databaseId, dto, user);
     }
 
     @Put(':id')
@@ -97,9 +96,8 @@ export class DatabasesController {
     @ApiResponse({ status: 200, description: 'Database updated successfully' })
     async updateDatabasePut(
         @Param('id', ParseIntPipe) databaseId: number,
-        @Body() dto: UpdateDatabaseDto,
-        @GetUser() user: User,
         @Body() dto: UpdateDatabaseDto, 
+        @GetUser() user: User,
     ) {
         return this.databasesService.updateDatabase(databaseId, dto, user);
     }
@@ -112,7 +110,7 @@ export class DatabasesController {
         @Param('id', ParseIntPipe) id: number, // Database ID
         @GetUser() user: User,
     ) {
-        return this.databasesService.deleteDatabase(id, user.id, user.role);
+        return this.databasesService.deleteDatabase(id, user);
     }
 
     @Post(':id/query')

@@ -4,21 +4,17 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { Database, DatabaseTable, TableColumn } from '../../models/database.model';
-import { TableService } from '../../services/table.service';
+import { Database } from '../../models/database.model';
+import { DatabaseTable } from '../../models/table.model';
 import { ConfirmDialogComponent } from '../../dialogs/confirm-dialog/confirm-dialog.component';
-import { TableCreateDialogComponent } from '../../dialogs/table-create-dialog/table-create-dialog.component';
-import { TableEditDialogComponent } from '../../dialogs/table-edit-dialog/table-edit-dialog.component';
-import { DataCreateDialogComponent } from '../../dialogs/data-create-dialog/data-create-dialog.component';
-import { DataEditDialogComponent } from '../../dialogs/data-edit-dialog/data-edit-dialog.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DatabaseService, QueryResult } from '../../services/database.service';
-import { CreateTableDto, UpdateTableDto } from '../../models/database.model';
+import { CreateTableDialogComponent } from '../../dialogs/create-table-dialog/create-table-dialog.component';
 
 @Component({
   selector: 'app-database-table-viewer',
   templateUrl: './database-table-viewer.component.html',
-  styleUrls: ['./database-table-viewer.component.scss']
+  styleUrls: []
 })
 export class DatabaseTableViewerComponent implements OnInit, AfterViewInit {
   @Input() database!: Database;
@@ -53,17 +49,12 @@ export class DatabaseTableViewerComponent implements OnInit, AfterViewInit {
     private route: ActivatedRoute,
     private router: Router,
     private databaseService: DatabaseService,
-    private tableService: TableService,
     public dialog: MatDialog,
     private snackBar: MatSnackBar
   ) {}
 
   ngOnInit() {
     const dbId = Number(this.route.snapshot.paramMap.get('id'));
-    this.tableService.getTables(dbId).subscribe(tables => {
-      this.tables = tables;
-    });
-
     this.route.params.subscribe(params => {
         const tableId = +params['tableId'];
         if(tableId) {
@@ -150,60 +141,53 @@ export class DatabaseTableViewerComponent implements OnInit, AfterViewInit {
   }
 
   openCreateTableDialog() {
-    const dialogRef = this.dialog.open(TableCreateDialogComponent, {
+    const dialogRef = this.dialog.open(CreateTableDialogComponent, {
       width: '600px',
       data: { databaseId: this.database.id }
     });
 
-    dialogRef.afterClosed().subscribe((result: CreateTableDto) => {
+    dialogRef.afterClosed().subscribe((result: any) => {
       if (result && this.database) {
-        this.tableService.createTable(this.database.id, result).subscribe({
-          next: (newTable) => {
-            this.tables.push(newTable);
-            this.selectTable(newTable);
-            this.snackBar.open('Tabelle erfolgreich erstellt', 'OK', { duration: 3000 });
-          },
-          error: (error) => {
-            console.error('Error creating table:', error);
-            this.snackBar.open('Fehler beim Erstellen der Tabelle', 'OK', { duration: 3000 });
+        this.route.params.subscribe(params => {
+          const tableId = +params['tableId'];
+          if(tableId) {
+            this.selectedTable = this.tables.find(t => t.id === tableId) ?? null;
+            if(this.selectedTable) {
+              this.loadTableData(this.selectedTable.name);
+            }
           }
         });
+        this.snackBar.open('Tabelle erfolgreich erstellt', 'OK', { duration: 3000 });
       }
     });
   }
 
   openEditTableDialog(table: DatabaseTable) {
-    const dialogRef = this.dialog.open(TableEditDialogComponent, {
+    /* const dialogRef = this.dialog.open(TableEditDialogComponent, {
       width: '600px',
       data: { table: table }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result && this.database) {
-        this.tableService.updateTable(this.database.id, table.id, result).subscribe({
-          next: (updatedTable) => {
-            const index = this.tables.findIndex(t => t.id === updatedTable.id);
-            if (index > -1) {
-              this.tables[index] = updatedTable;
+        this.route.params.subscribe(params => {
+          const tableId = +params['tableId'];
+          if(tableId) {
+            this.selectedTable = this.tables.find(t => t.id === tableId) ?? null;
+            if(this.selectedTable) {
+              this.loadTableData(this.selectedTable.name);
             }
-            if (this.selectedTable?.id === updatedTable.id) {
-              this.selectTable(updatedTable);
-            }
-            this.snackBar.open('Tabelle erfolgreich aktualisiert', 'OK', { duration: 3000 });
-          },
-          error: (error) => {
-            console.error('Error updating table:', error);
-            this.snackBar.open('Fehler beim Aktualisieren der Tabelle', 'OK', { duration: 3000 });
           }
         });
+        this.snackBar.open('Tabelle erfolgreich aktualisiert', 'OK', { duration: 3000 });
       }
-    });
+    }); */
   }
 
   openAddDataDialog(): void {
     if (!this.selectedTable || !this.database) return;
     
-    const dialogRef = this.dialog.open(DataCreateDialogComponent, {
+    /* const dialogRef = this.dialog.open(DataCreateDialogComponent, {
       width: '800px',
       data: {
         databaseId: this.database.id,
@@ -215,13 +199,13 @@ export class DatabaseTableViewerComponent implements OnInit, AfterViewInit {
       if (result) {
         this.loadTableData(this.selectedTable!.name);
       }
-    });
+    }); */
   }
 
   openEditDataDialog(rowData: any): void {
     if (!this.selectedTable || !this.database) return;
     
-    const dialogRef = this.dialog.open(DataEditDialogComponent, {
+    /* const dialogRef = this.dialog.open(DataEditDialogComponent, {
       width: '800px',
       data: {
         databaseId: this.database.id,
@@ -234,7 +218,7 @@ export class DatabaseTableViewerComponent implements OnInit, AfterViewInit {
       if (result) {
         this.loadTableData(this.selectedTable!.name);
       }
-    });
+    }); */
   }
 
   truncateTable() {
@@ -252,12 +236,12 @@ export class DatabaseTableViewerComponent implements OnInit, AfterViewInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result && this.database) {
-        this.tableService.truncateTable(this.database.id, table.id).subscribe({
+        this.databaseService.truncateTable(this.database.id, table.id).subscribe({
           next: () => {
             this.loadTableData(table.name);
             this.snackBar.open('Tabelle erfolgreich geleert', 'OK', { duration: 3000 });
           },
-          error: (error) => {
+          error: (error: any) => {
             console.error('Error truncating table', error);
             this.snackBar.open('Fehler beim Leeren der Tabelle', 'OK', { duration: 3000 });
           }
@@ -278,7 +262,7 @@ export class DatabaseTableViewerComponent implements OnInit, AfterViewInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result && this.database) {
-        this.tableService.deleteTable(this.database.id, table.id).subscribe({
+        this.databaseService.deleteTable(this.database.id, table.id).subscribe({
           next: () => {
             this.tables = this.tables.filter(t => t.id !== table.id);
             if (this.selectedTable?.id === table.id) {
@@ -288,7 +272,7 @@ export class DatabaseTableViewerComponent implements OnInit, AfterViewInit {
             }
             this.snackBar.open('Tabelle erfolgreich gelöscht', 'OK', { duration: 3000 });
           },
-          error: (error) => {
+          error: (error: any) => {
             console.error('Error deleting table', error);
             this.snackBar.open('Fehler beim Löschen der Tabelle', 'OK', { duration: 3000 });
           }
@@ -316,12 +300,12 @@ export class DatabaseTableViewerComponent implements OnInit, AfterViewInit {
             }
             const rowId = row[primaryKeyCol.name];
 
-            this.tableService.deleteTableRow(this.database.id, this.selectedTable.id, rowId).subscribe({
+            this.databaseService.deleteTableRow(this.database.id, this.selectedTable.id, rowId).subscribe({
                 next: () => {
                     this.loadTableData(this.selectedTable!.name);
                     this.snackBar.open('Zeile erfolgreich gelöscht', 'OK', { duration: 3000 });
                 },
-                error: (error) => {
+                error: (error: any) => {
                     console.error('Error deleting row:', error);
                     this.snackBar.open('Fehler beim Löschen der Zeile', 'OK', { duration: 3000 });
                 }
@@ -353,7 +337,7 @@ export class DatabaseTableViewerComponent implements OnInit, AfterViewInit {
       if (result) {
         const deletePromises = rows.map(row => {
           const pkValue = row[pkColumn.name];
-          return this.tableService.deleteTableRow(
+          return this.databaseService.deleteTableRow(
             this.database!.id,
             this.selectedTable!.id,
             pkValue
