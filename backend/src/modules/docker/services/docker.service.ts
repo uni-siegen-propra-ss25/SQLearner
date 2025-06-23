@@ -2,11 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import * as Docker from 'dockerode';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { exec } from 'child_process';
-import * as fs from 'fs';
-import * as util from 'util';
-
-const execAsync = util.promisify(exec);
 
 /**
  * Service responsible for managing Docker containers for the SQL learning system.
@@ -37,12 +32,18 @@ export class DockerService {
         }
 
         const container = await this.docker.createContainer({
-            Image: 'postgres:alpine',
-            Env: ['POSTGRES_PASSWORD=secret'],
+            Image: 'postgres:15-alpine',
+            Env: [
+                'POSTGRES_PASSWORD=secret',
+                'POSTGRES_USER=postgres',
+                'POSTGRES_DB=exercise_db'
+            ],
             ExposedPorts: { '5432/tcp': {} },
             HostConfig: {
                 PortBindings: { '5432/tcp': [{ HostPort: '0' }] },
                 AutoRemove: true,
+                Memory: 256 * 1024 * 1024, // 256MB limit
+                MemorySwap: 256 * 1024 * 1024,
             },
         });
 
@@ -50,41 +51,17 @@ export class DockerService {
         const containerInfo = await container.inspect();
         const port = containerInfo.NetworkSettings.Ports['5432/tcp'][0].HostPort;
 
-        const dbName = exercise.database.schemaSql;
-        const backupPath = `/tmp/backup-${Date.now()}.sql`;
-
-        const dumpCommand = `pg_dump -h ${process.env.DB_HOST} -p ${process.env.DB_PORT} -U ${process.env.DB_USER} -d ${dbName} > ${backupPath}`;
-        await execAsync(dumpCommand, { env: { PGPASSWORD: process.env.DB_PASSWORD } });
-
-        const tarStream = fs.createReadStream(backupPath);
-        await container.putArchive(tarStream, { path: '/tmp' });
-
-        const restoreCommand = `psql -U postgres -d postgres -f ${backupPath}`;
-        const restoreExec = await container.exec({
-            Cmd: ['sh', '-c', restoreCommand],
-            AttachStdout: true,
-            AttachStderr: true,
-        });
-
-        await new Promise<void>((resolve, reject) => {
-            restoreExec.start({}, (err, stream) => {
-                if (err) return reject(err);
-                if (stream) {
-                    stream.on('end', resolve);
-                    stream.on('error', reject);
-                } else {
-                    resolve();
-                }
-            });
-        });
-
-        fs.unlinkSync(backupPath);
+        // Wait for PostgreSQL to be ready
+        await new Promise(resolve => setTimeout(resolve, 5000));
 
         return {
             containerId: container.id,
             connectionDetails: {
                 host: 'localhost',
-                port: port,
+                port: parseInt(port),
+                database: 'exercise_db',
+                user: 'postgres',
+                password: 'secret'
             },
         };
     }

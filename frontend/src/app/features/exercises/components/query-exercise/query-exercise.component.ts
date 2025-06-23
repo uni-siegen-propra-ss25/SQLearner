@@ -44,18 +44,28 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.route.paramMap.subscribe((params: ParamMap) => {
             const exerciseId = Number(params.get('exerciseId'));
+            console.log('=== DEBUG: QueryExerciseComponent ngOnInit ===');
+            console.log('exerciseId from route:', exerciseId);
+            console.log('exercise from @Input:', this.exercise);
+            console.log('exercise.id:', this.exercise?.id);
+            
             if (exerciseId) {
+                console.log('Creating container for exerciseId:', exerciseId);
                 this.containerSubscription = this.dockerService.createContainer(exerciseId).subscribe({
                     next: (response: { containerId: string; connectionDetails: any }) => {
+                        console.log('Container created successfully:', response);
                         this.containerId = response.containerId;
                         this.connectionDetails = response.connectionDetails;
                     },
                     error: (error: any) => {
+                        console.error('Failed to create container:', error);
                         this.snackBar.open('Failed to create exercise environment.', 'Close', {
                             duration: 5000,
                         });
                     }
                 });
+            } else {
+                console.error('No exerciseId found in route params');
             }
         });
     }

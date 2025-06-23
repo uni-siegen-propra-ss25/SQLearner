@@ -12,6 +12,9 @@ export class DockerService {
   constructor(private http: HttpClient) { }
 
   createContainer(exerciseId: number): Observable<{ containerId: string; connectionDetails: any }> {
+    console.log('=== DEBUG: DockerService.createContainer ===');
+    console.log('exerciseId:', exerciseId);
+    console.log('API URL:', `${this.apiUrl}/containers/${exerciseId}`);
     return this.http.post<{ containerId: string; connectionDetails: any }>(`${this.apiUrl}/containers/${exerciseId}`, {});
   }
 
