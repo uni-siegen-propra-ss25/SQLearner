@@ -44,7 +44,7 @@ export class ExerciseDialogComponent implements OnInit {
             type: [type, Validators.required],
             difficulty: [this.data.difficulty || Difficulty.EASY, Validators.required],
             databaseId: [this.data.databaseId || null, validators],
-            querySolution: [this.data.querySolution || null, validators],
+            solution: [this.data.solution || ''],
             answers: this.fb.array([]),
             topicId: [this.data.topicId],
             order: [this.data.order || 0],
@@ -71,14 +71,14 @@ export class ExerciseDialogComponent implements OnInit {
     private setupTypeValidation() {
         this.exerciseForm.get('type')?.valueChanges.subscribe((type: ExerciseType) => {
             const databaseIdControl = this.exerciseForm.get('databaseId');
-            const querySolutionControl = this.exerciseForm.get('querySolution');
+            const solutionControl = this.exerciseForm.get('solution');
             const answersControl = this.exerciseForm.get('answers') as FormArray;
 
             // Reset all controls and their validators
             databaseIdControl?.clearValidators();
             databaseIdControl?.setValue(null);
-            querySolutionControl?.clearValidators();
-            querySolutionControl?.setValue(null);
+            solutionControl?.clearValidators();
+            solutionControl?.setValue(null);
 
             // Clear answers array for non-choice exercises
             if (type !== ExerciseType.SINGLE_CHOICE && type !== ExerciseType.MULTIPLE_CHOICE) {
@@ -97,7 +97,7 @@ export class ExerciseDialogComponent implements OnInit {
             // Set up validators based on type
             if (type === ExerciseType.QUERY) {
                 databaseIdControl?.setValidators([Validators.required]);
-                querySolutionControl?.setValidators([Validators.required]);
+                solutionControl?.setValidators([Validators.required]);
             } else if (
                 type === ExerciseType.SINGLE_CHOICE ||
                 type === ExerciseType.MULTIPLE_CHOICE
@@ -127,7 +127,7 @@ export class ExerciseDialogComponent implements OnInit {
 
             // Update validation status
             databaseIdControl?.updateValueAndValidity();
-            querySolutionControl?.updateValueAndValidity();
+            solutionControl?.updateValueAndValidity();
             if (answersControl.length > 0) {
                 answersControl.controls.forEach((control) => {
                     control.get('text')?.updateValueAndValidity();
@@ -199,26 +199,48 @@ export class ExerciseDialogComponent implements OnInit {
     }
 
     onSubmit(): void {
+        console.log('=== DEBUG: onSubmit called ===');
         const validation = this.validateForm();
         if (!validation.valid) {
+            console.log('=== DEBUG: Form validation failed ===');
             this.snackBar.open(validation.error || 'Form validation failed', 'Close', { duration: 5000 });
             return;
         }
 
         const formValue = { ...this.exerciseForm.value };
+        console.log('=== DEBUG: Form processing ===');
+        console.log('Form value before processing:', formValue);
+        console.log('Dialog data:', this.data);
+
+        // Always include topicId from dialog data
+        formValue.topicId = this.data.topicId;
+        console.log('TopicId set to:', formValue.topicId);
 
         // Clean up the form value based on exercise type
         if (formValue.type !== ExerciseType.QUERY) {
+            console.log('=== DEBUG: Removing query fields ===');
             delete formValue.databaseId;
-            delete formValue.querySolution;
+            delete formValue.solution;
+        } else {
+            console.log('=== DEBUG: QUERY exercise - checking fields ===');
+            console.log('databaseId:', formValue.databaseId);
+            console.log('solution:', formValue.solution);
+            console.log('solution type:', typeof formValue.solution);
+            console.log('solution length:', formValue.solution?.length);
         }
+        
         if (
             formValue.type !== ExerciseType.SINGLE_CHOICE &&
             formValue.type !== ExerciseType.MULTIPLE_CHOICE
         ) {
+            console.log('=== DEBUG: Removing answer fields ===');
             delete formValue.answers;
         }
 
+        console.log('=== DEBUG: Final form value ===');
+        console.log('Final form value to be sent:', formValue);
+        console.log('Final form value keys:', Object.keys(formValue));
+        console.log('Final form value stringified:', JSON.stringify(formValue, null, 2));
         this.dialogRef.close(formValue);
     }
 

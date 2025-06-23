@@ -9,11 +9,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { DatabaseRoutingModule } from './database-routing.module';
 import { DatabaseListComponent } from './components/database-list/database-list.component';
 import { DatabaseTableViewerComponent } from './components/database-table-viewer/database-table-viewer.component';
 import { DatabaseEditDialogComponent } from './dialogs/database-edit-dialog/database-edit-dialog.component';
@@ -44,11 +46,13 @@ import { CreateTableDialogComponent } from './dialogs/create-table-dialog/create
         MatInputModule,
         MatDividerModule,
         MatProgressBarModule,
+        MatProgressSpinnerModule,
         MatDialogModule,
         MatButtonModule,
         MatSelectModule,
         MatCheckboxModule,
-        MatTooltipModule
+        MatTooltipModule,
+        DatabaseRoutingModule
     ]
 })
 export class DatabaseModule { }

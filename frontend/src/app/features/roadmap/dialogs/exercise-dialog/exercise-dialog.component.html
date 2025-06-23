@@ -67,13 +67,13 @@
         <mat-label>Solution Query</mat-label>
         <textarea
           matInput
-          formControlName="querySolution"
+          formControlName="solution"
           placeholder="SELECT * FROM table WHERE condition"
           required
           rows="6"
         ></textarea>
         <mat-hint>Enter the SQL query that represents the correct solution</mat-hint>
-        <mat-error *ngIf="exerciseForm.get('querySolution')?.hasError('required')">
+        <mat-error *ngIf="exerciseForm.get('solution')?.hasError('required')">
           Solution query is required
         </mat-error>
       </mat-form-field>

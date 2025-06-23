@@ -1,34 +1,45 @@
+<h2 mat-dialog-title>Neue Datenbank erstellen</h2>
+
 <mat-dialog-content>
-  <h2>Neue Datenbank erstellen</h2>
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <mat-form-field class="full-width">
       <mat-label>Name</mat-label>
-      <input matInput formControlName="name" placeholder="Name der Datenbank">
+      <input matInput formControlName="name" placeholder="Name der Datenbank" required>
       <mat-error *ngIf="form.get('name')?.hasError('required')">
         Ein Name ist erforderlich
       </mat-error>
+      <mat-error *ngIf="form.get('name')?.hasError('pattern')">
+        Name muss mit Buchstabe oder Unterstrich beginnen und nur Buchstaben, Zahlen und Unterstriche enthalten
+      </mat-error>
+      <mat-hint>Nur Buchstaben, Zahlen und Unterstriche erlaubt</mat-hint>
     </mat-form-field>
 
     <mat-form-field class="full-width">
       <mat-label>Beschreibung</mat-label>
       <textarea matInput formControlName="description" 
-                placeholder="Optionale Beschreibung der Datenbank"></textarea>
+                placeholder="Optionale Beschreibung der Datenbank"
+                rows="3"></textarea>
     </mat-form-field>
 
     <div class="sql-schema-field">
       <mat-form-field class="full-width">
         <mat-label>SQL Schema (Optional)</mat-label>
         <textarea matInput formControlName="schemaSql" 
-                  placeholder="CREATE TABLE ..."
-                  rows="6"></textarea>
+                  placeholder="CREATE TABLE users (id SERIAL PRIMARY KEY, name VARCHAR(100));"
+                  rows="8"></textarea>
         <mat-hint>Gib hier optional SQL-Befehle ein, um die Datenbankstruktur zu definieren</mat-hint>
       </mat-form-field>
     </div>
-
-    <div class="dialog-actions">
-      <button mat-button type="button" (click)="onCancel()">Abbrechen</button>
-      <button mat-raised-button color="primary" type="submit" 
-              [disabled]="!form.valid">Erstellen</button>
-    </div>
   </form>
 </mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="onCancel()" [disabled]="isLoading">Abbrechen</button>
+  <button mat-raised-button color="primary" type="submit" 
+          [disabled]="!form.valid || isLoading"
+          (click)="onSubmit()">
+    <mat-spinner *ngIf="isLoading" diameter="20" class="spinner"></mat-spinner>
+    <span *ngIf="!isLoading">Erstellen</span>
+    <span *ngIf="isLoading">Wird erstellt...</span>
+  </button>
+</mat-dialog-actions>

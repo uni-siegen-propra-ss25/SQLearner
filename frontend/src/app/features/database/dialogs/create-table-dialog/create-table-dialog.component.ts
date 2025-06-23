@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { DatabaseService } from '../../services/database.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 export interface ColumnDefinition {
   name: string;
@@ -15,6 +17,11 @@ export interface ColumnDefinition {
 export interface CreateTableData {
   tableName: string;
   columns: ColumnDefinition[];
+}
+
+export interface CreateTableDialogData {
+  databaseId: number;
+  databaseName: string;
 }
 
 @Component({
@@ -35,7 +42,10 @@ export class CreateTableDialogComponent {
 
   constructor(
     private fb: FormBuilder,
-    private dialogRef: MatDialogRef<CreateTableDialogComponent>
+    private dialogRef: MatDialogRef<CreateTableDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: CreateTableDialogData,
+    private databaseService: DatabaseService,
+    private snackBar: MatSnackBar
   ) {
     this.form = this.fb.group({
       tableName: ['', [Validators.required, Validators.pattern(/^[a-zA-Z_][a-zA-Z0-9_]*$/)]],
@@ -118,7 +128,27 @@ export class CreateTableDialogComponent {
   onSubmit() {
     if (this.form.valid) {
       const sql = this.generateSQL();
-      this.dialogRef.close({ sql, formData: this.form.value });
+      
+      // Выполняем SQL запрос для создания таблицы
+      this.databaseService.runQuery(this.data.databaseId, sql).subscribe({
+        next: (result) => {
+          this.snackBar.open('Tabelle erfolgreich erstellt!', 'OK', { duration: 3000 });
+          this.dialogRef.close({ 
+            success: true, 
+            sql, 
+            formData: this.form.value,
+            result 
+          });
+        },
+        error: (error) => {
+          console.error('Error creating table:', error);
+          this.snackBar.open(
+            `Fehler beim Erstellen der Tabelle: ${error.error?.message || error.message || 'Unbekannter Fehler'}`, 
+            'OK', 
+            { duration: 5000 }
+          );
+        }
+      });
     }
   }
 

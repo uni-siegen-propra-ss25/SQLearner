@@ -12,4 +12,5 @@ export interface DatabaseTable {
   name: string;
   columns: DatabaseColumn[];
   databaseId: number;
+  rowCount?: number;
 } 

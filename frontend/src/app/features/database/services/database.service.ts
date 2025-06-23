@@ -46,19 +46,15 @@ export class DatabaseService {
     }
 
     createDatabase(database: CreateDatabaseDto): Observable<Database> {
-        console.log('DatabaseService - Creating database with data:', database);
-        console.log('DatabaseService - Current user role:', this.authService.getUserRole());
-        console.log('DatabaseService - Is user a tutor?', this.authService.isTutor());
-        console.log('DatabaseService - Auth token:', this.authService.getToken());
+        console.log('Creating database:', database);
 
         return this.http.post<Database>(this.baseUrl, database).pipe(
             map((database) => {
-                console.log('DatabaseService - Database created successfully:', database);
+                console.log('Database created successfully:', database);
                 return this.convertDates(database);
             }),
             catchError((error) => {
-                console.error('DatabaseService - Error creating database:', error);
-                console.error('DatabaseService - Error details:', error.error);
+                console.error('Error creating database:', error);
                 throw error;
             }),
         );

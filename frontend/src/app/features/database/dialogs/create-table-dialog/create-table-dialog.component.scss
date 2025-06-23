@@ -1,12 +1,12 @@
-
 :host {
     display: block;
   
     mat-dialog-content {
-      min-width: 500px;
-      max-width: 800px;
+      min-width: 600px;
+      max-width: 900px;
+      max-height: 80vh;
       padding: 24px;
-      overflow-x: hidden;
+      overflow-y: auto;
     }
   }
   
@@ -16,7 +16,7 @@
   }
   
   .form-section {
-    margin-bottom: 36px;
+    margin-bottom: 32px;
   
     &:last-child {
       margin-bottom: 0;
@@ -27,11 +27,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
   
     h3 {
       margin: 0;
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       font-weight: 500;
       color: rgba(0, 0, 0, 0.87);
     }
@@ -40,26 +40,26 @@
   .columns-container {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 20px;
     width: 100%;
-    overflow-x: hidden;
   }
   
   .column-item {
     background: #f8f9fa;
-    border-radius: 8px;
-    padding: 16px;
+    border-radius: 12px;
+    padding: 20px;
     border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   
     .column-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
   
       h4 {
         margin: 0;
-        font-size: 1rem;
+        font-size: 1.1rem;
         font-weight: 500;
         color: rgba(0, 0, 0, 0.87);
       }
@@ -68,47 +68,52 @@
     .column-fields {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 16px;
     }
   
     .field-row {
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      align-items: start;
   
       &.checkboxes {
+        display: flex;
         flex-wrap: wrap;
-        gap: 16px;
+        gap: 20px;
+        align-items: center;
   
         mat-checkbox {
-          margin-right: 16px;
+          margin-right: 0;
         }
       }
   
+      &.full-width {
+        grid-template-columns: 1fr;
+      }
+  
       mat-form-field {
-        flex: 1;
-        min-width: 150px;
+        width: 100%;
       }
     }
   }
   
   .sql-preview {
     background: #1e1e1e;
-    border-radius: 8px;
-    padding: 16px;
+    border-radius: 12px;
+    padding: 20px;
     border: 1px solid rgba(0, 0, 0, 0.12);
-    min-height: 200px;
-    max-height: 400px;
+    min-height: 150px;
+    max-height: 300px;
     width: 100%;
-    overflow-x: hidden;
     overflow-y: auto;
   
     pre {
       margin: 0;
       color: #d4d4d4;
       font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-      font-size: 1.1rem;
-      line-height: 1.5;
+      font-size: 0.9rem;
+      line-height: 1.6;
       white-space: pre-wrap;
       word-wrap: break-word;
     }
@@ -117,30 +122,18 @@
   .dialog-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 8px;
-    padding: 16px 24px;
+    gap: 12px;
+    padding: 20px 24px;
     margin: 0;
     border-top: 1px solid rgba(0, 0, 0, 0.08);
+    background: #fafafa;
   
     button {
-      min-width: 100px;
+      min-width: 120px;
+      padding: 8px 24px;
   
       &[color='primary'] {
-        margin-left: 8px;
-      }
-    }
-  }
-  
-  mat-dialog-actions {
-    padding: 16px 24px;
-    margin: 0;
-    border-top: 1px solid rgba(0, 0, 0, 0.08);
-  
-    button {
-      min-width: 100px;
-  
-      &[color='primary'] {
-        margin-left: 8px;
+        margin-left: 0;
       }
     }
   }
@@ -153,18 +146,60 @@
     }
   }
   
+  // Responsive design
+  @media (max-width: 768px) {
+    mat-dialog-content {
+      min-width: 90vw;
+      max-width: 95vw;
+      padding: 16px;
+    }
+  
+    .field-row {
+      grid-template-columns: 1fr !important;
+      gap: 12px !important;
+    }
+  
+    .column-item {
+      padding: 16px;
+    }
+  
+    .dialog-actions {
+      padding: 16px;
+      flex-direction: column;
+  
+      button {
+        width: 100%;
+        margin-left: 0 !important;
+      }
+    }
+  }
+  
   // Dark theme adjustments
   :host-context(.dark-theme) {
     .column-item {
-      background: rgba(255, 255, 255, 0.03);
-      border-color: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.1);
     }
   
     .sql-preview {
-      border-color: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.1);
     }
   
-    mat-dialog-actions {
-      border-top-color: rgba(255, 255, 255, 0.08);
+    .dialog-actions {
+      border-top-color: rgba(255, 255, 255, 0.1);
+      background: rgba(0, 0, 0, 0.05);
+    }
+  }
+  
+  mat-dialog-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  
+    .database-name {
+      font-size: 0.9rem;
+      color: rgba(0, 0, 0, 0.6);
+      font-weight: normal;
     }
   } 

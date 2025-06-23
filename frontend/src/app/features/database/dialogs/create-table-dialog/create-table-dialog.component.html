@@ -1,4 +1,7 @@
-<h2 mat-dialog-title>Neue Tabelle erstellen</h2>
+<h2 mat-dialog-title>
+  Neue Tabelle erstellen
+  <span class="database-name" *ngIf="data?.databaseName">in "{{ data.databaseName }}"</span>
+</h2>
 
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
   <mat-dialog-content>
@@ -31,7 +34,8 @@
             <h4>Spalte {{ i + 1 }}</h4>
             <button type="button" mat-icon-button color="warn" 
                     (click)="removeColumn(i)" 
-                    [disabled]="columns.length === 1">
+                    [disabled]="columns.length === 1"
+                    matTooltip="Spalte löschen">
               <mat-icon>delete</mat-icon>
             </button>
           </div>
@@ -65,7 +69,7 @@
               </mat-form-field>
             </div>
 
-            <div class="field-row">
+            <div class="field-row full-width">
               <mat-form-field appearance="fill">
                 <mat-label>Standardwert (optional)</mat-label>
                 <input matInput formControlName="defaultValue" />
