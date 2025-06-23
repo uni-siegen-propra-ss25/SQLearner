@@ -12,13 +12,14 @@ export class SubmissionService {
 
     constructor(private http: HttpClient) {}
 
-    submitAnswer(exerciseId: number, answer: string): Observable<Feedback> {
+    submitAnswer(exerciseId: number, answer: string, connectionDetails?: { host: string; port: number }): Observable<Feedback> {
         return this.http.post<Feedback>(`${this.baseUrl}/exercises/${exerciseId}/submit`, {
             answerText: answer,
+            connectionDetails,
         });
     }
 
-    runQuery(exerciseId: number, query: string): Observable<any> {
-        return this.http.post<any>(`${this.baseUrl}/exercises/${exerciseId}/run-query`, { query });
+    runQuery(exerciseId: number, query: string, connectionDetails?: { host: string; port: number }): Observable<any> {
+        return this.http.post<any>(`${this.baseUrl}/exercises/${exerciseId}/run-query`, { query, connectionDetails });
     }
 }

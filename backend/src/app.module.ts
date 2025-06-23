@@ -5,13 +5,12 @@ import { UsersModule } from './modules/users/users.module';
 import { ChaptersModule } from './modules/chapters/chapters.module';
 import { TopicsModule } from './modules/topics/topics.module';
 import { ExercisesModule } from './modules/exercises/exercises.module';
-import { DatabaseModule } from './modules/database/database.module';
+import { DatabasesModule } from './modules/databases/databases.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { ProgressModule } from './modules/progress/progress.module';
 import { BookmarksModule } from './modules/bookmarks/bookmarks.module';
-import { TodosModule } from './modules/todos/todos.module';
-import { HintsModule } from './modules/hints/hints.module';
-import { QuestionModule } from './modules/questions/question.module';
+import { SqlEvaluationModule } from './modules/sql-evaluation/sql-evaluation.module';
+import { DockerModule } from './modules/docker/docker.module';
 
 @Module({
     imports: [
@@ -20,17 +19,15 @@ import { QuestionModule } from './modules/questions/question.module';
         }),
         AuthModule,
         UsersModule,
-        DatabaseModule,
+        DatabasesModule,
         ChaptersModule,
         TopicsModule,
         ExercisesModule,
         ChatModule,
         ProgressModule,
         BookmarksModule,
-        SettingsModule,
-        TodosModule,
-        HintsModule,
-        QuestionModule,
+        SqlEvaluationModule,
+        DockerModule,
     ],
 })
 export class AppModule {}

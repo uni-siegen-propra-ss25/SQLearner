@@ -1,13 +1,14 @@
-import { Injectable, ForbiddenException, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, ForbiddenException, NotFoundException, Logger, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { Role, User, ContainerStatus, Database } from '@prisma/client';
 import { SqlErrorException } from '../../../common/exceptions/sql-error.exception';
 import { DockerService } from '../../docker/services/docker.service';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { Pool } from 'pg';
+import { Pool, Client } from 'pg';
 import { DatabaseDto } from '../models/database.dto';
 import { CreateDatabaseDto } from '../models/create-database.dto';
 import { UpdateDatabaseDto } from '../models/update-database.dto';
+import { QueryResult } from '../../sql-evaluation/models/query-result.dto';
 
 @Injectable()
 export class DatabasesService {
@@ -25,7 +26,7 @@ export class DatabasesService {
     }
 
     async getAllDatabases() {
-        
+        return this.prisma.database.findMany();
     }
 
     async getDatabaseById(id: number) {
@@ -52,7 +53,10 @@ export class DatabasesService {
             data: {
                 name: file.originalname,
                 description: 'Uploaded SQL file',
-                schemaSql: schema
+                schemaSql: schema,
+                owner: {
+                    connect: { id: user.id }
+                }
             },
         });
 
@@ -122,7 +126,10 @@ export class DatabasesService {
             data: {
                 name: dto.name,
                 description: dto.description,
-                schemaSql: dto.schemaSql || ''
+                schemaSql: dto.schemaSql || '',
+                owner: {
+                    connect: { id: user.id }
+                }
             },
         });
 
@@ -176,31 +183,6 @@ export class DatabasesService {
                 where: { id: database.id },
             });
             
-            // Re-throw the error with proper formatting
-            if (error instanceof Error && 'code' in error) {
-                const pgError = error as PostgresError;
-                const errorMap: { [key: string]: string } = {
-                    '42P01': 'Table does not exist',
-                    '42703': 'Column does not exist',
-                    '23505': 'Unique constraint violation',
-                    '23503': 'Foreign key violation',
-                    '42601': 'Syntax error in SQL schema',
-                    '28P01': 'Invalid password',
-                    '3D000': 'Database does not exist',
-                    '42501': 'Permission denied',
-                    '42P04': 'Database already exists'
-                };
-
-                const errorMessage = errorMap[pgError.code] || pgError.message;
-                throw new SqlErrorException({
-                    message: `Failed to create database: ${errorMessage}`,
-                    name: pgError.name,
-                    code: pgError.code,
-                    detail: pgError.detail,
-                    stack: pgError.stack
-                });
-            }
-            
             throw new SqlErrorException({
                 message: `Failed to create database: ${error instanceof Error ? error.message : 'Unknown error'}`,
                 name: 'DatabaseCreationError',
@@ -216,11 +198,11 @@ export class DatabasesService {
         dto: UpdateDatabaseDto,
         user: User,
     ) {
-        if (user.role !== Role.TUTOR) {
-            throw new ForbiddenException('Only tutors can update databases');
-        }
-        
         const database = await this.getDatabaseById(id);
+
+        if (user.role !== Role.ADMIN && database.ownerId !== user.id) {
+            throw new ForbiddenException('You do not have permission to update this database.');
+        }
 
         // Only update name and description, not schemaSql (which contains the database name)
         const updateData: any = {};
@@ -235,6 +217,10 @@ export class DatabasesService {
 
     async deleteDatabase(id: number, user: User) {
         const database = await this.getDatabaseById(id);
+
+        if (user.role !== Role.ADMIN && database.ownerId !== user.id) {
+            throw new ForbiddenException('You are not the owner of this database.');
+        }
 
         try {
             // Get database name from schemaSql field
@@ -257,16 +243,15 @@ export class DatabasesService {
                 `, [dbName]);
 
                 // Drop the database
-                await adminPool.query(`DROP DATABASE IF EXISTS "${dbName}"`);
+                await adminPool.query(`DROP DATABASE "${dbName}"`);
                 console.log(`Database ${dbName} dropped successfully`);
                 await adminPool.end();
             }
         } catch (error) {
-            console.error('Error dropping database:', error);
-            // Continue deleting the database record even if dropping database fails
+            console.error(`Error dropping database ${database.schemaSql}:`, error);
         }
 
-        // Delete the database record from the Database table
+        // Delete the database record
         return this.prisma.database.delete({
             where: { id },
         });
@@ -389,30 +374,6 @@ export class DatabasesService {
             if (this.isWriteOperation(query)) {
                 await client.query('ROLLBACK');
             }
-
-            // Handle specific PostgreSQL errors
-            if (error instanceof Error && 'code' in error) {
-                const pgError = error as PostgresError;
-                const errorMap: { [key: string]: string } = {
-                    '42P01': 'Table does not exist',
-                    '42703': 'Column does not exist',
-                    '23505': 'Unique constraint violation',
-                    '23503': 'Foreign key violation',
-                    '42601': 'Syntax error',
-                    '28P01': 'Invalid password',
-                    '3D000': 'Database does not exist',
-                    '42501': 'Permission denied'
-                };
-
-                const errorMessage = errorMap[pgError.code] || pgError.message;
-                throw new SqlErrorException({
-                    message: errorMessage,
-                    name: pgError.name,
-                    code: pgError.code,
-                    detail: pgError.detail,
-                    stack: pgError.stack
-                });
-            }
             
             throw error;
         } finally {
@@ -458,5 +419,73 @@ export class DatabasesService {
         const writeCommands = ['INSERT', 'UPDATE', 'DELETE', 'DROP', 'ALTER', 'CREATE', 'TRUNCATE'];
         const normalizedQuery = query.trim().toUpperCase();
         return writeCommands.some(cmd => normalizedQuery.startsWith(cmd));
+    }
+
+    async runQueryInContainer(connectionDetails: any, query: string): Promise<QueryResult> {
+        let client: Client | null = null;
+        const startTime = Date.now();
+        try {
+            client = new Client(connectionDetails);
+            await client.connect();
+            const result = await client.query(query);
+            const executionTimeMs = Date.now() - startTime;
+            return {
+                columns: result.fields.map(field => field.name),
+                rows: result.rows,
+                rowCount: result.rowCount ?? 0,
+                command: result.command,
+                executionTimeMs,
+            };
+        } catch (e) {
+            const executionTimeMs = Date.now() - startTime;
+            const error = e as Error;
+            return {
+                columns: [],
+                rows: [],
+                rowCount: 0,
+                executionTimeMs,
+                error: error.message,
+            };
+        }
+        finally {
+            if (client) {
+                await client.end();
+            }
+        }
+    }
+
+    async createTable(databaseId: number, dto: any, userId: number, userRole: Role | string) {
+        if (String(userRole).toUpperCase() !== 'TUTOR') {
+            throw new ForbiddenException('Only tutors can create tables');
+        }
+        // Getting the database
+        const database = await this.getDatabaseById(databaseId);
+        if (!database) {
+            throw new NotFoundException('Database not found');
+        }
+        if (database.ownerId !== userId) {
+            throw new ForbiddenException('Only the owner can create tables in this database');
+        }
+        // Generate SQL for table creation
+        const columnsSql = dto.columns.map((col: any) => {
+            let colDef = `"${col.name}" ${col.type}`;
+            if (col.isPrimaryKey) colDef += ' PRIMARY KEY';
+            if (col.autoIncrement) colDef += ' GENERATED ALWAYS AS IDENTITY';
+            if (col.nullable === false) colDef += ' NOT NULL';
+            if (col.defaultValue) colDef += ` DEFAULT ${col.defaultValue}`;
+            return colDef;
+        }).join(', ');
+        const createTableSql = `CREATE TABLE "${dto.name}" (${columnsSql})`;
+        // Execute SQL in the required database
+        const dbPool = new Pool({
+            host: process.env.DB_HOST,
+            port: parseInt(process.env.DB_PORT || '5432', 10),
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: database.schemaSql
+        });
+        await dbPool.query(createTableSql);
+        await dbPool.end();
+        return { message: 'Table created successfully' };
     }
 }

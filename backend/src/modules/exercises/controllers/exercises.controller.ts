@@ -170,10 +170,10 @@ export class ExercisesController {
     @ApiResponse({ status: 404, description: 'Exercise not found' })
     async submitAnswer(
         @Param('id') id: number,
-        @Body() body: { answerText: string },
+        @Body() body: { answerText: string, connectionDetails?: { host: string; port: number } },
         @GetUser('id') userId: number,
     ) {
-        return this.exercisesService.submitAnswer(id, body.answerText, userId);
+        return this.exercisesService.submitAnswer(id, body.answerText, userId, body.connectionDetails);
     }
 
     /**
@@ -192,8 +192,8 @@ export class ExercisesController {
     @ApiResponse({ status: 404, description: 'Exercise or database not found' })
     async runQuery(
         @Param('id') id: number,
-        @Body() body: { query: string },
+        @Body() body: { query: string, connectionDetails?: { host: string; port: number } },
     ): Promise<{ columns: string[]; rows: any[] }> {
-        return this.exercisesService.runQuery(id, body.query);
+        return this.exercisesService.runQuery(id, body.query, body.connectionDetails);
     }
 }

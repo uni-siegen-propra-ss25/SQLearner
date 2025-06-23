@@ -1,137 +1,202 @@
 .database-container {
-  padding: 24px;
-
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-
-    h1 {
-      margin: 0;
-      font-size: 1.5rem;
-      color: rgba(0, 0, 0, 0.87);
-    }
-
-    .actions {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  
+    .header {
       display: flex;
-      gap: 12px;
-
-      button {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-    }
-  }
-
-  .database-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 24px;
-    padding: 8px;
-  }
-
-  .database-card {
-    cursor: pointer;
-    transition: all 0.3s ease;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-    &:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-    }
-
-    mat-card-header {
-      padding: 16px;
-      background: rgba(0, 0, 0, 0.02);
-      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-
-      mat-card-title {
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+      gap: 16px;
+  
+      h1 {
         margin: 0;
-        font-size: 1.25rem;
+        font-size: 2rem;
         font-weight: 500;
         color: rgba(0, 0, 0, 0.87);
       }
-
-      mat-card-subtitle {
-        margin: 4px 0 0 0;
-        color: rgba(0, 0, 0, 0.6);
+  
+      .actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+  
+        button {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
       }
     }
-
-    mat-card-content {
-      padding: 16px;
-      flex-grow: 1;
-
-      .description {
-        margin: 0;
-        color: rgba(0, 0, 0, 0.6);
-        font-size: 0.9375rem;
-        line-height: 1.5;
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-      }
+  
+    .database-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 24px;
     }
-
-    mat-card-actions {
-      padding: 8px;
-      border-top: 1px solid rgba(0, 0, 0, 0.08);
-      background: rgba(0, 0, 0, 0.02);
-
-      button {
-        margin: 0 4px;
-      }
-    }
-  }
-}
-
-// Dark theme adjustments
-:host-context(.dark-theme) {
-  .database-container {
-    .header h1 {
-      color: rgba(255, 255, 255, 0.87);
-    }
-
+  
     .database-card {
-      background: #2d2d2d;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+  
       &:hover {
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        border-color: rgba(33, 150, 243, 0.3);
       }
-
+  
       mat-card-header {
-        background: rgba(255, 255, 255, 0.05);
-        border-bottom-color: rgba(255, 255, 255, 0.08);
-
+        padding-bottom: 16px;
+        position: relative;
+  
         mat-card-title {
-          color: rgba(255, 255, 255, 0.87);
+          font-size: 1.25rem;
+          font-weight: 500;
+          margin-bottom: 4px;
         }
-
+  
         mat-card-subtitle {
-          color: rgba(255, 255, 255, 0.6);
+          font-size: 0.875rem;
+          color: rgba(0, 0, 0, 0.6);
+        }
+  
+        .header-actions {
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          z-index: 10;
         }
       }
-
+  
       mat-card-content {
         .description {
-          color: rgba(255, 255, 255, 0.6);
+          color: rgba(0, 0, 0, 0.7);
+          margin-bottom: 20px;
+          line-height: 1.5;
+          min-height: 40px;
+        }
+  
+        .database-actions {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 12px;
+  
+          .open-database-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            font-weight: 500;
+          }
+  
+          .secondary-actions {
+            display: flex;
+            gap: 4px;
+          }
         }
       }
-
+  
       mat-card-actions {
-        background: rgba(255, 255, 255, 0.05);
-        border-top-color: rgba(255, 255, 255, 0.08);
+        padding: 16px;
+        margin: 0;
+        border-top: 1px solid rgba(0, 0, 0, 0.08);
+        background: rgba(0, 0, 0, 0.02);
+  
+        .delete-btn {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          padding: 8px 16px;
+        }
       }
     }
   }
-}
+  
+  // Responsive design
+  @media (max-width: 768px) {
+    .database-container {
+      padding: 16px;
+  
+      .header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+  
+        .actions {
+          justify-content: center;
+        }
+      }
+  
+      .database-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+  
+        .database-card {
+          .database-actions {
+            flex-direction: column;
+            gap: 12px;
+  
+            .open-database-btn {
+              width: 100%;
+            }
+  
+            .secondary-actions {
+              justify-content: center;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // Dark theme adjustments
+  :host-context(.dark-theme) {
+    .database-container {
+      .header h1 {
+        color: rgba(255, 255, 255, 0.87);
+      }
+  
+      .database-grid .database-card {
+        background: #2d2d2d;
+        border-color: rgba(255, 255, 255, 0.1);
+  
+        &:hover {
+          border-color: rgba(100, 181, 246, 0.3);
+        }
+  
+        mat-card-header {
+          mat-card-title {
+            color: rgba(255, 255, 255, 0.87);
+          }
+  
+          mat-card-subtitle {
+            color: rgba(255, 255, 255, 0.6);
+          }
+        }
+  
+        mat-card-content .description {
+          color: rgba(255, 255, 255, 0.7);
+        }
+  
+        mat-card-actions {
+          border-top-color: rgba(255, 255, 255, 0.1);
+          background: rgba(255, 255, 255, 0.02);
+        }
+      }
+    }
+  }

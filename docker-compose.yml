@@ -18,13 +18,14 @@ services:
       retries: 5
 
   migrations:
-    build: ./backend
-    command: sh -c "while ! nc -z db 5432; do sleep 1; done && npx prisma migrate deploy"
-    environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/sqlearner?schema=public
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     depends_on:
-      db:
-        condition: service_healthy
+      - db
+    environment:
+      DATABASE_URL: 'postgresql://postgres:postgres@db:5432/sqlearner?schema=public'
+    command: sh -c "while ! nc -z db 5432; do sleep 1; done && npx prisma migrate deploy"
 
   backend:
     build: ./backend
@@ -54,6 +55,7 @@ services:
     volumes:
       - ./backend:/app
       - /app/node_modules
+      - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       migrations:
         condition: service_completed_successfully

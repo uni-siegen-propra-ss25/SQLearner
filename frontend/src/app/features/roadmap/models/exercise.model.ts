@@ -28,7 +28,7 @@ export interface Exercise {
         schemaSql?: string;
     };
     databaseId?: number;
-    querySolution?: string;
+    solution?: string;
 
     // Choice specific fields
     answers?: AnswerOption[];

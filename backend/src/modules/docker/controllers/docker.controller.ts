@@ -21,8 +21,7 @@ export class DockerController {
         @Param('exerciseId') exerciseId: number,
         @GetUser() user: User
     ) {
-        // Implementation coming in next step
-        return null;
+        return this.dockerService.createContainer(exerciseId, user);
     }
 
     /**
@@ -35,7 +34,7 @@ export class DockerController {
         @Param('containerId') containerId: string,
         @GetUser() user: User
     ) {
-        // Implementation coming in next step
+        return this.dockerService.deleteContainer(containerId, user);
     }
 
     /**

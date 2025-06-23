@@ -45,10 +45,15 @@ export class ExercisesService {
     }
 
     createExercise(exercise: Partial<Exercise>): Observable<number> {
+        console.log('Creating exercise with data:', exercise);
         // No need to modify the topicId, it's already in the exercise data
         return this.http
             .post<number>(this.baseUrl, exercise)
-            .pipe(catchError((error) => this.handleError(error)));
+            .pipe(catchError((error) => {
+                console.error('Error creating exercise:', error);
+                console.error('Request data:', exercise);
+                return this.handleError(error);
+            }));
     }
 
     updateExercise(id: number, exercise: Partial<Exercise>): Observable<Exercise> {

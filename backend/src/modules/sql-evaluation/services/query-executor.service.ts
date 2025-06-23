@@ -1,7 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { DatabasesService } from '../../databases/services/databases.service';
+import { DatabasesService } from 'src/modules/databases/services/databases.service';
+import { performance } from 'perf_hooks';
 import { SqlEvaluationException } from '../exceptions/sql-evaluation.exception';
-import { QueryResult } from '../models/query-result.dto';
+import { QueryResult as QueryResultDto } from '../models/query-result.dto';
+import { TimeoutError } from 'rxjs';
 
 /**
  * Service responsible for secure execution of SQL queries with validation, sanitization, and timeout protection.
@@ -24,13 +26,15 @@ export class QueryExecutorService {
      * @param {string} query - The SQL query to execute (SELECT statements only)
      * @param {number} databaseId - The ID of the database to execute the query against
      * @param {string} context - Optional context for logging (default: 'unknown')
-     * @returns {Promise<QueryResult>} - Promise resolving to standardized query result with columns, rows, and metadata
+     * @param {object} connectionDetails - Optional container connection details
+     * @returns {Promise<QueryResultDto>} - Promise resolving to standardized query result with columns, rows, and metadata
      */
     async executeQuerySafely(
-        query: string,
         databaseId: number,
-        context: string = 'unknown'
-    ): Promise<QueryResult> {
+        query: string,
+        context: string = 'unknown',
+        connectionDetails?: { host: string; port: number }
+    ): Promise<QueryResultDto> {
         this.logger.debug(`Executing ${context} query on database ${databaseId}`);
         
         // 1. Validate query safety
@@ -42,36 +46,27 @@ export class QueryExecutorService {
         // 3. Execute with timeout
         const startTime = performance.now();
           try {
-            const rawResult = await Promise.race([
-                this.databasesService.runQuery(databaseId, sanitizedQuery),
-                this.createTimeoutPromise()
-            ]);
+            const rawResult = connectionDetails
+                ? await this.databasesService.runQueryInContainer({
+                    ...connectionDetails,
+                    database: 'postgres' // Connect to default db for inspection
+                }, sanitizedQuery)
+                : await this.databasesService.runQuery(databaseId, sanitizedQuery);
 
-            const executionTime = performance.now() - startTime;
-
-            // Adapt rawResult to expected format
-            const result = {
-                columns: rawResult.fields ? rawResult.fields.map((f: { name: string }) => f.name) : [],
-                rows: rawResult.rows
-            };
-            
-            // 4. Validate result
-            this.validateResult(result);
-            
-            this.logger.debug(`${context} query executed successfully in ${Math.round(executionTime)}ms`);
-            
-            return {
-                columns: result.columns,
-                rows: result.rows,
-                rowCount: result.rows.length,
-                executionTimeMs: Math.round(executionTime)
-            };
+            return rawResult as QueryResultDto;
 
         } catch (error) {
             this.logger.error(`${context} query execution failed: ${error.message}`);
             
             if (error instanceof SqlEvaluationException) {
                 throw error;
+            }
+            
+            if (error instanceof TimeoutError) {
+                throw new SqlEvaluationException(
+                    'Query execution timeout (10 seconds)',
+                    'TIMEOUT'
+                );
             }
             
             throw new SqlEvaluationException(

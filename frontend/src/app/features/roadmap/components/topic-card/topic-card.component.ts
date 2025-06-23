@@ -171,26 +171,36 @@ export class TopicCardComponent implements OnInit {
      * Handles dialog result and triggers exercise reload with user feedback on success/failure.
      */
     openNewExerciseDialog(): void {
+        const dialogData = {
+            topicId: this.topic.id,
+            order: this.exercises.length,
+        };
+        console.log('=== DEBUG: Opening exercise dialog ===');
+        console.log('Topic ID:', this.topic.id);
+        console.log('Dialog data:', dialogData);
+        
         const dialogRef = this.dialog.open(ExerciseDialogComponent, {
             width: '800px',
-            data: {
-                topicId: this.topic.id,
-                order: this.exercises.length,
-            },
+            data: dialogData,
         });
 
         dialogRef.afterClosed().subscribe((result) => {
+            console.log('=== DEBUG: Dialog closed ===');
+            console.log('Result:', result);
             if (result) {
-                // Add topic ID to the exercise data for backend association
-                const exerciseData = { ...result, topicId: this.topic.id };
-                this.exercisesService.createExercise(exerciseData).subscribe({
+                console.log('=== DEBUG: Creating exercise ===');
+                console.log('Exercise data to send:', result);
+                this.exercisesService.createExercise(result).subscribe({
                     next: () => {
+                        console.log('=== DEBUG: Exercise created successfully ===');
                         this.loadExercises();
                         this.snackBar.open('Exercise created successfully', 'Close', {
                             duration: 3000,
                         });
                     },
                     error: (error) => {
+                        console.log('=== DEBUG: Error creating exercise ===');
+                        console.error('Error details:', error);
                         console.error('Error creating exercise:', error);
                         this.snackBar.open('Failed to create exercise', 'Close', {
                             duration: 3000,

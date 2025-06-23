@@ -226,10 +226,11 @@ export class ExercisesService {    /**
      *
      * @param {number} id - The ID of the exercise to run the query for
      * @param {string} query - The query to run
+     * @param {object} connectionDetails - Optional connection details for the database
      * @returns {Promise<{columns: string[]; rows: any[]}>} Promise resolving to the query result
      * @throws {NotFoundException} if the exercise or database does not exist
      */
-    async runQuery(id: number, query: string): Promise<{ columns: string[]; rows: any[] }> {
+    async runQuery(id: number, query: string, connectionDetails?: { host: string; port: number }): Promise<{ columns: string[]; rows: any[] }> {
         const exercise = await this.prisma.exercise.findUnique({
             where: { id },
             include: {
@@ -245,82 +246,85 @@ export class ExercisesService {    /**
             throw new NotFoundException('Exercise has no associated database');
         }        
         
-        const result = await this.databasesService.runQuery(exercise.database.id, query);
+        // If it's a query exercise, a container may be needed.
+        if (exercise.type === ExerciseType.QUERY) {
+            const result = connectionDetails
+            ? await this.databasesService.runQueryInContainer({
+                ...connectionDetails,
+                database: 'postgres'
+              }, query)
+            : await this.databasesService.runQuery(exercise.database.id, query);
+
+            let columns: string[];
+            if ('fields' in result && Array.isArray(result.fields)) {
+                columns = result.fields.map((field: any) => field.name);
+            } else if ('columns' in result && Array.isArray(result.columns)) {
+                columns = result.columns;
+            } else {
+                columns = [];
+            }
+
+            return {
+                columns: columns,
+                rows: result.rows || [],
+            };
+        }
+
         return {
-            columns: result.columns ? result.columns.map((f: any) => f.name) : [],
-            rows: result.rows,
+            columns: [],
+            rows: [],
         };
-    }    
-    
+    }
+
     /**
-     * Submits an answer for exercises.
-     * Evaluates the answer for correctness and saves progress to database.
-     * Supports SQL Query, Single Choice, and Multiple Choice exercises.
-     * Provides instant feedback with German messages and updates user progress for correct answers.
+     * Submits and evaluates an answer for an exercise.
+     * Handles different exercise types: Single/Multiple Choice and SQL queries.
      *
-     * @param {number} id - The ID of the exercise to submit an answer for
-     * @param {string} answerText - The answer text (SQL query for QUERY exercises, selected option IDs for choice exercises)
+     * @param {number} id - The ID of the exercise
+     * @param {string} answerText - The submitted answer
      * @param {number} userId - The ID of the user submitting the answer
-     * @returns {Promise<{id: number; exerciseId: number; userId: number; answerText: string; isCorrect: boolean; feedback?: string; createdAt: Date}>} Promise resolving to the submission record with evaluation results
+     * @param {object} connectionDetails - Optional connection details for the database
+     * @returns {Promise<any>} Promise resolving to the evaluation result
      * @throws {NotFoundException} if the exercise does not exist
-     * @throws {BadRequestException} if the exercise type is not supported
      */
     async submitAnswer(
         id: number,
         answerText: string,
         userId: number,
+        connectionDetails?: { host: string; port: number }
     ) {
         const exercise = await this.getExerciseById(id);
-        
-        // Unterstützte Aufgabentypen prüfen
-        if (exercise.type !== ExerciseType.SINGLE_CHOICE && 
-            exercise.type !== ExerciseType.MULTIPLE_CHOICE &&
-            exercise.type !== ExerciseType.QUERY) {
-            throw new BadRequestException(
-                `Exercise type ${exercise.type} wird für Antwortauswertung nicht unterstützt. Unterstützte Typen: Single-Choice, Multiple-Choice, Query.`
-            );
-        }
-        let isCorrect = false;
-        let feedback = '';        // Antwort je nach Aufgabentyp evaluieren
-        if (exercise.type === ExerciseType.QUERY && exercise.querySolution) {
-            try {
-                // Automatische SQL-Bewertung
-                const evaluation = await this.sqlEvaluationService.evaluateQuery(
-                    answerText,
-                    exercise.querySolution,
-                    exercise.databaseId!
-                );
-                
-                isCorrect = evaluation.isCorrect;
-                feedback = evaluation.feedback;
-                
-            } catch (error) {
-                console.error('SQL evaluation failed:', error);
-                isCorrect = false;
-                feedback = 'Automatische Bewertung fehlgeschlagen. Ein Tutor wird Ihre Lösung prüfen.';
-            }
-        } else if (exercise.type === ExerciseType.SINGLE_CHOICE) {
-            ({ isCorrect, feedback } = this.evaluateSingleChoice(exercise, answerText));
+
+        let result: { isCorrect: boolean; feedback: string };
+
+        if (exercise.type === ExerciseType.SINGLE_CHOICE) {
+            result = this.evaluateSingleChoice(exercise, answerText);
         } else if (exercise.type === ExerciseType.MULTIPLE_CHOICE) {
-            ({ isCorrect, feedback } = this.evaluateMultipleChoice(exercise, answerText));
+            result = this.evaluateMultipleChoice(exercise, answerText);
+        } else if (exercise.type === ExerciseType.QUERY || exercise.type === ExerciseType.FREETEXT) {
+            if (!exercise.databaseId || !exercise.solution) {
+                throw new BadRequestException('Exercise is not configured correctly for evaluation.');
+            }
+            const evaluationResult = await this.sqlEvaluationService.evaluateQuery(
+                answerText,
+                exercise.solution,
+                exercise.databaseId,
+                connectionDetails,
+            );
+            result = {
+                isCorrect: evaluationResult.isCorrect,
+                feedback: evaluationResult.feedback,
+            };
+        } else {
+            throw new BadRequestException('Unsupported exercise type');
         }
 
-        // Progress aktualisieren wenn Antwort richtig ist
-        if (isCorrect) {
-            try {
-                await this.progressService.updateExerciseProgress(userId, id, { 
-                    exerciseId: id,
-                    isPassed: true 
-                });
-            } catch (error) {
-                // Fehler loggen aber Submission nicht fehlschlagen lassen
-                console.error('Fehler beim Aktualisieren des Exercise Progress:', error);
-            }
+        if (result.isCorrect) {
+            await this.progressService.updateExerciseProgress(userId, id, { exerciseId: id, isPassed: true });
         }
 
         return {
-            isCorrect,
-            feedback,
+            ...result,
             exerciseId: id,
             userId
         };

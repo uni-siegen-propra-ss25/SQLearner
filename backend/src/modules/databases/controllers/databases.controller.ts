@@ -10,6 +10,7 @@ import {
     UploadedFile,
     ParseIntPipe,
     UseInterceptors,
+    Patch,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth/jwt-auth.guard';
@@ -22,7 +23,6 @@ import { QueryDto } from '../models/query.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateDatabaseDto } from '../models/create-database.dto';
 import { UpdateDatabaseDto } from '../models/update-database.dto';
-
 /**
  * Controller managing database operations for the SQL learning system.
  * Handles:
@@ -38,6 +38,19 @@ export class DatabasesController {
     constructor(
         private readonly databasesService: DatabasesService,
     ) {}
+
+    @Post('upload')
+    @Roles(Role.TUTOR)
+    @ApiConsumes('multipart/form-data')
+    @UseInterceptors(FileInterceptor('file'))
+    @ApiOperation({ summary: 'Upload SQL file to create database' })
+    @ApiResponse({ status: 201, description: 'SQL file uploaded and database created successfully' })
+    uploadDatabase(
+        @UploadedFile() file: Express.Multer.File,
+        @GetUser() user: User,
+    ) {
+        return this.databasesService.uploadDatabase(file, user);
+    }
 
     @Get()
     @Roles(Role.TUTOR)
@@ -58,34 +71,33 @@ export class DatabasesController {
     @Roles(Role.TUTOR)
     @ApiOperation({ summary: 'Create a new empty database' })
     @ApiResponse({ status: 201, description: 'Database created successfully' })
-    async createDatabase(
+    createDatabase(
         @Body() dto: CreateDatabaseDto,
         @GetUser() user: User,
     ) {
         return this.databasesService.createDatabase(dto, user);
     }
 
-    @Post('upload')
-    @Roles(Role.TUTOR)
-    @ApiConsumes('multipart/form-data')
+    @Patch(':id')
     @UseInterceptors(FileInterceptor('file'))
-    @ApiOperation({ summary: 'Upload SQL file to create database' })
-    @ApiResponse({ status: 201, description: 'SQL file uploaded and database created successfully' })
-    async uploadDatabase(
-        @UploadedFile() file: Express.Multer.File,
+    @ApiOperation({ summary: 'Update database metadata' })
+    @ApiResponse({ status: 200, description: 'Database updated successfully' })
+    updateDatabase(
+        @Param('id', ParseIntPipe) databaseId: number,
+        @Body() dto: UpdateDatabaseDto,
         @GetUser() user: User,
     ) {
-        return this.databasesService.uploadDatabase(file, user);
+        return this.databasesService.updateDatabase(databaseId, dto, user);
     }
 
     @Put(':id')
     @Roles(Role.TUTOR)
     @ApiOperation({ summary: 'Update database metadata' })
     @ApiResponse({ status: 200, description: 'Database updated successfully' })
-    async updateDatabase(
+    async updateDatabasePut(
         @Param('id', ParseIntPipe) databaseId: number,
-        @GetUser() user: User,
         @Body() dto: UpdateDatabaseDto, 
+        @GetUser() user: User,
     ) {
         return this.databasesService.updateDatabase(databaseId, dto, user);
     }
@@ -111,5 +123,17 @@ export class DatabasesController {
     ) {
         // This operation stays in DatabasesService since it's a database-level operation
         return this.databasesService.runQuery(id, dto.query);
+    }
+
+    @Post(':id/tables')
+    @Roles(Role.TUTOR)
+    @ApiOperation({ summary: 'Create a new table in the database' })
+    @ApiResponse({ status: 201, description: 'Table created successfully' })
+    async createTable(
+        @Param('id', ParseIntPipe) databaseId: number,
+        @Body() dto: any, 
+        @GetUser() user: User,
+    ) {
+        return this.databasesService.createTable(databaseId, dto, user.id, user.role);
     }
 }

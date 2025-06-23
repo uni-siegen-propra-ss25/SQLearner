@@ -3,4 +3,6 @@ export interface QueryResult {
     rows: Record<string, any>[];
     rowCount: number;
     executionTimeMs: number;
+    command?: string;
+    error?: string;
 }

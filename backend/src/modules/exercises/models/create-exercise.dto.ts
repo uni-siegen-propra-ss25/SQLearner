@@ -69,7 +69,7 @@ export class CreateExerciseDto {
     @ApiProperty({ description: 'The SQL solution query', required: false })
     @IsString()
     @IsOptional()
-    querySolution?: string;
+    solution?: string;
 
     @ApiProperty({
         description: 'The answers for choice exercises',

@@ -1,15 +1,18 @@
-import { Component, Input, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, Input, ViewChild, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { Exercise } from '../../../roadmap/models/exercise.model';
 import { SubmissionService } from '../../services/submission.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SqlEditorComponent } from '../../../../shared/components/sql-editor/sql-editor.component';
+import { DockerService } from '../../services/docker.service';
+import { ActivatedRoute, ParamMap } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-query-exercise',
     templateUrl: './query-exercise.component.html',
     styleUrls: ['./query-exercise.component.scss'],
 })
-export class QueryExerciseComponent {
+export class QueryExerciseComponent implements OnInit, OnDestroy {
     @Input() exercise!: Exercise;
     @ViewChild(SqlEditorComponent) sqlEditor!: SqlEditorComponent;
     
@@ -21,6 +24,9 @@ export class QueryExerciseComponent {
     currentView: 'schema' | 'result' = 'result';
     isDarkMode = false; // Should be synced with your app's theme service
     isCorrectAnswer = false;
+    private containerId: string | null = null;
+    private connectionDetails: { host: string; port: number } | null = null;
+    private containerSubscription: Subscription | null = null;
 
     // Pagination variables
     pageSize = 10;
@@ -30,8 +36,55 @@ export class QueryExerciseComponent {
     @Output() completed = new EventEmitter<number>();
       constructor(
         private submissionService: SubmissionService,
-        private snackBar: MatSnackBar
+        private snackBar: MatSnackBar,
+        private dockerService: DockerService,
+        private route: ActivatedRoute
     ) {}
+
+    ngOnInit(): void {
+        this.route.paramMap.subscribe((params: ParamMap) => {
+            const exerciseId = Number(params.get('exerciseId'));
+            console.log('=== DEBUG: QueryExerciseComponent ngOnInit ===');
+            console.log('exerciseId from route:', exerciseId);
+            console.log('exercise from @Input:', this.exercise);
+            console.log('exercise.id:', this.exercise?.id);
+            
+            if (exerciseId) {
+                console.log('Creating container for exerciseId:', exerciseId);
+                this.containerSubscription = this.dockerService.createContainer(exerciseId).subscribe({
+                    next: (response: { containerId: string; connectionDetails: any }) => {
+                        console.log('Container created successfully:', response);
+                        this.containerId = response.containerId;
+                        this.connectionDetails = response.connectionDetails;
+                    },
+                    error: (error: any) => {
+                        console.error('Failed to create container:', error);
+                        this.snackBar.open('Failed to create exercise environment.', 'Close', {
+                            duration: 5000,
+                        });
+                    }
+                });
+            } else {
+                console.error('No exerciseId found in route params');
+            }
+        });
+    }
+
+    ngOnDestroy(): void {
+        if (this.containerSubscription) {
+            this.containerSubscription.unsubscribe();
+        }
+        if (this.containerId) {
+            this.dockerService.deleteContainer(this.containerId).subscribe({
+                next: () => {
+                    // Container deleted successfully
+                },
+                error: (error: any) => {
+                    // Handle error, maybe log it
+                }
+            });
+        }
+    }
 
     onSqlChange(newValue: string) {
         this.sqlQuery = newValue;
@@ -53,13 +106,13 @@ export class QueryExerciseComponent {
         if (!this.sqlQuery.trim()) return;
 
         this.isLoading = true;
-        this.submissionService.runQuery(this.exercise.id, this.sqlQuery).subscribe({
-            next: (result) => {
+        this.submissionService.runQuery(this.exercise.id, this.sqlQuery, this.connectionDetails || undefined).subscribe({
+            next: (result: any) => {
                 this.queryResult = result;
                 this.isLoading = false;
                 this.currentView = 'result';
             },
-            error: (error) => {
+            error: (error: any) => {
                 this.isLoading = false;
                 this.queryResult = null;
                 const errorMessage = error.error?.detail || error.error?.message || error.message || 'Failed to run query';
@@ -74,8 +127,8 @@ export class QueryExerciseComponent {
     submitAnswer(): void {
         if (!this.sqlQuery.trim() || this.isLoading) return;
 
-        this.isLoading = true;        this.submissionService.submitAnswer(this.exercise.id, this.sqlQuery).subscribe({
-            next: (submission) => {
+        this.isLoading = true;        this.submissionService.submitAnswer(this.exercise.id, this.sqlQuery, this.connectionDetails || undefined).subscribe({
+            next: (submission: any) => {
                 this.isLoading = false;
                 this.isCorrectAnswer = submission.isCorrect;
                 
@@ -91,7 +144,7 @@ export class QueryExerciseComponent {
                     this.showFeedback = true;
                 }
             },
-            error: (error) => {
+            error: (error: any) => {
                 this.isLoading = false;
                 this.snackBar.open(error.message || 'Failed to submit answer', 'Close', {
                     duration: 3000,

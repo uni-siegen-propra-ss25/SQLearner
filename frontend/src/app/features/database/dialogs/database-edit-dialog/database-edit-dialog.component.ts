@@ -25,6 +25,7 @@ export class DatabaseEditDialogComponent {
     ) {
         this.form = this.fb.group({
             name: [data.name, Validators.required],
+            description: [data.description || '', Validators.required]
         });
 
         this.queryForm = this.fb.group({
@@ -59,9 +60,14 @@ export class DatabaseEditDialogComponent {
 
     onSubmit() {
         if (this.form.valid) {
-            this.databaseService.updateDatabase(this.data.id, { name: this.form.value.name }).subscribe({
+            const updateData = {
+                name: this.form.value.name,
+                description: this.form.value.description
+            };
+
+            this.databaseService.updateDatabase(this.data.id, updateData).subscribe({
                 next: (database: Database) => {
-                    this.snackBar.open('Database name updated successfully', 'Close', {
+                    this.snackBar.open('Database updated successfully', 'Close', {
                         duration: 3000
                     });
                     this.dialogRef.close(database);
