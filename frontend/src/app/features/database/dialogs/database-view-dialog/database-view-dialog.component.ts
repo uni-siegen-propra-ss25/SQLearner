@@ -20,7 +20,7 @@ export class DatabaseViewDialogComponent implements OnInit, AfterViewInit {
   @ViewChild('editorContainer') editorContainer!: ElementRef;
   
   queryForm: FormGroup;
-  queryResult: QueryResult | null = null;
+  queryResult!: QueryResult;
   error: string | null = null;
   displayedColumns: string[] = [];
   isLoading = false;
@@ -86,7 +86,11 @@ export class DatabaseViewDialogComponent implements OnInit, AfterViewInit {
 
     this.isLoading = true;
     this.error = null;
-    this.queryResult = null;
+    this.queryResult = {
+      columns: [],
+      rows: [],
+      error: undefined
+    };
     this.displayedColumns = []; // Reset columns
 
     console.log('Executing query:', query);
@@ -122,7 +126,11 @@ export class DatabaseViewDialogComponent implements OnInit, AfterViewInit {
       this.editor.setValue('');
     }
     this.queryForm.patchValue({ query: '' });
-    this.queryResult = null;
+    this.queryResult = {
+      columns: [],
+      rows: [],
+      error: undefined
+    };
     this.error = null;
   }
 
@@ -196,7 +204,11 @@ ORDER BY table_name, ordinal_position;`;
     
     // Show success message in the results section
     setTimeout(() => {
-      this.queryResult = null;
+      this.queryResult = {
+        columns: [],
+        rows: [],
+        error: undefined
+      };
       this.error = null;
     }, 3000);
   }
