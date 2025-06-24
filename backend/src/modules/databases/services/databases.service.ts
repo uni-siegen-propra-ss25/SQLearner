@@ -53,10 +53,7 @@ export class DatabasesService {
             data: {
                 name: file.originalname,
                 description: 'Uploaded SQL file',
-                schemaSql: schema,
-                owner: {
-                    connect: { id: user.id }
-                }
+                schemaSql: schema
             },
         });
 
@@ -126,10 +123,7 @@ export class DatabasesService {
             data: {
                 name: dto.name,
                 description: dto.description,
-                schemaSql: dto.schemaSql || '',
-                owner: {
-                    connect: { id: user.id }
-                }
+                schemaSql: dto.schemaSql || ''
             },
         });
 
@@ -200,7 +194,7 @@ export class DatabasesService {
     ) {
         const database = await this.getDatabaseById(id);
 
-        if (user.role !== Role.ADMIN && database.ownerId !== user.id) {
+        if (user.role !== Role.ADMIN) {
             throw new ForbiddenException('You do not have permission to update this database.');
         }
 
@@ -218,7 +212,7 @@ export class DatabasesService {
     async deleteDatabase(id: number, user: User) {
         const database = await this.getDatabaseById(id);
 
-        if (user.role !== Role.ADMIN && database.ownerId !== user.id) {
+        if (user.role !== Role.ADMIN) {
             throw new ForbiddenException('You are not the owner of this database.');
         }
 
@@ -463,9 +457,7 @@ export class DatabasesService {
         if (!database) {
             throw new NotFoundException('Database not found');
         }
-        if (database.ownerId !== userId) {
-            throw new ForbiddenException('Only the owner can create tables in this database');
-        }
+        
         // Generate SQL for table creation
         const columnsSql = dto.columns.map((col: any) => {
             let colDef = `"${col.name}" ${col.type}`;
