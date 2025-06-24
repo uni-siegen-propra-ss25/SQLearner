@@ -302,12 +302,12 @@ export class ExercisesService {    /**
         } else if (exercise.type === ExerciseType.MULTIPLE_CHOICE) {
             result = this.evaluateMultipleChoice(exercise, answerText);
         } else if (exercise.type === ExerciseType.QUERY || exercise.type === ExerciseType.FREETEXT) {
-            if (!exercise.databaseId || !exercise.solution) {
+            if (!exercise.databaseId || !exercise.querySolution) {
                 throw new BadRequestException('Exercise is not configured correctly for evaluation.');
             }
             const evaluationResult = await this.sqlEvaluationService.evaluateQuery(
                 answerText,
-                exercise.solution,
+                exercise.querySolution,
                 exercise.databaseId,
                 connectionDetails,
             );
