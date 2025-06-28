@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { SqlEvaluationService } from './services/sql-evaluation.service';
 import { QueryExecutorService } from './services/query-executor.service';
 import { ResultComparatorService } from './services/result-comparator.service';
+import { AiFeedbackService } from './services/ai-feedback.service';
 import { DatabasesModule } from '../databases/databases.module';
 
 @Module({
@@ -9,7 +10,8 @@ import { DatabasesModule } from '../databases/databases.module';
     providers: [
         SqlEvaluationService,
         QueryExecutorService,
-        ResultComparatorService
+        ResultComparatorService,
+        AiFeedbackService
     ],
     exports: [SqlEvaluationService]
 })

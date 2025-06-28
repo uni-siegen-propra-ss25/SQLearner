@@ -3,6 +3,8 @@ import { QueryExecutorService } from './query-executor.service';
 import { ResultComparatorService } from './result-comparator.service';
 import { EvaluationResult, EvaluationCategory } from '../models/evaluation-result.dto';
 import { SqlEvaluationException } from '../exceptions/sql-evaluation.exception';
+import { AiFeedbackService } from './ai-feedback.service';
+import { DatabasesService } from '../../databases/services/databases.service'; 
 
 /**
  * Main orchestrator service for SQL query evaluation and assessment.
@@ -12,15 +14,19 @@ import { SqlEvaluationException } from '../exceptions/sql-evaluation.exception';
 export class SqlEvaluationService {
     private readonly logger = new Logger(SqlEvaluationService.name);
 
+    constructor(
+        private readonly queryExecutor: QueryExecutorService,
+        private readonly resultComparator: ResultComparatorService,
+        private readonly aiFeedbackService: AiFeedbackService,
+        private readonly databasesService: DatabasesService // for schema extraction
+    ) {}
+
     /**
      * Creates an instance of SqlEvaluationService with required dependencies.
      * @param {QueryExecutorService} queryExecutor - Service for secure SQL query execution
      * @param {ResultComparatorService} resultComparator - Service for result set comparison
      */
-    constructor(
-        private readonly queryExecutor: QueryExecutorService,
-        private readonly resultComparator: ResultComparatorService
-    ) {}
+
 
     /**
      * Evaluates a student's SQL query against a reference solution.
@@ -63,7 +69,6 @@ export class SqlEvaluationService {
         connectionDetails?: { host: string; port: number }
     ): Promise<EvaluationResult> {
         this.logger.log(`Starting SQL evaluation for database ${databaseId}`);
-        
         try {
             // Execute both queries in parallel
             const [studentResult, solutionResult] = await Promise.all([
@@ -78,16 +83,38 @@ export class SqlEvaluationService {
             );
 
             // Generate evaluation
-            const evaluation = this.generateEvaluation(comparison, studentResult);
-            
+            let evaluation = this.generateEvaluation(comparison, studentResult);
+
+            // KI-Feedback nur bei falscher Lösung generieren
+            if (!evaluation.isCorrect) {
+                // Hole das Datenbankschema
+                let schema = '';
+                try {
+                    const db = await this.databasesService.getDatabaseById(databaseId);
+                    schema = db?.schemaSql || '';
+                } catch (e) {
+                    this.logger.warn('Konnte Datenbankschema nicht laden: ' + e.message);
+                }
+                const aiFeedback = await this.aiFeedbackService.generateFeedback({
+                    studentQuery,
+                    solutionQuery,
+                    schema,
+                    studentResult,
+                    solutionResult,
+                    errorCategory: evaluation.category
+                });
+                evaluation.feedback = aiFeedback;
+            }
+
             this.logger.log(`SQL evaluation completed: ${evaluation.category}`);
             return evaluation;
-
         } catch (error) {
             this.logger.error(`SQL evaluation failed: ${error.message}`);
             return this.createErrorEvaluation(error);
         }
-    }    /**
+    } 
+
+    /**
      * Generates a comprehensive evaluation result based on the comparison analysis.
      * Categorizes the result and provides appropriate feedback messages.
      * 
@@ -136,7 +163,7 @@ export class SqlEvaluationService {
             executionTimeMs: studentResult.executionTimeMs,
             technicalDetails: comparison
         };
-    }
+    } 
 
     /**
      * Creates an evaluation result for error scenarios.
