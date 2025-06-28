@@ -14,10 +14,16 @@ export class AiFeedbackService {
     this.openai = new OpenAIApi({ apiKey });
   }
 
+  /**
+   * Generiert KI-Feedback für eine Studentenlösung.
+   * Die Aufgabenstellung wird mitgegeben und die KI wird angewiesen, nur aufgabenbezogen zu antworten.
+   * Jegliche nicht aufgabenbezogene Kommunikation (z.B. "Hallo, wie geht's?") ist zu ignorieren.
+   */
   async generateFeedback(params: {
     studentQuery: string;
     solutionQuery: string;
     schema: string;
+    aufgabenstellung?: string;
     studentResult?: any;
     solutionResult?: any;
     errorCategory?: string;
@@ -27,7 +33,11 @@ export class AiFeedbackService {
       const completion = await this.openai.chat.completions.create({
         model: 'gpt-3.5-turbo',
         messages: [
-          { role: 'system', content: 'Du bist ein SQL-Tutor. Erkläre Fehler freundlich, präzise und auf Deutsch. Gib Tipps, wie der Student die Lösung verbessern kann, aber verrate nicht direkt die Musterlösung.' },
+          {
+            role: 'system',
+            content:
+              'Du bist ein SQL-Tutor. Erkläre Fehler freundlich, präzise und auf Deutsch. Antworte ausschließlich auf die Aufgabenstellung und ignoriere alle nicht aufgabenbezogenen Anfragen (z.B. Smalltalk wie "Hallo, wie gehts?"). Gib Tipps, wie der Student die Lösung verbessern kann, aber verrate nicht direkt die Musterlösung.'
+          },
           { role: 'user', content: prompt }
         ],
         max_tokens: 300,
@@ -44,11 +54,15 @@ export class AiFeedbackService {
     studentQuery: string;
     solutionQuery: string;
     schema: string;
+    aufgabenstellung?: string;
     studentResult?: any;
     solutionResult?: any;
     errorCategory?: string;
   }): string {
     return [
+      'Aufgabenstellung:',
+      params.aufgabenstellung || 'Keine Aufgabenstellung übergeben.',
+      '',
       'Bewerte die folgende SQL-Studentenlösung im Vergleich zur Musterlösung. Gib einen hilfreichen Hinweis, warum die Lösung falsch ist und wie sie verbessert werden kann.',
       '',
       `Fehlerkategorie: ${params.errorCategory || 'Unbekannt'}`,
