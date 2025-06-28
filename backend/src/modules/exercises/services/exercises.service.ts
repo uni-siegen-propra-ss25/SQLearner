@@ -230,7 +230,7 @@ export class ExercisesService {    /**
      * @returns {Promise<{columns: string[]; rows: any[]}>} Promise resolving to the query result
      * @throws {NotFoundException} if the exercise or database does not exist
      */
-    async runQuery(id: number, query: string, connectionDetails?: { host: string; port: number }): Promise<{ columns: string[]; rows: any[] }> {
+    async runQuery(id: number, query: string, connectionDetails?: { host: string; port: number; database?: string }): Promise<{ columns: string[]; rows: any[] }> {
         const exercise = await this.prisma.exercise.findUnique({
             where: { id },
             include: {
@@ -251,9 +251,14 @@ export class ExercisesService {    /**
             const result = connectionDetails
             ? await this.databasesService.runQueryInContainer({
                 ...connectionDetails,
-                database: 'postgres'
+                database: connectionDetails.database || 'exercise_db'
               }, query)
             : await this.databasesService.runQuery(exercise.database.id, query);
+
+            // Check if there was an error in the result
+            if ('error' in result && result.error) {
+                throw new BadRequestException(`Query execution failed: ${result.error}`);
+            }
 
             let columns: string[];
             if ('fields' in result && Array.isArray(result.fields)) {

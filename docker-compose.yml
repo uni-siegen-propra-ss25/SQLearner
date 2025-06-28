@@ -16,6 +16,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - sqlearner-network
 
   migrations:
     build:
@@ -26,6 +28,8 @@ services:
     environment:
       DATABASE_URL: 'postgresql://postgres:postgres@db:5432/sqlearner?schema=public'
     command: sh -c "while ! nc -z db 5432; do sleep 1; done && npx prisma migrate deploy"
+    networks:
+      - sqlearner-network
 
   backend:
     build: ./backend
@@ -60,6 +64,8 @@ services:
       migrations:
         condition: service_completed_successfully
     command: npm run start:dev
+    networks:
+      - sqlearner-network
 
   frontend:
     build: ./frontend
@@ -78,6 +84,12 @@ services:
           memory: 6G
         reservations:
           memory: 3G
+    networks:
+      - sqlearner-network
+
+networks:
+  sqlearner-network:
+    driver: bridge
 
 volumes:
   postgres_data: 

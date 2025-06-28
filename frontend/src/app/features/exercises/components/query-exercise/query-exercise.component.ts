@@ -25,7 +25,7 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
     isDarkMode = false; // Should be synced with your app's theme service
     isCorrectAnswer = false;
     private containerId: string | null = null;
-    private connectionDetails: { host: string; port: number } | null = null;
+    private connectionDetails: { host: string; port: number; database?: string } | null = null;
     private containerSubscription: Subscription | null = null;
 
     // Pagination variables
@@ -105,17 +105,25 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
     runQuery(): void {
         if (!this.sqlQuery.trim()) return;
 
+        console.log('=== DEBUG: QueryExerciseComponent.runQuery ===');
+        console.log('Exercise ID:', this.exercise.id);
+        console.log('SQL Query:', this.sqlQuery);
+        console.log('Connection Details:', this.connectionDetails);
+
         this.isLoading = true;
         this.submissionService.runQuery(this.exercise.id, this.sqlQuery, this.connectionDetails || undefined).subscribe({
             next: (result: any) => {
+                console.log('Query result received:', result);
                 this.queryResult = result;
                 this.isLoading = false;
                 this.currentView = 'result';
             },
             error: (error: any) => {
+                console.error('Query execution error:', error);
                 this.isLoading = false;
                 this.queryResult = null;
                 const errorMessage = error.error?.detail || error.error?.message || error.message || 'Failed to run query';
+                console.error('Error message:', errorMessage);
                 this.snackBar.open(errorMessage, 'Close', {
                     duration: 5000,
                     panelClass: ['error-snackbar']
