@@ -11,6 +11,7 @@ import { DatabaseUploadDialogComponent } from './dialogs/database-upload-dialog/
 import { DatabaseViewDialogComponent } from './dialogs/database-view-dialog/database-view-dialog.component';
 import { ConfirmDialogComponent } from './dialogs/confirm-dialog/confirm-dialog.component';
 import { CreateTableDialogComponent } from './dialogs/create-table-dialog/create-table-dialog.component';
+import { DataEditDialogComponent } from './dialogs/data-edit-dialog/data-edit-dialog.component';
 
 @NgModule({
     declarations: [
@@ -21,7 +22,8 @@ import { CreateTableDialogComponent } from './dialogs/create-table-dialog/create
         DatabaseUploadDialogComponent,
         DatabaseViewDialogComponent,
         ConfirmDialogComponent,
-        CreateTableDialogComponent
+        CreateTableDialogComponent,
+        DataEditDialogComponent
     ],
     imports: [
         CommonModule,

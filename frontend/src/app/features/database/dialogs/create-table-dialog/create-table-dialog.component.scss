@@ -2,11 +2,13 @@
     display: block;
   
     mat-dialog-content {
-      min-width: 600px;
-      max-width: 900px;
+      min-width: 100%;
+      max-width: 100%;
       max-height: 80vh;
       padding: 24px;
       overflow-y: auto;
+      overflow-x: hidden;
+      box-sizing: border-box;
     }
   }
   
@@ -28,6 +30,8 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 16px;
   
     h3 {
       margin: 0;
@@ -73,7 +77,7 @@
   
     .field-row {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 16px;
       align-items: start;
   
@@ -85,6 +89,7 @@
   
         mat-checkbox {
           margin-right: 0;
+          min-width: 120px;
         }
       }
   
@@ -94,6 +99,7 @@
   
       mat-form-field {
         width: 100%;
+        min-width: 0; // Prevent overflow
       }
     }
   }
@@ -107,6 +113,8 @@
     max-height: 300px;
     width: 100%;
     overflow-y: auto;
+    overflow-x: auto;
+    box-sizing: border-box;
   
     pre {
       margin: 0;
@@ -116,6 +124,7 @@
       line-height: 1.6;
       white-space: pre-wrap;
       word-wrap: break-word;
+      word-break: break-word;
     }
   }
   
@@ -127,6 +136,7 @@
     margin: 0;
     border-top: 1px solid rgba(0, 0, 0, 0.08);
     background: #fafafa;
+    flex-wrap: wrap;
   
     button {
       min-width: 120px;
@@ -149,8 +159,6 @@
   // Responsive design
   @media (max-width: 768px) {
     mat-dialog-content {
-      min-width: 90vw;
-      max-width: 95vw;
       padding: 16px;
     }
   
@@ -170,6 +178,15 @@
       button {
         width: 100%;
         margin-left: 0 !important;
+      }
+    }
+  
+    .section-header {
+      flex-direction: column;
+      align-items: stretch;
+      
+      button {
+        width: 100%;
       }
     }
   }

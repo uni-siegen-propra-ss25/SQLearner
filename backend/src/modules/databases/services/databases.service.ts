@@ -213,7 +213,7 @@ export class DatabasesService {
         const database = await this.getDatabaseById(id);
 
         if (user.role !== Role.ADMIN) {
-            throw new ForbiddenException('You are not the owner of this database.');
+            throw new ForbiddenException('You do not have permission to delete this database.');
         }
 
         try {
@@ -479,5 +479,196 @@ export class DatabasesService {
         await dbPool.query(createTableSql);
         await dbPool.end();
         return { message: 'Table created successfully' };
+    }
+
+    /**
+     * Inserts a new row into a table
+     * @param databaseId - The ID of the database
+     * @param tableName - The name of the table
+     * @param data - The data to insert
+     * @param userRole - The role of the user
+     * @returns Promise resolving to the inserted row
+     */
+    async insertRow(databaseId: number, tableName: string, data: Record<string, any>, userRole: Role | string) {
+        if (String(userRole).toUpperCase() !== 'TUTOR') {
+            throw new ForbiddenException('Only tutors can insert data');
+        }
+
+        const database = await this.getDatabaseById(databaseId);
+        if (!database) {
+            throw new NotFoundException('Database not found');
+        }
+
+        // Validate table exists
+        const tableExists = await this.tableExists(database.schemaSql, tableName);
+        if (!tableExists) {
+            throw new NotFoundException(`Table ${tableName} not found`);
+        }
+
+        // Build INSERT query
+        const columns = Object.keys(data);
+        const values = Object.values(data);
+        const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
+        
+        const insertSql = `INSERT INTO "${tableName}" (${columns.map(col => `"${col}"`).join(', ')}) VALUES (${placeholders}) RETURNING *`;
+
+        const dbPool = new Pool({
+            host: process.env.DB_HOST,
+            port: parseInt(process.env.DB_PORT || '5432', 10),
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: database.schemaSql
+        });
+
+        try {
+            const result = await dbPool.query(insertSql, values);
+            return result.rows[0];
+        } catch (error) {
+            throw new SqlErrorException({
+                message: `Failed to insert row: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                name: 'InsertError',
+                code: 'INSERT_ERROR'
+            });
+        } finally {
+            await dbPool.end();
+        }
+    }
+
+    /**
+     * Updates a row in a table
+     * @param databaseId - The ID of the database
+     * @param tableName - The name of the table
+     * @param data - The data to update
+     * @param whereClause - The WHERE clause for the update
+     * @param userRole - The role of the user
+     * @returns Promise resolving to the updated row
+     */
+    async updateRow(databaseId: number, tableName: string, data: Record<string, any>, whereClause: string, userRole: Role | string) {
+        if (String(userRole).toUpperCase() !== 'TUTOR') {
+            throw new ForbiddenException('Only tutors can update data');
+        }
+
+        const database = await this.getDatabaseById(databaseId);
+        if (!database) {
+            throw new NotFoundException('Database not found');
+        }
+
+        // Validate table exists
+        const tableExists = await this.tableExists(database.schemaSql, tableName);
+        if (!tableExists) {
+            throw new NotFoundException(`Table ${tableName} not found`);
+        }
+
+        // Build UPDATE query
+        const columns = Object.keys(data);
+        const values = Object.values(data);
+        const setClause = columns.map((col, index) => `"${col}" = $${index + 1}`).join(', ');
+        
+        const updateSql = `UPDATE "${tableName}" SET ${setClause} WHERE ${whereClause} RETURNING *`;
+
+        const dbPool = new Pool({
+            host: process.env.DB_HOST,
+            port: parseInt(process.env.DB_PORT || '5432', 10),
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: database.schemaSql
+        });
+
+        try {
+            const result = await dbPool.query(updateSql, values);
+            if (result.rowCount === 0) {
+                throw new NotFoundException('No rows were updated');
+            }
+            return result.rows[0];
+        } catch (error) {
+            throw new SqlErrorException({
+                message: `Failed to update row: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                name: 'UpdateError',
+                code: 'UPDATE_ERROR'
+            });
+        } finally {
+            await dbPool.end();
+        }
+    }
+
+    /**
+     * Deletes a row from a table
+     * @param databaseId - The ID of the database
+     * @param tableName - The name of the table
+     * @param whereClause - The WHERE clause for the delete
+     * @param userRole - The role of the user
+     * @returns Promise resolving to the deletion result
+     */
+    async deleteRow(databaseId: number, tableName: string, whereClause: string, userRole: Role | string) {
+        if (String(userRole).toUpperCase() !== 'TUTOR') {
+            throw new ForbiddenException('Only tutors can delete data');
+        }
+
+        const database = await this.getDatabaseById(databaseId);
+        if (!database) {
+            throw new NotFoundException('Database not found');
+        }
+
+        // Validate table exists
+        const tableExists = await this.tableExists(database.schemaSql, tableName);
+        if (!tableExists) {
+            throw new NotFoundException(`Table ${tableName} not found`);
+        }
+
+        const deleteSql = `DELETE FROM "${tableName}" WHERE ${whereClause} RETURNING *`;
+
+        const dbPool = new Pool({
+            host: process.env.DB_HOST,
+            port: parseInt(process.env.DB_PORT || '5432', 10),
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: database.schemaSql
+        });
+
+        try {
+            const result = await dbPool.query(deleteSql);
+            if (result.rowCount === 0) {
+                throw new NotFoundException('No rows were deleted');
+            }
+            return { message: 'Row deleted successfully', deletedRow: result.rows[0] };
+        } catch (error) {
+            throw new SqlErrorException({
+                message: `Failed to delete row: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                name: 'DeleteError',
+                code: 'DELETE_ERROR'
+            });
+        } finally {
+            await dbPool.end();
+        }
+    }
+
+    /**
+     * Checks if a table exists in the database
+     * @param dbName - The database name
+     * @param tableName - The table name
+     * @returns Promise resolving to boolean
+     */
+    private async tableExists(dbName: string, tableName: string): Promise<boolean> {
+        const dbPool = new Pool({
+            host: process.env.DB_HOST,
+            port: parseInt(process.env.DB_PORT || '5432', 10),
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: dbName
+        });
+
+        try {
+            const result = await dbPool.query(
+                `SELECT EXISTS (
+                    SELECT FROM information_schema.tables 
+                    WHERE table_schema = 'public' 
+                    AND table_name = $1
+                )`,
+                [tableName]
+            );
+            return result.rows[0].exists;
+        } finally {
+            await dbPool.end();
+        }
     }
 }

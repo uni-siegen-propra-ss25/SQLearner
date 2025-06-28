@@ -10,6 +10,7 @@ import { ConfirmDialogComponent } from '../../dialogs/confirm-dialog/confirm-dia
 import { ActivatedRoute, Router } from '@angular/router';
 import { DatabaseService, QueryResult } from '../../services/database.service';
 import { CreateTableDialogComponent } from '../../dialogs/create-table-dialog/create-table-dialog.component';
+import { DataEditDialogComponent, DataEditDialogData } from '../../dialogs/data-edit-dialog/data-edit-dialog.component';
 import { AuthService } from 'app/features/auth/services/auth.service';
 import { Role } from 'app/features/users/models/role.model';
 
@@ -55,7 +56,7 @@ export class DatabaseTableViewerComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit() {
-    // Получаем ID базы данных из маршрута
+    // Get database ID from the route
     this.route.params.subscribe(params => {
       this.databaseId = +params['id'];
       if (this.databaseId) {
@@ -63,7 +64,7 @@ export class DatabaseTableViewerComponent implements OnInit, AfterViewInit {
       }
     });
 
-    // Проверяем роль пользователя
+    // Checking the user role
     this.authService.user$.subscribe(user => {
       this.isTutor = user?.role === Role.TUTOR;
     });
@@ -180,7 +181,7 @@ export class DatabaseTableViewerComponent implements OnInit, AfterViewInit {
   loadTablesSimple() {
     if (!this.databaseId) return;
 
-    // Простой запрос только для названий таблиц
+    // Simple query for table names only
     this.databaseService.runQuery(this.databaseId, `
       SELECT table_name as name 
       FROM information_schema.tables 
@@ -244,17 +245,42 @@ export class DatabaseTableViewerComponent implements OnInit, AfterViewInit {
 
     let filtered = [...this.tableData];
     
-    // Search filter
+    // Text search
     if (this.searchQuery) {
       const searchLower = this.searchQuery.toLowerCase();
       filtered = filtered.filter(row => {
-        return Object.values(row).some(value => 
-          String(value).toLowerCase().includes(searchLower)
-        );
+        return Object.entries(row).some(([columnName, value]) => {
+          // Skip system columns
+          if (columnName.toLowerCase().includes('id') && typeof value === 'number') {
+            return false;
+          }
+          
+          // Search by string values
+          if (typeof value === 'string') {
+            return value.toLowerCase().includes(searchLower);
+          }
+          
+          // Search by numeric values
+          if (typeof value === 'number') {
+            return value.toString().includes(searchLower);
+          }
+          
+          // Search by boolean values
+          if (typeof value === 'boolean') {
+            return value.toString().toLowerCase().includes(searchLower);
+          }
+          
+          // Search by null values
+          if (value === null) {
+            return 'null'.includes(searchLower);
+          }
+          
+          return false;
+        });
       });
     }
 
-    // NULL filters
+    // Filters by data type
     switch (this.selectedFilter) {
       case 'null':
         filtered = filtered.filter(row => 
@@ -266,11 +292,93 @@ export class DatabaseTableViewerComponent implements OnInit, AfterViewInit {
           Object.values(row).every(value => value !== null)
         );
         break;
+      case 'empty_strings':
+        filtered = filtered.filter(row => 
+          Object.values(row).some(value => value === '' || value === '')
+        );
+        break;
+      case 'non_empty_strings':
+        filtered = filtered.filter(row => 
+          Object.values(row).some(value => typeof value === 'string' && value.trim() !== '')
+        );
+        break;
     }
 
     this.totalRows = filtered.length;
     this.filteredData = filtered;
     this.dataSource.data = filtered;
+  }
+
+  /**
+   * Advanced search with SQL-like filters
+   * @param searchText - Text for search
+   * @param columnName - Name of the column to search (optional)
+   * @param operator - Comparison operator (=, !=, >, <, >=, <=, LIKE, IN)
+   */
+  advancedSearch(searchText: string, columnName?: string, operator: string = 'LIKE') {
+    if (!this.tableData) return;
+
+    let filtered = [...this.tableData];
+    
+    if (searchText) {
+      filtered = filtered.filter(row => {
+        if (columnName && row.hasOwnProperty(columnName)) {
+          return this.matchesCondition(row[columnName], searchText, operator);
+        } else {
+          // Поиск по всем столбцам
+          return Object.entries(row).some(([colName, value]) => {
+            return this.matchesCondition(value, searchText, operator);
+          });
+        }
+      });
+    }
+
+    this.totalRows = filtered.length;
+    this.filteredData = filtered;
+    this.dataSource.data = filtered;
+  }
+
+  /**
+   * Checks if the value matches the condition
+   */
+  private matchesCondition(value: any, searchText: string, operator: string): boolean {
+    const searchLower = searchText.toLowerCase();
+    const valueStr = String(value).toLowerCase();
+
+    switch (operator.toUpperCase()) {
+      case '=':
+        return valueStr === searchLower;
+      case '!=':
+        return valueStr !== searchLower;
+      case '>':
+        return Number(value) > Number(searchText);
+      case '<':
+        return Number(value) < Number(searchText);
+      case '>=':
+        return Number(value) >= Number(searchText);
+      case '<=':
+        return Number(value) <= Number(searchText);
+      case 'LIKE':
+        return valueStr.includes(searchLower);
+      case 'STARTS_WITH':
+        return valueStr.startsWith(searchLower);
+      case 'ENDS_WITH':
+        return valueStr.endsWith(searchLower);
+      case 'IN':
+        const searchValues = searchText.split(',').map(v => v.trim().toLowerCase());
+        return searchValues.includes(valueStr);
+      default:
+        return valueStr.includes(searchLower);
+    }
+  }
+
+  /**
+   * Clears all filters and searches
+   */
+  clearFilters() {
+    this.searchQuery = '';
+    this.selectedFilter = 'all';
+    this.filterData();
   }
 
   onPageChange(event: any): void {
@@ -283,7 +391,8 @@ export class DatabaseTableViewerComponent implements OnInit, AfterViewInit {
     if (!this.database) return;
 
     const dialogRef = this.dialog.open(CreateTableDialogComponent, {
-      width: '800px',
+      width: '95vw',
+      maxWidth: '1200px',
       maxHeight: '90vh',
       data: { 
         databaseId: this.database.id,
@@ -307,15 +416,73 @@ export class DatabaseTableViewerComponent implements OnInit, AfterViewInit {
   openAddDataDialog(): void {
     if (!this.selectedTable || !this.database) return;
     
-    // TODO: Hinzufügen von Daten
-    this.snackBar.open('Funktion noch nicht implementiert', 'OK', { duration: 3000 });
+    const dialogRef = this.dialog.open(DataEditDialogComponent, {
+      width: '600px',
+      maxHeight: '90vh',
+      data: {
+        mode: 'add',
+        tableName: this.selectedTable.name,
+        columns: this.selectedTable.columns,
+        databaseId: this.database.id
+      } as DataEditDialogData
+    });
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result && result.success) {
+        // Send data to the server
+        this.databaseService.insertRow(this.database!.id, this.selectedTable!.name, result.data).subscribe({
+          next: () => {
+            this.snackBar.open('Datensatz erfolgreich hinzugefügt!', 'OK', { duration: 3000 });
+            this.loadTableData(this.selectedTable!.name); // Reload table data
+          },
+          error: (error: any) => {
+            console.error('Error adding row:', error);
+            this.snackBar.open('Fehler beim Hinzufügen des Datensatzes.', 'OK', { duration: 3000 });
+          }
+        });
+      }
+    });
   }
 
   openEditDataDialog(rowData: any): void {
     if (!this.selectedTable || !this.database) return;
     
-    // TODO: Datenbearbeitung implementieren
-    this.snackBar.open('Funktion noch nicht implementiert', 'OK', { duration: 3000 });
+    const dialogRef = this.dialog.open(DataEditDialogComponent, {
+      width: '600px',
+      maxHeight: '90vh',
+      data: {
+        mode: 'edit',
+        tableName: this.selectedTable.name,
+        columns: this.selectedTable.columns,
+        rowData: rowData,
+        databaseId: this.database.id
+      } as DataEditDialogData
+    });
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result && result.success) {
+        // Create a WHERE clause to update a specific row
+        const primaryKeyColumn = this.selectedTable!.columns.find(col => col.isPrimaryKey);
+        if (!primaryKeyColumn) {
+          this.snackBar.open('Kein Primärschlüssel gefunden für Update.', 'OK', { duration: 3000 });
+          return;
+        }
+        
+        const whereClause = `"${primaryKeyColumn.name}" = ${rowData[primaryKeyColumn.name]}`;
+        
+        // Send data to the server
+        this.databaseService.updateRow(this.database!.id, this.selectedTable!.name, result.data, whereClause).subscribe({
+          next: () => {
+            this.snackBar.open('Datensatz erfolgreich aktualisiert!', 'OK', { duration: 3000 });
+            this.loadTableData(this.selectedTable!.name); // Reload table data
+          },
+          error: (error: any) => {
+            console.error('Error updating row:', error);
+            this.snackBar.open('Fehler beim Aktualisieren des Datensatzes.', 'OK', { duration: 3000 });
+          }
+        });
+      }
+    });
   }
 
   truncateTable() {
@@ -383,8 +550,26 @@ export class DatabaseTableViewerComponent implements OnInit, AfterViewInit {
 
     dialogRef.afterClosed().subscribe((result: boolean) => {
       if (result) {
-        // TODO: Löschung einer Zeichenkette implementieren
-        this.snackBar.open('Funktion noch nicht implementiert', 'OK', { duration: 3000 });
+        // Create a WHERE clause to delete a specific row
+        const primaryKeyColumn = this.selectedTable!.columns.find(col => col.isPrimaryKey);
+        if (!primaryKeyColumn) {
+          this.snackBar.open('Kein Primärschlüssel gefunden für Löschung.', 'OK', { duration: 3000 });
+          return;
+        }
+        
+        const whereClause = `"${primaryKeyColumn.name}" = ${row[primaryKeyColumn.name]}`;
+        
+        // Send a request for deletion
+        this.databaseService.deleteRow(this.databaseId!, this.selectedTable!.name, whereClause).subscribe({
+          next: () => {
+            this.snackBar.open('Zeile erfolgreich gelöscht!', 'OK', { duration: 3000 });
+            this.loadTableData(this.selectedTable!.name); // Reload table data
+          },
+          error: (error: any) => {
+            console.error('Error deleting row:', error);
+            this.snackBar.open('Fehler beim Löschen der Zeile.', 'OK', { duration: 3000 });
+          }
+        });
       }
     });
   }

@@ -173,9 +173,22 @@
         <mat-icon>check_circle</mat-icon>
         <span>Nur nicht NULL anzeigen</span>
     </button>
+    <button mat-menu-item (click)="selectedFilter = 'empty_strings'; filterData()">
+        <mat-icon>space_bar</mat-icon>
+        <span>Leere Zeichenketten</span>
+    </button>
+    <button mat-menu-item (click)="selectedFilter = 'non_empty_strings'; filterData()">
+        <mat-icon>text_fields</mat-icon>
+        <span>Nicht-leere Zeichenketten</span>
+    </button>
     <mat-divider *ngIf="isTutor"></mat-divider>
     <button mat-menu-item *ngIf="isTutor" (click)="truncateTable()" color="warn">
         <mat-icon>clear_all</mat-icon>
         <span>Alle Zeilen löschen</span>
+    </button>
+    <mat-divider></mat-divider>
+    <button mat-menu-item (click)="clearFilters()">
+        <mat-icon>clear</mat-icon>
+        <span>Filter löschen</span>
     </button>
 </mat-menu>

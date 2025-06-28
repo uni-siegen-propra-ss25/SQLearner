@@ -100,4 +100,43 @@ export class DatabaseService {
         const headers = new HttpHeaders({ 'enctype': 'multipart/form-data' });
         return this.http.post<Database>(`${this.baseUrl}/upload`, formData, { headers });
     }
+
+    /**
+     * Inserts a new row into a table
+     * @param databaseId - The ID of the database
+     * @param tableName - The name of the table
+     * @param data - The data to insert
+     * @returns Observable of the inserted row
+     */
+    insertRow(databaseId: number, tableName: string, data: Record<string, any>): Observable<any> {
+        return this.http.post<any>(`${this.baseUrl}/${databaseId}/tables/${tableName}/rows`, { data });
+    }
+
+    /**
+     * Updates a row in a table
+     * @param databaseId - The ID of the database
+     * @param tableName - The name of the table
+     * @param data - The data to update
+     * @param whereClause - The WHERE clause for the update
+     * @returns Observable of the updated row
+     */
+    updateRow(databaseId: number, tableName: string, data: Record<string, any>, whereClause: string): Observable<any> {
+        return this.http.put<any>(`${this.baseUrl}/${databaseId}/tables/${tableName}/rows`, { 
+            data, 
+            whereClause 
+        });
+    }
+
+    /**
+     * Deletes a row from a table
+     * @param databaseId - The ID of the database
+     * @param tableName - The name of the table
+     * @param whereClause - The WHERE clause for the delete
+     * @returns Observable of the deletion result
+     */
+    deleteRow(databaseId: number, tableName: string, whereClause: string): Observable<any> {
+        return this.http.delete<any>(`${this.baseUrl}/${databaseId}/tables/${tableName}/rows`, { 
+            body: { whereClause } 
+        });
+    }
 }

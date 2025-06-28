@@ -23,6 +23,7 @@ import { QueryDto } from '../models/query.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateDatabaseDto } from '../models/create-database.dto';
 import { UpdateDatabaseDto } from '../models/update-database.dto';
+import { RowDataDto } from '../models/row-data.dto';
 /**
  * Controller managing database operations for the SQL learning system.
  * Handles:
@@ -135,5 +136,47 @@ export class DatabasesController {
         @GetUser() user: User,
     ) {
         return this.databasesService.createTable(databaseId, dto, user.id, user.role);
+    }
+
+    @Post(':id/tables/:tableName/rows')
+    @Roles(Role.TUTOR)
+    @ApiOperation({ summary: 'Insert a new row into a table' })
+    @ApiResponse({ status: 201, description: 'Row inserted successfully' })
+    async insertRow(
+        @Param('id', ParseIntPipe) databaseId: number,
+        @Param('tableName') tableName: string,
+        @Body() dto: RowDataDto,
+        @GetUser() user: User,
+    ) {
+        return this.databasesService.insertRow(databaseId, tableName, dto.data, user.role);
+    }
+
+    @Put(':id/tables/:tableName/rows')
+    @Roles(Role.TUTOR)
+    @ApiOperation({ summary: 'Update a row in a table' })
+    @ApiResponse({ status: 200, description: 'Row updated successfully' })
+    async updateRow(
+        @Param('id', ParseIntPipe) databaseId: number,
+        @Param('tableName') tableName: string,
+        @Body() dto: RowDataDto,
+        @GetUser() user: User,
+    ) {
+        if (!dto.whereClause) {
+            throw new Error('WHERE clause is required for UPDATE operations');
+        }
+        return this.databasesService.updateRow(databaseId, tableName, dto.data, dto.whereClause, user.role);
+    }
+
+    @Delete(':id/tables/:tableName/rows')
+    @Roles(Role.TUTOR)
+    @ApiOperation({ summary: 'Delete a row from a table' })
+    @ApiResponse({ status: 200, description: 'Row deleted successfully' })
+    async deleteRow(
+        @Param('id', ParseIntPipe) databaseId: number,
+        @Param('tableName') tableName: string,
+        @Body() dto: { whereClause: string },
+        @GetUser() user: User,
+    ) {
+        return this.databasesService.deleteRow(databaseId, tableName, dto.whereClause, user.role);
     }
 }
