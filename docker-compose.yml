@@ -46,8 +46,8 @@ services:
       - no-new-privileges:true
     cpu_count: 2
     cpu_percent: 50
-    mem_limit: 512m
-    memswap_limit: 512m
+    mem_limit: 2g
+    memswap_limit: 2g 
     ulimits:
       nproc: 100
       nofile:
