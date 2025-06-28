@@ -1,45 +1,78 @@
-<h2 mat-dialog-title>Neue Datenbank erstellen</h2>
+<div class="database-create-dialog">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon>add</mat-icon>
+      Neue Datenbank erstellen
+    </h2>
+    <button mat-icon-button mat-dialog-close>
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
 
-<mat-dialog-content>
-  <form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <mat-form-field class="full-width">
-      <mat-label>Name</mat-label>
-      <input matInput formControlName="name" placeholder="Name der Datenbank" required>
-      <mat-error *ngIf="form.get('name')?.hasError('required')">
-        Ein Name ist erforderlich
-      </mat-error>
-      <mat-error *ngIf="form.get('name')?.hasError('pattern')">
-        Name muss mit Buchstabe oder Unterstrich beginnen und nur Buchstaben, Zahlen und Unterstriche enthalten
-      </mat-error>
-      <mat-hint>Nur Buchstaben, Zahlen und Unterstriche erlaubt</mat-hint>
-    </mat-form-field>
+  <mat-dialog-content>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-section">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Name</mat-label>
+          <input matInput formControlName="name" placeholder="Name der Datenbank" required>
+          <mat-error *ngIf="form.get('name')?.hasError('required')">
+            Ein Name ist erforderlich
+          </mat-error>
+          <mat-error *ngIf="form.get('name')?.hasError('pattern')">
+            Name muss mit Buchstabe oder Unterstrich beginnen und nur Buchstaben, Zahlen und Unterstriche enthalten
+          </mat-error>
+          <mat-hint>Nur Buchstaben, Zahlen und Unterstriche erlaubt</mat-hint>
+        </mat-form-field>
+      </div>
 
-    <mat-form-field class="full-width">
-      <mat-label>Beschreibung</mat-label>
-      <textarea matInput formControlName="description" 
-                placeholder="Optionale Beschreibung der Datenbank"
-                rows="3"></textarea>
-    </mat-form-field>
+      <div class="form-section">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Beschreibung</mat-label>
+          <textarea matInput formControlName="description" 
+                    placeholder="Optionale Beschreibung der Datenbank"
+                    rows="3"></textarea>
+        </mat-form-field>
+      </div>
 
-    <div class="sql-schema-field">
-      <mat-form-field class="full-width">
-        <mat-label>SQL Schema (Optional)</mat-label>
-        <textarea matInput formControlName="schemaSql" 
-                  placeholder="CREATE TABLE users (id SERIAL PRIMARY KEY, name VARCHAR(100));"
-                  rows="8"></textarea>
-        <mat-hint>Gib hier optional SQL-Befehle ein, um die Datenbankstruktur zu definieren</mat-hint>
-      </mat-form-field>
-    </div>
-  </form>
-</mat-dialog-content>
+      <div class="form-section">
+        <div class="section-header">
+          <h3>SQL Schema (Optional)</h3>
+          <div class="schema-info">
+            <mat-icon>info</mat-icon>
+            <span>Definieren Sie hier die Datenbankstruktur</span>
+          </div>
+        </div>
+        
+        <div class="sql-editor-container">
+          <div class="editor-header">
+            <span class="editor-label">SQL Code</span>
+            <div class="editor-actions">
+              <button type="button" mat-icon-button matTooltip="Beispiel laden" (click)="loadExample()">
+                <mat-icon>code</mat-icon>
+              </button>
+              <button type="button" mat-icon-button matTooltip="Code formatieren" (click)="formatCode()">
+                <mat-icon>format_align_left</mat-icon>
+              </button>
+            </div>
+          </div>
+          <div #sqlEditorContainer class="monaco-editor-container"></div>
+          <div class="editor-hint">
+            <mat-icon>lightbulb</mat-icon>
+            <span>Verwenden Sie CREATE TABLE, INSERT INTO und andere SQL-Befehle</span>
+          </div>
+        </div>
+      </div>
+    </form>
+  </mat-dialog-content>
 
-<mat-dialog-actions align="end">
-  <button mat-button type="button" (click)="onCancel()" [disabled]="isLoading">Abbrechen</button>
-  <button mat-raised-button color="primary" type="submit" 
-          [disabled]="!form.valid || isLoading"
-          (click)="onSubmit()">
-    <mat-spinner *ngIf="isLoading" diameter="20" class="spinner"></mat-spinner>
-    <span *ngIf="!isLoading">Erstellen</span>
-    <span *ngIf="isLoading">Wird erstellt...</span>
-  </button>
-</mat-dialog-actions>
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="onCancel()" [disabled]="isLoading">Abbrechen</button>
+    <button mat-raised-button color="primary" type="submit" 
+            [disabled]="!form.valid || isLoading"
+            (click)="onSubmit()">
+      <mat-spinner diameter="20" *ngIf="isLoading"></mat-spinner>
+      <span *ngIf="!isLoading">Erstellen</span>
+      <span *ngIf="isLoading">Wird erstellt...</span>
+    </button>
+  </mat-dialog-actions>
+</div>

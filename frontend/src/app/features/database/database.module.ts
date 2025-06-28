@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from 'app/material.module';
+import { SharedModule } from '../../shared/shared.module';
 import { DatabaseRoutingModule } from './database-routing.module';
 import { DatabaseListComponent } from './components/database-list/database-list.component';
 import { DatabaseTableViewerComponent } from './components/database-table-viewer/database-table-viewer.component';
@@ -12,6 +13,7 @@ import { DatabaseViewDialogComponent } from './dialogs/database-view-dialog/data
 import { ConfirmDialogComponent } from './dialogs/confirm-dialog/confirm-dialog.component';
 import { CreateTableDialogComponent } from './dialogs/create-table-dialog/create-table-dialog.component';
 import { DataEditDialogComponent } from './dialogs/data-edit-dialog/data-edit-dialog.component';
+import { EditTableDialogComponent } from './dialogs/edit-table-dialog/edit-table-dialog.component';
 
 @NgModule({
     declarations: [
@@ -23,13 +25,15 @@ import { DataEditDialogComponent } from './dialogs/data-edit-dialog/data-edit-di
         DatabaseViewDialogComponent,
         ConfirmDialogComponent,
         CreateTableDialogComponent,
-        DataEditDialogComponent
+        DataEditDialogComponent,
+        EditTableDialogComponent
     ],
     imports: [
         CommonModule,
         FormsModule,
         ReactiveFormsModule,
         MaterialModule,
+        SharedModule,
         DatabaseRoutingModule
     ]
 })

@@ -11,6 +11,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DatabaseService, QueryResult } from '../../services/database.service';
 import { CreateTableDialogComponent } from '../../dialogs/create-table-dialog/create-table-dialog.component';
 import { DataEditDialogComponent, DataEditDialogData } from '../../dialogs/data-edit-dialog/data-edit-dialog.component';
+import { EditTableDialogComponent, EditTableDialogData } from '../../dialogs/edit-table-dialog/edit-table-dialog.component';
 import { AuthService } from 'app/features/auth/services/auth.service';
 import { Role } from 'app/features/users/models/role.model';
 
@@ -409,8 +410,26 @@ export class DatabaseTableViewerComponent implements OnInit, AfterViewInit {
   }
 
   openEditTableDialog(table: DatabaseTable) {
-    // TODO: Tabellenbearbeitung implementieren
-    this.snackBar.open('Funktion noch nicht implementiert', 'OK', { duration: 3000 });
+    if (!this.database) return;
+
+    const dialogRef = this.dialog.open(EditTableDialogComponent, {
+      width: '95vw',
+      maxWidth: '1200px',
+      maxHeight: '90vh',
+      data: {
+        databaseId: this.database.id,
+        databaseName: this.database.name,
+        tableName: table.name,
+        columns: table.columns
+      } as EditTableDialogData
+    });
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result && result.success) {
+        this.loadTables(); // Reload tables and row counts
+        this.snackBar.open('Tabelle erfolgreich bearbeitet!', 'OK', { duration: 3000 });
+      }
+    });
   }
 
   openAddDataDialog(): void {

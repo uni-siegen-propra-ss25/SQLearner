@@ -2,59 +2,143 @@
   display: block;
 }
 
-mat-dialog-content {
-  min-width: 500px;
-  max-width: 600px;
-  padding: 24px;
+.database-create-dialog {
+  min-width: 600px;
+  max-width: 1000px;
+  max-height: 90vh;
 }
 
-h2 {
-  margin: 0 0 24px 0;
-  font-size: 1.5rem;
-  font-weight: 500;
-  color: rgba(0, 0, 0, 0.87);
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px 0;
+  
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    
+    mat-icon {
+      color: #1976d2;
+    }
+  }
+}
+
+mat-dialog-content {
+  padding: 16px 24px;
+  max-height: 70vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.form-section {
+  margin-bottom: 24px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+
+  h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.87);
+  }
+
+  .schema-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: rgba(0, 0, 0, 0.6);
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+.sql-editor-container {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fafafa;
+}
+
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background: #f5f5f5;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+
+  .editor-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.87);
+  }
+
+  .editor-actions {
+    display: flex;
+    gap: 4px;
+
+    button {
+      width: 32px;
+      height: 32px;
+      line-height: 32px;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
+}
+
+.monaco-editor-container {
+  height: 300px;
+  min-height: 200px;
+  max-height: 400px;
+  background: #ffffff;
+}
+
+.editor-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #e3f2fd;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  font-size: 0.85rem;
+  color: rgba(0, 0, 0, 0.7);
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: #1976d2;
+  }
 }
 
 .full-width {
   width: 100%;
-  margin-bottom: 20px;
-}
-
-.sql-schema-field {
-  margin-bottom: 24px;
-
-  mat-form-field {
-    width: 100%;
-  }
-
-  textarea {
-    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-    font-size: 0.9rem;
-    line-height: 1.4;
-  }
-}
-
-mat-dialog-actions {
-  padding: 16px 24px;
-  margin: 0;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
-  background: #fafafa;
-
-  button {
-    min-width: 100px;
-    padding: 8px 24px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    &[color='primary'] {
-      margin-left: 0;
-    }
-
-    .spinner {
-      margin-right: 4px;
-    }
-  }
+  margin-bottom: 16px;
 }
 
 mat-form-field {
@@ -65,16 +149,40 @@ mat-form-field {
   }
 }
 
+mat-dialog-actions {
+  padding: 16px 24px;
+  gap: 8px;
+
+  button {
+    min-width: 100px;
+
+    mat-spinner {
+      margin-right: 8px;
+    }
+  }
+}
+
 // Responsive design
 @media (max-width: 768px) {
-  mat-dialog-content {
+  .database-create-dialog {
     min-width: 90vw;
     max-width: 95vw;
-    padding: 16px;
+  }
+
+  mat-dialog-content {
+    padding: 12px 16px;
+  }
+
+  .dialog-header {
+    padding: 12px 16px 0;
+  }
+
+  .monaco-editor-container {
+    height: 250px;
   }
 
   mat-dialog-actions {
-    padding: 16px;
+    padding: 12px 16px;
     flex-direction: column;
 
     button {
@@ -82,16 +190,31 @@ mat-form-field {
       margin-left: 0 !important;
     }
   }
+
+  .section-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
 // Dark theme adjustments
 :host-context(.dark-theme) {
-  h2 {
-    color: rgba(255, 255, 255, 0.87);
+  .sql-editor-container {
+    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.05);
   }
 
-  mat-dialog-actions {
-    border-top-color: rgba(255, 255, 255, 0.08);
-    background: rgba(0, 0, 0, 0.05);
+  .editor-header {
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom-color: rgba(255, 255, 255, 0.12);
+  }
+
+  .editor-hint {
+    background: rgba(25, 118, 210, 0.1);
+    border-top-color: rgba(255, 255, 255, 0.12);
+  }
+
+  .monaco-editor-container {
+    background: #1e1e1e;
   }
 } 
