@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from '../../../features/auth/services/auth.service';
 import { ProfileComponent } from '../../../features/users/components/profile/profile.component';
 import { Role } from '../../../features/users/models/role.model';
+import { TranslateService } from '@ngx-translate/core';
 
 export interface NavigationItem {
     icon: string;
@@ -26,17 +27,21 @@ export class NavigationRailComponent {
     @Input() userRole: Role | null = null;
 
     @Output() itemSelected = new EventEmitter<NavigationItem>();
-    @Output() darkModeChanged = new EventEmitter<boolean>();
     @Output() languageChanged = new EventEmitter<string>();
     @Output() logStatusChanged = new EventEmitter<void>();
 
-    isDarkMode = false;
+    currentLang = 'de';
 
     constructor(
         private router: Router,
         private dialog: MatDialog,
         private authService: AuthService,
-    ) {}
+        private translate: TranslateService,
+    ) {
+        const savedLang = localStorage.getItem('language') || 'de';
+        this.currentLang = savedLang;
+    }
+
     openProfile(): void {
         const user = this.authService.getUserFromToken();
         this.dialog.open(ProfileComponent, {
@@ -57,11 +62,6 @@ export class NavigationRailComponent {
         this.itemSelected.emit(item);
     }
 
-    toggleDarkMode(): void {
-        this.isDarkMode = !this.isDarkMode;
-        this.darkModeChanged.emit(this.isDarkMode);
-    }
-
     onLogStatusChanged(): void {
         if (this.userRole) {
             this.logStatusChanged.emit();
@@ -71,6 +71,9 @@ export class NavigationRailComponent {
     }
 
     onLanguageChange(language: string): void {
+        this.currentLang = language;
+        this.translate.use(language);
+        localStorage.setItem('language', language);
         this.languageChanged.emit(language);
     }
 }

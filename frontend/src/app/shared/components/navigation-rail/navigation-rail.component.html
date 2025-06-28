@@ -17,38 +17,40 @@
       <span class="icon-container">
         <mat-icon>{{ item.icon }}</mat-icon>
       </span>
-      <span class="label-text">{{ item.label }}</span>
+      <span class="label-text">{{ item.label | translate }}</span>
     </a>
   </div>
 
   <div class="nav-footer">
-    <button class="nav-item" (click)="onLanguageChange('de')">
-      <span class="icon-container">
-        <mat-icon>language</mat-icon>
-      </span>
-      <span class="label-text">Sprache</span>
-    </button>
-
-    <button class="nav-item" (click)="toggleDarkMode()">
-      <span class="icon-container">
-        <mat-icon>{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
-      </span>
-      <span class="label-text">{{ isDarkMode ? 'Light' : 'Dark' }}</span>
-    </button>
+    <div class="language-switcher">
+      <button class="lang-btn" (click)="onLanguageChange('de')" [class.active]="currentLang === 'de'">
+        🇩🇪
+      </button>
+      <button class="lang-btn" (click)="onLanguageChange('en')" [class.active]="currentLang === 'en'">
+        🇬🇧
+      </button>
+    </div>
 
     <button class="nav-item" *ngIf="userRole; else loginBtn" (click)="openProfile()">
       <span class="icon-container">
         <mat-icon>person</mat-icon>
       </span>
-      <span class="label-text">Profile</span>
+      <span class="label-text">{{ 'PROFILE' | translate }}</span>
     </button>
     <ng-template #loginBtn>
       <button class="nav-item" (click)="onLogStatusChanged()">
         <span class="icon-container">
           <mat-icon>login</mat-icon>
         </span>
-        <span class="label-text">Login</span>
+        <span class="label-text">{{ 'LOGIN' | translate }}</span>
       </button>
     </ng-template>
+
+    <button class="nav-item">
+      <span class="icon-container">
+        <mat-icon>dark_mode</mat-icon>
+      </span>
+      <span class="label-text">Dark/Light</span>
+    </button>
   </div>
 </nav>

@@ -28,19 +28,19 @@
       
       <!-- Action buttons section -->
       <div class="action-buttons" style="display: flex; align-items: center; gap: 0px; margin-left: auto;">
-        <mat-icon *ngIf="!isTutor && (isCompleted || isLocallyCompleted())" class="completed-icon" matTooltip="Erledigt">check_circle</mat-icon>
+        <mat-icon *ngIf="!isTutor && (isCompleted || isLocallyCompleted())" class="completed-icon" matTooltip="{{ 'COMPLETED' | translate }}">check_circle</mat-icon>
         <button
           *ngIf="!isTutor"
           mat-icon-button
           [color]="isBookmarked ? 'accent' : ''"
           (click)="onBookmarkClick($event)"
           [disabled]="isBookmarkLoading"
-          matTooltip="{{ isBookmarked ? 'Lesezeichen entfernen' : 'Lesezeichen hinzufügen' }}"
+          matTooltip="{{ isBookmarked ? ('REMOVE_BOOKMARK' | translate) : ('ADD_BOOKMARK' | translate) }}"
           class="bookmark-button"
         >
           <mat-icon>{{ isBookmarked ? 'bookmark' : 'bookmark_border' }}</mat-icon>
         </button>
-        <mat-icon *ngIf="isTutor && isBookmarked" class="bookmark-icon" matTooltip="Gemerkte Aufgabe">bookmark</mat-icon>
+        <mat-icon *ngIf="isTutor && isBookmarked" class="bookmark-icon" matTooltip="{{ 'BOOKMARKED_EXERCISE' | translate }}">bookmark</mat-icon>
         <!-- Edit und Delete Buttons für Tutoren -->
         <ng-container *ngIf="isTutor">
           <button
@@ -90,7 +90,7 @@
         "
       >
         <mat-icon>list</mat-icon>
-        <span>{{ exercise.answers.length }} options</span>
+        <span>{{ exercise.answers.length }} {{ 'OPTIONS' | translate }}</span>
       </div>
 
       <!-- Creation date -->

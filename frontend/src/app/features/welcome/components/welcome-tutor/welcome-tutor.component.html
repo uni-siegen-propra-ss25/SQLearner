@@ -1,6 +1,6 @@
 <!-- Greeting section at the top of the page -->
 <div class="welcome-container">
-  <h1>Willkommen bei SQLearner</h1>
+  <h1>{{ 'WELCOME' | translate }}</h1>
   <p>Ihre Plattform zum Lernen und Üben von SQL</p>
 </div>
 
@@ -42,7 +42,7 @@
 
     <!-- Personal to-do list box -->
     <mat-card class="box todo-box">
-      <mat-card-title>Meine To-dos</mat-card-title>
+      <mat-card-title>{{ 'MY_TODOS' | translate }}</mat-card-title>
       <mat-card-content>
         <ul>
           <!-- Loop through all to-dos, showing checkbox to mark done and delete button -->

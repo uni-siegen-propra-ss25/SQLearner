@@ -1,6 +1,6 @@
 <div class="chapter-progress">
     <!-- Section title -->
-    <h3>Fortschritt nach Kapiteln</h3>
+    <h3>{{ 'PROGRESS_BY_CHAPTER' | translate }}</h3>
     
     <!-- List of all chapters with progress bars -->
     <div class="chapters-list">
@@ -12,7 +12,7 @@
             <div class="chapter-info">
                 <h4>{{chapter.chapterTitle}}</h4>
                 <span class="completion">
-                    {{chapter.completedExercises}} / {{chapter.totalExercises}} Übungen abgeschlossen
+                    {{chapter.completedExercises}} / {{chapter.totalExercises}} {{ 'EXERCISES_COMPLETED' | translate }}
                 </span>
             </div>
             

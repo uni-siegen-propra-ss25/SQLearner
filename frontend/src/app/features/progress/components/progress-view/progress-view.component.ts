@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ProgressService } from '../../services/progress.service';
 import { BookmarkService } from '../../services/bookmark.service';
 import { UserProgressSummary } from '../../models/progress.model';
 import { BookmarkData } from '../../models/bookmark.model';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 
 /**
  * Component responsible for displaying user progress statistics and managing bookmarks.
@@ -14,7 +16,7 @@ import { BookmarkData } from '../../models/bookmark.model';
     templateUrl: './progress-view.component.html',
     styleUrls: ['./progress-view.component.scss']
 })
-export class ProgressViewComponent implements OnInit {
+export class ProgressViewComponent implements OnInit, OnDestroy {
     /** User's comprehensive progress data including completion statistics and chapter breakdown */
     userProgress: UserProgressSummary | null = null;
     
@@ -27,9 +29,12 @@ export class ProgressViewComponent implements OnInit {
     /** Error message to display if data loading fails */
     error: string | null = null;
 
+    private bookmarkErrorSub: Subscription | undefined;
+
     constructor(
         private progressService: ProgressService,
-        private bookmarkService: BookmarkService
+        private bookmarkService: BookmarkService,
+        private translate: TranslateService
     ) { }
 
     /**
@@ -39,6 +44,11 @@ export class ProgressViewComponent implements OnInit {
     ngOnInit(): void {
         this.loadUserProgress();
         this.loadBookmarks();
+        this.bookmarkErrorSub = this.translate.onLangChange.subscribe(() => {
+            if (this.error) {
+                this.setBookmarkError();
+            }
+        });
     }
 
     /**
@@ -55,7 +65,7 @@ export class ProgressViewComponent implements OnInit {
             },
             error: (error) => {
                 console.error('Fehler beim Laden des Fortschritts:', error);
-                this.error = 'Fortschrittsdaten konnten nicht geladen werden.';
+                this.error = this.translate.instant('PROGRESS_LOAD_ERROR');
                 this.loading = false;
             }
         });
@@ -74,7 +84,7 @@ export class ProgressViewComponent implements OnInit {
             },
             error: (error) => {
                 console.error('Fehler beim Laden der Lesezeichen:', error);
-                this.error = 'Lesezeichen konnten nicht geladen werden.';
+                this.setBookmarkError();
             }
         });
     }
@@ -93,6 +103,18 @@ export class ProgressViewComponent implements OnInit {
             error: (error) => {
                 console.error('Fehler beim Entfernen des Lesezeichens:', error);
             }
+        });
+    }
+
+    ngOnDestroy(): void {
+        if (this.bookmarkErrorSub) {
+            this.bookmarkErrorSub.unsubscribe();
+        }
+    }
+
+    private setBookmarkError() {
+        this.translate.get('BOOKMARKS_LOAD_ERROR').subscribe((msg: string) => {
+            this.error = msg;
         });
     }
 }

@@ -6,7 +6,7 @@
       <!-- Topic title display -->
       <div class="topic-title">{{ topic.title }}</div>
       <span class="topic-progress" *ngIf="exercises.length > 0 && !isTutor">
-        {{ getCompletedCount() }}/{{ exercises.length }} erledigt
+        {{ getCompletedCount() }}/{{ exercises.length }} {{ 'COMPLETED' | translate }}
         <mat-progress-bar
           *ngIf="exercises.length > 0"
           class="topic-progress-bar"

@@ -8,6 +8,7 @@ import { MaterialModule } from 'app/material.module';
 import { FormsModule } from '@angular/forms'; 
 import { WelcomeComponent } from 'app/features/welcome/welcome.component';
 import { HttpClientModule } from '@angular/common/http';
+import { TranslateModule } from '@ngx-translate/core';
 
 import { QuestionComponent } from 'app/features/welcome/components/welcome-tutor/questions/question.component';
 import { PapierkorbComponent } from './components/welcome-tutor/questions/papierkorb/papierkorb.component';
@@ -34,6 +35,7 @@ import { FragenChatComponent } from './components/welcome-student/fragen-chat/fr
     FormsModule,
     MaterialModule,
     HttpClientModule,
+    TranslateModule,
   ],
 })
 export class WelcomeModule {}

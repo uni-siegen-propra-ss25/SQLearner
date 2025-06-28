@@ -5,6 +5,7 @@ import { MaterialModule } from '../../material.module';
 import { ProgressViewComponent } from './components/progress-view/progress-view.component';
 import { ChapterProgressComponent } from './components/chapter-progress/chapter-progress.component';
 import { BookmarkedExercisesComponent } from './components/bookmarked-exercises/bookmarked-exercises.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
     declarations: [
@@ -15,7 +16,8 @@ import { BookmarkedExercisesComponent } from './components/bookmarked-exercises/
     imports: [
         CommonModule,
         ProgressRoutingModule,
-        MaterialModule
+        MaterialModule,
+        TranslateModule
     ]
 })
 export class ProgressModule { }

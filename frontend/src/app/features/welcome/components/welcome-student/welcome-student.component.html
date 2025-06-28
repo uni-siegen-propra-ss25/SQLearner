@@ -1,7 +1,7 @@
 <!-- Welcome section with greeting and description -->
 <div class="welcome-container">
-  <h1>Willkommen bei SQLearner</h1>
-  <p>Your platform to learn and practice SQL</p>
+  <h1>{{ 'WELCOME' | translate }}</h1>
+  <p>{{ 'WELCOME_SUB' | translate }}</p>
 </div>
 
 <!-- Main content layout container -->
@@ -12,7 +12,7 @@
 
     <!-- Tutor hints card -->
     <mat-card class="box hint-box">
-      <mat-card-title>Hinweise des Tutors</mat-card-title>
+      <mat-card-title>{{ 'TUTOR_HINTS' | translate }}</mat-card-title>
       <mat-card-content>
         <!-- List of available hints -->
         <ul class="hinweis-liste">
@@ -23,14 +23,14 @@
 
         <!-- Message when no hints are available -->
         <p *ngIf="hinweise.length === 0" class="keine-hinweise">
-          Es gibt keine neuen Hinweise
+          {{ 'NO_HINTS' | translate }}
         </p>
       </mat-card-content>
     </mat-card>
 
     <!-- Student to-do list card -->
     <mat-card class="box todo-box">
-      <mat-card-title>Meine To-dos</mat-card-title>
+      <mat-card-title>{{ 'MY_TODOS' | translate }}</mat-card-title>
       <mat-card-content>
 
         <!-- To-do items list -->
@@ -51,7 +51,7 @@
         <!-- Input field to add new to-dos -->
         <div class="todo-add">
           <mat-form-field appearance="fill" class="todo-input">
-            <mat-label>Füge eine neue Aufgabe hinzu</mat-label>
+            <mat-label>{{ 'ADD_TODO' | translate }}</mat-label>
             <input matInput [(ngModel)]="newTodo" (keyup.enter)="addTodo()" />
           </mat-form-field>
 
@@ -69,7 +69,7 @@
   <!-- Bottom row with forum preview -->
   <div class="bottom-row">
     <mat-card class="box question-box">
-      <mat-card-title>Das Fragenforum</mat-card-title>
+      <mat-card-title>{{ 'QUESTION_FORUM' | translate }}</mat-card-title>
       <mat-card-content>
 
         <!-- Last forum message preview (question or answer) -->
@@ -84,14 +84,14 @@
         <!-- Message when there are no questions/answers -->
           <ng-template #noMessages>
              <div class="placeholder-box">
-                <p class="placeholder-text">Das Fragenforum ist leer</p>
+                <p class="placeholder-text">{{ 'NO_QUESTIONS' | translate }}</p>
               </div>
           </ng-template>
       </mat-card-content>
 
       <!-- Button to navigate to full forum -->
       <mat-card-actions align="end">
-        <button mat-button color="primary" (click)="goToFragen()">Stelle eine Frage</button>
+        <button mat-button color="primary" (click)="goToFragen()">{{ 'ASK_QUESTION' | translate }}</button>
       </mat-card-actions>
     </mat-card>
   </div>

@@ -5,11 +5,12 @@ import { NavigationRailComponent } from './components/navigation-rail/navigation
 import { SqlEditorComponent } from './components/sql-editor/sql-editor.component';
 import { MonacoEditorService } from './services/monaco-editor.service';
 import { MaterialModule } from '../material.module';
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
     declarations: [NavigationRailComponent, SqlEditorComponent],
-    imports: [CommonModule, MaterialModule, RouterModule],
-    exports: [NavigationRailComponent, SqlEditorComponent],
+    imports: [CommonModule, MaterialModule, RouterModule, TranslateModule],
+    exports: [NavigationRailComponent, SqlEditorComponent, TranslateModule],
     providers: [MonacoEditorService],
 })
 export class SharedModule {}

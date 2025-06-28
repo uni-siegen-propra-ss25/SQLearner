@@ -2,8 +2,8 @@
     <!-- Empty state when no bookmarks exist -->
     <div *ngIf="bookmarks.length === 0" class="no-bookmarks">
         <mat-icon>bookmark_border</mat-icon>
-        <p>Keine gemerkten Aufgaben vorhanden.</p>
-        <p class="hint">Du kannst während des Lernens Aufgaben mit einem Lesezeichen markieren, um später darauf zurückzukommen.</p>
+        <p>{{ 'NO_BOOKMARKED_TASKS' | translate }}</p>
+        <p class="hint">{{ 'BOOKMARK_HINT' | translate }}</p>
     </div>
     
     <!-- List of bookmark cards when bookmarks exist -->

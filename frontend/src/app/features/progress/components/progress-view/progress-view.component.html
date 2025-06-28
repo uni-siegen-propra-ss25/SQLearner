@@ -1,8 +1,8 @@
 <div class="container">
     <!-- Page header with title and description -->
     <div class="header">
-        <h1>Mein Fortschritt</h1>
-        <p>Verfolge deinen Lernfortschritt</p>
+        <h1>{{ 'MY_PROGRESS' | translate }}</h1>
+        <p>{{ 'TRACK_PROGRESS' | translate }}</p>
     </div>
 
     <!-- Main content grid layout -->
@@ -10,7 +10,7 @@
         <!-- Left card: Progress statistics -->
         <mat-card class="progress-card">
             <mat-card-header>
-                <mat-card-title>Mein Fortschritt</mat-card-title>
+                <mat-card-title>{{ 'MY_PROGRESS' | translate }}</mat-card-title>
             </mat-card-header>
             <mat-card-content>
                 <!-- Loading state -->
@@ -29,7 +29,7 @@
                 <div *ngIf="!loading && !error && userProgress">
                     <!-- Overall progress with custom bar -->
                     <div class="total-progress">
-                        <h3>Gesamtfortschritt:</h3>
+                        <h3>{{ 'OVERALL_PROGRESS' | translate }}</h3>
                         <p>{{userProgress.completionPercentage | number:'1.0-0'}}%</p>
                         <div class="bar average" [style.width.%]="userProgress.completionPercentage"></div>
                     </div>
@@ -51,7 +51,7 @@
         <!-- Right card: Bookmarked exercises -->
         <mat-card class="bookmarks-card">
             <mat-card-header>
-                <mat-card-title>Gemerkte Aufgaben</mat-card-title>
+                <mat-card-title>{{ 'BOOKMARKED_TASKS' | translate }}</mat-card-title>
             </mat-card-header>
             <mat-card-content>
                 <!-- Bookmarks component with remove functionality -->
