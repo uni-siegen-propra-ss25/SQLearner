@@ -19,7 +19,7 @@
       <app-sql-editor
         class="sql-editor"
         [initialValue]="sqlQuery"
-        [schema]="exercise.database?.schemaSql || ''"
+        [schema]="actualDatabaseSchema || exercise.database?.schemaSql || ''"
         [theme]="isDarkMode ? 'dark' : 'light'"
         (valueChange)="onSqlChange($event)"
         (editorReady)="onEditorReady()"
@@ -73,7 +73,7 @@
           </div>
         </h3>
         <div class="schema-content mat-elevation-z1">
-          <pre>{{ exercise.database?.schemaSql || 'Kein Schema verfügbar' }}</pre>
+          <pre>{{ actualDatabaseSchema || exercise.database?.schemaSql || 'Kein Schema verfügbar' }}</pre>
         </div>
       </div>
 

@@ -6,6 +6,7 @@ import { SqlEditorComponent } from '../../../../shared/components/sql-editor/sql
 import { DockerService } from '../../services/docker.service';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { DatabaseService } from '../../../database/services/database.service';
 
 @Component({
     selector: 'app-query-exercise',
@@ -24,6 +25,7 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
     currentView: 'schema' | 'result' = 'result';
     isDarkMode = false; // Should be synced with your app's theme service
     isCorrectAnswer = false;
+    actualDatabaseSchema = ''; // Store the actual schema from the real database
     private containerId: string | null = null;
     private connectionDetails: { host: string; port: number; database?: string } | null = null;
     private containerSubscription: Subscription | null = null;
@@ -38,10 +40,21 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
         private submissionService: SubmissionService,
         private snackBar: MatSnackBar,
         private dockerService: DockerService,
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private databaseService: DatabaseService
     ) {}
 
     ngOnInit(): void {
+        console.log('=== DEBUG: QueryExerciseComponent.ngOnInit ===');
+        console.log('Exercise:', this.exercise);
+        console.log('Exercise database ID:', this.exercise?.database?.id);
+        
+        // Load the actual database schema if available
+        if (this.exercise?.database?.id) {
+            console.log('Loading database schema...');
+            this.loadDatabaseSchema(this.exercise.database.id);
+        }
+        
         this.route.paramMap.subscribe((params: ParamMap) => {
             const exerciseId = Number(params.get('exerciseId'));
             console.log('=== DEBUG: QueryExerciseComponent ngOnInit ===');
@@ -54,8 +67,11 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
                 this.containerSubscription = this.dockerService.createContainer(exerciseId).subscribe({
                     next: (response: { containerId: string; connectionDetails: any }) => {
                         console.log('Container created successfully:', response);
+                        console.log('Container ID:', response.containerId);
+                        console.log('Connection details:', response.connectionDetails);
                         this.containerId = response.containerId;
                         this.connectionDetails = response.connectionDetails;
+                        console.log('Container setup complete - ready for queries');
                     },
                     error: (error: any) => {
                         console.error('Failed to create container:', error);
@@ -87,7 +103,11 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
     }
 
     onSqlChange(newValue: string) {
+        console.log('=== DEBUG: onSqlChange called ===');
+        console.log('New value:', newValue);
+        console.log('Previous sqlQuery:', this.sqlQuery);
         this.sqlQuery = newValue;
+        console.log('Updated sqlQuery:', this.sqlQuery);
     }
 
     onEditorReady() {
@@ -173,5 +193,29 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
         if (!this.queryResult?.rows) return [];
         const start = this.pageIndex * this.pageSize;
         return this.queryResult.rows.slice(start, start + this.pageSize);
+    }
+
+    /**
+     * Loads the actual database schema from the PostgreSQL database
+     * instead of using the static schemaSql field
+     */
+    private loadDatabaseSchema(databaseId: number): void {
+        this.databaseService.getDatabaseSchema(databaseId).subscribe({
+            next: (response) => {
+                this.actualDatabaseSchema = response.schema;
+                console.log('Actual database schema loaded:', this.actualDatabaseSchema);
+                
+                // Update SQL editor with new schema if it's already initialized
+                if (this.sqlEditor) {
+                    // The SQL editor component will automatically pick up the schema change
+                    // through the [schema] binding in the template
+                }
+            },
+            error: (error) => {
+                console.error('Failed to load database schema:', error);
+                // Fallback to static schema if available
+                this.actualDatabaseSchema = this.exercise?.database?.schemaSql || '';
+            }
+        });
     }
 }

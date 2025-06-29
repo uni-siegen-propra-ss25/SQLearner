@@ -1,9 +1,8 @@
-import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, OnChanges, SimpleChanges } from '@angular/core';
 import { editor } from 'monaco-editor';
 import * as monaco from 'monaco-editor';
 import { MonacoEditorService } from '../../services/monaco-editor.service';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 
 export interface TableInfo {
     name: string;
@@ -44,7 +43,7 @@ export interface ValidationError {
     template: '<div #editorContainer class="editor-container"></div>',
     styleUrls: ['./sql-editor.component.scss']
 })
-export class SqlEditorComponent implements OnInit, OnDestroy {
+export class SqlEditorComponent implements OnInit, OnDestroy, OnChanges {
     @ViewChild('editorContainer', { static: true }) editorContainer!: ElementRef;
     @Input() initialValue = '';
     @Input() schema = '';
@@ -117,6 +116,8 @@ export class SqlEditorComponent implements OnInit, OnDestroy {
 
             this.editor.onDidChangeModelContent(() => {
                 const value = this.editor?.getValue() || '';
+                console.log('=== DEBUG: SQL Editor content changed ===');
+                console.log('New value:', value);
                 this.valueChange.emit(value);
                 this.updateEditorMarkers();
             });
@@ -129,6 +130,20 @@ export class SqlEditorComponent implements OnInit, OnDestroy {
 
         } catch (error) {
             console.error('Failed to initialize SQL Editor:', error);
+        }
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        // React to schema changes
+        if (changes['schema'] && !changes['schema'].firstChange) {
+            const newSchema = changes['schema'].currentValue;
+            if (newSchema) {
+                this.parseSchema(newSchema);
+            } else {
+                // Clear tables and columns if schema is empty
+                this.tables = [];
+                this.columns = [];
+            }
         }
     }
 

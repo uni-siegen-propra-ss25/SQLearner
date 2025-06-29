@@ -230,13 +230,22 @@ export class ExercisesService {    /**
      * @returns {Promise<{columns: string[]; rows: any[]}>} Promise resolving to the query result
      * @throws {NotFoundException} if the exercise or database does not exist
      */
-    async runQuery(id: number, query: string, connectionDetails?: { host: string; port: number; database?: string }): Promise<{ columns: string[]; rows: any[] }> {
+    async runQuery(id: number, query: string, connectionDetails?: { host: string; port: number }): Promise<{ columns: string[]; rows: any[] }> {
+        console.log('=== DEBUG: ExercisesService.runQuery ===');
+        console.log('Exercise ID:', id);
+        console.log('Query:', query);
+        console.log('Connection Details:', connectionDetails);
+        
         const exercise = await this.prisma.exercise.findUnique({
             where: { id },
             include: {
                 database: true,
             },
         });
+
+        console.log('Exercise found:', exercise?.id);
+        console.log('Exercise type:', exercise?.type);
+        console.log('Exercise database ID:', exercise?.database?.id);
 
         if (!exercise) {
             throw new NotFoundException('Exercise not found');
@@ -248,17 +257,17 @@ export class ExercisesService {    /**
         
         // If it's a query exercise, a container may be needed.
         if (exercise.type === ExerciseType.QUERY) {
+            console.log('Running query for QUERY exercise type');
+            console.log('Using connectionDetails:', !!connectionDetails);
+            
             const result = connectionDetails
             ? await this.databasesService.runQueryInContainer({
                 ...connectionDetails,
-                database: connectionDetails.database || 'exercise_db'
+                database: 'exercise_db' // Use the correct database name from the container
               }, query)
             : await this.databasesService.runQuery(exercise.database.id, query);
 
-            // Check if there was an error in the result
-            if ('error' in result && result.error) {
-                throw new BadRequestException(`Query execution failed: ${result.error}`);
-            }
+            console.log('Query result received:', result);
 
             let columns: string[];
             if ('fields' in result && Array.isArray(result.fields)) {
@@ -268,6 +277,9 @@ export class ExercisesService {    /**
             } else {
                 columns = [];
             }
+
+            console.log('Processed columns:', columns);
+            console.log('Row count:', result.rows?.length || 0);
 
             return {
                 columns: columns,

@@ -82,6 +82,15 @@ export class DatabaseService {
         return this.http.post<QueryResult>(`${this.baseUrl}/${databaseId}/query`, { query });
     }
 
+    /**
+     * Gets the actual PostgreSQL schema from the database
+     * @param databaseId - The ID of the database
+     * @returns Observable with the schema SQL
+     */
+    getDatabaseSchema(databaseId: number): Observable<{ schema: string }> {
+        return this.http.get<{ schema: string }>(`${this.baseUrl}/${databaseId}/schema`);
+    }
+
     truncateTable(databaseId: number, tableId: number): Observable<void> {
         return this.http.post<void>(`${this.baseUrl}/${databaseId}/tables/${tableId}/truncate`, {});
     }

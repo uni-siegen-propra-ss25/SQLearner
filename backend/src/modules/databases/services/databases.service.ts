@@ -41,6 +41,173 @@ export class DatabasesService {
         return database;
     }
 
+    /**
+     * Gets the actual PostgreSQL schema from the real database
+     * @param id Database ID
+     * @returns SQL schema as string
+     */
+    async getDatabaseSchema(id: number): Promise<{ schema: string }> {
+        const database = await this.getDatabaseById(id);
+        
+        // Get the actual database name from schemaSql field
+        const dbName = database.schemaSql;
+        if (!dbName) {
+            throw new NotFoundException('Database not properly initialized');
+        }
+
+        // Create a new connection pool for the specific database
+        const dbPool = new Pool({
+            host: process.env.DB_HOST,
+            port: parseInt(process.env.DB_PORT || '5432', 10),
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: dbName
+        });
+
+        const client = await dbPool.connect();
+        try {
+            // Query to get all table definitions
+            const tableQuery = `
+                SELECT 
+                    table_name
+                FROM 
+                    information_schema.tables 
+                WHERE 
+                    table_schema = 'public' 
+                    AND table_type = 'BASE TABLE'
+                ORDER BY 
+                    table_name;
+            `;
+            
+            const tablesResult = await client.query(tableQuery);
+            const tableNames = tablesResult.rows.map(row => row.table_name);
+            
+            let schemaSQL = '';
+            
+            // For each table, get its CREATE TABLE statement
+            for (const tableName of tableNames) {
+                // Get table structure
+                const columnsQuery = `
+                    SELECT 
+                        column_name,
+                        data_type,
+                        is_nullable,
+                        column_default,
+                        character_maximum_length,
+                        numeric_precision,
+                        numeric_scale
+                    FROM 
+                        information_schema.columns 
+                    WHERE 
+                        table_schema = 'public' 
+                        AND table_name = $1
+                    ORDER BY 
+                        ordinal_position;
+                `;
+                
+                const columnsResult = await client.query(columnsQuery, [tableName]);
+                
+                // Get primary keys
+                const pkQuery = `
+                    SELECT 
+                        column_name
+                    FROM 
+                        information_schema.key_column_usage kcu
+                    JOIN 
+                        information_schema.table_constraints tc 
+                        ON kcu.constraint_name = tc.constraint_name
+                    WHERE 
+                        tc.table_schema = 'public' 
+                        AND tc.table_name = $1 
+                        AND tc.constraint_type = 'PRIMARY KEY'
+                    ORDER BY 
+                        kcu.ordinal_position;
+                `;
+                
+                const pkResult = await client.query(pkQuery, [tableName]);
+                const primaryKeys = pkResult.rows.map(row => row.column_name);
+                
+                // Get foreign keys
+                const fkQuery = `
+                    SELECT 
+                        kcu.column_name,
+                        ccu.table_name AS foreign_table_name,
+                        ccu.column_name AS foreign_column_name
+                    FROM 
+                        information_schema.key_column_usage AS kcu
+                    JOIN 
+                        information_schema.referential_constraints AS rc
+                        ON kcu.constraint_name = rc.constraint_name
+                    JOIN 
+                        information_schema.key_column_usage AS ccu
+                        ON ccu.constraint_name = rc.unique_constraint_name
+                    WHERE 
+                        kcu.table_schema = 'public' 
+                        AND kcu.table_name = $1;
+                `;
+                
+                const fkResult = await client.query(fkQuery, [tableName]);
+                
+                // Build CREATE TABLE statement
+                schemaSQL += `CREATE TABLE ${tableName} (\n`;
+                
+                const columnDefinitions = columnsResult.rows.map(column => {
+                    let def = `    ${column.column_name} `;
+                    
+                    // Handle data type
+                    if (column.data_type === 'character varying' && column.character_maximum_length) {
+                        def += `VARCHAR(${column.character_maximum_length})`;
+                    } else if (column.data_type === 'character' && column.character_maximum_length) {
+                        def += `CHAR(${column.character_maximum_length})`;
+                    } else if (column.data_type === 'numeric' && column.numeric_precision) {
+                        if (column.numeric_scale) {
+                            def += `NUMERIC(${column.numeric_precision}, ${column.numeric_scale})`;
+                        } else {
+                            def += `NUMERIC(${column.numeric_precision})`;
+                        }
+                    } else {
+                        def += column.data_type.toUpperCase();
+                    }
+                    
+                    // Handle NOT NULL
+                    if (column.is_nullable === 'NO') {
+                        def += ' NOT NULL';
+                    }
+                    
+                    // Handle DEFAULT
+                    if (column.column_default) {
+                        def += ` DEFAULT ${column.column_default}`;
+                    }
+                    
+                    return def;
+                });
+                
+                schemaSQL += columnDefinitions.join(',\n');
+                
+                // Add PRIMARY KEY constraint
+                if (primaryKeys.length > 0) {
+                    schemaSQL += `,\n    PRIMARY KEY (${primaryKeys.join(', ')})`;
+                }
+                
+                // Add FOREIGN KEY constraints
+                for (const fk of fkResult.rows) {
+                    schemaSQL += `,\n    FOREIGN KEY (${fk.column_name}) REFERENCES ${fk.foreign_table_name}(${fk.foreign_column_name})`;
+                }
+                
+                schemaSQL += '\n);\n\n';
+            }
+            
+            return { schema: schemaSQL.trim() };
+            
+        } catch (error) {
+            console.error('Error retrieving database schema:', error);
+            throw new InternalServerErrorException('Failed to retrieve database schema');
+        } finally {
+            client.release();
+            await dbPool.end();
+        }
+    }
+
     async uploadDatabase(file: Express.Multer.File, user: User) {
         if (user.role !== Role.TUTOR) {
             throw new ForbiddenException('Only tutors can upload SQL files');
@@ -194,7 +361,7 @@ export class DatabasesService {
     ) {
         const database = await this.getDatabaseById(id);
 
-        if (user.role !== Role.ADMIN) {
+        if (user.role !== Role.TUTOR) {
             throw new ForbiddenException('You do not have permission to update this database.');
         }
 
@@ -212,8 +379,8 @@ export class DatabasesService {
     async deleteDatabase(id: number, user: User) {
         const database = await this.getDatabaseById(id);
 
-        if (user.role !== Role.ADMIN) {
-            throw new ForbiddenException('You do not have permission to delete this database.');
+        if (user.role !== Role.TUTOR) {
+            throw new ForbiddenException('You are not the owner of this database.');
         }
 
         try {
@@ -416,13 +583,32 @@ export class DatabasesService {
     }
 
     async runQueryInContainer(connectionDetails: any, query: string): Promise<QueryResult> {
+        console.log('=== DEBUG: DatabasesService.runQueryInContainer ===');
+        console.log('Connection Details received:', connectionDetails);
+        console.log('Query to execute:', query);
+        
         let client: Client | null = null;
         const startTime = Date.now();
         try {
             client = new Client(connectionDetails);
+            console.log('Creating client with connection details:', {
+                host: connectionDetails.host,
+                port: connectionDetails.port,
+                database: connectionDetails.database,
+                user: connectionDetails.user
+            });
+            console.log('Connecting to database...');
             await client.connect();
+            console.log('Connected successfully, executing query...');
             const result = await client.query(query);
             const executionTimeMs = Date.now() - startTime;
+            
+            console.log('Query executed successfully');
+            console.log('Fields:', result.fields?.map(f => f.name));
+            console.log('Row count:', result.rowCount);
+            console.log('First row sample:', result.rows[0]);
+            console.log('Execution time:', executionTimeMs, 'ms');
+            
             return {
                 columns: result.fields.map(field => field.name),
                 rows: result.rows,
@@ -433,6 +619,8 @@ export class DatabasesService {
         } catch (e) {
             const executionTimeMs = Date.now() - startTime;
             const error = e as Error;
+            console.error('Query execution failed:', error.message);
+            console.error('Error details:', error);
             return {
                 columns: [],
                 rows: [],
@@ -443,6 +631,7 @@ export class DatabasesService {
         }
         finally {
             if (client) {
+                console.log('Closing database connection...');
                 await client.end();
             }
         }
@@ -479,196 +668,5 @@ export class DatabasesService {
         await dbPool.query(createTableSql);
         await dbPool.end();
         return { message: 'Table created successfully' };
-    }
-
-    /**
-     * Inserts a new row into a table
-     * @param databaseId - The ID of the database
-     * @param tableName - The name of the table
-     * @param data - The data to insert
-     * @param userRole - The role of the user
-     * @returns Promise resolving to the inserted row
-     */
-    async insertRow(databaseId: number, tableName: string, data: Record<string, any>, userRole: Role | string) {
-        if (String(userRole).toUpperCase() !== 'TUTOR') {
-            throw new ForbiddenException('Only tutors can insert data');
-        }
-
-        const database = await this.getDatabaseById(databaseId);
-        if (!database) {
-            throw new NotFoundException('Database not found');
-        }
-
-        // Validate table exists
-        const tableExists = await this.tableExists(database.schemaSql, tableName);
-        if (!tableExists) {
-            throw new NotFoundException(`Table ${tableName} not found`);
-        }
-
-        // Build INSERT query
-        const columns = Object.keys(data);
-        const values = Object.values(data);
-        const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
-        
-        const insertSql = `INSERT INTO "${tableName}" (${columns.map(col => `"${col}"`).join(', ')}) VALUES (${placeholders}) RETURNING *`;
-
-        const dbPool = new Pool({
-            host: process.env.DB_HOST,
-            port: parseInt(process.env.DB_PORT || '5432', 10),
-            user: process.env.DB_USER,
-            password: process.env.DB_PASSWORD,
-            database: database.schemaSql
-        });
-
-        try {
-            const result = await dbPool.query(insertSql, values);
-            return result.rows[0];
-        } catch (error) {
-            throw new SqlErrorException({
-                message: `Failed to insert row: ${error instanceof Error ? error.message : 'Unknown error'}`,
-                name: 'InsertError',
-                code: 'INSERT_ERROR'
-            });
-        } finally {
-            await dbPool.end();
-        }
-    }
-
-    /**
-     * Updates a row in a table
-     * @param databaseId - The ID of the database
-     * @param tableName - The name of the table
-     * @param data - The data to update
-     * @param whereClause - The WHERE clause for the update
-     * @param userRole - The role of the user
-     * @returns Promise resolving to the updated row
-     */
-    async updateRow(databaseId: number, tableName: string, data: Record<string, any>, whereClause: string, userRole: Role | string) {
-        if (String(userRole).toUpperCase() !== 'TUTOR') {
-            throw new ForbiddenException('Only tutors can update data');
-        }
-
-        const database = await this.getDatabaseById(databaseId);
-        if (!database) {
-            throw new NotFoundException('Database not found');
-        }
-
-        // Validate table exists
-        const tableExists = await this.tableExists(database.schemaSql, tableName);
-        if (!tableExists) {
-            throw new NotFoundException(`Table ${tableName} not found`);
-        }
-
-        // Build UPDATE query
-        const columns = Object.keys(data);
-        const values = Object.values(data);
-        const setClause = columns.map((col, index) => `"${col}" = $${index + 1}`).join(', ');
-        
-        const updateSql = `UPDATE "${tableName}" SET ${setClause} WHERE ${whereClause} RETURNING *`;
-
-        const dbPool = new Pool({
-            host: process.env.DB_HOST,
-            port: parseInt(process.env.DB_PORT || '5432', 10),
-            user: process.env.DB_USER,
-            password: process.env.DB_PASSWORD,
-            database: database.schemaSql
-        });
-
-        try {
-            const result = await dbPool.query(updateSql, values);
-            if (result.rowCount === 0) {
-                throw new NotFoundException('No rows were updated');
-            }
-            return result.rows[0];
-        } catch (error) {
-            throw new SqlErrorException({
-                message: `Failed to update row: ${error instanceof Error ? error.message : 'Unknown error'}`,
-                name: 'UpdateError',
-                code: 'UPDATE_ERROR'
-            });
-        } finally {
-            await dbPool.end();
-        }
-    }
-
-    /**
-     * Deletes a row from a table
-     * @param databaseId - The ID of the database
-     * @param tableName - The name of the table
-     * @param whereClause - The WHERE clause for the delete
-     * @param userRole - The role of the user
-     * @returns Promise resolving to the deletion result
-     */
-    async deleteRow(databaseId: number, tableName: string, whereClause: string, userRole: Role | string) {
-        if (String(userRole).toUpperCase() !== 'TUTOR') {
-            throw new ForbiddenException('Only tutors can delete data');
-        }
-
-        const database = await this.getDatabaseById(databaseId);
-        if (!database) {
-            throw new NotFoundException('Database not found');
-        }
-
-        // Validate table exists
-        const tableExists = await this.tableExists(database.schemaSql, tableName);
-        if (!tableExists) {
-            throw new NotFoundException(`Table ${tableName} not found`);
-        }
-
-        const deleteSql = `DELETE FROM "${tableName}" WHERE ${whereClause} RETURNING *`;
-
-        const dbPool = new Pool({
-            host: process.env.DB_HOST,
-            port: parseInt(process.env.DB_PORT || '5432', 10),
-            user: process.env.DB_USER,
-            password: process.env.DB_PASSWORD,
-            database: database.schemaSql
-        });
-
-        try {
-            const result = await dbPool.query(deleteSql);
-            if (result.rowCount === 0) {
-                throw new NotFoundException('No rows were deleted');
-            }
-            return { message: 'Row deleted successfully', deletedRow: result.rows[0] };
-        } catch (error) {
-            throw new SqlErrorException({
-                message: `Failed to delete row: ${error instanceof Error ? error.message : 'Unknown error'}`,
-                name: 'DeleteError',
-                code: 'DELETE_ERROR'
-            });
-        } finally {
-            await dbPool.end();
-        }
-    }
-
-    /**
-     * Checks if a table exists in the database
-     * @param dbName - The database name
-     * @param tableName - The table name
-     * @returns Promise resolving to boolean
-     */
-    private async tableExists(dbName: string, tableName: string): Promise<boolean> {
-        const dbPool = new Pool({
-            host: process.env.DB_HOST,
-            port: parseInt(process.env.DB_PORT || '5432', 10),
-            user: process.env.DB_USER,
-            password: process.env.DB_PASSWORD,
-            database: dbName
-        });
-
-        try {
-            const result = await dbPool.query(
-                `SELECT EXISTS (
-                    SELECT FROM information_schema.tables 
-                    WHERE table_schema = 'public' 
-                    AND table_name = $1
-                )`,
-                [tableName]
-            );
-            return result.rows[0].exists;
-        } finally {
-            await dbPool.end();
-        }
     }
 }

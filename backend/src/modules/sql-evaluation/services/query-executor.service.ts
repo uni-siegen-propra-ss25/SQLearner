@@ -49,7 +49,7 @@ export class QueryExecutorService {
             const rawResult = connectionDetails
                 ? await this.databasesService.runQueryInContainer({
                     ...connectionDetails,
-                    database: 'postgres' // Connect to default db for inspection
+                    database: 'exercise_db' // Connect to the correct container database
                 }, sanitizedQuery)
                 : await this.databasesService.runQuery(databaseId, sanitizedQuery);
 

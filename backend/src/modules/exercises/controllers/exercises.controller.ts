@@ -192,8 +192,16 @@ export class ExercisesController {
     @ApiResponse({ status: 404, description: 'Exercise or database not found' })
     async runQuery(
         @Param('id') id: number,
-        @Body() body: { query: string, connectionDetails?: { host: string; port: number; database?: string } },
+        @Body() body: { query: string, connectionDetails?: { host: string; port: number } },
     ): Promise<{ columns: string[]; rows: any[] }> {
-        return this.exercisesService.runQuery(id, body.query, body.connectionDetails);
+        console.log('=== DEBUG: ExercisesController.runQuery ===');
+        console.log('Exercise ID:', id);
+        console.log('Request body:', body);
+        console.log('Query:', body.query);
+        console.log('Connection Details:', body.connectionDetails);
+        
+        const result = await this.exercisesService.runQuery(id, body.query, body.connectionDetails);
+        console.log('Controller result:', result);
+        return result;
     }
 }
