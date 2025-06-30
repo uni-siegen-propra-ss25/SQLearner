@@ -116,8 +116,6 @@ export class SqlEditorComponent implements OnInit, OnDestroy, OnChanges {
 
             this.editor.onDidChangeModelContent(() => {
                 const value = this.editor?.getValue() || '';
-                console.log('=== DEBUG: SQL Editor content changed ===');
-                console.log('New value:', value);
                 this.valueChange.emit(value);
                 this.updateEditorMarkers();
             });

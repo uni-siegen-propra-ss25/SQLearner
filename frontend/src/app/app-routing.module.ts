@@ -59,6 +59,15 @@ const routes: Routes = [
             allowedRoles: [Role.STUDENT, Role.TUTOR, Role.ADMIN],
         },
     },
+    {
+        path: 'settings',
+        loadChildren: () =>
+            import('./features/settings/settings.module').then((m) => m.SettingsModule),
+        canActivate: [RoleGuard],
+        data: {
+            allowedRoles: [Role.ADMIN],
+        },
+    },
 ];
 
 @NgModule({

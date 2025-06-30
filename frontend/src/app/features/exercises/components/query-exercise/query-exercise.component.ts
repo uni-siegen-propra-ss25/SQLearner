@@ -45,10 +45,6 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
     ) {}
 
     ngOnInit(): void {
-        console.log('=== DEBUG: QueryExerciseComponent.ngOnInit ===');
-        console.log('Exercise:', this.exercise);
-        console.log('Exercise database ID:', this.exercise?.database?.id);
-        
         // Load the actual database schema if available
         if (this.exercise?.database?.id) {
             console.log('Loading database schema...');
@@ -57,10 +53,6 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
         
         this.route.paramMap.subscribe((params: ParamMap) => {
             const exerciseId = Number(params.get('exerciseId'));
-            console.log('=== DEBUG: QueryExerciseComponent ngOnInit ===');
-            console.log('exerciseId from route:', exerciseId);
-            console.log('exercise from @Input:', this.exercise);
-            console.log('exercise.id:', this.exercise?.id);
             
             if (exerciseId) {
                 console.log('Creating container for exerciseId:', exerciseId);
@@ -103,11 +95,7 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
     }
 
     onSqlChange(newValue: string) {
-        console.log('=== DEBUG: onSqlChange called ===');
-        console.log('New value:', newValue);
-        console.log('Previous sqlQuery:', this.sqlQuery);
         this.sqlQuery = newValue;
-        console.log('Updated sqlQuery:', this.sqlQuery);
     }
 
     onEditorReady() {
@@ -125,15 +113,9 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
     runQuery(): void {
         if (!this.sqlQuery.trim()) return;
 
-        console.log('=== DEBUG: QueryExerciseComponent.runQuery ===');
-        console.log('Exercise ID:', this.exercise.id);
-        console.log('SQL Query:', this.sqlQuery);
-        console.log('Connection Details:', this.connectionDetails);
-
         this.isLoading = true;
         this.submissionService.runQuery(this.exercise.id, this.sqlQuery, this.connectionDetails || undefined).subscribe({
             next: (result: any) => {
-                console.log('Query result received:', result);
                 this.queryResult = result;
                 this.isLoading = false;
                 this.currentView = 'result';
@@ -203,7 +185,6 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
         this.databaseService.getDatabaseSchema(databaseId).subscribe({
             next: (response) => {
                 this.actualDatabaseSchema = response.schema;
-                console.log('Actual database schema loaded:', this.actualDatabaseSchema);
                 
                 // Update SQL editor with new schema if it's already initialized
                 if (this.sqlEditor) {

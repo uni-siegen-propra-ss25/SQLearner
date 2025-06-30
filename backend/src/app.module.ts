@@ -11,6 +11,7 @@ import { ProgressModule } from './modules/progress/progress.module';
 import { BookmarksModule } from './modules/bookmarks/bookmarks.module';
 import { SqlEvaluationModule } from './modules/sql-evaluation/sql-evaluation.module';
 import { DockerModule } from './modules/docker/docker.module';
+import { SettingsModule } from './modules/settings/settings.module';
 
 @Module({
     imports: [
@@ -28,6 +29,7 @@ import { DockerModule } from './modules/docker/docker.module';
         BookmarksModule,
         SqlEvaluationModule,
         DockerModule,
+        SettingsModule,
     ],
 })
 export class AppModule {}
