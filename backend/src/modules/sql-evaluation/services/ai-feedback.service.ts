@@ -1,17 +1,42 @@
 import { Injectable, Logger } from '@nestjs/common';
-import  OpenAIApi from 'openai';
+import OpenAIApi from 'openai';
+import { SettingsService } from '../../settings/services/settings.service';
 
 @Injectable()
 export class AiFeedbackService {
   private readonly logger = new Logger(AiFeedbackService.name);
-  private readonly openai: OpenAIApi;
+  private openai: OpenAIApi | null = null;
+  private currentApiKey: string | null = null;
 
-  constructor() {
-    const apiKey = process.env.OPENAI_API_KEY || process.env.OPENAI_KEY || process.env.OPENAI_SECRET || process.env.OPENAI;
-    if (!apiKey) {
-      this.logger.warn('No OpenAI API key found in environment variables.');
+  constructor(private readonly settingsService: SettingsService) {}
+
+  private async getOpenAIInstance(): Promise<OpenAIApi | null> {
+    try {
+      // First try to get API key from database
+      let apiKey = await this.settingsService.getSetting('OPENAI_API_KEY');
+      
+      // Fallback to environment variables if not found in database
+      if (!apiKey) {
+        apiKey = process.env.OPENAI_API_KEY || process.env.OPENAI_KEY || process.env.OPENAI_SECRET || process.env.OPENAI || null;
+      }
+
+      if (!apiKey) {
+        this.logger.warn('No OpenAI API key found in database or environment variables.');
+        return null;
+      }
+
+      // Reinitialize if API key has changed
+      if (this.currentApiKey !== apiKey) {
+        this.logger.log('API key changed, reinitializing OpenAI client');
+        this.openai = new OpenAIApi({ apiKey });
+        this.currentApiKey = apiKey;
+      }
+
+      return this.openai;
+    } catch (error) {
+      this.logger.error('Failed to initialize OpenAI client:', error);
+      return null;
     }
-    this.openai = new OpenAIApi({ apiKey });
   }
 
   /**
@@ -28,9 +53,16 @@ export class AiFeedbackService {
     solutionResult?: any;
     errorCategory?: string;
   }): Promise<string> {
+    const openai = await this.getOpenAIInstance();
+    
+    if (!openai) {
+      this.logger.error('OpenAI client is not available. Please check API key configuration.');
+      return 'KI-Feedback ist momentan nicht verfügbar. Bitte konfigurieren Sie den OpenAI API-Key.';
+    }
+
     const prompt = this.buildPrompt(params);
     try {
-      const completion = await this.openai.chat.completions.create({
+      const completion = await openai.chat.completions.create({
         model: 'gpt-4.1',
         messages: [
           {
