@@ -2,11 +2,11 @@
   <!-- Header -->
   <div class="archiv-header">
     <h1>SQLearner</h1>
-    <p>Archiv - Archivierte Fragen verwalten</p>
+    <p>{{ 'TUTOR_QUESTIONS_PAGE.ARCHIVE_HEADER' | translate }}</p>
 
     <div class="zurueck-link" (click)="zurueck()">
       <mat-icon class="klickbares-icon">arrow_back</mat-icon>
-      <span>Zurück</span>
+      <span>{{ 'TUTOR_QUESTIONS_PAGE.BACK' | translate }}</span>
     </div>
   </div>
   
@@ -24,9 +24,11 @@
       <div class="frage-aktionen">
         <button mat-icon-button color="primary" (click)="wiederherstellen(frage)">
           <mat-icon>restore</mat-icon>
+          {{ 'TUTOR_QUESTIONS_PAGE.RESTORE' | translate }}
         </button>
         <button mat-icon-button color="warn" (click)="inPapierkorbVerschieben(frage)">
           <mat-icon>delete_forever</mat-icon>
+          {{ 'TUTOR_QUESTIONS_PAGE.DELETE_FOREVER' | translate }}
         </button>
       </div>
     </div>
@@ -34,6 +36,6 @@
 
   <!-- Fallback when archive is empty -->
   <ng-template #leer>
-    <p class="leertext">Das Archiv ist leer 📦</p>
+    <p class="leertext">{{ 'TUTOR_QUESTIONS_PAGE.ARCHIVE_EMPTY' | translate }}</p>
   </ng-template>
 </div>

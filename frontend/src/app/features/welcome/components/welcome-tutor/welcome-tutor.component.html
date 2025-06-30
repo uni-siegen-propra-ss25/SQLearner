@@ -1,7 +1,7 @@
 <!-- Greeting section at the top of the page -->
 <div class="welcome-container">
   <h1>{{ 'WELCOME' | translate }}</h1>
-  <p>Ihre Plattform zum Lernen und Üben von SQL</p>
+  <p>{{ 'WELCOME_TUTOR_PAGE.PLATFORM_SUB' | translate }}</p>
 </div>
 
 <!-- Main content area -->
@@ -12,7 +12,7 @@
 
     <!-- Hint box for students -->
     <mat-card class="box hint-box">
-      <mat-card-title>Hinweise für Studierende</mat-card-title>
+      <mat-card-title>{{ 'WELCOME_TUTOR_PAGE.HINTS_TITLE' | translate }}</mat-card-title>
       <mat-card-content>
         <ul class="hinweis-liste">
           <!-- Loop through all hints, displaying each with a warning icon, text, and a delete button -->
@@ -25,13 +25,13 @@
           </li>
         </ul>
         <!-- Message shown if no hints exist -->
-        <p *ngIf="hints.length === 0" class="keine-eintraege">Erstellen Sie einen Hinweis</p>
+        <p *ngIf="hints.length === 0" class="keine-eintraege">{{ 'WELCOME_TUTOR_PAGE.HINTS_EMPTY' | translate }}</p>
       </mat-card-content>
 
       <!-- Input field to add a new hint -->
       <mat-card-actions class="hint-add">
         <mat-form-field appearance="fill" class="hint-input">
-          <mat-label>Neuen Hinweis hinzufügen...</mat-label>
+          <mat-label>{{ 'WELCOME_TUTOR_PAGE.HINTS_ADD_LABEL' | translate }}</mat-label>
           <input matInput [(ngModel)]="newHint" (keyup.enter)="addHint()" />
         </mat-form-field>
         <button mat-icon-button color="primary" (click)="addHint()">
@@ -42,7 +42,7 @@
 
     <!-- Personal to-do list box -->
     <mat-card class="box todo-box">
-      <mat-card-title>{{ 'MY_TODOS' | translate }}</mat-card-title>
+      <mat-card-title>{{ 'WELCOME_TUTOR_PAGE.MY_TODOS_TITLE' | translate }}</mat-card-title>
       <mat-card-content>
         <ul>
           <!-- Loop through all to-dos, showing checkbox to mark done and delete button -->
@@ -56,12 +56,12 @@
           </li>
         </ul>
         <!-- Message shown if no to-dos exist -->
-        <p *ngIf="todos.length === 0" class="keine-eintraege">Ergänzen Sie Ihre To-do-Liste</p>
+        <p *ngIf="todos.length === 0" class="keine-eintraege">{{ 'WELCOME_TUTOR_PAGE.TODOS_EMPTY' | translate }}</p>
 
         <!-- Input to add a new to-do -->
         <div class="todo-add">
           <mat-form-field appearance="fill" class="todo-input">
-            <mat-label>Neue Aufgabe hinzufügen...</mat-label>
+            <mat-label>{{ 'WELCOME_TUTOR_PAGE.TODOS_ADD_LABEL' | translate }}</mat-label>
             <input matInput [(ngModel)]="newTodo" (keyup.enter)="addTodo()" />
           </mat-form-field>
           <button mat-icon-button color="primary" (click)="addTodo()">
@@ -75,7 +75,7 @@
   <!-- Bottom row with the latest student questions -->
   <div class="bottom-row">
     <mat-card class="box question-box">
-      <mat-card-title>Fragen der Studierenden</mat-card-title>
+      <mat-card-title>{{ 'WELCOME_TUTOR_PAGE.STUDENT_QUESTIONS_TITLE' | translate }}</mat-card-title>
       <mat-card-content>
         <div class="fragenliste">
           <!-- Conditionally display questions if any exist; otherwise show fallback message -->
@@ -90,14 +90,14 @@
             </div>
           </ng-container>
           <ng-template #keineFragen>
-            <p class="keine-fragen">Sie haben noch keine Fragen</p>
+            <p class="keine-fragen">{{ 'WELCOME_TUTOR_PAGE.STUDENT_QUESTIONS_EMPTY' | translate }}</p>
           </ng-template>
         </div>
       </mat-card-content>
 
       <!-- Button linking to the full questions list -->
       <mat-card-actions class="fragen-actions">
-        <button mat-button color="primary" (click)="goToFragen()">Alle anzeigen</button>
+        <button mat-button color="primary" (click)="goToFragen()">{{ 'WELCOME_TUTOR_PAGE.SHOW_ALL' | translate }}</button>
       </mat-card-actions>
     </mat-card>
   </div>

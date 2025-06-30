@@ -29,8 +29,10 @@ export class NavigationRailComponent {
     @Output() itemSelected = new EventEmitter<NavigationItem>();
     @Output() languageChanged = new EventEmitter<string>();
     @Output() logStatusChanged = new EventEmitter<void>();
+    @Output() themeChanged = new EventEmitter<boolean>();
 
     currentLang = 'de';
+    isDarkTheme = false;
 
     constructor(
         private router: Router,
@@ -40,6 +42,7 @@ export class NavigationRailComponent {
     ) {
         const savedLang = localStorage.getItem('language') || 'de';
         this.currentLang = savedLang;
+        this.isDarkTheme = localStorage.getItem('theme') === 'dark';
     }
 
     openProfile(): void {
@@ -75,5 +78,16 @@ export class NavigationRailComponent {
         this.translate.use(language);
         localStorage.setItem('language', language);
         this.languageChanged.emit(language);
+    }
+
+    toggleTheme(): void {
+        this.isDarkTheme = !this.isDarkTheme;
+        localStorage.setItem('theme', this.isDarkTheme ? 'dark' : 'light');
+        this.themeChanged.emit(this.isDarkTheme);
+    }
+
+    logout(): void {
+        this.authService.logout();
+        this.router.navigate(['/auth/login']);
     }
 }

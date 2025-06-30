@@ -2,11 +2,11 @@
   <!-- Header -->
   <div class="beantwortet-header">
     <h1>SQLearner</h1>
-    <p>Beantwortete Fragen - Verwalten Sie das Fragenforum</p>
+    <p>{{ 'TUTOR_ANSWERED_PAGE.HEADER' | translate }}</p>
 
     <div class="zurueck-link" (click)="zurueck()">
       <mat-icon class="klickbares-icon">arrow_back</mat-icon>
-      <span>Zurück</span>
+      <span>{{ 'TUTOR_ANSWERED_PAGE.BACK' | translate }}</span>
     </div>
   </div>
   
@@ -34,6 +34,6 @@
 
   <!-- Wenn keine beantworteten Fragen -->
   <ng-template #leer>
-    <p class="leertext">Keine beantworteten Fragen vorhanden ✅</p>
+    <p class="leertext">{{ 'TUTOR_ANSWERED_PAGE.NO_ANSWERED' | translate }}</p>
   </ng-template>
 </div>

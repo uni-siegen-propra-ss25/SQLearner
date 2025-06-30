@@ -21,7 +21,7 @@
     </a>
   </div>
 
-  <div class="nav-footer">
+  <div class="nav-footer" *ngIf="!userRole">
     <div class="language-switcher">
       <button class="lang-btn" (click)="onLanguageChange('de')" [class.active]="currentLang === 'de'">
         🇩🇪
@@ -31,26 +31,54 @@
       </button>
     </div>
 
-    <button class="nav-item" *ngIf="userRole; else loginBtn" (click)="openProfile()">
+    <button class="nav-item" (click)="onLogStatusChanged()">
       <span class="icon-container">
-        <mat-icon>person</mat-icon>
+        <mat-icon>login</mat-icon>
       </span>
-      <span class="label-text">{{ 'PROFILE' | translate }}</span>
+      <span class="label-text">{{ 'LOGIN' | translate }}</span>
     </button>
-    <ng-template #loginBtn>
-      <button class="nav-item" (click)="onLogStatusChanged()">
-        <span class="icon-container">
-          <mat-icon>login</mat-icon>
-        </span>
-        <span class="label-text">{{ 'LOGIN' | translate }}</span>
-      </button>
-    </ng-template>
+  </div>
 
-    <button class="nav-item">
-      <span class="icon-container">
-        <mat-icon>dark_mode</mat-icon>
-      </span>
-      <span class="label-text">Dark/Light</span>
+  <div class="burger-menu" *ngIf="userRole">
+    <button mat-icon-button [matMenuTriggerFor]="menu" class="burger-button">
+      <mat-icon>menu</mat-icon>
     </button>
+
+    <mat-menu #menu="matMenu" class="settings-menu">
+      <button mat-menu-item (click)="openProfile()">
+        <mat-icon>person</mat-icon>
+        <span>{{ 'PROFILE' | translate }}</span>
+      </button>
+
+      <mat-divider></mat-divider>
+
+      <button mat-menu-item [matMenuTriggerFor]="languageMenu">
+        <mat-icon>language</mat-icon>
+        <span>{{ 'LANGUAGE' | translate }}</span>
+      </button>
+
+      <button mat-menu-item (click)="toggleTheme()">
+        <mat-icon>{{ isDarkTheme ? 'light_mode' : 'dark_mode' }}</mat-icon>
+        <span>{{ (isDarkTheme ? 'LIGHT_MODE' : 'DARK_MODE') | translate }}</span>
+      </button>
+
+      <mat-divider></mat-divider>
+
+      <button mat-menu-item (click)="logout()" class="logout-item">
+        <mat-icon>logout</mat-icon>
+        <span>{{ 'LOGOUT' | translate }}</span>
+      </button>
+    </mat-menu>
+
+    <mat-menu #languageMenu="matMenu" class="language-menu">
+      <button mat-menu-item (click)="onLanguageChange('de')" [class.active]="currentLang === 'de'">
+        <span class="flag">🇩🇪</span>
+        <span>Deutsch</span>
+      </button>
+      <button mat-menu-item (click)="onLanguageChange('en')" [class.active]="currentLang === 'en'">
+        <span class="flag">🇬🇧</span>
+        <span>English</span>
+      </button>
+    </mat-menu>
   </div>
 </nav>

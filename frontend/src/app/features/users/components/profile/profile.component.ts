@@ -1,8 +1,9 @@
-import { Component, Inject, Input, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Component, OnInit } from '@angular/core';
+import { MatDialogRef } from '@angular/material/dialog';
 import { User } from '../../../users/models/user.model';
 import { AuthService } from '../../../auth/services/auth.service';
 import { Role } from '../../../users/models/role.model';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-profile',
@@ -17,16 +18,10 @@ export class ProfileComponent implements OnInit {
     /** The current user's profile data */
     user: User | null = null;
 
-    /** Role display mapping */
-    roleDisplayNames = {
-        [Role.ADMIN]: 'Administrator',
-        [Role.TUTOR]: 'Tutor',
-        [Role.STUDENT]: 'Student',
-    };
-
     constructor(
         private authService: AuthService,
         private dialogRef: MatDialogRef<ProfileComponent>,
+        private translate: TranslateService
     ) {}
 
     /**
@@ -45,14 +40,7 @@ export class ProfileComponent implements OnInit {
      */
     getRegistrationDate(): string {
         if (!this.user?.createdAt) return '-';
-        return new Date(this.user.createdAt).toLocaleDateString('de-DE');
-    }
-
-    /**
-     * Gets the display name for a role
-     */
-    getRoleDisplayName(role: string): string {
-        return this.roleDisplayNames[role as Role] || role;
+        return new Date(this.user.createdAt).toLocaleDateString(this.translate.currentLang === 'de' ? 'de-DE' : 'en-GB');
     }
 
     /**

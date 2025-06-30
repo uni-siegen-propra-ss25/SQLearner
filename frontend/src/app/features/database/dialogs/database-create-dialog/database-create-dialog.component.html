@@ -2,7 +2,7 @@
   <div class="dialog-header">
     <h2 mat-dialog-title>
       <mat-icon>add</mat-icon>
-      Neue Datenbank erstellen
+      {{ 'DATABASE_CREATE_DIALOG.TITLE' | translate }}
     </h2>
     <button mat-icon-button mat-dialog-close>
       <mat-icon>close</mat-icon>
@@ -13,44 +13,44 @@
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <div class="form-section">
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Name</mat-label>
-          <input matInput formControlName="name" placeholder="Name der Datenbank" required>
+          <mat-label>{{ 'DATABASE_CREATE_DIALOG.NAME' | translate }}</mat-label>
+          <input matInput formControlName="name" [placeholder]="'DATABASE_CREATE_DIALOG.NAME_PLACEHOLDER' | translate" required>
           <mat-error *ngIf="form.get('name')?.hasError('required')">
-            Ein Name ist erforderlich
+            {{ 'DATABASE_CREATE_DIALOG.NAME_REQUIRED' | translate }}
           </mat-error>
           <mat-error *ngIf="form.get('name')?.hasError('pattern')">
-            Name muss mit Buchstabe oder Unterstrich beginnen und nur Buchstaben, Zahlen und Unterstriche enthalten
+            {{ 'DATABASE_CREATE_DIALOG.NAME_PATTERN_ERROR' | translate }}
           </mat-error>
-          <mat-hint>Nur Buchstaben, Zahlen und Unterstriche erlaubt</mat-hint>
+          <mat-hint>{{ 'DATABASE_CREATE_DIALOG.NAME_HINT' | translate }}</mat-hint>
         </mat-form-field>
       </div>
 
       <div class="form-section">
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Beschreibung</mat-label>
+          <mat-label>{{ 'DATABASE_CREATE_DIALOG.DESCRIPTION' | translate }}</mat-label>
           <textarea matInput formControlName="description" 
-                    placeholder="Optionale Beschreibung der Datenbank"
+                    [placeholder]="'DATABASE_CREATE_DIALOG.DESCRIPTION_PLACEHOLDER' | translate"
                     rows="3"></textarea>
         </mat-form-field>
       </div>
 
       <div class="form-section">
         <div class="section-header">
-          <h3>SQL Schema (Optional)</h3>
+          <h3>{{ 'DATABASE_CREATE_DIALOG.SQL_SCHEMA' | translate }}</h3>
           <div class="schema-info">
             <mat-icon>info</mat-icon>
-            <span>Definieren Sie hier die Datenbankstruktur</span>
+            <span>{{ 'DATABASE_CREATE_DIALOG.SCHEMA_INFO' | translate }}</span>
           </div>
         </div>
         
         <div class="sql-editor-container">
           <div class="editor-header">
-            <span class="editor-label">SQL Code</span>
+            <span class="editor-label">{{ 'DATABASE_CREATE_DIALOG.SQL_CODE' | translate }}</span>
             <div class="editor-actions">
-              <button type="button" mat-icon-button matTooltip="Beispiel laden" (click)="loadExample()">
+              <button type="button" mat-icon-button [matTooltip]="'DATABASE_CREATE_DIALOG.LOAD_EXAMPLE' | translate" (click)="loadExample()">
                 <mat-icon>code</mat-icon>
               </button>
-              <button type="button" mat-icon-button matTooltip="Code formatieren" (click)="formatCode()">
+              <button type="button" mat-icon-button [matTooltip]="'DATABASE_CREATE_DIALOG.FORMAT_CODE' | translate" (click)="formatCode()">
                 <mat-icon>format_align_left</mat-icon>
               </button>
             </div>
@@ -58,7 +58,7 @@
           <div #sqlEditorContainer class="monaco-editor-container"></div>
           <div class="editor-hint">
             <mat-icon>lightbulb</mat-icon>
-            <span>Verwenden Sie CREATE TABLE, INSERT INTO und andere SQL-Befehle</span>
+            <span>{{ 'DATABASE_CREATE_DIALOG.EDITOR_HINT' | translate }}</span>
           </div>
         </div>
       </div>
@@ -66,13 +66,15 @@
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">
-    <button mat-button type="button" (click)="onCancel()" [disabled]="isLoading">Abbrechen</button>
+    <button mat-button type="button" (click)="onCancel()" [disabled]="isLoading">
+      {{ 'DATABASE_CREATE_DIALOG.CANCEL' | translate }}
+    </button>
     <button mat-raised-button color="primary" type="submit" 
             [disabled]="!form.valid || isLoading"
             (click)="onSubmit()">
       <mat-spinner diameter="20" *ngIf="isLoading"></mat-spinner>
-      <span *ngIf="!isLoading">Erstellen</span>
-      <span *ngIf="isLoading">Wird erstellt...</span>
+      <span *ngIf="!isLoading">{{ 'DATABASE_CREATE_DIALOG.CREATE' | translate }}</span>
+      <span *ngIf="isLoading">{{ 'DATABASE_CREATE_DIALOG.CREATING' | translate }}</span>
     </button>
   </mat-dialog-actions>
 </div>

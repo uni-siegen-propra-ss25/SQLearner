@@ -4,12 +4,12 @@
       <div class="auth-container">
         <div class="auth-header">
           <img src="assets/icons/logo_SQLearner.svg" alt="Logo" class="auth-logo" />
-          <h1 class="auth-title">Sign in</h1>
+          <h1 class="auth-title">{{ 'LOGIN_PAGE.TITLE' | translate }}</h1>
         </div>
 
         <div class="auth-form-fields">
           <mat-form-field appearance="outline" class="auth-field">
-            <mat-label>Email</mat-label>
+            <mat-label>{{ 'LOGIN_PAGE.EMAIL' | translate }}</mat-label>
             <input matInput type="email" formControlName="email" />
             @if (
               (loginForm.get('email')?.touched || loginForm.get('email')?.dirty) &&
@@ -17,7 +17,7 @@
             ) {
               <mat-error class="auth-error">
                 <mat-icon>error_outline</mat-icon>
-                Email is required
+                {{ 'LOGIN_PAGE.EMAIL_REQUIRED' | translate }}
               </mat-error>
             }
             @if (
@@ -26,13 +26,13 @@
             ) {
               <mat-error class="auth-error">
                 <mat-icon>error_outline</mat-icon>
-                Please enter a valid email
+                {{ 'LOGIN_PAGE.EMAIL_INVALID' | translate }}
               </mat-error>
             }
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="auth-field">
-            <mat-label>Password</mat-label>
+            <mat-label>{{ 'LOGIN_PAGE.PASSWORD' | translate }}</mat-label>
             <input
               matInput
               [type]="hidePassword ? 'password' : 'text'"
@@ -47,7 +47,7 @@
             ) {
               <mat-error class="auth-error">
                 <mat-icon>error_outline</mat-icon>
-                Password is required
+                {{ 'LOGIN_PAGE.PASSWORD_REQUIRED' | translate }}
               </mat-error>
             }
             @if (
@@ -56,22 +56,22 @@
             ) {
               <mat-error class="auth-error">
                 <mat-icon>error_outline</mat-icon>
-                Password must be at least 8 characters
+                {{ 'LOGIN_PAGE.PASSWORD_MINLENGTH' | translate }}
               </mat-error>
             }
           </mat-form-field>
 
           <div class="auth-links">
-            <a mat-button color="primary">Forgot password?</a>
+            <a mat-button color="primary">{{ 'LOGIN_PAGE.FORGOT_PASSWORD' | translate }}</a>
           </div>
         </div>
       </div>
     </mat-card-content>
 
     <mat-card-actions class="auth-actions">
-      <a mat-button routerLink="/auth/register" class="auth-secondary-button"> Create account </a>
+      <a mat-button routerLink="/auth/register" class="auth-secondary-button">{{ 'LOGIN_PAGE.CREATE_ACCOUNT' | translate }}</a>
       <button mat-flat-button color="primary" type="submit" class="auth-primary-button">
-        Sign in
+        {{ 'LOGIN_PAGE.SIGN_IN' | translate }}
       </button>
     </mat-card-actions>
   </mat-card>

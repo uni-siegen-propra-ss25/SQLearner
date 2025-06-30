@@ -2,11 +2,11 @@
   <!-- Header -->
   <div class="papierkorb-header">
     <h1>SQLearner</h1>
-    <p>Papierkorb - Gelöschte Fragen verwalten</p>
+    <p>{{ 'TUTOR_QUESTIONS_PAGE.TRASH_HEADER' | translate }}</p>
   
     <div class="zurueck-link" (click)="zurueck()">
       <mat-icon class="klickbares-icon">arrow_back</mat-icon>
-      <span>Zurück</span>
+      <span>{{ 'TUTOR_QUESTIONS_PAGE.BACK' | translate }}</span>
     </div>
   </div>
 
@@ -24,9 +24,11 @@
       <div class="frage-aktionen">
         <button mat-icon-button color="primary" (click)="wiederherstellen(frage)">
           <mat-icon>restore</mat-icon>
+          {{ 'TUTOR_QUESTIONS_PAGE.RESTORE' | translate }}
         </button>
         <button mat-icon-button color="warn" (click)="endgueltigLoeschen(frage)">
           <mat-icon>delete_forever</mat-icon>
+          {{ 'TUTOR_QUESTIONS_PAGE.DELETE_FOREVER' | translate }}
         </button>
       </div>
     </div>
@@ -34,6 +36,6 @@
 
   <!-- Empty trash fallback -->
   <ng-template #leer>
-    <p class="leertext">Der Papierkorb ist leer 🗑️</p>
+    <p class="leertext">{{ 'TUTOR_QUESTIONS_PAGE.TRASH_EMPTY' | translate }}</p>
   </ng-template>
 </div>

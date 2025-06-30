@@ -3,15 +3,15 @@
   <div class="header">
     <div class="title-section">
       <h1>SQLearner</h1>
-      <p>Fragen der Studierenden</p>
+      <p>{{ 'TUTOR_QUESTIONS_PAGE.TITLE' | translate }}</p>
     </div>
     <div class="nav-links">
       <!-- Navigation links to answered, archived and deleted questions -->
-      <a routerLink="/welcome/tutor/beantwortet">Beantwortet</a>
-      <a routerLink="/welcome/tutor/archiv">Archiv</a>
-      <a routerLink="/welcome/tutor/papierkorb">Papierkorb</a>
+      <a routerLink="/welcome/tutor/beantwortet">{{ 'TUTOR_QUESTIONS_PAGE.ANSWERED' | translate }}</a>
+      <a routerLink="/welcome/tutor/archiv">{{ 'TUTOR_QUESTIONS_PAGE.ARCHIVE' | translate }}</a>
+      <a routerLink="/welcome/tutor/papierkorb">{{ 'TUTOR_QUESTIONS_PAGE.TRASH' | translate }}</a>
       <a class="back-button-tutor" routerLink="/welcome/tutor">
-        <mat-icon>arrow_back</mat-icon> Startseite
+        <mat-icon>arrow_back</mat-icon> {{ 'TUTOR_QUESTIONS_PAGE.BACK' | translate }}
       </a>
     </div>
   </div>
@@ -22,13 +22,13 @@
     <div class="fragen-container">
       <p class="unread">
         <ng-container *ngIf="ungeleseneNachrichten === 0">
-          Sie haben <strong>keine</strong> unbeantwortete Frage
+          <span [innerHTML]="'TUTOR_QUESTIONS_PAGE.NO_UNANSWERED' | translate"></span>
         </ng-container>
         <ng-container *ngIf="ungeleseneNachrichten === 1">
-          Sie haben <strong>eine</strong> unbeantwortete Frage
+          <span [innerHTML]="'TUTOR_QUESTIONS_PAGE.ONE_UNANSWERED' | translate"></span>
         </ng-container>
         <ng-container *ngIf="ungeleseneNachrichten > 1">
-          Sie haben <strong>{{ ungeleseneNachrichten }}</strong> unbeantwortete Fragen
+          <span [innerHTML]="'TUTOR_QUESTIONS_PAGE.MANY_UNANSWERED' | translate:{count: ungeleseneNachrichten}"></span>
         </ng-container>
       </p>
 
@@ -39,21 +39,21 @@
           {{ question.student_name }} ({{ question.erstellt_am | date:'dd.MM.yyyy HH:mm' }}): „{{ question.frage }}“
         </p>
         <div class="aktionen">
-          <a href="#" (click)="anpinnen(question, $event)">Markieren</a>
-          <a href="#" (click)="archivieren(question, $event)">Archivieren</a>
-          <a href="#" (click)="beantworten(question, $event)">Beantworten</a>
-          <a href="#" (click)="loeschen(question, $event)">Löschen</a>
+          <a href="#" (click)="anpinnen(question, $event)">{{ 'TUTOR_QUESTIONS_PAGE.PIN' | translate }}</a>
+          <a href="#" (click)="archivieren(question, $event)">{{ 'TUTOR_QUESTIONS_PAGE.ARCHIVE_ACTION' | translate }}</a>
+          <a href="#" (click)="beantworten(question, $event)">{{ 'TUTOR_QUESTIONS_PAGE.ANSWER' | translate }}</a>
+          <a href="#" (click)="loeschen(question, $event)">{{ 'TUTOR_QUESTIONS_PAGE.DELETE' | translate }}</a>
         </div>
       </div>
     </div>
 
     <!-- Right column: pinned questions -->
     <div class="angepinnt-box">
-      <h3>Markiert</h3>
-      <div *ngIf="angepinnt.length === 0" class="leertext">Keine markierten Nachrichten</div>
+      <h3>{{ 'TUTOR_QUESTIONS_PAGE.PINNED' | translate }}</h3>
+      <div *ngIf="angepinnt.length === 0" class="leertext">{{ 'TUTOR_QUESTIONS_PAGE.NO_PINNED' | translate }}</div>
       <div *ngFor="let question of angepinnt" class="angeheftet-frage">
         <p>{{ question.student_name }} ({{ question.erstellt_am | date:'dd.MM.yyyy HH:mm' }}): „{{ question.frage }}“</p>
-        <a href="#" (click)="entferneAngepinnt(question, $event)">Entfernen</a>
+        <a href="#" (click)="entferneAngepinnt(question, $event)">{{ 'TUTOR_QUESTIONS_PAGE.REMOVE_PIN' | translate }}</a>
       </div>
     </div>
   </div>
@@ -61,12 +61,12 @@
   <!-- Modal for answering a question -->
   <div class="antwort-modal" *ngIf="ausgewaehlteQuestion">
     <div class="antwort-box">
-      <h2>Antwort auf: {{ ausgewaehlteQuestion.student_name }}</h2>
-      <textarea [(ngModel)]="antwortText" placeholder="Antwort schreiben..."></textarea>
+      <h2>{{ 'TUTOR_QUESTIONS_PAGE.ANSWER_TO' | translate:{name: ausgewaehlteQuestion.student_name} }}</h2>
+      <textarea [(ngModel)]="antwortText" [placeholder]="'TUTOR_QUESTIONS_PAGE.WRITE_ANSWER' | translate"></textarea>
 
       <div class="antwort-aktionen">
-         <button (click)="antwortAbschicken()">Antwort senden</button>
-         <button class="abbrechen" (click)="antwortAbbrechen()">Abbrechen</button>
+         <button (click)="antwortAbschicken()">{{ 'TUTOR_QUESTIONS_PAGE.SEND_ANSWER' | translate }}</button>
+         <button class="abbrechen" (click)="antwortAbbrechen()">{{ 'TUTOR_QUESTIONS_PAGE.CANCEL' | translate }}</button>
       </div>
     </div>
   </div>

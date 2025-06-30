@@ -25,11 +25,11 @@
   <!-- Empty state when no chapters exist -->
   <div *ngIf="chapters.length === 0" class="empty-state">
     <mat-icon>school</mat-icon>
-    <p>No chapters available yet.</p>
+    <p>{{ 'ROADMAP_PAGE.NO_CHAPTERS' | translate }}</p>
     <!-- First chapter creation button for tutors -->
     <button *ngIf="isTutor" mat-raised-button color="primary" (click)="openNewChapterDialog()">
       <mat-icon class="add-icon">add</mat-icon>
-      Create First Chapter
+      {{ 'ROADMAP_PAGE.CREATE_FIRST_CHAPTER' | translate }}
     </button>
   </div>
 
@@ -37,7 +37,7 @@
   <div *ngIf="chapters.length > 0 && isTutor" class="add-chapter-container">
     <button mat-raised-button color="primary" (click)="openNewChapterDialog()">
       <mat-icon class="add-icon">add</mat-icon>
-      Add New Chapter
+      {{ 'ROADMAP_PAGE.ADD_NEW_CHAPTER' | translate }}
     </button>
   </div>
 </div>

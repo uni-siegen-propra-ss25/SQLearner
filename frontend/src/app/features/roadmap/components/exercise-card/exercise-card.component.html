@@ -47,7 +47,7 @@
             mat-icon-button
             color="primary"
             (click)="edit.emit(exercise)"
-            matTooltip="Edit exercise"
+            matTooltip="{{ 'EDIT_EXERCISE' | translate }}"
           >
             <mat-icon>edit</mat-icon>
           </button>
@@ -55,7 +55,7 @@
             mat-icon-button
             color="warn"
             (click)="delete.emit(exercise.id)"
-            matTooltip="Delete exercise"
+            matTooltip="{{ 'DELETE_EXERCISE' | translate }}"
           >
             <mat-icon>delete</mat-icon>
           </button>

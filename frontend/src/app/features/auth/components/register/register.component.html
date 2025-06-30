@@ -4,13 +4,13 @@
       <div class="auth-container">
         <div class="auth-header">
           <img src="assets/icons/logo_SQLearner.svg" alt="Logo" class="auth-logo" />
-          <h1 class="auth-title">Create Account</h1>
+          <h1 class="auth-title">{{ 'REGISTER_PAGE.TITLE' | translate }}</h1>
         </div>
 
         <div class="auth-form-fields auth-form-grid">
           <div class="auth-grid-row">
             <mat-form-field appearance="outline" class="auth-field">
-              <mat-label>First Name</mat-label>
+              <mat-label>{{ 'REGISTER_PAGE.FIRST_NAME' | translate }}</mat-label>
               <input matInput type="text" formControlName="firstName" />
               @if (
                 (registerForm.get('firstName')?.touched || registerForm.get('firstName')?.dirty) &&
@@ -18,12 +18,12 @@
               ) {
                 <mat-error class="auth-error">
                   <mat-icon>error_outline</mat-icon>
-                  First name is required
+                  {{ 'REGISTER_PAGE.FIRST_NAME_REQUIRED' | translate }}
                 </mat-error>
               }
             </mat-form-field>
             <mat-form-field appearance="outline" class="auth-field">
-              <mat-label>Last Name</mat-label>
+              <mat-label>{{ 'REGISTER_PAGE.LAST_NAME' | translate }}</mat-label>
               <input matInput type="text" formControlName="lastName" />
               @if (
                 (registerForm.get('lastName')?.touched || registerForm.get('lastName')?.dirty) &&
@@ -31,7 +31,7 @@
               ) {
                 <mat-error class="auth-error">
                   <mat-icon>error_outline</mat-icon>
-                  Last name is required
+                  {{ 'REGISTER_PAGE.LAST_NAME_REQUIRED' | translate }}
                 </mat-error>
               }
             </mat-form-field>
@@ -39,7 +39,7 @@
 
           <div class="auth-grid-row">
             <mat-form-field appearance="outline" class="auth-field">
-              <mat-label>Password</mat-label>
+              <mat-label>{{ 'REGISTER_PAGE.PASSWORD' | translate }}</mat-label>
               <input
                 matInput
                 [type]="hidePassword ? 'password' : 'text'"
@@ -59,7 +59,7 @@
               ) {
                 <mat-error class="auth-error">
                   <mat-icon>error_outline</mat-icon>
-                  Password is required
+                  {{ 'REGISTER_PAGE.PASSWORD_REQUIRED' | translate }}
                 </mat-error>
               }
               @if (
@@ -68,12 +68,12 @@
               ) {
                 <mat-error class="auth-error">
                   <mat-icon>error_outline</mat-icon>
-                  Password must be at least 8 characters
+                  {{ 'REGISTER_PAGE.PASSWORD_MINLENGTH' | translate }}
                 </mat-error>
               }
             </mat-form-field>
             <mat-form-field appearance="outline" class="auth-field">
-              <mat-label>Confirm Password</mat-label>
+              <mat-label>{{ 'REGISTER_PAGE.CONFIRM_PASSWORD' | translate }}</mat-label>
               <input
                 matInput
                 [type]="hideConfirmPassword ? 'password' : 'text'"
@@ -94,20 +94,20 @@
               ) {
                 <mat-error class="auth-error">
                   <mat-icon>error_outline</mat-icon>
-                  Please confirm your password
+                  {{ 'REGISTER_PAGE.CONFIRM_PASSWORD_REQUIRED' | translate }}
                 </mat-error>
               }
               @if (registerForm.hasError('passwordMismatch')) {
                 <mat-error class="auth-error">
                   <mat-icon>error_outline</mat-icon>
-                  Passwords do not match
+                  {{ 'REGISTER_PAGE.PASSWORDS_DO_NOT_MATCH' | translate }}
                 </mat-error>
               }
             </mat-form-field>
           </div>
 
           <mat-form-field appearance="outline" class="auth-field auth-field-full">
-            <mat-label>Email</mat-label>
+            <mat-label>{{ 'REGISTER_PAGE.EMAIL' | translate }}</mat-label>
             <input matInput type="email" formControlName="email" />
             @if (
               (registerForm.get('email')?.touched || registerForm.get('email')?.dirty) &&
@@ -115,7 +115,7 @@
             ) {
               <mat-error class="auth-error">
                 <mat-icon>error_outline</mat-icon>
-                Email is required
+                {{ 'REGISTER_PAGE.EMAIL_REQUIRED' | translate }}
               </mat-error>
             }
             @if (
@@ -124,13 +124,13 @@
             ) {
               <mat-error class="auth-error">
                 <mat-icon>error_outline</mat-icon>
-                Please enter a valid email
+                {{ 'REGISTER_PAGE.EMAIL_INVALID' | translate }}
               </mat-error>
             }
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="auth-field auth-field-full">
-            <mat-label>Role</mat-label>
+            <mat-label>{{ 'REGISTER_PAGE.ROLE' | translate }}</mat-label>
             <mat-select formControlName="role">
               <mat-option *ngFor="let role of roles" [value]="role">{{ role }}</mat-option>
             </mat-select>
@@ -139,14 +139,14 @@
             ) {
               <mat-error class="auth-error">
                 <mat-icon>error_outline</mat-icon>
-                Role is required
+                {{ 'REGISTER_PAGE.ROLE_REQUIRED' | translate }}
               </mat-error>
             }
           </mat-form-field>
 
           @if (isStudent) {
             <mat-form-field appearance="outline" class="auth-field auth-field-full">
-              <mat-label>Matriculation Number</mat-label>
+              <mat-label>{{ 'REGISTER_PAGE.MATRICULATION_NUMBER' | translate }}</mat-label>
               <input matInput type="text" formControlName="matriculationNumber" />
               @if (
                 (registerForm.get('matriculationNumber')?.touched ||
@@ -155,7 +155,7 @@
               ) {
                 <mat-error class="auth-error">
                   <mat-icon>error_outline</mat-icon>
-                  Matriculation number is required
+                  {{ 'REGISTER_PAGE.MATRICULATION_NUMBER_REQUIRED' | translate }}
                 </mat-error>
               }
             </mat-form-field>
@@ -166,10 +166,10 @@
 
     <mat-card-actions class="auth-actions">
       <a mat-button routerLink="/auth/login" class="auth-secondary-button">
-        Already have an account?
+        {{ 'REGISTER_PAGE.ALREADY_HAVE_ACCOUNT' | translate }}
       </a>
       <button mat-flat-button color="primary" type="submit" class="auth-primary-button">
-        Create Account
+        {{ 'REGISTER_PAGE.CREATE_ACCOUNT' | translate }}
       </button>
     </mat-card-actions>
   </mat-card>
