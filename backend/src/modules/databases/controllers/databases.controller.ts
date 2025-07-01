@@ -143,4 +143,16 @@ export class DatabasesController {
     async getDatabaseSchema(@Param('id', ParseIntPipe) id: number) {
         return this.databasesService.getDatabaseSchema(id);
     }
+
+    @Post(':id/tables/:tableName/rows')
+    @ApiOperation({ summary: 'Insert a new row into a table' })
+    @ApiResponse({ status: 201, description: 'Row inserted successfully' })
+    async insertRow(
+        @Param('id', ParseIntPipe) databaseId: number,
+        @Param('tableName') tableName: string,
+        @Body('data') data: Record<string, any>,
+        @GetUser() user: User,
+    ) {
+        return this.databasesService.insertRow(databaseId, tableName, data, user);
+    }
 }
