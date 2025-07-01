@@ -12,6 +12,7 @@ import { BookmarksModule } from './modules/bookmarks/bookmarks.module';
 import { SqlEvaluationModule } from './modules/sql-evaluation/sql-evaluation.module';
 import { DockerModule } from './modules/docker/docker.module';
 import { SettingsModule } from './modules/settings/settings.module';
+import { SchemaVisualizationModule } from './modules/schema-visualization/schema-visualization.module';
 
 @Module({
     imports: [
@@ -30,6 +31,7 @@ import { SettingsModule } from './modules/settings/settings.module';
         SqlEvaluationModule,
         DockerModule,
         SettingsModule,
+        SchemaVisualizationModule,
     ],
 })
 export class AppModule {}

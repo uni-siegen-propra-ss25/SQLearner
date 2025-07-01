@@ -108,6 +108,17 @@
         display: flex;
         align-items: center;
         gap: 8px;
+        flex: 1;
+
+        .er-diagram-button {
+          margin-left: auto;
+          opacity: 0.8;
+          transition: opacity 0.2s ease;
+
+          &:hover {
+            opacity: 1;
+          }
+        }
       }
 
       mat-icon {

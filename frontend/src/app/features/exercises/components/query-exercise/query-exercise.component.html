@@ -70,6 +70,15 @@
           <div class="schema-header">
             <mat-icon>schema</mat-icon>
             <span>Datenbankschema</span>
+            <button
+              mat-icon-button
+              color="primary"
+              (click)="showErDiagram()"
+              matTooltip="ER-Diagramm anzeigen"
+              class="er-diagram-button"
+            >
+              <mat-icon>account_tree</mat-icon>
+            </button>
           </div>
         </h3>
         <div class="schema-content mat-elevation-z1">

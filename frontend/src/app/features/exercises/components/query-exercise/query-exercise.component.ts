@@ -2,11 +2,14 @@ import { Component, Input, ViewChild, Output, EventEmitter, OnInit, OnDestroy } 
 import { Exercise } from '../../../roadmap/models/exercise.model';
 import { SubmissionService } from '../../services/submission.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
 import { SqlEditorComponent } from '../../../../shared/components/sql-editor/sql-editor.component';
 import { DockerService } from '../../services/docker.service';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { DatabaseService } from '../../../database/services/database.service';
+import { SchemaVisualizationService } from '../../../../core/services/schema-visualization.service';
+import { ErDiagramComponent } from '../../../../shared/components/er-diagram/er-diagram.component';
 
 @Component({
     selector: 'app-query-exercise',
@@ -41,7 +44,9 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
         private snackBar: MatSnackBar,
         private dockerService: DockerService,
         private route: ActivatedRoute,
-        private databaseService: DatabaseService
+        private databaseService: DatabaseService,
+        private dialog: MatDialog,
+        private schemaVisualizationService: SchemaVisualizationService
     ) {}
 
     ngOnInit(): void {
@@ -197,6 +202,68 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
                 // Fallback to static schema if available
                 this.actualDatabaseSchema = this.exercise?.database?.schemaSql || '';
             }
+        });
+    }
+
+    /**
+     * Shows the ER diagram in a dialog
+     */
+    showErDiagram(): void {
+        const schemaToUse = this.actualDatabaseSchema || this.exercise?.database?.schemaSql || '';
+        
+        if (!schemaToUse.trim()) {
+            this.snackBar.open('Kein Schema verfügbar für das ER-Diagramm', 'Schließen', {
+                duration: 3000
+            });
+            return;
+        }
+
+        // If we have a database ID, use that for visualization
+        if (this.exercise?.database?.id) {
+            this.schemaVisualizationService.visualizeDatabase(this.exercise.database.id).subscribe({
+                next: (erDiagram) => {
+                    this.openErDiagramDialog(erDiagram);
+                },
+                error: (error) => {
+                    console.error('Failed to visualize database:', error);
+                    this.fallbackToSchemaString(schemaToUse);
+                }
+            });
+        } else {
+            // Fallback to parsing the schema string
+            this.fallbackToSchemaString(schemaToUse);
+        }
+    }
+
+    private fallbackToSchemaString(schema: string): void {
+        this.schemaVisualizationService.parseSchemaString({
+            schema: schema,
+            name: this.exercise?.database?.name || 'Schema'
+        }).subscribe({
+            next: (erDiagram) => {
+                this.openErDiagramDialog(erDiagram);
+            },
+            error: (error) => {
+                console.error('Failed to parse schema:', error);
+                this.snackBar.open('Fehler beim Generieren des ER-Diagramms. Bitte SQL-Schema prüfen.', 'Schließen', {
+                    duration: 5000
+                });
+            }
+        });
+    }
+
+    private openErDiagramDialog(erDiagram: any): void {
+        this.dialog.open(ErDiagramComponent, {
+            data: {
+                dbmlCode: erDiagram.dbmlCode,
+                databaseName: this.exercise?.database?.name
+            },
+            width: '90vw',
+            height: '90vh',
+            maxWidth: '1200px',
+            maxHeight: '800px',
+            disableClose: false,
+            panelClass: 'er-diagram-dialog'
         });
     }
 }

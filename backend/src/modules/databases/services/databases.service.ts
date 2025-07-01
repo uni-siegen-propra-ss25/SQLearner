@@ -43,8 +43,10 @@ export class DatabasesService {
 
     /**
      * Gets the actual PostgreSQL schema from the real database
+     * Removes PostgreSQL-specific syntax like ::regclass, ::type casts to ensure
+     * compatibility with parsers and clean display in frontend
      * @param id Database ID
-     * @returns SQL schema as string
+     * @returns SQL schema as string without PostgreSQL casts
      */
     async getDatabaseSchema(id: number): Promise<{ schema: string }> {
         const database = await this.getDatabaseById(id);
@@ -196,6 +198,9 @@ export class DatabasesService {
                 
                 schemaSQL += '\n);\n\n';
             }
+            
+            // Clean up PostgreSQL-specific syntax before returning
+            schemaSQL = this.sanitizePostgreSQLSchema(schemaSQL);
             
             return { schema: schemaSQL.trim() };
             
@@ -668,5 +673,45 @@ export class DatabasesService {
         await dbPool.query(createTableSql);
         await dbPool.end();
         return { message: 'Table created successfully' };
+    }
+
+    /**
+     * Sanitizes PostgreSQL-specific syntax from SQL schema
+     * Removes ::regclass, ::type casts, and other PostgreSQL-specific elements
+     * to ensure compatibility with parsers and clean display
+     * @param schemaSQL Raw SQL schema with potential PostgreSQL casts
+     * @returns Cleaned SQL schema without PostgreSQL-specific syntax
+     */
+    private sanitizePostgreSQLSchema(schemaSQL: string): string {
+        let cleanSchema = schemaSQL;
+        
+        // 1. Remove ::regclass casts (common in foreign key references)
+        cleanSchema = cleanSchema.replace(/::regclass/g, '');
+        
+        // 2. Remove all other ::type casts (::text, ::integer, ::boolean, etc.)
+        cleanSchema = cleanSchema.replace(/::[a-zA-Z_][a-zA-Z0-9_]*/g, '');
+        
+        // 3. Clean up quoted values with type casts: 'value'::type → 'value'
+        cleanSchema = cleanSchema.replace(/'([^']+)'::[a-zA-Z_][a-zA-Z0-9_]*/g, "'$1'");
+        
+        // 4. Clean up unquoted values with type casts: value::type → value
+        cleanSchema = cleanSchema.replace(/\b([a-zA-Z0-9_]+)::[a-zA-Z_][a-zA-Z0-9_]*/g, '$1');
+        
+        // 5. Clean up numeric casts: 123::integer → 123
+        cleanSchema = cleanSchema.replace(/\b(\d+(?:\.\d+)?)::[a-zA-Z_][a-zA-Z0-9_]*/g, '$1');
+        
+        // 6. Remove PostgreSQL-specific function calls in defaults that might have casts
+        cleanSchema = cleanSchema.replace(/nextval\(([^)]+)\)::[a-zA-Z_][a-zA-Z0-9_]*/g, 'nextval($1)');
+        
+        // 7. Clean up any remaining double colons that might be left over
+        cleanSchema = cleanSchema.replace(/\s+::\s+/g, ' ');
+        
+        // 8. Normalize whitespace and remove empty lines
+        cleanSchema = cleanSchema
+            .replace(/\n\s*\n\s*\n/g, '\n\n') // Remove triple+ newlines
+            .replace(/\s+$/gm, '') // Remove trailing whitespace
+            .replace(/^\s+$/gm, ''); // Remove lines with only whitespace
+        
+        return cleanSchema;
     }
 }
