@@ -9,7 +9,7 @@ import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { DatabaseService } from '../../../database/services/database.service';
 import { SchemaVisualizationService } from '../../../../core/services/schema-visualization.service';
-import { ErDiagramComponent } from '../../../../shared/components/er-diagram/er-diagram.component';
+import { ErDiagramComponent } from '../../../schema-visualization/components/er-diagram/er-diagram.component';
 
 @Component({
     selector: 'app-query-exercise',

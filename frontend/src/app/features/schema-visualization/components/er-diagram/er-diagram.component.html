@@ -1,0 +1,34 @@
+<div class="er-dialog">
+  <div class="er-dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon>schema</mat-icon>
+      ER-Diagramm{{ data.databaseName ? ' - ' + data.databaseName : '' }}
+    </h2>
+    <button mat-icon-button mat-dialog-close matTooltip="Schließen">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  
+  <mat-dialog-content class="er-dialog-content">
+    <div class="er-container" *ngIf="diagramHtml; else errorState">
+      <div [innerHTML]="diagramHtml" class="diagram-content"></div>
+    </div>
+    
+    <ng-template #errorState>
+      <div class="error-state">
+        <mat-icon>error_outline</mat-icon>
+        <h3>Diagramm konnte nicht generiert werden</h3>
+        <p>Bitte überprüfen Sie das SQL-Schema.</p>
+        <mat-divider></mat-divider>
+        <details>
+          <summary>DBML Code anzeigen</summary>
+          <pre><code>{{ data.dbmlCode || 'Kein DBML Code verfügbar' }}</code></pre>
+        </details>
+      </div>
+    </ng-template>
+  </mat-dialog-content>
+  
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Schließen</button>
+  </mat-dialog-actions>
+</div>

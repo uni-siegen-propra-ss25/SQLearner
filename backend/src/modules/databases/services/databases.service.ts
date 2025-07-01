@@ -702,6 +702,10 @@ export class DatabasesService {
         
         // 6. Remove PostgreSQL-specific function calls in defaults that might have casts
         cleanSchema = cleanSchema.replace(/nextval\(([^)]+)\)::[a-zA-Z_][a-zA-Z0-9_]*/g, 'nextval($1)');
+
+        // 6a. Remove DEFAULT nextval('...') (with or without cast)
+        cleanSchema = cleanSchema.replace(/DEFAULT\s+nextval\([^)]*\)/gi, '');
+        cleanSchema = cleanSchema.replace(/DEFAULT\s+nextval\([^)]*\)::[a-zA-Z_][a-zA-Z0-9_]*/gi, '');
         
         // 7. Clean up any remaining double colons that might be left over
         cleanSchema = cleanSchema.replace(/\s+::\s+/g, ' ');
