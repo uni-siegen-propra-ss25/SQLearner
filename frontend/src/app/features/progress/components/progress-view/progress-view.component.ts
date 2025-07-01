@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ProgressService } from '../../services/progress.service';
 import { BookmarkService } from '../../services/bookmark.service';
 import { UserProgressSummary } from '../../models/progress.model';
+import { ProgressDto } from '../../models/progress-dto.model';
 import { BookmarkData } from '../../models/bookmark.model';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
@@ -30,6 +31,7 @@ export class ProgressViewComponent implements OnInit, OnDestroy {
     error: string | null = null;
 
     private bookmarkErrorSub: Subscription | undefined;
+    private progressSub: Subscription | undefined;
 
     constructor(
         private progressService: ProgressService,
@@ -40,10 +42,12 @@ export class ProgressViewComponent implements OnInit, OnDestroy {
     /**
      * Angular lifecycle hook that initializes the component.
      * Loads user progress data and bookmarks when the component is created.
+     * Also subscribes to progress changes for automatic updates.
      */
     ngOnInit(): void {
         this.loadUserProgress();
         this.loadBookmarks();
+        this.subscribeToProgressChanges();
         this.bookmarkErrorSub = this.translate.onLangChange.subscribe(() => {
             if (this.error) {
                 this.setBookmarkError();
@@ -52,14 +56,34 @@ export class ProgressViewComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * Fetches the user's progress summary from the backend API.
+     * Subscribes to progress changes to automatically refresh detailed progress
+     * when exercises are completed through other components.
+     * 
+     * @private
+     */
+    private subscribeToProgressChanges(): void {
+        this.progressSub = this.progressService.getUserProgress().subscribe({
+            next: () => {
+                // Reload detailed progress when basic progress changes
+                this.loadUserProgress();
+            },
+            error: (error) => {
+                console.error('Error monitoring progress changes:', error);
+            }
+        });
+    }
+
+    /**
+     * Fetches the user's detailed progress summary from the backend API.
      * Updates the component state with progress data or error information.
      * 
      * @private
      */
     private loadUserProgress(): void {
-        this.progressService.getUserProgress().subscribe({
+        this.progressService.getUserProgressDetailed().subscribe({
             next: (progress) => {
+                console.log('📊 PROGRESS VIEW - Detailed progress received:', progress);
+                console.log('📊 PROGRESS VIEW - Chapter progress:', progress.chapterProgress);
                 this.userProgress = progress;
                 this.loading = false;
             },
@@ -109,6 +133,9 @@ export class ProgressViewComponent implements OnInit, OnDestroy {
     ngOnDestroy(): void {
         if (this.bookmarkErrorSub) {
             this.bookmarkErrorSub.unsubscribe();
+        }
+        if (this.progressSub) {
+            this.progressSub.unsubscribe();
         }
     }
 

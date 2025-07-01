@@ -34,6 +34,8 @@ export class ProgressService {
      * @throws {NotFoundException} When user with specified ID does not exist
      */
     async getUserProgress(userId: number): Promise<UserProgressSummary> {
+        console.log('🔍 getUserProgress called for userId:', userId);
+        
         // Verify user exists
         const user = await this.prisma.user.findUnique({
             where: { id: userId },
@@ -42,6 +44,8 @@ export class ProgressService {
         if (!user) {
             throw new NotFoundException(`User with ID ${userId} not found`);
         }
+
+        console.log('🔍 User found:', user.firstName, user.lastName);
 
         // Get all exercises with user progress
         const exercises = await this.prisma.exercise.findMany({
@@ -57,12 +61,23 @@ export class ProgressService {
             },
         });
 
+        console.log('🔍 Found', exercises.length, 'exercises');
+        console.log('🔍 First exercise sample:', exercises[0] ? {
+            id: exercises[0].id,
+            title: exercises[0].title,
+            progressCount: exercises[0].Progress.length,
+            topic: exercises[0].topic.title,
+            chapter: exercises[0].topic.chapter.title
+        } : 'No exercises');
+
         // Calculate total statistics
         const totalExercises = exercises.length;
         const completedExercises = exercises.filter(ex => 
             ex.Progress.length > 0 && ex.Progress[0].isPassed
         ).length;
         const completionPercentage = totalExercises > 0 ? Math.round((completedExercises / totalExercises) * 100) : 0;
+
+        console.log('🔍 Statistics:', { totalExercises, completedExercises, completionPercentage });
 
         // Calculate chapter progress
         const chapterProgress = await this.calculateChapterProgress(exercises);
@@ -76,7 +91,7 @@ export class ProgressService {
             orderBy: { lastAttemptAt: 'desc' },
         });
 
-        return {
+        const result = {
             userId,
             totalExercises,
             completedExercises,
@@ -85,6 +100,11 @@ export class ProgressService {
             difficultyStats,
             lastActivityDate: lastActivity?.lastAttemptAt || null,
         };
+        
+        console.log('🔍 Final result chapter count:', result.chapterProgress.length);
+        console.log('🔍 First chapter exercises:', result.chapterProgress[0]?.exercises || 'No first chapter');
+
+        return result;
     }
 
     /**
@@ -135,22 +155,59 @@ export class ProgressService {
     }
 
     /**
+     * Retrieves only the completed exercise IDs for a specific user.
+     * Lightweight method for frontend roadmap completion tracking.
+     * 
+     * @param {number} userId - The unique identifier of the user
+     * @returns {Promise<number[]>} Array of exercise IDs that the user has successfully completed
+     * @throws {NotFoundException} When user with specified ID does not exist
+     */
+    async getCompletedExerciseIds(userId: number): Promise<number[]> {
+        // Verify user exists
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+        });
+
+        if (!user) {
+            throw new NotFoundException(`User with ID ${userId} not found`);
+        }
+
+        // Get all completed exercises for the user
+        const completedProgress = await this.prisma.progress.findMany({
+            where: { 
+                userId,
+                isPassed: true,
+            },
+            select: {
+                exerciseId: true,
+            },
+        });
+
+        return completedProgress.map(progress => progress.exerciseId);
+    }
+
+    /**
      * Calculates progress statistics for each chapter based on exercise completion.
      * Groups exercises by chapter and computes completion rates.
      * 
      * @private
      * @param {any[]} exercises - Array of exercises with progress and topic/chapter relationships
-     * @returns {Promise<ChapterProgress[]>} Array of chapter progress objects with completion statistics
+     * @returns {Promise<ChapterProgress[]>} Array of chapter progress objects with completion statistics and detailed exercise data
      */
     private async calculateChapterProgress(exercises: any[]): Promise<ChapterProgress[]> {
+        console.log('🔍 calculateChapterProgress called with:', exercises.length, 'exercises');
+        
         const chapterMap = new Map<number, {
             chapter: any;
             total: number;
             completed: number;
+            exercises: Array<{ exerciseId: number; isPassed: boolean }>;
         }>();
 
         // Group exercises by chapter
         exercises.forEach(exercise => {
+            console.log('🔍 Processing exercise:', exercise.id, 'with Progress:', exercise.Progress);
+            
             const chapter = exercise.topic.chapter;
             const chapterId = chapter.id;
             
@@ -159,26 +216,39 @@ export class ProgressService {
                     chapter,
                     total: 0,
                     completed: 0,
+                    exercises: [],
                 });
             }
 
             const chapterData = chapterMap.get(chapterId)!;
             chapterData.total++;
             
-            if (exercise.Progress.length > 0 && exercise.Progress[0].isPassed) {
+            const isPassed = exercise.Progress.length > 0 && exercise.Progress[0].isPassed;
+            console.log('🔍 Exercise', exercise.id, 'isPassed:', isPassed);
+            
+            // Add exercise details
+            chapterData.exercises.push({
+                exerciseId: exercise.id,
+                isPassed,
+            });
+            
+            if (isPassed) {
                 chapterData.completed++;
             }
         });
 
-        // Convert to ChapterProgress array
-        return Array.from(chapterMap.values()).map(({ chapter, total, completed }) => ({
+        const result = Array.from(chapterMap.values()).map(({ chapter, total, completed, exercises }) => ({
             chapterId: chapter.id,
             chapterTitle: chapter.title,
             totalExercises: total,
             completedExercises: completed,
             completionPercentage: total > 0 ? Math.round((completed / total) * 100) : 0,
             isCompleted: completed === total && total > 0,
+            exercises, // Include detailed exercise data
         }));
+        
+        console.log('🔍 Chapter progress result:', JSON.stringify(result, null, 2));
+        return result;
     }
 
     /**

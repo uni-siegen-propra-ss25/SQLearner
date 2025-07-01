@@ -56,18 +56,10 @@ export class ChoiceExerciseComponent {
                     this.isSubmitting = false;
                     this.isAnswered = true;
                     this.isCorrectAnswer = submission.isCorrect;
-                      if (submission.isCorrect) {
+                    if (submission.isCorrect) {
                         this.completed.emit(this.exercise.id);
-                        // Markiere die Aufgabe lokal als erledigt
-                        const completed = localStorage.getItem('completedExercises');
-                        let arr: number[] = [];
-                        try {
-                            arr = completed ? JSON.parse(completed) : [];
-                        } catch { arr = []; }
-                        if (!arr.includes(this.exercise.id)) {
-                            arr.push(this.exercise.id);
-                            localStorage.setItem('completedExercises', JSON.stringify(arr));
-                        }
+                        // Record completion through the progress service
+                        this.progressService.recordCompletion(this.exercise.id);
                     }
                     
                     const message = submission.feedback || 'Answer submitted successfully';

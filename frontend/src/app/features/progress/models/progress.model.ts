@@ -23,6 +23,11 @@ export interface ProgressData {
     lastAttemptAt: Date;
 }
 
+export interface ExerciseProgress {
+    exerciseId: number;
+    isPassed: boolean;
+}
+
 export interface ChapterProgress {
     chapterId: number;
     chapterTitle: string;
@@ -30,7 +35,7 @@ export interface ChapterProgress {
     completedExercises: number;
     completionPercentage: number;
     isCompleted?: boolean;
-    exercises?: ProgressData[];
+    exercises?: ExerciseProgress[];
 }
 
 export interface UserProgressSummary {

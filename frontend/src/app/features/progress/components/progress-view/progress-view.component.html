@@ -45,6 +45,18 @@
                         <p>Noch keine Kapitel verfügbar.</p>
                     </div>
                 </div>
+
+                <!-- Debug: Progress Data -->
+                <div style="background: #f0f0f0; padding: 10px; margin: 10px 0; font-size: 12px;">
+                  <strong>DEBUG - Progress Overview:</strong><br>
+                  Is userProgress available: {{ !!userProgress }}<br>
+                  <div *ngIf="userProgress">
+                    Total: {{ userProgress.totalExercises }}<br>
+                    Completed: {{ userProgress.completedExercises }}<br>
+                    Percentage: {{ userProgress.completionPercentage }}%<br>
+                    Chapter count: {{ userProgress.chapterProgress.length }}
+                  </div>
+                </div>
             </mat-card-content>
         </mat-card>
         

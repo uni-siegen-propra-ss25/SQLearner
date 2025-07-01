@@ -15,6 +15,12 @@ export interface ChapterProgress {
     completedExercises: number;
     completionPercentage: number;
     isCompleted: boolean;
+    exercises?: ExerciseProgress[]; // Added for detailed exercise tracking
+}
+
+export interface ExerciseProgress {
+    exerciseId: number;
+    isPassed: boolean;
 }
 
 export interface DifficultyStats {

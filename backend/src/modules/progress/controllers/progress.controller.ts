@@ -42,6 +42,19 @@ export class ProgressController {
     }
 
     /**
+     * Retrieves only the completed exercise IDs for the authenticated user.
+     * Lightweight endpoint for frontend roadmap completion tracking.
+     * 
+     * @param {number} userId - The authenticated user's ID extracted from JWT token
+     * @returns {Promise<number[]>} Array of completed exercise IDs
+     */
+    @Get('user/completed-exercises')
+    @Roles('STUDENT', 'TUTOR', 'ADMIN')
+    async getCompletedExerciseIds(@GetUser('id') userId: number): Promise<number[]> {
+        return this.progressService.getCompletedExerciseIds(userId);
+    }
+
+    /**
      * Retrieves progress summary for any user by their ID.
      * Allows tutors and admins to view student progress for monitoring.
      * 
