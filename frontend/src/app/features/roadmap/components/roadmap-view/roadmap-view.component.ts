@@ -105,6 +105,9 @@ export class RoadmapViewComponent implements OnInit, OnDestroy {
      * Handles different loading strategies based on user authentication state.
      */
     ngOnInit(): void {
+        // Immer beim Betreten der Roadmap den Progress neu laden
+        this.progressService.reloadUserProgress();
+
         this.subscriptions.push(
             this.authService.user$.subscribe((user) => {
                 this.isTutor = user?.role === Role.TUTOR || user?.role === Role.ADMIN;
