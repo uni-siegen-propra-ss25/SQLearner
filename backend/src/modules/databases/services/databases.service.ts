@@ -10,10 +10,18 @@ import { CreateDatabaseDto } from '../models/create-database.dto';
 import { UpdateDatabaseDto } from '../models/update-database.dto';
 import { QueryResult } from '../../sql-evaluation/models/query-result.dto';
 
+/**
+ * Service for managing database operations, schema extraction, and SQL execution.
+ * Handles creation, update, deletion, and querying of user databases.
+ */
 @Injectable()
 export class DatabasesService {
     private pool: Pool;
 
+    /**
+     * Initializes the DatabasesService with a PostgreSQL connection pool.
+     * @param {PrismaService} prisma - The Prisma service for database access.
+     */
     constructor(private prisma: PrismaService) {
         // Initialise connection pool with PostgreSQL
         this.pool = new Pool({
@@ -25,10 +33,20 @@ export class DatabasesService {
         });
     }
 
+    /**
+     * Retrieves all databases from the system.
+     * @returns {Promise<Database[]>} - Array of all database records.
+     */
     async getAllDatabases() {
         return this.prisma.database.findMany();
     }
 
+    /**
+     * Retrieves a database by its ID.
+     * @param {number} id - The ID of the database.
+     * @returns {Promise<Database>} - The database record.
+     * @throws {NotFoundException} - If the database does not exist.
+     */
     async getDatabaseById(id: number) {
         const database = await this.prisma.database.findUnique({
             where: { id },
@@ -45,8 +63,9 @@ export class DatabasesService {
      * Gets the actual PostgreSQL schema from the real database
      * Removes PostgreSQL-specific syntax like ::regclass, ::type casts to ensure
      * compatibility with parsers and clean display in frontend
-     * @param id Database ID
-     * @returns SQL schema as string without PostgreSQL casts
+     * @param {number} id - Database ID
+     * @returns {Promise<{ schema: string }>} - SQL schema as string without PostgreSQL casts
+     * @throws {NotFoundException|InternalServerErrorException} - If the database is not found or retrieval fails
      */
     async getDatabaseSchema(id: number): Promise<{ schema: string }> {
         const database = await this.getDatabaseById(id);
@@ -213,6 +232,13 @@ export class DatabasesService {
         }
     }
 
+    /**
+     * Uploads a SQL file and creates a new database from it.
+     * @param {Express.Multer.File} file - The uploaded SQL file.
+     * @param {User} user - The user performing the upload.
+     * @returns {Promise<Database>} - The created database record.
+     * @throws {ForbiddenException} - If the user is not a tutor.
+     */
     async uploadDatabase(file: Express.Multer.File, user: User) {
         if (user.role !== Role.TUTOR) {
             throw new ForbiddenException('Only tutors can upload SQL files');
@@ -284,6 +310,13 @@ export class DatabasesService {
         return database;
     }
 
+    /**
+     * Creates a new database with the given parameters.
+     * @param {CreateDatabaseDto} dto - DTO containing database creation data.
+     * @param {User} user - The user creating the database.
+     * @returns {Promise<Database>} - The created database record.
+     * @throws {ForbiddenException|SqlErrorException} - If the user is not a tutor or creation fails.
+     */
     async createDatabase(dto: CreateDatabaseDto, user: User) {
         
         if (user.role !== Role.TUTOR) {
@@ -359,6 +392,14 @@ export class DatabasesService {
         return database;
     }
 
+    /**
+     * Updates a database's name and description.
+     * @param {number} id - The ID of the database to update.
+     * @param {UpdateDatabaseDto} dto - DTO with update data.
+     * @param {User} user - The user performing the update.
+     * @returns {Promise<Database>} - The updated database record.
+     * @throws {ForbiddenException} - If the user is not a tutor.
+     */
     async updateDatabase(
         id: number,
         dto: UpdateDatabaseDto,
@@ -381,6 +422,13 @@ export class DatabasesService {
         });
     }
 
+    /**
+     * Deletes a database and drops the corresponding PostgreSQL database.
+     * @param {number} id - The ID of the database to delete.
+     * @param {User} user - The user performing the deletion.
+     * @returns {Promise<Database>} - The deleted database record.
+     * @throws {ForbiddenException} - If the user is not a tutor.
+     */
     async deleteDatabase(id: number, user: User) {
         const database = await this.getDatabaseById(id);
 
@@ -425,8 +473,8 @@ export class DatabasesService {
 
     /**
      * Extracts table names from the SQL schema
-     * @param schemaSql SQL database schema
-     * @returns array of table names
+     * @param {string} schemaSql - SQL database schema
+     * @returns {string[]} - Array of table names
      */
     private extractTableNames(schemaSql: string): string[] {
         const tableNames: string[] = [];
@@ -445,8 +493,8 @@ export class DatabasesService {
 
     /**
      * Checks if a table is a system table
-     * @param tableName table name
-     * @returns true if the table is a system table
+     * @param {string} tableName - Table name
+     * @returns {boolean} - True if the table is a system table
      */
     private isSystemTable(tableName: string): boolean {
         const systemTables = [
@@ -550,8 +598,8 @@ export class DatabasesService {
 
     /**
      * Extracts table names that would be affected by a SQL query
-     * @param query SQL query
-     * @returns array of affected table names
+     * @param {string} query - SQL query
+     * @returns {string[]} - Array of affected table names
      */
     private extractAffectedTables(query: string): string[] {
         const tables = new Set<string>();
@@ -578,8 +626,8 @@ export class DatabasesService {
 
     /**
      * Checks if a query is a write operation (INSERT, UPDATE, DELETE, etc.)
-     * @param query SQL query
-     * @returns true if the query modifies data
+     * @param {string} query - SQL query
+     * @returns {boolean} - True if the query modifies data
      */
     private isWriteOperation(query: string): boolean {
         const writeCommands = ['INSERT', 'UPDATE', 'DELETE', 'DROP', 'ALTER', 'CREATE', 'TRUNCATE'];
@@ -587,6 +635,12 @@ export class DatabasesService {
         return writeCommands.some(cmd => normalizedQuery.startsWith(cmd));
     }
 
+    /**
+     * Runs a SQL query in a Docker container using provided connection details.
+     * @param {any} connectionDetails - Connection details for the database.
+     * @param {string} query - The query to execute.
+     * @returns {Promise<QueryResult>} - The query result including execution time and errors.
+     */
     async runQueryInContainer(connectionDetails: any, query: string): Promise<QueryResult> {
         console.log('=== DEBUG: DatabasesService.runQueryInContainer ===');
         console.log('Connection Details received:', connectionDetails);
@@ -642,6 +696,15 @@ export class DatabasesService {
         }
     }
 
+    /**
+     * Creates a new table in the specified database.
+     * @param {number} databaseId - The ID of the database.
+     * @param {any} dto - DTO containing table creation data.
+     * @param {number} userId - The ID of the user creating the table.
+     * @param {Role | string} userRole - The role of the user.
+     * @returns {Promise<{ message: string }>} - Success message.
+     * @throws {ForbiddenException|NotFoundException} - If the user is not a tutor or database not found.
+     */
     async createTable(databaseId: number, dto: any, userId: number, userRole: Role | string) {
         if (String(userRole).toUpperCase() !== 'TUTOR') {
             throw new ForbiddenException('Only tutors can create tables');
@@ -679,8 +742,8 @@ export class DatabasesService {
      * Sanitizes PostgreSQL-specific syntax from SQL schema
      * Removes ::regclass, ::type casts, and other PostgreSQL-specific elements
      * to ensure compatibility with parsers and clean display
-     * @param schemaSQL Raw SQL schema with potential PostgreSQL casts
-     * @returns Cleaned SQL schema without PostgreSQL-specific syntax
+     * @param {string} schemaSQL - Raw SQL schema with potential PostgreSQL casts
+     * @returns {string} - Cleaned SQL schema without PostgreSQL-specific syntax
      */
     private sanitizePostgreSQLSchema(schemaSQL: string): string {
         let cleanSchema = schemaSQL;

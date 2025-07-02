@@ -1,10 +1,17 @@
+<!--
+  Main container for the SQL query exercise component.
+  Contains header, description, SQL editor, actions, view container (schema/results), and feedback section.
+-->
 <div class="query-exercise">
   <mat-card-content>
+    <!-- Exercise header: title, completion icon, and database info -->
     <div class="exercise-header">
       <h2 class="exercise-title">
         {{ exercise.title }}
+        <!-- Icon shown if the answer is correct -->
         <mat-icon *ngIf="isCorrectAnswer" class="completed-icon">check_circle</mat-icon>
       </h2>
+      <!-- Database information (icon and name) -->
       <div class="database-info" *ngIf="exercise.database">
         <mat-icon>storage</mat-icon>
         <span>
@@ -12,9 +19,10 @@
         </span>
       </div>
     </div>
+    <!-- Exercise description -->
     <p class="exercise-description">{{ exercise.description }}</p>
 
-    <!-- SQL Editor -->
+    <!-- SQL Editor section -->
     <div class="editor-section">
       <app-sql-editor
         class="sql-editor"
@@ -26,8 +34,9 @@
       ></app-sql-editor>
     </div>
 
-    <!-- Actions -->
+    <!-- Actions: view toggles and query/submit buttons -->
     <div class="actions">
+      <!-- Toggle between schema and result view -->
       <div class="toggle-view">
         <mat-button-toggle-group [(ngModel)]="currentView">
           <mat-button-toggle value="schema" matTooltip="Datenbankschema anzeigen">
@@ -39,6 +48,7 @@
         </mat-button-toggle-group>
       </div>
 
+      <!-- Query and submit buttons -->
       <div class="query-actions">
         <button
           mat-stroked-button
@@ -62,14 +72,15 @@
       </div>
     </div>
 
-    <!-- View Container -->
+    <!-- View container: shows either schema or query results -->
     <div class="view-container">
-      <!-- Schema View -->
+      <!-- Schema View: shows the SQL schema and ER diagram button -->
       <div class="schema-view" *ngIf="currentView === 'schema'">
         <h3>
           <div class="schema-header">
             <mat-icon>schema</mat-icon>
             <span>Datenbankschema</span>
+            <!-- Button to open the ER diagram dialog -->
             <button
               mat-icon-button
               color="primary"
@@ -81,12 +92,13 @@
             </button>
           </div>
         </h3>
+        <!-- SQL schema content display -->
         <div class="schema-content mat-elevation-z1">
           <pre>{{ actualDatabaseSchema || exercise.database?.schemaSql || 'Kein Schema verfügbar' }}</pre>
         </div>
       </div>
 
-      <!-- Results View -->
+      <!-- Results View: shows the query result table or loading/empty state -->
       <div class="results-view" *ngIf="currentView === 'result'">
         <div class="results-section" *ngIf="queryResult || isLoading">
           <h3>
@@ -94,8 +106,10 @@
             {{ isLoading ? 'Query wird ausgeführt...' : 'Ergebnis deiner Query' }}
           </h3>
 
+          <!-- Progress bar shown while loading -->
           <mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
 
+          <!-- Query results table -->
           <div class="results-table" *ngIf="!isLoading && queryResult">
             <div class="table-stats">
               {{ queryResult.rows.length }} Zeile{{
@@ -105,6 +119,7 @@
             </div>
             <div class="table-container mat-elevation-z1">
               <table mat-table [dataSource]="paginatedRows">
+                <!-- Table columns dynamically generated -->
                 <ng-container
                   [matColumnDef]="col"
                   *ngFor="let col of queryResult.columns; let i = index"
@@ -117,6 +132,7 @@
                 <tr mat-row *matRowDef="let row; columns: queryResult.columns"></tr>
               </table>
 
+              <!-- Paginator for result table -->
               <mat-paginator
                 [length]="queryResult.rows.length"
                 [pageSize]="pageSize"
@@ -130,6 +146,7 @@
           </div>
         </div>
 
+        <!-- Empty state if no query has been run -->
         <div class="empty-state" *ngIf="!queryResult && !isLoading">
           <mat-icon>table_chart</mat-icon>
           <p>Führe eine Query aus, um das Ergebnis zu sehen.</p>
@@ -137,7 +154,7 @@
       </div>
     </div>
 
-    <!-- Feedback Section -->
+    <!-- Feedback Section: shows AI feedback after submission -->
     <mat-expansion-panel *ngIf="showFeedback" class="feedback-section">
       <mat-expansion-panel-header>
         <mat-panel-title>

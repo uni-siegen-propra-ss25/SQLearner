@@ -1,4 +1,11 @@
+<!--
+  ER Diagram Dialog
+  - Header: Shows the title and close button
+  - Content: Shows the ER diagram visualization or an error state
+  - Actions: Dialog close button
+-->
 <div class="er-dialog">
+  <!-- Dialog header with title and close button -->
   <div class="er-dialog-header">
     <h2 mat-dialog-title>
       <mat-icon>schema</mat-icon>
@@ -9,11 +16,14 @@
     </button>
   </div>
   
+  <!-- Main content area: diagram or error state -->
   <mat-dialog-content class="er-dialog-content">
     <div class="er-container" *ngIf="diagramHtml; else errorState">
+      <!-- Render the generated ER diagram HTML -->
       <div [innerHTML]="diagramHtml" class="diagram-content"></div>
     </div>
     
+    <!-- Error state if diagram generation fails -->
     <ng-template #errorState>
       <div class="error-state">
         <mat-icon>error_outline</mat-icon>
@@ -28,6 +38,7 @@
     </ng-template>
   </mat-dialog-content>
   
+  <!-- Dialog actions (footer) -->
   <mat-dialog-actions align="end">
     <button mat-button mat-dialog-close>Schließen</button>
   </mat-dialog-actions>

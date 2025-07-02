@@ -2,6 +2,14 @@ import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
+/**
+ * Data structure representing a column in a table for DBML parsing and visualization.
+ * @property {string} name - The name of the column.
+ * @property {string} type - The SQL data type of the column.
+ * @property {boolean} isPrimaryKey - Whether the column is a primary key.
+ * @property {boolean} isForeignKey - Whether the column is a foreign key.
+ * @property {boolean} isUnique - Whether the column has a unique constraint.
+ */
 interface TableColumn {
   name: string;
   type: string;
@@ -10,11 +18,23 @@ interface TableColumn {
   isUnique: boolean;
 }
 
+/**
+ * Data structure representing a table parsed from DBML.
+ * @property {string} name - The name of the table.
+ * @property {TableColumn[]} columns - Array of columns in the table.
+ */
 interface DbmlTable {
   name: string;
   columns: TableColumn[];
 }
 
+/**
+ * Data structure representing a relationship parsed from DBML.
+ * @property {string} fromTable - Name of the source table.
+ * @property {string} fromColumn - Name of the source column.
+ * @property {string} toTable - Name of the target table.
+ * @property {string} toColumn - Name of the target column.
+ */
 interface DbmlRelationship {
   fromTable: string;
   fromColumn: string;
@@ -22,11 +42,20 @@ interface DbmlRelationship {
   toColumn: string;
 }
 
+/**
+ * Data passed to the ER diagram dialog component.
+ * @property {string} dbmlCode - The DBML code to visualize.
+ * @property {string} [databaseName] - Optional name of the database.
+ */
 interface ERDiagramDialogData {
   dbmlCode: string;
   databaseName?: string;
 }
 
+/**
+ * Component for visualizing an ER diagram from DBML code.
+ * Parses DBML and generates a simple HTML-based visualization of tables and relationships.
+ */
 @Component({
   selector: 'app-er-diagram',
   templateUrl: './er-diagram.component.html',
@@ -41,14 +70,24 @@ export class ErDiagramComponent implements OnInit, OnDestroy {
     private sanitizer: DomSanitizer
   ) {}
 
+  /**
+   * Lifecycle hook for component initialization. Generates the diagram on load.
+   */
   ngOnInit(): void {
     this.generateDiagram();
   }
 
+  /**
+   * Lifecycle hook for component destruction. Used for cleanup if needed.
+   */
   ngOnDestroy(): void {
     // Cleanup if needed
   }
 
+  /**
+   * Generates the ER diagram HTML from the provided DBML code.
+   * Sets the sanitized HTML for rendering in the dialog.
+   */
   private async generateDiagram(): Promise<void> {
     try {
       if (!this.data.dbmlCode || this.data.dbmlCode.trim() === '') {
@@ -71,6 +110,11 @@ export class ErDiagramComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Creates a simple HTML visualization of the ER diagram from DBML code.
+   * @param {string} dbmlCode - The DBML code to parse and visualize.
+   * @returns {string} - The generated HTML string for the diagram.
+   */
   private createSimpleVisualization(dbmlCode: string): string {
     // Simple DBML parser to create a table-based visualization
     const tables = this.parseDbmlTables(dbmlCode);
@@ -122,6 +166,11 @@ export class ErDiagramComponent implements OnInit, OnDestroy {
     return html;
   }
 
+  /**
+   * Parses DBML code and extracts table definitions.
+   * @param {string} dbmlCode - The DBML code to parse.
+   * @returns {DbmlTable[]} - Array of parsed tables.
+   */
   private parseDbmlTables(dbmlCode: string): DbmlTable[] {
     const tables: DbmlTable[] = [];
     const tableRegex = /Table\s+(\w+)\s*\{([^}]+)\}/g;
@@ -138,6 +187,11 @@ export class ErDiagramComponent implements OnInit, OnDestroy {
     return tables;
   }
 
+  /**
+   * Parses the content of a DBML table and extracts columns.
+   * @param {string} tableContent - The content of the table block in DBML.
+   * @returns {TableColumn[]} - Array of parsed columns.
+   */
   private parseTableColumns(tableContent: string): TableColumn[] {
     const columns: TableColumn[] = [];
     const lines = tableContent.split('\n').map(line => line.trim()).filter(line => line);
@@ -161,6 +215,11 @@ export class ErDiagramComponent implements OnInit, OnDestroy {
     return columns;
   }
 
+  /**
+   * Parses DBML code and extracts relationships between tables.
+   * @param {string} dbmlCode - The DBML code to parse.
+   * @returns {DbmlRelationship[]} - Array of parsed relationships.
+   */
   private parseDbmlRelationships(dbmlCode: string): DbmlRelationship[] {
     const relationships: DbmlRelationship[] = [];
     const refRegex = /(\w+)\.(\w+)\s*>\s*(\w+)\.(\w+)/g;

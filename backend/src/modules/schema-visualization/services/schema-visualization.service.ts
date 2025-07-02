@@ -18,6 +18,12 @@ export class SchemaVisualizationService {
     
     constructor(private readonly databasesService: DatabasesService) {}
 
+    /**
+     * Parses a schema string and returns an ER diagram DTO for visualization.
+     * @param {ParseSchemaDto} parseSchemaDto - DTO containing the schema string and optional name.
+     * @returns {Promise<ERDiagramDto>} - The ER diagram data transfer object.
+     * @throws {BadRequestException|InternalServerErrorException} - If parsing or mapping fails.
+     */
     async parseSchemaString(parseSchemaDto: ParseSchemaDto): Promise<ERDiagramDto> {
         let typedSchema: TypedJsonSchema;
         
@@ -83,6 +89,12 @@ export class SchemaVisualizationService {
         }
     }
 
+    /**
+     * Visualizes a database schema by its database ID.
+     * @param {number} databaseId - The ID of the database to visualize.
+     * @returns {Promise<ERDiagramDto>} - The ER diagram data transfer object.
+     * @throws {Error} - If the database schema cannot be visualized.
+     */
     async visualizeDatabase(databaseId: number): Promise<ERDiagramDto> {
         try {
             const { schema } = await this.databasesService.getDatabaseSchema(databaseId);
@@ -99,8 +111,9 @@ export class SchemaVisualizationService {
     }
 
     /**
-     * Fallback parser using regex-based approach
-     * Returns TypedJsonSchema for consistency with AST parser
+     * Fallback parser using a regex-based approach to parse SQL schema.
+     * @param {string} schemaSql - The SQL schema string to parse.
+     * @returns {Promise<TypedJsonSchema>} - The parsed schema as a typed JSON object.
      */
     private async parseSchemaWithCustomParser(schemaSql: string): Promise<TypedJsonSchema> {
         // Enhanced parsing logic based on original regex approach but improved
@@ -194,7 +207,10 @@ export class SchemaVisualizationService {
     }
 
     /**
-     * Convert TypedJsonSchema to DBML format
+     * Converts a typed JSON schema to DBML (Database Markup Language) format.
+     * @param {TypedJsonSchema} typedSchema - The typed JSON schema to convert.
+     * @param {string} databaseName - The name of the database for the DBML project.
+     * @returns {string} - The DBML code as a string.
      */
     private convertTypedSchemaToDbml(typedSchema: TypedJsonSchema, databaseName: string): string {
         try {
@@ -246,7 +262,9 @@ export class SchemaVisualizationService {
     }
 
     /**
-     * Convert TypedJsonSchema to internal DTO format
+     * Maps a typed JSON schema to the internal DTO format for ER diagram visualization.
+     * @param {TypedJsonSchema} typedSchema - The typed JSON schema to map.
+     * @returns {{ tables: TableNodeDto[], relationships: RelationshipDto[] }} - The mapped tables and relationships.
      */
     private mapTypedSchemaToDto(typedSchema: TypedJsonSchema): { tables: TableNodeDto[], relationships: RelationshipDto[] } {
         const tables: TableNodeDto[] = [];
@@ -291,6 +309,11 @@ export class SchemaVisualizationService {
         return { tables, relationships };
     }
 
+    /**
+     * Calculates the positions of tables and relationships for ER diagram layout.
+     * @param {{ tables: TableNodeDto[], relationships: RelationshipDto[] }} data - The tables and relationships to position.
+     * @returns {{ tables: TableNodeDto[], relationships: RelationshipDto[] }} - The positioned tables and relationships.
+     */
     private calculatePositions(data: { tables: TableNodeDto[], relationships: RelationshipDto[] }): { tables: TableNodeDto[], relationships: RelationshipDto[] } {
         const tables = [...data.tables];
         const relationships = [...data.relationships];
@@ -314,11 +337,21 @@ export class SchemaVisualizationService {
         return { tables, relationships };
     }
 
+    /**
+     * Extracts the default value from a column constraints string.
+     * @param {string} constraints - The constraints string from the column definition.
+     * @returns {string|null} - The extracted default value or null if not present.
+     */
     private extractDefault(constraints: string): string | null {
         const defaultMatch = constraints.match(/DEFAULT\s+([^,\s]+)/i);
         return defaultMatch ? defaultMatch[1].replace(/['"]/g, '') : null;
     }
 
+    /**
+     * Maps a SQL data type string to a DBML-compatible type string.
+     * @param {string} sqlType - The SQL data type string.
+     * @returns {string} - The DBML-compatible type string.
+     */
     private mapSqlTypeToDbml(sqlType: string): string {
         const typeMap: { [key: string]: string } = {
             'INTEGER': 'int',
@@ -338,6 +371,11 @@ export class SchemaVisualizationService {
         return typeMap[upperType] || sqlType.toLowerCase();
     }
 
+    /**
+     * Normalizes a column type string to a standard format.
+     * @param {string} type - The column type string.
+     * @returns {string} - The normalized column type.
+     */
     private normalizeColumnType(type: string): string {
         const typeMap: { [key: string]: string } = {
             'INTEGER': 'INT',
@@ -357,6 +395,11 @@ export class SchemaVisualizationService {
         return typeMap[upperType] || type;
     }
 
+    /**
+     * Builds a string of constraints for a column from its data object.
+     * @param {any} columnData - The column data object.
+     * @returns {string} - The constraints as a single string.
+     */
     private buildConstraintsString(columnData: any): string {
         const constraints: string[] = [];
         
@@ -369,6 +412,11 @@ export class SchemaVisualizationService {
         return constraints.join(' ');
     }
 
+    /**
+     * Builds an array of constraint strings for a column from its data object.
+     * @param {any} columnData - The column data object.
+     * @returns {string[]} - The constraints as an array of strings.
+     */
     private buildConstraintsArray(columnData: any): string[] {
         const constraints: string[] = [];
         

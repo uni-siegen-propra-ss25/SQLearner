@@ -14,9 +14,11 @@ import {
  * Converts PostgreSQL DDL to typed JSON schema
  */
 export class PostgreSQLASTParser {
-  
   /**
-   * Parse PostgreSQL DDL string to typed JSON schema
+   * Parses a PostgreSQL DDL string and returns a typed JSON schema representation.
+   * @param {string} ddl - The PostgreSQL DDL string to parse.
+   * @returns {TypedJsonSchema} - The parsed schema as a typed JSON object.
+   * @throws {SchemaParsingError} - If parsing fails due to syntax or unsupported features.
    */
   parseSchema(ddl: string): TypedJsonSchema {
     try {
@@ -64,7 +66,10 @@ export class PostgreSQLASTParser {
   }
   
   /**
-   * Map CREATE TABLE AST node to TableSchema
+   * Maps a CREATE TABLE AST node to a TableSchema object.
+   * @param {any} statement - The AST node representing the CREATE TABLE statement.
+   * @returns {TableSchema} - The mapped table schema.
+   * @throws {ASTMappingError} - If mapping fails due to missing or invalid data.
    */
   private mapCreateTableStatement(statement: any): TableSchema {
     try {
@@ -97,7 +102,11 @@ export class PostgreSQLASTParser {
   }
   
   /**
-   * Map column definition to ColumnSchema
+   * Maps a column definition AST node to a ColumnSchema object.
+   * @param {any} column - The AST node representing the column definition.
+   * @param {string} tableName - The name of the table the column belongs to.
+   * @returns {ColumnSchema} - The mapped column schema.
+   * @throws {ASTMappingError} - If mapping fails due to missing or invalid data.
    */
   private mapColumnDefinition(column: any, tableName: string): ColumnSchema {
     try {
@@ -158,7 +167,9 @@ export class PostgreSQLASTParser {
   }
   
   /**
-   * Map PostgreSQL data types to normalized string
+   * Maps a PostgreSQL data type AST node to a normalized string representation.
+   * @param {any} dataType - The AST node representing the data type.
+   * @returns {string} - The normalized data type as a string.
    */
   private mapDataType(dataType: any): string {
     if (!dataType) return 'UNKNOWN';
@@ -227,7 +238,9 @@ export class PostgreSQLASTParser {
   }
   
   /**
-   * Handle table-level constraints
+   * Applies table-level constraints (e.g., PRIMARY KEY, UNIQUE) to the column schemas.
+   * @param {any} statement - The AST node representing the CREATE TABLE statement.
+   * @param {ColumnSchema[]} columns - The array of column schemas to update.
    */
   private handleTableConstraints(statement: any, columns: ColumnSchema[]): void {
     for (const constraint of statement.constraints || []) {
@@ -264,7 +277,9 @@ export class PostgreSQLASTParser {
   }
   
   /**
-   * Extract foreign keys from CREATE TABLE statement
+   * Extracts all foreign key constraints from a CREATE TABLE AST node.
+   * @param {any} statement - The AST node representing the CREATE TABLE statement.
+   * @returns {ForeignKeySchema[]} - Array of extracted foreign key schemas.
    */
   private extractForeignKeysFromTable(statement: any): ForeignKeySchema[] {
     const foreignKeys: ForeignKeySchema[] = [];
@@ -293,7 +308,11 @@ export class PostgreSQLASTParser {
   }
   
   /**
-   * Map foreign key constraint to ForeignKeySchema
+   * Maps a foreign key constraint AST node to a ForeignKeySchema object.
+   * @param {any} constraint - The AST node representing the foreign key constraint.
+   * @param {string} sourceTable - The name of the source table.
+   * @param {string} sourceColumn - The name of the source column.
+   * @returns {ForeignKeySchema|null} - The mapped foreign key schema or null if mapping fails.
    */
   private mapForeignKeyConstraint(constraint: any, sourceTable: string, sourceColumn: string): ForeignKeySchema | null {
     try {
@@ -321,7 +340,9 @@ export class PostgreSQLASTParser {
   }
   
   /**
-   * Extract default value from constraint
+   * Extracts the default value from a column constraint AST node.
+   * @param {any} constraint - The AST node representing the default constraint.
+   * @returns {string|null} - The extracted default value or null if not present.
    */
   private extractDefaultValue(constraint: any): string | null {
     try {
@@ -344,7 +365,10 @@ export class PostgreSQLASTParser {
   }
 
   /**
-   * Extract error fragment from DDL for better error messages
+   * Extracts a code fragment from the DDL string for error reporting.
+   * @param {string} ddl - The original DDL string.
+   * @param {any} location - The error location object from the parser.
+   * @returns {string} - The extracted code fragment for context.
    */
   private extractErrorFragment(ddl: string, location: any): string {
     try {

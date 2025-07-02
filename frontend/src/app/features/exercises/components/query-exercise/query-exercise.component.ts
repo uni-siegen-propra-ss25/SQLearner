@@ -1,3 +1,7 @@
+/**
+ * Component for SQL query exercises.
+ * Handles container setup, query execution, answer submission, schema loading, and ER diagram visualization.
+ */
 import { Component, Input, ViewChild, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { Exercise } from '../../../roadmap/models/exercise.model';
 import { SubmissionService } from '../../services/submission.service';
@@ -17,29 +21,125 @@ import { ErDiagramComponent } from '../../../schema-visualization/components/er-
     styleUrls: ['./query-exercise.component.scss'],
 })
 export class QueryExerciseComponent implements OnInit, OnDestroy {
+    /**
+     * The exercise object containing all relevant data for the current query exercise.
+     * @type {Exercise}
+     */
     @Input() exercise!: Exercise;
+
+    /**
+     * Reference to the SQL editor component.
+     * @type {SqlEditorComponent}
+     */
     @ViewChild(SqlEditorComponent) sqlEditor!: SqlEditorComponent;
     
+    /**
+     * The current SQL query entered by the user.
+     * @type {string}
+     */
     sqlQuery = '';
+
+    /**
+     * The result of the last executed query.
+     * @type {any}
+     */
     queryResult: any = null;
+
+    /**
+     * Indicates if a query or submission is currently loading.
+     * @type {boolean}
+     */
     isLoading = false;
+
+    /**
+     * Controls the visibility of feedback for the user.
+     * @type {boolean}
+     */
     showFeedback = false;
+
+    /**
+     * Stores feedback text from the backend.
+     * @type {string | null}
+     */
     feedback: string | null = null;
+
+    /**
+     * The current view mode ('schema' or 'result').
+     * @type {'schema' | 'result'}
+     */
     currentView: 'schema' | 'result' = 'result';
-    isDarkMode = false; // Should be synced with your app's theme service
+
+    /**
+     * Indicates if dark mode is enabled.
+     * @type {boolean}
+     */
+    isDarkMode = false;
+
+    /**
+     * Indicates if the last submitted answer was correct.
+     * @type {boolean}
+     */
     isCorrectAnswer = false;
-    actualDatabaseSchema = ''; // Store the actual schema from the real database
+
+    /**
+     * Stores the actual schema loaded from the database.
+     * @type {string}
+     */
+    actualDatabaseSchema = '';
+
+    /**
+     * The ID of the running Docker container for this exercise.
+     * @type {string | null}
+     */
     private containerId: string | null = null;
+
+    /**
+     * Connection details for the running Docker container.
+     * @type {{ host: string; port: number; database?: string } | null}
+     */
     private connectionDetails: { host: string; port: number; database?: string } | null = null;
+
+    /**
+     * Subscription for the Docker container lifecycle.
+     * @type {Subscription | null}
+     */
     private containerSubscription: Subscription | null = null;
 
-    // Pagination variables
+    /**
+     * Pagination: number of rows per page.
+     * @type {number}
+     */
     pageSize = 10;
+
+    /**
+     * Pagination: available page size options.
+     * @type {number[]}
+     */
     pageSizeOptions = [5, 10, 25, 100];
+
+    /**
+     * Pagination: current page index.
+     * @type {number}
+     */
     pageIndex = 0;
     
+    /**
+     * Emits the exercise ID when the user completes the exercise.
+     * @type {EventEmitter<number>}
+     */
     @Output() completed = new EventEmitter<number>();
-      constructor(
+
+    /**
+     * Constructor for QueryExerciseComponent.
+     * @param {SubmissionService} submissionService - Service for submitting answers and running queries.
+     * @param {MatSnackBar} snackBar - Service for showing notifications.
+     * @param {DockerService} dockerService - Service for managing Docker containers.
+     * @param {ActivatedRoute} route - Activated route for accessing route parameters.
+     * @param {DatabaseService} databaseService - Service for database schema operations.
+     * @param {MatDialog} dialog - Material dialog service for opening dialogs.
+     * @param {SchemaVisualizationService} schemaVisualizationService - Service for ER diagram visualization.
+     */
+    constructor(
         private submissionService: SubmissionService,
         private snackBar: MatSnackBar,
         private dockerService: DockerService,
@@ -49,6 +149,10 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
         private schemaVisualizationService: SchemaVisualizationService
     ) {}
 
+    /**
+     * Lifecycle hook: Initializes the component, loads schema, and creates Docker container.
+     * @returns {void}
+     */
     ngOnInit(): void {
         // Load the actual database schema if available
         if (this.exercise?.database?.id) {
@@ -83,6 +187,10 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
         });
     }
 
+    /**
+     * Lifecycle hook: Cleans up subscriptions and deletes the Docker container on destroy.
+     * @returns {void}
+     */
     ngOnDestroy(): void {
         if (this.containerSubscription) {
             this.containerSubscription.unsubscribe();
@@ -99,22 +207,39 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
         }
     }
 
+    /**
+     * Handles changes in the SQL editor.
+     * @param {string} newValue - The new SQL query value.
+     * @returns {void}
+     */
     onSqlChange(newValue: string) {
         this.sqlQuery = newValue;
     }
 
+    /**
+     * Called when the SQL editor is ready. Sets the theme if dark mode is enabled.
+     * @returns {void}
+     */
     onEditorReady() {
-        // You can perform any initialization that requires the editor to be ready
         if (this.isDarkMode) {
             this.sqlEditor.setTheme('dark');
         }
     }
 
+    /**
+     * Toggles the SQL editor theme between dark and light.
+     * @param {boolean} isDark - Whether dark mode should be enabled.
+     * @returns {void}
+     */
     toggleTheme(isDark: boolean) {
         this.isDarkMode = isDark;
         this.sqlEditor?.setTheme(isDark ? 'dark' : 'light');
     }
 
+    /**
+     * Executes the current SQL query and displays the result.
+     * @returns {void}
+     */
     runQuery(): void {
         if (!this.sqlQuery.trim()) return;
 
@@ -139,17 +264,24 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
         });
     }
 
+    /**
+     * Submits the current SQL query as an answer for the exercise.
+     * Shows feedback and emits completion if correct.
+     * @returns {void}
+     */
     submitAnswer(): void {
         if (!this.sqlQuery.trim() || this.isLoading) return;
 
-        this.isLoading = true;        this.submissionService.submitAnswer(this.exercise.id, this.sqlQuery, this.connectionDetails || undefined).subscribe({
+        this.isLoading = true;
+        this.submissionService.submitAnswer(this.exercise.id, this.sqlQuery, this.connectionDetails || undefined).subscribe({
             next: (submission: any) => {
                 this.isLoading = false;
                 this.isCorrectAnswer = submission.isCorrect;
                 
-                // Display feedback from submission response (same as choice-exercise)
+                // Display feedback from submission response
                 const message = submission.feedback || 'Answer submitted successfully';
-                this.snackBar.open(message, 'Close', { duration: 4000 });                if (submission.isCorrect) {
+                this.snackBar.open(message, 'Close', { duration: 4000 });
+                if (submission.isCorrect) {
                     this.completed.emit(this.exercise.id);
                 }
 
@@ -165,17 +297,31 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
                     duration: 3000,
                 });
             },
-        });    }
+        });
+    }
 
+    /**
+     * Toggles the visibility of the feedback section.
+     * @returns {void}
+     */
     toggleFeedback(): void {
         this.showFeedback = !this.showFeedback;
     }
 
+    /**
+     * Handles pagination changes for the query result table.
+     * @param {any} e - The pagination event.
+     * @returns {void}
+     */
     onPageChange(e: any): void {
         this.pageIndex = e.pageIndex;
         this.pageSize = e.pageSize;
     }
 
+    /**
+     * Returns the paginated rows for the current page.
+     * @returns {any[]} - Array of rows for the current page.
+     */
     get paginatedRows(): any[] {
         if (!this.queryResult?.rows) return [];
         const start = this.pageIndex * this.pageSize;
@@ -183,8 +329,9 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * Loads the actual database schema from the PostgreSQL database
-     * instead of using the static schemaSql field
+     * Loads the actual database schema from the PostgreSQL database instead of using the static schemaSql field.
+     * @param {number} databaseId - The ID of the database to load the schema for.
+     * @returns {void}
      */
     private loadDatabaseSchema(databaseId: number): void {
         this.databaseService.getDatabaseSchema(databaseId).subscribe({
@@ -206,7 +353,9 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * Shows the ER diagram in a dialog
+     * Shows the ER diagram in a dialog for the current exercise schema.
+     * Uses the backend visualization if possible, otherwise parses the schema string.
+     * @returns {void}
      */
     showErDiagram(): void {
         const schemaToUse = this.actualDatabaseSchema || this.exercise?.database?.schemaSql || '';
@@ -235,6 +384,11 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
         }
     }
 
+    /**
+     * Parses the schema string and opens the ER diagram dialog as a fallback.
+     * @param {string} schema - The SQL schema string to parse.
+     * @returns {void}
+     */
     private fallbackToSchemaString(schema: string): void {
         this.schemaVisualizationService.parseSchemaString({
             schema: schema,
@@ -252,6 +406,11 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
         });
     }
 
+    /**
+     * Opens the ER diagram dialog with the provided ER diagram data.
+     * @param {any} erDiagram - The ER diagram data (DBML code and database name).
+     * @returns {void}
+     */
     private openErDiagramDialog(erDiagram: any): void {
         this.dialog.open(ErDiagramComponent, {
             data: {
