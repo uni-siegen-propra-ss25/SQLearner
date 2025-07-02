@@ -9,6 +9,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
  * @property {boolean} isPrimaryKey - Whether the column is a primary key.
  * @property {boolean} isForeignKey - Whether the column is a foreign key.
  * @property {boolean} isUnique - Whether the column has a unique constraint.
+ * @property {object} references - Foreign key reference information (if isForeignKey is true).
  */
 interface TableColumn {
   name: string;
@@ -16,6 +17,10 @@ interface TableColumn {
   isPrimaryKey: boolean;
   isForeignKey: boolean;
   isUnique: boolean;
+  references?: {
+    table: string;
+    column: string;
+  };
 }
 
 /**
@@ -108,6 +113,9 @@ export class ErDiagramComponent implements OnInit, OnDestroy {
       // Parse DBML code into structured data for template rendering
       this.parsedTables = this.parseDbmlTables(this.data.dbmlCode);
       this.parsedRelationships = this.parseDbmlRelationships(this.data.dbmlCode);
+      
+      // Map FK references from relationships to columns
+      this.mapForeignKeyReferences();
 
       console.log('✅ [AUDIT] Parsing Complete:');
       console.log('   Parsed Tables Count:', this.parsedTables.length);
@@ -121,7 +129,8 @@ export class ErDiagramComponent implements OnInit, OnDestroy {
           type: c.type, 
           pk: c.isPrimaryKey, 
           fk: c.isForeignKey,
-          unique: c.isUnique
+          unique: c.isUnique,
+          references: c.references
         })));
       });
       
@@ -129,12 +138,40 @@ export class ErDiagramComponent implements OnInit, OnDestroy {
       this.parsedRelationships.forEach((rel, index) => {
         console.log(`   🔗 Relationship ${index + 1}: ${rel.fromTable}.${rel.fromColumn} -> ${rel.toTable}.${rel.toColumn}`);
       });
-      
+
       // No longer generate HTML content - use Angular template instead
       this.diagramHtml = null;
     } catch (error) {
       console.error('Error generating ER diagram:', error);
     }
+  }
+
+  /**
+   * Maps foreign key references from relationships to table columns.
+   * This complements the inline FK references parsed from DBML columns.
+   */
+  private mapForeignKeyReferences(): void {
+    this.parsedRelationships.forEach(relationship => {
+      // Find the source table and column
+      const sourceTable = this.parsedTables.find(t => t.name === relationship.fromTable);
+      if (sourceTable) {
+        const sourceColumn = sourceTable.columns.find(c => c.name === relationship.fromColumn);
+        if (sourceColumn) {
+          // Only set isForeignKey if not already set by inline parsing
+          if (!sourceColumn.isForeignKey) {
+            sourceColumn.isForeignKey = true;
+          }
+          // Only set references if not already set by inline parsing
+          if (!sourceColumn.references) {
+            sourceColumn.references = {
+              table: relationship.toTable,
+              column: relationship.toColumn
+            };
+          }
+          console.log(`🔗 Mapped FK reference: ${relationship.fromTable}.${relationship.fromColumn} → ${relationship.toTable}.${relationship.toColumn}`);
+        }
+      }
+    });
   }
 
   /**
@@ -231,21 +268,25 @@ export class ErDiagramComponent implements OnInit, OnDestroy {
       const name = parts[0];
       const type = parts[1];
       
-      // Robustere Erkennung für PK/FK/UQ
+      // Erkenne PK/FK/UQ über explizite DBML-Attribute
       const isPrimaryKey = /\[.*\bpk\b.*\]/i.test(line) || /\[.*primary key.*\]/i.test(line);
-      let isForeignKey = /\[.*ref:.*\]/i.test(line) || /\[.*foreign key.*\]/i.test(line);
       const isUnique = /\[.*\buq\b.*\]/i.test(line) || /\[.*unique.*\]/i.test(line);
       
-      // Fallback: Erkenne Spalten mit '_id' Suffix als potenzielle Foreign Keys
-      // (außer wenn sie bereits als Primary Key erkannt wurden)
-      if (!isForeignKey && !isPrimaryKey && name.toLowerCase().endsWith('_id')) {
-        isForeignKey = true;
-        console.log(`FK detected by naming convention: ${name}`);
+      // Erkenne FK über ref: Attribut in der Spalte
+      const refMatch = line.match(/ref:\s*>\s*(\w+)\.(\w+)/i);
+      const isForeignKey = !!refMatch || /\[.*foreign key.*\]/i.test(line);
+      
+      let references = undefined;
+      if (refMatch) {
+        references = {
+          table: refMatch[1],
+          column: refMatch[2]
+        };
       }
       
-      console.log(`Column parsed: ${name} (PK: ${isPrimaryKey}, FK: ${isForeignKey}, UQ: ${isUnique})`);
+      console.log(`Column parsed: ${name} (PK: ${isPrimaryKey}, FK: ${isForeignKey}, UQ: ${isUnique}, Ref: ${references ? `${references.table}.${references.column}` : 'none'})`);
       
-      columns.push({ name, type, isPrimaryKey, isForeignKey, isUnique });
+      columns.push({ name, type, isPrimaryKey, isForeignKey, isUnique, references });
     });
     
     return columns;

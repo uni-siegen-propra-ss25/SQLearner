@@ -214,6 +214,11 @@ export class SchemaVisualizationService {
      */
     private convertTypedSchemaToDbml(typedSchema: TypedJsonSchema, databaseName: string): string {
         try {
+            console.log('🔍 [AUDIT] Converting TypedSchema to DBML:');
+            console.log('   Tables count:', typedSchema.tables?.length || 0);
+            console.log('   Foreign Keys count:', typedSchema.foreignKeys?.length || 0);
+            console.log('   Foreign Keys:', typedSchema.foreignKeys);
+            
             let dbml = `Project ${databaseName} {\n`;
             dbml += `  database_type: 'PostgreSQL'\n`;
             dbml += `  Note: 'Generated from SQL Schema via ${typedSchema.metadata?.source || 'unknown parser'}'\n`;
@@ -233,6 +238,15 @@ export class SchemaVisualizationService {
                     if (column.isUnique) attributes.push('unique');
                     if (column.defaultValue) attributes.push(`default: '${column.defaultValue}'`);
                     
+                    // Add FK reference inline if this column is a foreign key
+                    const fkRef = typedSchema.foreignKeys.find(fk => 
+                        fk.sourceTable === table.name && fk.sourceColumn === column.name
+                    );
+                    if (fkRef) {
+                        attributes.push(`ref: > ${fkRef.targetTable}.${fkRef.targetColumn}`);
+                        console.log(`   ✅ Added FK reference: ${column.name} -> ${fkRef.targetTable}.${fkRef.targetColumn}`);
+                    }
+                    
                     if (attributes.length > 0) {
                         columnLine += ` [${attributes.join(', ')}]`;
                     }
@@ -243,7 +257,7 @@ export class SchemaVisualizationService {
                 dbml += `}\n\n`;
             }
 
-            // Add relationships (foreign keys)
+            // Add relationships (foreign keys) - keeping this for backward compatibility
             for (const fk of typedSchema.foreignKeys) {
                 dbml += `Ref: ${fk.sourceTable}.${fk.sourceColumn} > ${fk.targetTable}.${fk.targetColumn}`;
                 if (fk.onDelete) dbml += ` [delete: ${fk.onDelete.toLowerCase()}]`;
@@ -253,6 +267,9 @@ export class SchemaVisualizationService {
             if (typedSchema.foreignKeys.length > 0) {
                 dbml += '\n';
             }
+
+            console.log('📋 Generated DBML:');
+            console.log(dbml);
 
             return dbml;
         } catch (error) {

@@ -42,6 +42,9 @@ export class PostgreSQLASTParser {
         // Focus on CREATE TABLE statements which contain most DDL information
       }
       
+      // Mark columns as foreign keys based on extracted foreign key constraints
+      this.markForeignKeyColumns(tables, foreignKeys);
+      
       return {
         tables,
         foreignKeys,
@@ -285,25 +288,48 @@ export class PostgreSQLASTParser {
     const foreignKeys: ForeignKeySchema[] = [];
     const tableName = statement.name?.name;
     
-    // Column-level foreign keys
+    console.log(`🔍 Extracting FKs from table: ${tableName}`);
+    
+    // Column-level foreign keys (weniger häufig, aber möglich)
     for (const column of statement.columns || []) {
       for (const constraint of column.constraints || []) {
         if (constraint.type === 'foreign key') {
+          console.log(`   Found column-level FK: ${column.name?.name}`);
           const fk = this.mapForeignKeyConstraint(constraint, tableName, column.name?.name);
           if (fk) foreignKeys.push(fk);
         }
       }
     }
-    
-    // Table-level foreign keys
+
+    // Table-level foreign keys (Hauptfall für FOREIGN KEY statements)
     for (const constraint of statement.constraints || []) {
       if (constraint.type === 'foreign key') {
-        const sourceColumn = constraint.columns?.[0]?.name;
-        const fk = this.mapForeignKeyConstraint(constraint, tableName, sourceColumn);
-        if (fk) foreignKeys.push(fk);
+        // Korrigierte Zugriffe für pgsql-ast-parser v13+
+        const sourceColumn = constraint.localColumns?.[0]?.name;
+        const targetTable = constraint.foreignTable?.name;
+        const targetColumn = constraint.foreignColumns?.[0]?.name;
+        
+        console.log(`   Found table-level FK: ${sourceColumn} -> ${targetTable}.${targetColumn}`);
+        
+        if (sourceColumn && targetTable && targetColumn) {
+          const fk: ForeignKeySchema = {
+            sourceTable: tableName,
+            sourceColumn,
+            targetTable,
+            targetColumn,
+            constraintName: constraint.name?.name,
+            onDelete: constraint.onDelete,
+            onUpdate: constraint.onUpdate
+          };
+          foreignKeys.push(fk);
+          console.log(`   ✅ Added FK: ${tableName}.${sourceColumn} -> ${targetTable}.${targetColumn}`);
+        } else {
+          console.warn(`   ❌ Incomplete FK data: source=${sourceColumn}, target=${targetTable}.${targetColumn}`);
+        }
       }
     }
     
+    console.log(`   Extracted ${foreignKeys.length} FKs for table ${tableName}`);
     return foreignKeys;
   }
   
@@ -316,14 +342,16 @@ export class PostgreSQLASTParser {
    */
   private mapForeignKeyConstraint(constraint: any, sourceTable: string, sourceColumn: string): ForeignKeySchema | null {
     try {
-      const targetTable = constraint.references?.table?.name;
-      const targetColumn = constraint.references?.columns?.[0]?.name;
+      // Korrigierte Zugriffe für pgsql-ast-parser v13+
+      const targetTable = constraint.foreignTable?.name || constraint.references?.table?.name;
+      const targetColumn = constraint.foreignColumns?.[0]?.name || constraint.references?.columns?.[0]?.name;
       
       if (!targetTable || !targetColumn) {
+        console.warn(`   ❌ Missing target info: table=${targetTable}, column=${targetColumn}`);
         return null;
       }
-      
-      return {
+
+      const fkSchema = {
         sourceTable,
         sourceColumn,
         targetTable,
@@ -332,6 +360,9 @@ export class PostgreSQLASTParser {
         onDelete: constraint.onDelete,
         onUpdate: constraint.onUpdate
       };
+      
+      console.log(`   ✅ Created FK schema: ${sourceTable}.${sourceColumn} -> ${targetTable}.${targetColumn}`);
+      return fkSchema;
       
     } catch (error) {
       console.warn(`Failed to map foreign key constraint: ${error.message}`);
@@ -380,6 +411,40 @@ export class PostgreSQLASTParser {
       return line ? `Line ${lineIndex + 1}: ${line.substring(Math.max(0, column - 20), column + 20)}` : '';
     } catch {
       return '';
+    }
+  }
+
+  /**
+   * Marks columns as foreign keys based on the extracted foreign key constraints.
+   * This is necessary because foreign keys can be defined at table level, not just column level.
+   * @param {TableSchema[]} tables - The array of tables to update.
+   * @param {ForeignKeySchema[]} foreignKeys - The array of foreign key constraints.
+   */
+  private markForeignKeyColumns(tables: TableSchema[], foreignKeys: ForeignKeySchema[]): void {
+    console.log(`🔍 Marking FK columns. Total FKs to process: ${foreignKeys.length}`);
+    
+    for (const fk of foreignKeys) {
+      console.log(`   Processing FK: ${fk.sourceTable}.${fk.sourceColumn} -> ${fk.targetTable}.${fk.targetColumn}`);
+      
+      const table = tables.find(t => t.name === fk.sourceTable);
+      if (table) {
+        const column = table.columns.find(c => c.name === fk.sourceColumn);
+        if (column) {
+          console.log(`   Before: ${fk.sourceTable}.${fk.sourceColumn} isForeignKey=${column.isForeignKey}`);
+          column.isForeignKey = true;
+          // Add FOREIGN KEY to constraints if not already present
+          if (!column.constraints?.includes('FOREIGN KEY')) {
+            column.constraints = column.constraints || [];
+            column.constraints.push('FOREIGN KEY');
+          }
+          console.log(`   After: ${fk.sourceTable}.${fk.sourceColumn} isForeignKey=${column.isForeignKey}`);
+          console.log(`✅ Marked ${fk.sourceTable}.${fk.sourceColumn} as foreign key`);
+        } else {
+          console.warn(`   ❌ Column ${fk.sourceColumn} not found in table ${fk.sourceTable}`);
+        }
+      } else {
+        console.warn(`   ❌ Table ${fk.sourceTable} not found`);
+      }
     }
   }
 }

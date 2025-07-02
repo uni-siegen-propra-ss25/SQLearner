@@ -41,7 +41,10 @@
                 <mat-icon *ngIf="column.isPrimaryKey" 
                          class="pk-icon" 
                          matTooltip="Primärschlüssel">vpn_key</mat-icon>
-                <mat-icon *ngIf="column.isForeignKey" 
+                <mat-icon *ngIf="column.isForeignKey && column.references" 
+                         class="fk-icon" 
+                         matTooltip="FK → {{ column.references.table }}.{{ column.references.column }}">link</mat-icon>
+                <mat-icon *ngIf="column.isForeignKey && !column.references" 
                          class="fk-icon" 
                          matTooltip="Fremdschlüssel">link</mat-icon>
                 <mat-icon *ngIf="column.isUnique" 
