@@ -178,39 +178,17 @@ export class ExerciseCardComponent implements OnInit, OnDestroy {
     private loadCompletionStatus(): void {
         if (!this.exercise?.id) return;
         
-        // Initial load
-        this.updateCompletionStatus();
-
-        // Subscribe to progress updates
+        // Subscribe to progress updates using the unified ProgressDto
         this.progressService.getUserProgress()
             .pipe(takeUntil(this.destroy$))
             .subscribe({
                 next: (progress) => {
-                    const exerciseProgress = progress.chapterProgress
-                        .flatMap(chapter => chapter.exercises || [])
-                        .find(ex => ex.exerciseId === this.exercise.id);
-                    this.isCompleted = exerciseProgress?.isPassed || false;
+                    this.isCompleted = progress.completedExerciseIds.includes(this.exercise.id);
                 },
                 error: (error) => {
                     console.error('Error loading completion status:', error);
                 }
             });
-    }
-
-    private updateCompletionStatus(): void {
-        if (!this.exercise?.id) return;
-        
-        this.progressService.getUserProgress().subscribe({
-            next: (progress) => {
-                const exerciseProgress = progress.chapterProgress
-                    .flatMap(chapter => chapter.exercises || [])
-                    .find(ex => ex.exerciseId === this.exercise.id);
-                this.isCompleted = exerciseProgress?.isPassed || false;
-            },
-            error: (error) => {
-                console.error('Error updating completion status:', error);
-            }
-        });
     }
 
     /**
@@ -352,15 +330,4 @@ export class ExerciseCardComponent implements OnInit, OnDestroy {
         }
     }
 
-    isLocallyCompleted(): boolean {
-        // Fallback: Prüfe, ob die ID im localStorage als erledigt markiert ist
-        const completed = localStorage.getItem('completedExercises');
-        if (!completed) return false;
-        try {
-            const arr = JSON.parse(completed);
-            return Array.isArray(arr) && arr.includes(this.exercise.id);
-        } catch {
-            return false;
-        }
-    }
 }

@@ -42,6 +42,11 @@ export class ChoiceExerciseComponent {
         }
     }
 
+    /**
+     * Submits the selected answer(s) for the current exercise.
+     * Handles validation, submission, feedback, and completion event.
+     * @returns {void}
+     */
     submitAnswer(): void {
         if (this.selectedOptions.length === 0 || this.isCorrectAnswer) return;
         if (this.exercise.type === ExerciseType.SINGLE_CHOICE && this.selectedOptions.length > 1)
@@ -56,18 +61,10 @@ export class ChoiceExerciseComponent {
                     this.isSubmitting = false;
                     this.isAnswered = true;
                     this.isCorrectAnswer = submission.isCorrect;
-                      if (submission.isCorrect) {
+                    if (submission.isCorrect) {
                         this.completed.emit(this.exercise.id);
-                        // Markiere die Aufgabe lokal als erledigt
-                        const completed = localStorage.getItem('completedExercises');
-                        let arr: number[] = [];
-                        try {
-                            arr = completed ? JSON.parse(completed) : [];
-                        } catch { arr = []; }
-                        if (!arr.includes(this.exercise.id)) {
-                            arr.push(this.exercise.id);
-                            localStorage.setItem('completedExercises', JSON.stringify(arr));
-                        }
+                        // Record completion through the progress service
+                        this.progressService.recordCompletion(this.exercise.id);
                     }
                     
                     const message = submission.feedback || 'Answer submitted successfully';
