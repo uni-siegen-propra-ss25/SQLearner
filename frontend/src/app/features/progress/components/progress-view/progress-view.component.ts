@@ -116,8 +116,8 @@ export class ProgressViewComponent implements OnInit, OnDestroy {
     /**
      * Removes a bookmark from the user's saved exercises list.
      * Updates the local bookmarks array immediately upon successful deletion.
-     * 
      * @param {number} bookmarkId - The unique identifier of the bookmark to remove
+     * @returns {void}
      */
     removeBookmark(bookmarkId: number): void {
         this.bookmarkService.removeBookmark(bookmarkId).subscribe({
@@ -130,6 +130,10 @@ export class ProgressViewComponent implements OnInit, OnDestroy {
         });
     }
 
+    /**
+     * Angular lifecycle hook that cleans up subscriptions when the component is destroyed.
+     * @returns {void}
+     */
     ngOnDestroy(): void {
         if (this.bookmarkErrorSub) {
             this.bookmarkErrorSub.unsubscribe();
@@ -139,6 +143,11 @@ export class ProgressViewComponent implements OnInit, OnDestroy {
         }
     }
 
+    /**
+     * Sets the error message for bookmark loading failures using the translation service.
+     * @private
+     * @returns {void}
+     */
     private setBookmarkError() {
         this.translate.get('BOOKMARKS_LOAD_ERROR').subscribe((msg: string) => {
             this.error = msg;

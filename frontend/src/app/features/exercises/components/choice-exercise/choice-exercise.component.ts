@@ -42,6 +42,11 @@ export class ChoiceExerciseComponent {
         }
     }
 
+    /**
+     * Submits the selected answer(s) for the current exercise.
+     * Handles validation, submission, feedback, and completion event.
+     * @returns {void}
+     */
     submitAnswer(): void {
         if (this.selectedOptions.length === 0 || this.isCorrectAnswer) return;
         if (this.exercise.type === ExerciseType.SINGLE_CHOICE && this.selectedOptions.length > 1)

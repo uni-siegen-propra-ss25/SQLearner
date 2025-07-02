@@ -8,12 +8,15 @@ import { UserProgressSummary, ChapterProgress, DifficultyStats, ExerciseProgress
  */
 @Injectable()
 export class ProgressService {
+    /**
+     * Constructs the ProgressService with a PrismaService dependency.
+     * @param {PrismaService} prisma - The Prisma service for database access
+     */
     constructor(private readonly prisma: PrismaService) {}
 
     /**
      * Retrieves progress summaries for all users.
      * Can be resource-intensive for large number of users.
-     * 
      * @returns {Promise<UserProgressSummary[]>} Array of progress summaries for all users
      */
     async getAllUsersProgress(): Promise<UserProgressSummary[]> {
@@ -28,7 +31,6 @@ export class ProgressService {
     /**
      * Retrieves comprehensive progress information for a specific user.
      * Calculates overall completion, chapter-specific progress, and difficulty statistics.
-     * 
      * @param {number} userId - The unique identifier of the user
      * @returns {Promise<UserProgressSummary>} Complete progress summary including total exercises, completion percentage, chapter progress, and difficulty stats
      * @throws {NotFoundException} When user with specified ID does not exist
@@ -110,7 +112,6 @@ export class ProgressService {
     /**
      * Updates or creates progress record for a user's exercise attempt.
      * Increments attempt count and updates completion status and timestamp.
-     * 
      * @param {number} userId - The unique identifier of the user
      * @param {number} exerciseId - The unique identifier of the exercise
      * @param {ExerciseProgressUpdate} progressUpdate - Progress update data containing success status
@@ -157,7 +158,6 @@ export class ProgressService {
     /**
      * Retrieves only the completed exercise IDs for a specific user.
      * Lightweight method for frontend roadmap completion tracking.
-     * 
      * @param {number} userId - The unique identifier of the user
      * @returns {Promise<number[]>} Array of exercise IDs that the user has successfully completed
      * @throws {NotFoundException} When user with specified ID does not exist
@@ -189,7 +189,6 @@ export class ProgressService {
     /**
      * Calculates progress statistics for each chapter based on exercise completion.
      * Groups exercises by chapter and computes completion rates.
-     * 
      * @private
      * @param {any[]} exercises - Array of exercises with progress and topic/chapter relationships
      * @returns {Promise<ChapterProgress[]>} Array of chapter progress objects with completion statistics and detailed exercise data
@@ -254,7 +253,6 @@ export class ProgressService {
     /**
      * Calculates completion statistics grouped by exercise difficulty level.
      * Provides breakdown of easy, medium, and hard exercise completion rates.
-     * 
      * @private
      * @param {any[]} exercises - Array of exercises with difficulty and progress information
      * @returns {DifficultyStats} Statistics object containing completion data for each difficulty level

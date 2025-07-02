@@ -63,6 +63,7 @@ export class ProgressService {
      * Loads initial progress data when service is created.
      * Called automatically in constructor to populate the BehaviorSubject.
      * @private
+     * @returns {void}
      */
     private loadInitialProgress(): void {
         console.log('🚀 LOADING INITIAL PROGRESS...');
@@ -83,6 +84,7 @@ export class ProgressService {
      * Converts UserProgressSummary to simplified ProgressDto format.
      * Uses fallback strategy if detailed exercise data is not available.
      * @private
+     * @returns {Observable<ProgressDto>} Observable containing the transformed progress data
      */
     private getUserProgressInternal(): Observable<ProgressDto> {
         console.log('🔄 STARTING getUserProgressInternal - API URL:', `${this.baseUrl}/user`);
@@ -132,6 +134,9 @@ export class ProgressService {
      * Creates ProgressDto using fallback strategy when detailed exercise data is not available.
      * Uses separate API call to get completed exercise IDs.
      * @private
+     * @param {UserProgressSummary} summary - The user's progress summary
+     * @param {number[]} completedIds - Array of completed exercise IDs
+     * @returns {ProgressDto} The constructed progress DTO
      */
     private createProgressDtoWithFallback(summary: UserProgressSummary, completedIds: number[]): ProgressDto {
         const chapterProgress = summary.chapterProgress?.map(chapter => ({
@@ -152,6 +157,8 @@ export class ProgressService {
      * Transforms complex UserProgressSummary to simplified ProgressDto.
      * Extracts completed exercise IDs from nested chapter structure.
      * @private
+     * @param {UserProgressSummary} summary - The user's progress summary
+     * @returns {ProgressDto} The constructed progress DTO
      */
     private transformToProgressDto(summary: UserProgressSummary): ProgressDto {
         console.log('🔄 TRANSFORM - Input summary:', summary);

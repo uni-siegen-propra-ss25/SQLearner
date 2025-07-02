@@ -14,12 +14,15 @@ import { UserProgressSummary, ExerciseProgressUpdate } from '../models/progress.
 @Controller('progress')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class ProgressController {
+    /**
+     * Constructs the ProgressController with a ProgressService dependency.
+     * @param {ProgressService} progressService - The service for progress management and statistics
+     */
     constructor(private readonly progressService: ProgressService) {}
 
     /**
      * Retrieves all users' progress summaries.
      * Only accessible by tutors and admins.
-     * 
      * @returns {Promise<UserProgressSummary[]>} Array of progress summaries for all users
      */
     @Get('users')
@@ -31,7 +34,6 @@ export class ProgressController {
     /**
      * Retrieves the authenticated student's own progress summary.
      * Returns comprehensive progress data including completion statistics and chapter breakdown.
-     * 
      * @param {number} userId - The authenticated user's ID extracted from JWT token
      * @returns {Promise<UserProgressSummary>} Complete progress summary with exercise completion stats
      */
@@ -44,7 +46,6 @@ export class ProgressController {
     /**
      * Retrieves only the completed exercise IDs for the authenticated user.
      * Lightweight endpoint for frontend roadmap completion tracking.
-     * 
      * @param {number} userId - The authenticated user's ID extracted from JWT token
      * @returns {Promise<number[]>} Array of completed exercise IDs
      */
@@ -57,7 +58,6 @@ export class ProgressController {
     /**
      * Retrieves progress summary for any user by their ID.
      * Allows tutors and admins to view student progress for monitoring.
-     * 
      * @param {number} userId - The target user's ID from URL parameter
      * @returns {Promise<UserProgressSummary>} Complete progress summary with exercise completion stats
      */
@@ -69,10 +69,10 @@ export class ProgressController {
 
     /**
      * Updates progress for a specific exercise when a student submits an attempt.
-     * 
      * @param {number} exerciseId - The exercise ID from URL parameter
      * @param {ExerciseProgressUpdate} progressUpdate - Progress update data with completion status
      * @param {number} userId - The authenticated student's ID from JWT token
+     * @returns {Promise<void>} Resolves when progress is successfully updated
      */
     @Post('exercise/:id')
     @Roles('STUDENT')
