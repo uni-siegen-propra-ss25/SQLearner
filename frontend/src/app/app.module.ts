@@ -14,7 +14,6 @@ import { RouterModule } from '@angular/router';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { RoadmapModule } from './features/roadmap/roadmap.module';
 import { ExercisesModule } from './features/exercises/exercises.module';
-import { ChatModule } from './features/chat/chat.module';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
@@ -39,7 +38,6 @@ export function HttpLoaderFactory(http: HttpClient) {
         DragDropModule,
         RoadmapModule,
         ExercisesModule,
-        ChatModule,
         FormsModule,
         CommonModule,
         TranslateModule.forRoot({

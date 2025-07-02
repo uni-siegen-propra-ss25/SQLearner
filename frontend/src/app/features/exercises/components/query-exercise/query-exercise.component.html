@@ -129,7 +129,7 @@
     </div>
 
     <!-- Feedback Section -->
-    <mat-expansion-panel *ngIf="showFeedback" class="feedback-section">
+    <mat-expansion-panel *ngIf="showFeedback" [expanded]="showFeedback" class="feedback-section">
       <mat-expansion-panel-header>
         <mat-panel-title>
           <mat-icon>chat</mat-icon>
