@@ -18,14 +18,6 @@
   
   <!-- Main content area: diagram or error state -->
   <mat-dialog-content class="er-dialog-content">
-    <!-- Debug Information -->
-    <div class="debug-info" style="padding: 8px; background: #f0f0f0; margin: 8px; font-size: 12px;" *ngIf="parsedTables">
-      <strong>Debug:</strong> {{ parsedTables.length }} Tabellen gefunden
-      <div *ngFor="let table of parsedTables">
-        {{ table.name }}: {{ table.columns.length }} Spalten
-      </div>
-    </div>
-    
     <div class="er-container" *ngIf="parsedTables && parsedTables.length > 0; else errorState">
       <!-- Render the ER diagram using Angular components -->
       <div class="dbml-visualization">
@@ -55,16 +47,6 @@
               <span class="column-type">{{ column.type }}</span>
             </div>
           </div>
-        </div>
-        
-        <!-- Relationships section -->
-        <div class="relationships-section" *ngIf="parsedRelationships && parsedRelationships.length > 0">
-          <h4>Beziehungen:</h4>
-          <ul>
-            <li *ngFor="let rel of parsedRelationships">
-              {{ rel.fromTable }}.{{ rel.fromColumn }} → {{ rel.toTable }}.{{ rel.toColumn }}
-            </li>
-          </ul>
         </div>
       </div>
     </div>

@@ -47,31 +47,4 @@ export class SchemaVisualizationController {
         const databaseId = parseInt(id, 10);
         return await this.schemaVisualizationService.visualizeDatabase(databaseId);
     }
-
-    /**
-     * Test endpoint for FK parsing with minimal example.
-     * @returns {Promise<ERDiagramDto>} - The ER diagram data transfer object.
-     */
-    @Get('test-fk-parsing')
-    async testFkParsing(): Promise<ERDiagramDto> {
-        console.log('🧪 Testing FK parsing with minimal example');
-        
-        const testSchema = `
-CREATE TABLE parent (
-    id INTEGER PRIMARY KEY
-);
-
-CREATE TABLE child (
-    id INTEGER,
-    parent_id INTEGER,
-    FOREIGN KEY (parent_id) REFERENCES parent(id)
-);`;
-
-        const parseSchemaDto: ParseSchemaDto = {
-            schema: testSchema,
-            name: 'test-fk-schema'
-        };
-
-        return this.schemaVisualizationService.parseSchemaString(parseSchemaDto);
-    }
 }
