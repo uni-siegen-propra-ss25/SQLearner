@@ -6,7 +6,6 @@ import { ChaptersModule } from './modules/chapters/chapters.module';
 import { TopicsModule } from './modules/topics/topics.module';
 import { ExercisesModule } from './modules/exercises/exercises.module';
 import { DatabasesModule } from './modules/databases/databases.module';
-import { ChatModule } from './modules/chat/chat.module';
 import { ProgressModule } from './modules/progress/progress.module';
 import { BookmarksModule } from './modules/bookmarks/bookmarks.module';
 import { SqlEvaluationModule } from './modules/sql-evaluation/sql-evaluation.module';
@@ -25,7 +24,6 @@ import { SchemaVisualizationModule } from './modules/schema-visualization/schema
         ChaptersModule,
         TopicsModule,
         ExercisesModule,
-        ChatModule,
         ProgressModule,
         BookmarksModule,
         SqlEvaluationModule,

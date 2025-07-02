@@ -12,6 +12,7 @@ import { Database } from '../../models/database.model';
 export class DatabaseUploadDialogComponent {
     form: FormGroup;
     selectedFile: File | null = null;
+    fileInput: any;
 
     constructor(
         private fb: FormBuilder,
@@ -28,6 +29,24 @@ export class DatabaseUploadDialogComponent {
         const input = event.target as HTMLInputElement;
         if (input.files?.length) {
             this.selectedFile = input.files[0];
+        }
+    }
+
+    onFileDrop(event: DragEvent): void {
+        event.preventDefault();
+        if (event.dataTransfer && event.dataTransfer.files.length > 0) {
+            const file = event.dataTransfer.files[0];
+            if (file.name.endsWith('.sql')) {
+                this.selectedFile = file;
+            }
+        }
+    }
+
+    removeFile(event: Event): void {
+        event.stopPropagation();
+        this.selectedFile = null;
+        if (this.fileInput) {
+            this.fileInput.nativeElement.value = '';
         }
     }
 

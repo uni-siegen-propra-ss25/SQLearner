@@ -1,16 +1,16 @@
 import { Injectable, Logger } from '@nestjs/common';
-import OpenAIApi from 'openai';
+import OpenAI from 'openai';
 import { SettingsService } from '../../settings/services/settings.service';
 
 @Injectable()
 export class AiFeedbackService {
   private readonly logger = new Logger(AiFeedbackService.name);
-  private openai: OpenAIApi | null = null;
+  private openai: OpenAI | null = null;
   private currentApiKey: string | null = null;
 
   constructor(private readonly settingsService: SettingsService) {}
 
-  private async getOpenAIInstance(): Promise<OpenAIApi | null> {
+  private async getOpenAIInstance(): Promise<OpenAI | null> {
     try {
       // First try to get API key from database
       let apiKey = await this.settingsService.getSetting('OPENAI_API_KEY');
@@ -28,7 +28,7 @@ export class AiFeedbackService {
       // Reinitialize if API key has changed
       if (this.currentApiKey !== apiKey) {
         this.logger.log('API key changed, reinitializing OpenAI client');
-        this.openai = new OpenAIApi({ apiKey });
+        this.openai = new OpenAI({ apiKey });
         this.currentApiKey = apiKey;
       }
 

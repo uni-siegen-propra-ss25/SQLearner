@@ -781,4 +781,42 @@ export class DatabasesService {
         
         return cleanSchema;
     }
+
+    /**
+     * Inserts a new row into a table in the specified database
+     */
+    async insertRow(databaseId: number, tableName: string, data: Record<string, any>, user: User): Promise<any> {
+        // Getting the database
+        const database = await this.getDatabaseById(databaseId);
+        if (!database) {
+            throw new NotFoundException(`Database with ID ${databaseId} not found`);
+        }
+        // Database name (dbName) can be stored in the schemaSql field or similar
+        const dbName = database.schemaSql;
+        if (!dbName) {
+            throw new NotFoundException('Database not properly initialized');
+        }
+        // Connecting to the required database
+        const dbPool = new Pool({
+            host: process.env.DB_HOST,
+            port: parseInt(process.env.DB_PORT || '5432', 10),
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: dbName
+        });
+        const client = await dbPool.connect();
+        try {
+            const columns = Object.keys(data).map(key => `"${key}"`).join(', ');
+            const values = Object.values(data);
+            const placeholders = values.map((_, i) => `$${i + 1}`).join(', ');
+            const query = `INSERT INTO "${tableName}" (${columns}) VALUES (${placeholders}) RETURNING *;`;
+            const result = await client.query(query, values);
+            return result.rows[0];
+        } catch (error) {
+            throw new BadRequestException('Failed to insert row: ' + error.message);
+        } finally {
+            client.release();
+            await dbPool.end();
+        }
+    }
 }

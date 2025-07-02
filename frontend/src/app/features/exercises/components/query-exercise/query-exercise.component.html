@@ -154,8 +154,8 @@
       </div>
     </div>
 
-    <!-- Feedback Section: shows AI feedback after submission -->
-    <mat-expansion-panel *ngIf="showFeedback" class="feedback-section">
+    <!-- Feedback Section -->
+    <mat-expansion-panel *ngIf="showFeedback" [expanded]="showFeedback" class="feedback-section">
       <mat-expansion-panel-header>
         <mat-panel-title>
           <mat-icon>chat</mat-icon>

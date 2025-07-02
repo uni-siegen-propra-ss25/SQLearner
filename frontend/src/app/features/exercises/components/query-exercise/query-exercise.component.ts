@@ -277,14 +277,9 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
             next: (submission: any) => {
                 this.isLoading = false;
                 this.isCorrectAnswer = submission.isCorrect;
-                
-                // Display feedback from submission response
-                const message = submission.feedback || 'Answer submitted successfully';
-                this.snackBar.open(message, 'Close', { duration: 4000 });
                 if (submission.isCorrect) {
                     this.completed.emit(this.exercise.id);
                 }
-
                 // Store feedback for potential display in UI
                 if (submission.feedback) {
                     this.feedback = submission.feedback;
@@ -296,7 +291,7 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
                 this.snackBar.open(error.message || 'Failed to submit answer', 'Close', {
                     duration: 3000,
                 });
-            },
+            }
         });
     }
 
