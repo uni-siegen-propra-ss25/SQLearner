@@ -58,247 +58,276 @@
         justify-content: center;
         align-items: flex-start;
         min-height: 100%;
-
-        // Custom DBML visualization styles
-        ::ng-deep .dbml-visualization {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 20px;
-          justify-content: flex-start;
-          align-items: flex-start;
-          padding: 20px;
-
-          // Table box styling
-          .table-box {
-            background: white;
-            border: 2px solid #1976d2;
-            border-radius: 8px;
-            min-width: 250px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-
-            // Table header styling
-            .table-header {
-              background: #1976d2;
-              color: white;
-              padding: 12px 16px;
-              font-size: 16px;
-              font-weight: 600;
-              text-align: center;
-            }
-
-            // Table columns styling
-            .table-columns {
-              .column-row {
-                display: flex;
-                align-items: center;
-                padding: 8px 16px;
-                border-bottom: 1px solid #e0e0e0;
-                gap: 8px;
-
-                &:last-child {
-                  border-bottom: none;
-                }
-
-                // Highlight for primary key rows
-                &.primary-key-row {
-                  background-color: #e3f2fd;
-                  font-weight: 600;
-                }
-
-                // Column name styling
-                .column-name {
-                  flex: 1;
-                  font-weight: 500;
-                  color: #333;
-                }
-
-                // Column type styling
-                .column-type {
-                  color: #666;
-                  font-family: 'Courier New', monospace;
-                  font-size: 12px;
-                  background: #f5f5f5;
-                  padding: 2px 6px;
-                  border-radius: 3px;
-                }
-
-                // Badge styles for PK, FK, UQ
-                .badge {
-                  font-size: 10px;
-                  padding: 2px 6px;
-                  border-radius: 10px;
-                  font-weight: bold;
-
-                  &.primary-key {
-                    background: #1565c0;
-                    color: white;
-                  }
-
-                  &.foreign-key {
-                    background: #d84315;
-                    color: white;
-                  }
-
-                  &.unique {
-                    background: #f57c00;
-                    color: white;
-                  }
-                }
-              }
-            }
-          }
-
-          // Relationships section styling
-          .relationships-section {
-            width: 100%;
-            margin-top: 20px;
-            padding: 16px;
-            background: #f9f9f9;
-            border-radius: 8px;
-            border-left: 4px solid #ff5722;
-
-            h4 {
-              margin: 0 0 12px 0;
-              color: #d84315;
-              font-size: 16px;
-            }
-
-            ul {
-              margin: 0;
-              padding-left: 20px;
-
-              li {
-                margin: 4px 0;
-                color: #666;
-                font-family: 'Courier New', monospace;
-                font-size: 14px;
-              }
-            }
-          }
-        }
-
-        // SVG diagram styles (if used in the future)
-        ::ng-deep svg {
-          max-width: 100%;
-          height: auto;
-          border-radius: 4px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-          background-color: white;
-
-          // Improve text readability
-          text {
-            font-family: 'Roboto', sans-serif;
-            font-size: 12px;
-          }
-
-          // Style table headers
-          .table-header {
-            fill: #e3f2fd;
-            stroke: #bbdefb;
-          }
-
-          // Style table rows
-          .table-row {
-            fill: white;
-            stroke: #e0e0e0;
-          }
-
-          // Style foreign key relationships
-          .relationship-line {
-            stroke: #ff5722;
-            stroke-width: 2;
-          }
-
-          // Primary key styling
-          .primary-key {
-            font-weight: bold;
-            fill: #1565c0;
-          }
-
-          // Foreign key styling
-          .foreign-key {
-            fill: #d84315;
-          }
-        }
       }
     }
+  }
+}
 
-    // Error state styling for diagram errors
-    .error-state {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 48px 24px;
+// DBML Visualization Styles - MOVED OUT OF ::ng-deep
+.dbml-visualization {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: 20px;
+
+  // Table box styling
+  .table-box {
+    background: white;
+    border: 2px solid #1976d2;
+    border-radius: 8px;
+    min-width: 250px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+
+    // Table header styling
+    .table-header {
+      background: #1976d2;
+      color: white;
+      padding: 12px 16px;
+      font-size: 16px;
+      font-weight: 600;
       text-align: center;
-      color: #d32f2f;
+    }
 
-      mat-icon {
-        font-size: 3rem;
-        width: 3rem;
-        height: 3rem;
-        margin-bottom: 16px;
-      }
+    // Table columns styling
+    .table-columns {
+      .column-row {
+        display: flex;
+        align-items: center;
+        padding: 8px 16px;
+        border-bottom: 1px solid #e0e0e0;
+        gap: 8px;
 
-      h3 {
-        margin: 0 0 8px 0;
-        color: #c62828;
-      }
+        &:last-child {
+          border-bottom: none;
+        }
 
-      p {
-        margin: 0 0 24px 0;
-        color: #f44336;
-      }
+        // Highlight for primary key rows
+        &.primary-key-row {
+          background-color: #e3f2fd;
+          font-weight: 600;
+        }
 
-      mat-divider {
-        width: 100%;
-        margin: 16px 0;
-      }
-
-      details {
-        width: 100%;
-        text-align: left;
-
-        summary {
-          cursor: pointer;
-          padding: 8px 0;
+        // Column name styling
+        .column-name {
+          flex: 1;
           font-weight: 500;
-          color: #1976d2;
+          color: #333;
+        }
 
-          &:hover {
-            text-decoration: underline;
+        // Column type styling
+        .column-type {
+          color: #666;
+          font-family: 'Courier New', monospace;
+          font-size: 12px;
+          background: #f5f5f5;
+          padding: 2px 6px;
+          border-radius: 3px;
+        }
+
+        // Icon styles for PK, FK, UQ
+        .column-icons {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          margin-right: 8px;
+
+          .pk-icon {
+            color: #1976d2; // Blau für PK
+            font-size: 16px;
+            width: 16px;
+            height: 16px;
+          }
+
+          .fk-icon {
+            color: #388e3c; // Grün für FK
+            font-size: 16px;
+            width: 16px;
+            height: 16px;
+          }
+
+          .uq-icon {
+            color: #f57c00; // Orange für Unique
+            font-size: 16px;
+            width: 16px;
+            height: 16px;
           }
         }
 
-        pre {
-          background-color: #f5f5f5;
-          border: 1px solid #e0e0e0;
-          border-radius: 4px;
-          padding: 16px;
-          overflow-x: auto;
-          font-family: 'Courier New', monospace;
-          font-size: 0.875rem;
-          line-height: 1.4;
-          color: #333;
-          max-height: 200px;
-          overflow-y: auto;
+        // Badge styles for PK, FK, UQ (kept for backward compatibility)
+        .badge {
+          font-size: 10px;
+          padding: 2px 6px;
+          border-radius: 10px;
+          font-weight: bold;
+
+          &.primary-key {
+            background: #1565c0;
+            color: white;
+          }
+
+          &.foreign-key {
+            background: #d84315;
+            color: white;
+          }
+
+          &.unique {
+            background: #f57c00;
+            color: white;
+          }
         }
       }
     }
   }
 
-  // Actions section for dialog buttons
-  .er-dialog-actions {
-    padding: 16px 24px;
-    border-top: 1px solid #e0e0e0;
+  // Relationships section styling
+  .relationships-section {
+    width: 100%;
+    margin-top: 20px;
+    padding: 16px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    border-left: 4px solid #ff5722;
 
-    button {
-      margin-left: 8px;
+    h4 {
+      margin: 0 0 12px 0;
+      color: #d84315;
+      font-size: 16px;
+    }
 
-      &:first-child {
-        margin-left: 0;
+    ul {
+      margin: 0;
+      padding-left: 20px;
+
+      li {
+        margin: 4px 0;
+        color: #666;
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
       }
+    }
+  }
+}
+
+// Error state styling for diagram errors
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  color: #d32f2f;
+
+  mat-icon {
+    font-size: 3rem;
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 16px;
+  }
+
+  h3 {
+    margin: 0 0 8px 0;
+    color: #c62828;
+  }
+
+  p {
+    margin: 0 0 24px 0;
+    color: #f44336;
+  }
+
+  mat-divider {
+    width: 100%;
+    margin: 16px 0;
+  }
+
+  details {
+    width: 100%;
+    text-align: left;
+
+    summary {
+      cursor: pointer;
+      padding: 8px 0;
+      font-weight: 500;
+      color: #1976d2;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    pre {
+      background-color: #f5f5f5;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      padding: 16px;
+      overflow-x: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 0.875rem;
+      line-height: 1.4;
+      color: #333;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+  }
+}
+
+// SVG diagram styles (if used in the future)
+::ng-deep svg {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background-color: white;
+
+  // Improve text readability
+  text {
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
+  }
+
+  // Style table headers
+  .table-header {
+    fill: #e3f2fd;
+    stroke: #bbdefb;
+  }
+
+  // Style table rows
+  .table-row {
+    fill: white;
+    stroke: #e0e0e0;
+  }
+
+  // Style foreign key relationships
+  .relationship-line {
+    stroke: #ff5722;
+    stroke-width: 2;
+  }
+
+  // Primary key styling
+  .primary-key {
+    font-weight: bold;
+    fill: #1565c0;
+  }
+
+  // Foreign key styling
+  .foreign-key {
+    fill: #d84315;
+  }
+}
+
+// Actions section for dialog buttons
+.er-dialog-actions {
+  padding: 16px 24px;
+  border-top: 1px solid #e0e0e0;
+
+  button {
+    margin-left: 8px;
+
+    &:first-child {
+      margin-left: 0;
     }
   }
 }

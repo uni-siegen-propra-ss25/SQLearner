@@ -267,20 +267,30 @@ export class SchemaVisualizationService {
      * @returns {{ tables: TableNodeDto[], relationships: RelationshipDto[] }} - The mapped tables and relationships.
      */
     private mapTypedSchemaToDto(typedSchema: TypedJsonSchema): { tables: TableNodeDto[], relationships: RelationshipDto[] } {
+        console.log('🔍 [AUDIT] Mapping TypedSchema to DTO:');
+        console.log('   Input Schema Tables:', typedSchema.tables?.length || 0);
+        console.log('   Input Schema Foreign Keys:', typedSchema.foreignKeys?.length || 0);
+        
         const tables: TableNodeDto[] = [];
         const relationships: RelationshipDto[] = [];
 
         // Map tables
         for (const table of typedSchema.tables) {
-            const columns: ColumnDto[] = table.columns.map(column => ({
-                name: column.name,
-                type: column.type,
-                isPrimaryKey: column.isPrimaryKey,
-                isForeignKey: column.isForeignKey,
-                isUnique: column.isUnique,
-                isNullable: column.isNullable,
-                constraints: column.constraints?.join(' ') || ''
-            }));
+            console.log(`   📊 Processing Table: ${table.name}`);
+            
+            const columns: ColumnDto[] = table.columns.map(column => {
+                console.log(`      📝 Column: ${column.name} (PK: ${column.isPrimaryKey}, FK: ${column.isForeignKey}, Type: ${column.type})`);
+                
+                return {
+                    name: column.name,
+                    type: column.type,
+                    isPrimaryKey: column.isPrimaryKey,
+                    isForeignKey: column.isForeignKey,
+                    isUnique: column.isUnique,
+                    isNullable: column.isNullable,
+                    constraints: column.constraints?.join(' ') || ''
+                };
+            });
 
             tables.push({
                 id: table.name,
@@ -295,6 +305,8 @@ export class SchemaVisualizationService {
 
         // Map relationships from foreign keys
         for (const fk of typedSchema.foreignKeys) {
+            console.log(`   🔗 Processing FK: ${fk.sourceTable}.${fk.sourceColumn} -> ${fk.targetTable}.${fk.targetColumn}`);
+            
             relationships.push({
                 id: `${fk.sourceTable}.${fk.sourceColumn}_to_${fk.targetTable}.${fk.targetColumn}`,
                 fromTable: fk.sourceTable,
@@ -305,6 +317,10 @@ export class SchemaVisualizationService {
                 label: fk.constraintName || '',
             });
         }
+
+        console.log(`🎯 [AUDIT] Mapping Result: ${tables.length} tables, ${relationships.length} relationships`);
+        console.log('   Final Tables:', tables.map(t => ({ name: t.name, columns: t.columns.length })));
+        console.log('   Final Relationships:', relationships.map(r => `${r.fromTable}.${r.fromColumn} -> ${r.toTable}.${r.toColumn}`));
 
         return { tables, relationships };
     }

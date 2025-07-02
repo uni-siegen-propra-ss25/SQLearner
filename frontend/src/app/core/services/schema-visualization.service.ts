@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 /**
@@ -117,7 +118,31 @@ export class SchemaVisualizationService {
    * @returns {Observable<ERDiagramDto>} - Observable emitting the ER diagram data.
    */
   parseSchemaString(parseSchemaDto: ParseSchemaDto): Observable<ERDiagramDto> {
-    return this.http.post<ERDiagramDto>(`${this.baseUrl}/parse-schema`, parseSchemaDto);
+    console.log('🌐 [AUDIT] Frontend Service - parseSchemaString():');
+    console.log('   Request URL:', `${this.baseUrl}/parse-schema`);
+    console.log('   Request Data:', {
+      schema: parseSchemaDto.schema?.substring(0, 100) + '...',
+      name: parseSchemaDto.name,
+      schemaLength: parseSchemaDto.schema?.length || 0
+    });
+    
+    const request = this.http.post<ERDiagramDto>(`${this.baseUrl}/parse-schema`, parseSchemaDto);
+    
+    // Add response logging
+    return request.pipe(
+      tap(response => {
+        console.log('📨 [AUDIT] Frontend Service - Response received:');
+        console.log('   Tables Count:', response.tables?.length || 0);
+        console.log('   Relationships Count:', response.relationships?.length || 0);
+        console.log('   DBML Code Length:', response.dbmlCode?.length || 0);
+        console.log('   Response Tables:', response.tables?.map(t => ({ name: t.name, columns: t.columns?.length || 0 })));
+        console.log('   Response Relationships:', response.relationships?.map(r => `${r.fromTable}.${r.fromColumn} -> ${r.toTable}.${r.toColumn}`));
+      }),
+      catchError(error => {
+        console.error('❌ [AUDIT] Frontend Service - Request failed:', error);
+        throw error;
+      })
+    );
   }
 
   /**

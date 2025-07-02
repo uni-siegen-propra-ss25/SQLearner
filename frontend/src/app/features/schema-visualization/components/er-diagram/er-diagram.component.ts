@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, Inject, OnInit, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
@@ -59,10 +59,13 @@ interface ERDiagramDialogData {
 @Component({
   selector: 'app-er-diagram',
   templateUrl: './er-diagram.component.html',
-  styleUrls: ['./er-diagram.component.scss']
+  styleUrls: ['./er-diagram.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class ErDiagramComponent implements OnInit, OnDestroy {
   diagramHtml: SafeHtml | null = null;
+  parsedTables: DbmlTable[] = [];
+  parsedRelationships: DbmlRelationship[] = [];
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: ERDiagramDialogData,
@@ -85,26 +88,50 @@ export class ErDiagramComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Generates the ER diagram HTML from the provided DBML code.
-   * Sets the sanitized HTML for rendering in the dialog.
+   * Generates the ER diagram from the provided DBML code.
+   * Parses DBML and sets the parsed data for template rendering.
    */
   private async generateDiagram(): Promise<void> {
     try {
+      console.log('🎨 [AUDIT] Frontend - generateDiagram():');
+      console.log('   Input Data:', this.data);
+      console.log('   DBML Code Length:', this.data.dbmlCode?.length || 0);
+      console.log('   Database Name:', this.data.databaseName || 'None');
+      
       if (!this.data.dbmlCode || this.data.dbmlCode.trim() === '') {
-        console.warn('No DBML code provided');
+        console.warn('❌ No DBML code provided');
         return;
       }
 
-      // For now, we'll create a simple table visualization from DBML
-      // In the future, this can be replaced with a proper DBML renderer
-      const htmlContent = this.createSimpleVisualization(this.data.dbmlCode);
+      console.log('📋 DBML Code Preview:', this.data.dbmlCode.substring(0, 200) + '...');
+
+      // Parse DBML code into structured data for template rendering
+      this.parsedTables = this.parseDbmlTables(this.data.dbmlCode);
+      this.parsedRelationships = this.parseDbmlRelationships(this.data.dbmlCode);
+
+      console.log('✅ [AUDIT] Parsing Complete:');
+      console.log('   Parsed Tables Count:', this.parsedTables.length);
+      console.log('   Parsed Relationships Count:', this.parsedRelationships.length);
       
-      if (htmlContent) {
-        // Sanitize the HTML for security
-        this.diagramHtml = this.sanitizer.bypassSecurityTrustHtml(htmlContent);
-      } else {
-        console.error('Failed to generate visualization from DBML');
-      }
+      // Detailed table logging
+      this.parsedTables.forEach((table, index) => {
+        console.log(`   📊 Table ${index + 1}: ${table.name}`);
+        console.log(`      Columns (${table.columns.length}):`, table.columns.map(c => ({ 
+          name: c.name, 
+          type: c.type, 
+          pk: c.isPrimaryKey, 
+          fk: c.isForeignKey,
+          unique: c.isUnique
+        })));
+      });
+      
+      // Detailed relationship logging
+      this.parsedRelationships.forEach((rel, index) => {
+        console.log(`   🔗 Relationship ${index + 1}: ${rel.fromTable}.${rel.fromColumn} -> ${rel.toTable}.${rel.toColumn}`);
+      });
+      
+      // No longer generate HTML content - use Angular template instead
+      this.diagramHtml = null;
     } catch (error) {
       console.error('Error generating ER diagram:', error);
     }
@@ -131,16 +158,15 @@ export class ErDiagramComponent implements OnInit, OnDestroy {
       `;
       
       table.columns.forEach((column: TableColumn) => {
-        const badges = [];
-        if (column.isPrimaryKey) badges.push('<span class="badge primary-key">PK</span>');
-        if (column.isForeignKey) badges.push('<span class="badge foreign-key">FK</span>');
-        if (column.isUnique) badges.push('<span class="badge unique">UQ</span>');
-        
         html += `
           <div class="column-row ${column.isPrimaryKey ? 'primary-key-row' : ''}">
+            <span class="column-icons">
+              ${column.isPrimaryKey ? '<mat-icon class="pk-icon" matTooltip="Primärschlüssel">vpn_key</mat-icon>' : ''}
+              ${column.isForeignKey ? '<mat-icon class="fk-icon" matTooltip="Fremdschlüssel">link</mat-icon>' : ''}
+              ${column.isUnique ? '<mat-icon class="uq-icon" matTooltip="Eindeutig">star</mat-icon>' : ''}
+            </span>
             <span class="column-name">${column.name}</span>
             <span class="column-type">${column.type}</span>
-            ${badges.join(' ')}
           </div>
         `;
       });
@@ -205,9 +231,19 @@ export class ErDiagramComponent implements OnInit, OnDestroy {
       const name = parts[0];
       const type = parts[1];
       
-      const isPrimaryKey = line.includes('[primary key]') || line.includes('[pk]');
-      const isForeignKey = line.includes('[ref:') || line.includes('[foreign key]');
-      const isUnique = line.includes('[unique]') || line.includes('[uq]');
+      // Robustere Erkennung für PK/FK/UQ
+      const isPrimaryKey = /\[.*\bpk\b.*\]/i.test(line) || /\[.*primary key.*\]/i.test(line);
+      let isForeignKey = /\[.*ref:.*\]/i.test(line) || /\[.*foreign key.*\]/i.test(line);
+      const isUnique = /\[.*\buq\b.*\]/i.test(line) || /\[.*unique.*\]/i.test(line);
+      
+      // Fallback: Erkenne Spalten mit '_id' Suffix als potenzielle Foreign Keys
+      // (außer wenn sie bereits als Primary Key erkannt wurden)
+      if (!isForeignKey && !isPrimaryKey && name.toLowerCase().endsWith('_id')) {
+        isForeignKey = true;
+        console.log(`FK detected by naming convention: ${name}`);
+      }
+      
+      console.log(`Column parsed: ${name} (PK: ${isPrimaryKey}, FK: ${isForeignKey}, UQ: ${isUnique})`);
       
       columns.push({ name, type, isPrimaryKey, isForeignKey, isUnique });
     });
