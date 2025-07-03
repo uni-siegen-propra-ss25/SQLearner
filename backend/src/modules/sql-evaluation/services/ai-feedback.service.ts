@@ -95,7 +95,7 @@ export class AiFeedbackService {
       'Aufgabenstellung:',
       params.aufgabenstellung || 'Keine Aufgabenstellung übergeben.',
       '',
-      'Bewerte die folgende SQL-Studentenlösung im Vergleich zur Musterlösung. Gib einen hilfreichen Hinweis, warum die Lösung falsch ist und wie sie verbessert werden kann.',
+      'Bewerte die folgende SQL-Studentenlösung. Gib einen hilfreichen Hinweis, warum die Lösung falsch ist und wie sie verbessert werden kann. Erwähne die Musterlösung nicht explizit und gib keine Details daraus preis.',
       '',
       `Fehlerkategorie: ${params.errorCategory || 'Unbekannt'}`,
       '',
@@ -103,14 +103,15 @@ export class AiFeedbackService {
       'Datenbankschema:',
       params.schema,
       '---',
-      'Musterlösung:',
-      params.solutionQuery,
-      '---',
+      // Die Musterlösung und deren Ergebnis werden nicht mehr explizit im Prompt genannt
+      //'Musterlösung:',
+      //params.solutionQuery,
+      //'---',
       'Studentenlösung:',
       params.studentQuery,
       '---',
       params.studentResult ? `Ergebnis Studentenlösung: ${JSON.stringify(params.studentResult)}` : '',
-      params.solutionResult ? `Ergebnis Musterlösung: ${JSON.stringify(params.solutionResult)}` : '',
+      //params.solutionResult ? `Ergebnis Musterlösung: ${JSON.stringify(params.solutionResult)}` : '',
     ].filter(Boolean).join('\n');
   }
 }

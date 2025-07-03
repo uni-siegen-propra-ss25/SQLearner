@@ -62,12 +62,13 @@
         <button
           mat-flat-button
           color="primary"
-          [disabled]="!sqlQuery.trim() || isLoading"
+          [disabled]="!sqlQuery.trim() || isLoading || cooldown > 0"
           (click)="submitAnswer()"
           matTooltip="Reicht deine Lösung ein. Die KI überprüft, ob deine Query das gewünschte Ergebnis liefert."
         >
           <mat-icon>send</mat-icon>
-          Lösung einreichen
+          <ng-container *ngIf="cooldown > 0">Warte {{ cooldown }} s…</ng-container>
+          <ng-container *ngIf="cooldown === 0">Lösung einreichen</ng-container>
         </button>
       </div>
     </div>

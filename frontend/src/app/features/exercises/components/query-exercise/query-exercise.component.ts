@@ -14,13 +14,17 @@ import { Subscription } from 'rxjs';
 import { DatabaseService } from '../../../database/services/database.service';
 import { SchemaVisualizationService } from '../../../../core/services/schema-visualization.service';
 import { ErDiagramComponent } from '../../../schema-visualization/components/er-diagram/er-diagram.component';
-
 @Component({
     selector: 'app-query-exercise',
     templateUrl: './query-exercise.component.html',
     styleUrls: ['./query-exercise.component.scss'],
 })
 export class QueryExerciseComponent implements OnInit, OnDestroy {
+    /**
+     * Cooldown timer in seconds for the submit button
+     */
+    cooldown = 0;
+    private cooldownInterval: any;
     /**
      * The exercise object containing all relevant data for the current query exercise.
      * @type {Exercise}
@@ -270,7 +274,7 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
      * @returns {void}
      */
     submitAnswer(): void {
-        if (!this.sqlQuery.trim() || this.isLoading) return;
+        if (!this.sqlQuery.trim() || this.isLoading || this.cooldown > 0) return;
 
         this.isLoading = true;
         this.submissionService.submitAnswer(this.exercise.id, this.sqlQuery, this.connectionDetails || undefined).subscribe({
@@ -285,14 +289,32 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
                     this.feedback = submission.feedback;
                     this.showFeedback = true;
                 }
+                this.startCooldown(10);
             },
             error: (error: any) => {
                 this.isLoading = false;
                 this.snackBar.open(error.message || 'Failed to submit answer', 'Close', {
                     duration: 3000,
                 });
+                this.startCooldown(10);
             }
         });
+    }
+
+    /**
+     * Starts the cooldown timer for the submit button
+     */
+    private startCooldown(seconds: number) {
+        this.cooldown = seconds;
+        if (this.cooldownInterval) {
+            clearInterval(this.cooldownInterval);
+        }
+        this.cooldownInterval = setInterval(() => {
+            this.cooldown--;
+            if (this.cooldown <= 0) {
+                clearInterval(this.cooldownInterval);
+            }
+        }, 1000);
     }
 
     /**
