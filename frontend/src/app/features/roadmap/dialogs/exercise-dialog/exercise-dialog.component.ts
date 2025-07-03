@@ -5,6 +5,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Exercise, ExerciseType, Difficulty, AnswerOption } from '../../models/exercise.model';
 import { Database } from 'app/features/database/models/database.model';
 import { DatabaseService } from 'app/features/database/services/database.service';
+import { MatDialog } from '@angular/material/dialog';
+import { ExerciseAIGenerationDialogComponent } from './exercise-ai-generation-dialog.component';
 
 @Component({
     selector: 'app-exercise-dialog',
@@ -23,6 +25,7 @@ export class ExerciseDialogComponent implements OnInit {
         private readonly dialogRef: MatDialogRef<ExerciseDialogComponent>,
         private readonly databaseService: DatabaseService,
         private readonly snackBar: MatSnackBar,
+        private readonly dialog: MatDialog,
         @Inject(MAT_DIALOG_DATA) private readonly data: Partial<Exercise>,
     ) {
         this.isEditing = !!data.id;
@@ -247,6 +250,26 @@ export class ExerciseDialogComponent implements OnInit {
     onCancel(): void {
         this.dialogRef.close();
     }
+
+    openAIGenerationDialog(): void {
+  const dialogRef = this.dialog.open(ExerciseAIGenerationDialogComponent, {
+    width: '500px',
+    data: {
+      databases: this.databases,
+      defaultType: this.exerciseForm.get('type')?.value,
+      defaultDifficulty: this.exerciseForm.get('difficulty')?.value
+    }
+  });
+  dialogRef.afterClosed().subscribe((result: any) => {
+    if (result && this.exerciseForm) {
+      this.exerciseForm.patchValue({
+        title: result.title,
+        description: result.description,
+        solution: result.solution
+      });
+    }
+  });
+}
 
     onSingleChoiceSelect(selectedIndex: number) {
         // Uncheck all other answers

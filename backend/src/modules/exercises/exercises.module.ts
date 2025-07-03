@@ -1,11 +1,13 @@
 import { Module } from '@nestjs/common';
 import { ExercisesController } from './controllers/exercises.controller';
 import { ExercisesService } from './services/exercises.service';
+import { ExerciseGenerationService } from './services/exercise-generation.service';
 import { PrismaModule } from '../../prisma/prisma.module';
 import { TopicsModule } from '../topics/topics.module';
 import { DatabasesModule } from '../databases/databases.module';
 import { ProgressModule } from '../progress/progress.module';
 import { SqlEvaluationModule } from '../sql-evaluation/sql-evaluation.module';
+import { SettingsModule } from '../settings/settings.module';
 
 /**
  * Exercises Module manages all exercise-related functionality.
@@ -24,9 +26,9 @@ import { SqlEvaluationModule } from '../sql-evaluation/sql-evaluation.module';
  * @module ExercisesModule
  */
 @Module({
-    imports: [PrismaModule, TopicsModule, DatabasesModule, ProgressModule, SqlEvaluationModule],
+    imports: [PrismaModule, TopicsModule, DatabasesModule, ProgressModule, SqlEvaluationModule, SettingsModule],
     controllers: [ExercisesController],
-    providers: [ExercisesService],
+    providers: [ExercisesService, ExerciseGenerationService],
     exports: [ExercisesService],
 })
 export class ExercisesModule {}

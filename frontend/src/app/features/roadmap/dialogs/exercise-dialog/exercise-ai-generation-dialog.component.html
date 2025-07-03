@@ -1,0 +1,63 @@
+<h2 mat-dialog-title>Aufgabe mit KI generieren</h2>
+<mat-dialog-content [formGroup]="generationForm">
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Aufgabentyp</mat-label>
+    <mat-select formControlName="type" (selectionChange)="onTypeChange()">
+      <mat-option value="QUERY">Query</mat-option>
+      <mat-option value="SINGLE_CHOICE">Single Choice</mat-option>
+      <mat-option value="MULTIPLE_CHOICE">Multiple Choice</mat-option>
+      <mat-option value="FREETEXT">Freitext</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Schwierigkeit</mat-label>
+    <mat-select formControlName="difficulty">
+      <mat-option value="EASY">Einfach</mat-option>
+      <mat-option value="MEDIUM">Mittel</mat-option>
+      <mat-option value="HARD">Schwer</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <ng-container *ngIf="generationForm.get('type')?.value === 'QUERY'">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Datenbank</mat-label>
+      <mat-select formControlName="databaseId">
+        <mat-option *ngFor="let db of data.databases" [value]="db.id">{{ db.name }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>SQL-Syntaxelemente (optional)</mat-label>
+      <mat-select formControlName="syntaxElements" multiple>
+        <mat-option *ngFor="let s of syntaxElements" [value]="s">{{ s }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>SQL-Konzepte (optional)</mat-label>
+      <mat-select formControlName="sqlConcepts" multiple>
+        <mat-option *ngFor="let c of sqlConcepts" [value]="c">{{ c }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </ng-container>
+
+  <div *ngIf="error" class="error">{{ error }}</div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()">Abbrechen</button>
+  <button mat-flat-button color="primary" (click)="generate()" [disabled]="isLoading || generationForm.invalid">
+    <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+    <span *ngIf="!isLoading">Generieren</span>
+  </button>
+</mat-dialog-actions>
+
+<div *ngIf="result" class="result-box">
+  <h3>Vorschlag der KI</h3>
+  <p><strong>Titel:</strong> {{ result.title }}</p>
+  <p><strong>Beschreibung:</strong> {{ result.description }}</p>
+  <p><strong>Lösung:</strong></p>
+  <pre>{{ result.solution }}</pre>
+  <button mat-flat-button color="accent" (click)="useResult()">In Aufgabe übernehmen</button>
+</div>

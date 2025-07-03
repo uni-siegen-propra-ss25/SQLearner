@@ -151,4 +151,11 @@
       {{ isEditing ? ('EXERCISE_DIALOG.SAVE' | translate) : ('EXERCISE_DIALOG.CREATE' | translate) }}
     </button>
   </mat-dialog-actions>
+
+  <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+    <button mat-stroked-button color="accent" (click)="openAIGenerationDialog()">
+      <mat-icon>auto_awesome</mat-icon>
+      Mit KI generieren
+    </button>
+  </div>
 </form>
