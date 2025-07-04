@@ -13,7 +13,6 @@ export class ExerciseAIGenerationDialogComponent {
   generationForm: FormGroup;
   isLoading = false;
   error: string | null = null;
-  result: { title: string; description: string; solution: string } | null = null;
 
   syntaxElements = [
     'SELECT', 'WHERE', 'JOIN', 'GROUP BY', 'ORDER BY', 'HAVING', 'LIMIT', 'DISTINCT', 'UNION', 'IN', 'EXISTS', 'COUNT', 'AVG', 'SUM', 'MIN', 'MAX'
@@ -29,34 +28,31 @@ export class ExerciseAIGenerationDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: { databases: Database[], defaultType: string, defaultDifficulty: string }
   ) {
     this.generationForm = this.fb.group({
-      type: [data.defaultType || 'QUERY', Validators.required],
       difficulty: [data.defaultDifficulty || 'EASY', Validators.required],
-      databaseId: [null],
+      databaseId: [null, Validators.required],
       syntaxElements: [[]],
       sqlConcepts: [[]]
     });
   }
 
-  onTypeChange() {
-    if (this.generationForm.get('type')?.value !== 'QUERY') {
-      this.generationForm.get('databaseId')?.setValue(null);
-      this.generationForm.get('syntaxElements')?.setValue([]);
-      this.generationForm.get('sqlConcepts')?.setValue([]);
-    }
-  }
+
 
   generate() {
     this.isLoading = true;
     this.error = null;
-    this.result = null;
-    const payload = { ...this.generationForm.value };
+    const payload = { ...this.generationForm.value, type: 'QUERY' };
     this.http.post<{ title: string; description: string; solution: string }>(
       '/api/exercises/generate',
       payload
     ).subscribe({
       next: (res) => {
-        this.result = res;
         this.isLoading = false;
+        // Übergib zusätzlich difficulty und databaseId zurück
+        this.dialogRef.close({
+          ...res,
+          difficulty: this.generationForm.get('difficulty')?.value,
+          databaseId: this.generationForm.get('databaseId')?.value
+        });
       },
       error: (err) => {
         this.error = err?.error?.message || 'Fehler bei der Generierung.';
@@ -65,11 +61,7 @@ export class ExerciseAIGenerationDialogComponent {
     });
   }
 
-  useResult() {
-    if (this.result) {
-      this.dialogRef.close(this.result);
-    }
-  }
+
 
   close() {
     this.dialogRef.close();

@@ -265,7 +265,9 @@ export class ExerciseDialogComponent implements OnInit {
       this.exerciseForm.patchValue({
         title: result.title,
         description: result.description,
-        solution: result.solution
+        solution: result.solution,
+        difficulty: result.difficulty || this.exerciseForm.get('difficulty')?.value,
+        databaseId: result.databaseId || this.exerciseForm.get('databaseId')?.value
       });
     }
   });

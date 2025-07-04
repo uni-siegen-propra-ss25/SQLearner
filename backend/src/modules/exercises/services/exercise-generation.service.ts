@@ -45,8 +45,9 @@ export class ExerciseGenerationService {
 
     let dbSchema = '';
     if (params.type === 'QUERY' && params.databaseId) {
-      const db = await this.databasesService.getDatabaseById(params.databaseId);
-      dbSchema = db?.schemaSql || '';
+      // Hole das echte SQL-Schema der Datenbank
+      const schemaResult = await this.databasesService.getDatabaseSchema(params.databaseId);
+      dbSchema = schemaResult?.schema || '';
     }
 
     const prompt = this.buildPrompt(params, dbSchema);
@@ -78,16 +79,17 @@ export class ExerciseGenerationService {
   }
 
   private buildPrompt(params: any, dbSchema: string): string {
-    let prompt = `Typ: ${params.type}\nSchwierigkeit: ${params.difficulty}`;
-    if (params.type === 'QUERY') {
-      prompt += `\nDatenbankschema: ${dbSchema}`;
-      if (params.syntaxElements?.length) {
-        prompt += `\nVerwende folgende SQL-Syntaxelemente: ${params.syntaxElements.join(', ')}`;
-      }
-      if (params.sqlConcepts?.length) {
-        prompt += `\nBeziehe folgende SQL-Konzepte ein: ${params.sqlConcepts.join(', ')}`;
-      }
+    let prompt = `Erstelle eine SQL-Übungsaufgabe für Studierende. Die Aufgabe soll das Schreiben einer SQL-Query erfordern.\n`;
+    prompt += `Schwierigkeit: ${params.difficulty}\n`;
+    if (dbSchema) {
+      prompt += `Datenbankschema: ${dbSchema}\n`;
     }
-    return prompt;
+    if (params.syntaxElements?.length) {
+      prompt += `Verwende folgende SQL-Syntaxelemente: ${params.syntaxElements.join(', ')}\n`;
+    }
+    if (params.sqlConcepts?.length) {
+      prompt += `Beziehe folgende SQL-Konzepte ein: ${params.sqlConcepts.join(', ')}\n`;
+    }
+    return prompt.trim();
   }
 }

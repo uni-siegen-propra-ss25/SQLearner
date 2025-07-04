@@ -152,8 +152,9 @@
     </button>
   </mat-dialog-actions>
 
-  <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
-    <button mat-stroked-button color="accent" (click)="openAIGenerationDialog()">
+  <div class="ai-generate-row">
+    <button mat-stroked-button color="accent" (click)="openAIGenerationDialog()"
+      [disabled]="exerciseForm.get('type')?.value !== 'QUERY'">
       <mat-icon>auto_awesome</mat-icon>
       Mit KI generieren
     </button>
