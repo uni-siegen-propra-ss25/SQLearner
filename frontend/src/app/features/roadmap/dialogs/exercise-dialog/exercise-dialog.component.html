@@ -146,7 +146,7 @@
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">
-    <button mat-button (click)="onCancel()">{{ 'EXERCISE_DIALOG.CANCEL' | translate }}</button>
+    <button mat-button type="button" (click)="onCancel()">{{ 'EXERCISE_DIALOG.CANCEL' | translate }}</button>
     <button mat-flat-button color="primary" type="submit" [disabled]="!exerciseForm.valid">
       {{ isEditing ? ('EXERCISE_DIALOG.SAVE' | translate) : ('EXERCISE_DIALOG.CREATE' | translate) }}
     </button>
