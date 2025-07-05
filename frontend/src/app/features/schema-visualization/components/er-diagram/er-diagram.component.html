@@ -33,12 +33,11 @@
                 <mat-icon *ngIf="column.isPrimaryKey" 
                          class="pk-icon" 
                          matTooltip="Primärschlüssel">vpn_key</mat-icon>
-                <mat-icon *ngIf="column.isForeignKey && column.references" 
-                         class="fk-icon" 
-                         matTooltip="FK → {{ column.references.table }}.{{ column.references.column }}">link</mat-icon>
-                <mat-icon *ngIf="column.isForeignKey && !column.references" 
-                         class="fk-icon" 
-                         matTooltip="Fremdschlüssel">link</mat-icon>
+                <mat-icon *ngIf="column.isForeignKey"
+                         class="fk-icon"
+                         [ngClass]="{'composite-fk-icon': isColumnInCompositeFK(table.name, column.name)}"
+                         [matTooltip]="getForeignKeyTooltip(table.name, column.name)">link</mat-icon>
+                <span *ngIf="isColumnInCompositeFK(table.name, column.name)" class="composite-fk-badge" matTooltip="Teil eines zusammengesetzten Fremdschlüssels">FK-Gruppe</span>
                 <mat-icon *ngIf="column.isUnique" 
                          class="uq-icon" 
                          matTooltip="Eindeutig">star</mat-icon>
@@ -48,6 +47,8 @@
             </div>
           </div>
         </div>
+        
+        <!-- Relationships section entfernt -->
       </div>
     </div>
     

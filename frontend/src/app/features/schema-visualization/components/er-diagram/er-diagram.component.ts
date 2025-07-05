@@ -36,15 +36,15 @@ interface DbmlTable {
 /**
  * Data structure representing a relationship parsed from DBML.
  * @property {string} fromTable - Name of the source table.
- * @property {string} fromColumn - Name of the source column.
+ * @property {string | string[]} fromColumn - Name(s) of the source column(s). Single column as string, multi-column as array.
  * @property {string} toTable - Name of the target table.
- * @property {string} toColumn - Name of the target column.
+ * @property {string | string[]} toColumn - Name(s) of the target column(s). Single column as string, multi-column as array.
  */
 interface DbmlRelationship {
   fromTable: string;
-  fromColumn: string;
+  fromColumn: string | string[];
   toTable: string;
-  toColumn: string;
+  toColumn: string | string[];
 }
 
 /**
@@ -152,24 +152,49 @@ export class ErDiagramComponent implements OnInit, OnDestroy {
    */
   private mapForeignKeyReferences(): void {
     this.parsedRelationships.forEach(relationship => {
-      // Find the source table and column
-      const sourceTable = this.parsedTables.find(t => t.name === relationship.fromTable);
-      if (sourceTable) {
-        const sourceColumn = sourceTable.columns.find(c => c.name === relationship.fromColumn);
-        if (sourceColumn) {
-          // Only set isForeignKey if not already set by inline parsing
-          if (!sourceColumn.isForeignKey) {
-            sourceColumn.isForeignKey = true;
+      // Einzelspalten-FK wie gehabt
+      if (typeof relationship.fromColumn === 'string' && typeof relationship.toColumn === 'string') {
+        const sourceTable = this.parsedTables.find(t => t.name === relationship.fromTable);
+        if (sourceTable) {
+          const sourceColumn = sourceTable.columns.find(c => c.name === relationship.fromColumn);
+          if (sourceColumn) {
+            if (!sourceColumn.isForeignKey) {
+              sourceColumn.isForeignKey = true;
+            }
+            if (!sourceColumn.references) {
+              sourceColumn.references = {
+                table: relationship.toTable,
+                column: relationship.toColumn
+              };
+            }
+            console.log(`🔗 Mapped FK reference: ${relationship.fromTable}.${relationship.fromColumn} → ${relationship.toTable}.${relationship.toColumn}`);
           }
-          // Only set references if not already set by inline parsing
-          if (!sourceColumn.references) {
-            sourceColumn.references = {
-              table: relationship.toTable,
-              column: relationship.toColumn
-            };
-          }
-          console.log(`🔗 Mapped FK reference: ${relationship.fromTable}.${relationship.fromColumn} → ${relationship.toTable}.${relationship.toColumn}`);
         }
+      } else if (Array.isArray(relationship.fromColumn) && Array.isArray(relationship.toColumn)) {
+        // NEU: Für zusammengesetzte FKs alle beteiligten Spalten markieren
+        const sourceTable = this.parsedTables.find(t => t.name === relationship.fromTable);
+        if (sourceTable) {
+          relationship.fromColumn.forEach((colName, idx) => {
+            const sourceColumn = sourceTable.columns.find(c => c.name === colName);
+            if (sourceColumn) {
+              if (!sourceColumn.isForeignKey) {
+                sourceColumn.isForeignKey = true;
+              }
+              if (!sourceColumn.references) {
+                sourceColumn.references = {
+                  table: relationship.toTable,
+                  column: Array.isArray(relationship.toColumn) ? relationship.toColumn[idx] : relationship.toColumn
+                };
+              }
+              console.log(`🔗 Mapped composite FK: ${relationship.fromTable}.${colName} → ${relationship.toTable}.${Array.isArray(relationship.toColumn) ? relationship.toColumn[idx] : relationship.toColumn}`);
+            }
+          });
+        }
+      } else {
+        // Fallback: Logging für ungewöhnliche Fälle
+        const fromCols = Array.isArray(relationship.fromColumn) ? relationship.fromColumn.join(', ') : relationship.fromColumn;
+        const toCols = Array.isArray(relationship.toColumn) ? relationship.toColumn.join(', ') : relationship.toColumn;
+        console.log(`🔗 Composite FK detected: ${relationship.fromTable}.[${fromCols}] → ${relationship.toTable}.[${toCols}]`);
       }
     });
   }
@@ -221,7 +246,14 @@ export class ErDiagramComponent implements OnInit, OnDestroy {
     if (relationships.length > 0) {
       html += '<div class="relationships-section"><h4>Beziehungen:</h4><ul>';
       relationships.forEach((rel: DbmlRelationship) => {
-        html += `<li>${rel.fromTable}.${rel.fromColumn} → ${rel.toTable}.${rel.toColumn}</li>`;
+        const fromColumns = Array.isArray(rel.fromColumn) ? rel.fromColumn.join(', ') : rel.fromColumn;
+        const toColumns = Array.isArray(rel.toColumn) ? rel.toColumn.join(', ') : rel.toColumn;
+        const isComposite = Array.isArray(rel.fromColumn) && rel.fromColumn.length > 1;
+        
+        html += `<li class="${isComposite ? 'composite-fk' : 'single-fk'}">
+          ${rel.fromTable}.[${fromColumns}] → ${rel.toTable}.[${toColumns}]
+          ${isComposite ? '<span class="composite-badge">Zusammengesetzt</span>' : ''}
+        </li>`;
       });
       html += '</ul></div>';
     }
@@ -299,10 +331,17 @@ export class ErDiagramComponent implements OnInit, OnDestroy {
    */
   private parseDbmlRelationships(dbmlCode: string): DbmlRelationship[] {
     const relationships: DbmlRelationship[] = [];
-    const refRegex = /(\w+)\.(\w+)\s*>\s*(\w+)\.(\w+)/g;
+    
+    // Pattern for single column relationships: table.column > table.column
+    const singleRefRegex = /(\w+)\.(\w+)\s*>\s*(\w+)\.(\w+)/g;
+    
+    // Pattern for composite relationships: (table.col1, table.col2) > (table.col1, table.col2)
+    const compositeRefRegex = /\(([^)]+)\)\s*>\s*\(([^)]+)\)/g;
+    
     let match;
     
-    while ((match = refRegex.exec(dbmlCode)) !== null) {
+    // Parse single column relationships
+    while ((match = singleRefRegex.exec(dbmlCode)) !== null) {
       relationships.push({
         fromTable: match[1],
         fromColumn: match[2],
@@ -311,6 +350,132 @@ export class ErDiagramComponent implements OnInit, OnDestroy {
       });
     }
     
+    // Parse composite relationships
+    while ((match = compositeRefRegex.exec(dbmlCode)) !== null) {
+      const fromPart = match[1];
+      const toPart = match[2];
+      
+      // Parse source columns from "table.col1, table.col2" format
+      const fromColumns = this.parseCompositeColumns(fromPart);
+      const toColumns = this.parseCompositeColumns(toPart);
+      
+      if (fromColumns.length > 0 && toColumns.length > 0 && fromColumns.length === toColumns.length) {
+        relationships.push({
+          fromTable: fromColumns[0].table,
+          fromColumn: fromColumns.map(c => c.column),
+          toTable: toColumns[0].table,
+          toColumn: toColumns.map(c => c.column)
+        });
+      }
+    }
+    
     return relationships;
+  }
+
+  /**
+   * Checks if a relationship is a composite foreign key.
+   * @param {DbmlRelationship} relationship - The relationship to check.
+   * @returns {boolean} - True if the relationship is composite.
+   */
+  isCompositeRelationship(relationship: DbmlRelationship): boolean {
+    return Array.isArray(relationship.fromColumn) && relationship.fromColumn.length > 1;
+  }
+
+  /**
+   * Formats column names for display (handles both single and composite columns).
+   * @param {string | string[]} columns - The column(s) to format.
+   * @returns {string} - The formatted column names.
+   */
+  formatColumns(columns: string | string[]): string {
+    if (Array.isArray(columns)) {
+      return columns.join(', ');
+    }
+    return columns;
+  }
+
+  /**
+   * Creates a detailed tooltip for FK relationships, handling both single and composite FKs.
+   * @param {DbmlRelationship} relationship - The relationship to create a tooltip for.
+   * @returns {string} - The formatted tooltip text.
+   */
+  getRelationshipTooltip(relationship: DbmlRelationship): string {
+    const targetColumns = Array.isArray(relationship.toColumn) 
+      ? relationship.toColumn.join(', ') 
+      : relationship.toColumn;
+    
+    if (this.isCompositeRelationship(relationship)) {
+      return `FK → ${relationship.toTable}(${targetColumns})`;
+    } else {
+      return `FK → ${relationship.toTable}.${targetColumns}`;
+    }
+  }
+
+  /**
+   * Gets a tooltip for the composite badge indicating the number of columns.
+   * @param {DbmlRelationship} relationship - The relationship to create a tooltip for.
+   * @returns {string} - The formatted tooltip text for the composite badge.
+   */
+  getCompositeTooltip(relationship: DbmlRelationship): string {
+    const columnCount = Array.isArray(relationship.fromColumn) ? relationship.fromColumn.length : 1;
+    return `Zusammengesetzter Fremdschlüssel mit ${columnCount} Spalten`;
+  }
+
+  /**
+   * Parses composite column references like "table.col1, table.col2".
+   * @param {string} columnsPart - The columns part of a composite reference.
+   * @returns {Array<{table: string, column: string}>} - Array of table-column pairs.
+   */
+  private parseCompositeColumns(columnsPart: string): Array<{table: string, column: string}> {
+    const columns: Array<{table: string, column: string}> = [];
+    const parts = columnsPart.split(',').map(p => p.trim());
+    
+    parts.forEach(part => {
+      const match = part.match(/(\w+)\.(\w+)/);
+      if (match) {
+        columns.push({
+          table: match[1],
+          column: match[2]
+        });
+      }
+    });
+    
+    return columns;
+  }
+
+  /**
+   * Gibt den passenden Tooltip für eine FK-Spalte zurück (auch für zusammengesetzte FKs)
+   */
+  getForeignKeyTooltip(tableName: string, columnName: string): string {
+    // Suche nach einer zusammengesetzten Beziehung, an der diese Spalte beteiligt ist
+    const compositeRel = this.parsedRelationships.find(rel =>
+      Array.isArray(rel.fromColumn) &&
+      rel.fromTable === tableName &&
+      rel.fromColumn.includes(columnName)
+    );
+    if (compositeRel) {
+      const toCols = (compositeRel.toColumn as string[]).join(', ');
+      return `FK → ${compositeRel.toTable}.[${toCols}]`;
+    }
+    // Fallback: Einzelspalten-FK
+    const singleRel = this.parsedRelationships.find(rel =>
+      rel.fromTable === tableName &&
+      rel.fromColumn === columnName
+    );
+    if (singleRel) {
+      return `FK → ${singleRel.toTable}.${singleRel.toColumn}`;
+    }
+    // Fallback: generisch
+    return 'Fremdschlüssel';
+  }
+
+  /**
+   * Prüft, ob eine Spalte Teil eines zusammengesetzten Foreign Keys ist
+   */
+  isColumnInCompositeFK(tableName: string, columnName: string): boolean {
+    return this.parsedRelationships.some(rel =>
+      Array.isArray(rel.fromColumn) &&
+      rel.fromTable === tableName &&
+      rel.fromColumn.includes(columnName)
+    );
   }
 }

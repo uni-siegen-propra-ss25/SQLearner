@@ -214,11 +214,6 @@ export class SchemaVisualizationService {
      */
     private convertTypedSchemaToDbml(typedSchema: TypedJsonSchema, databaseName: string): string {
         try {
-            console.log('🔍 [AUDIT] Converting TypedSchema to DBML:');
-            console.log('   Tables count:', typedSchema.tables?.length || 0);
-            console.log('   Foreign Keys count:', typedSchema.foreignKeys?.length || 0);
-            console.log('   Foreign Keys:', typedSchema.foreignKeys);
-            
             let dbml = `Project ${databaseName} {\n`;
             dbml += `  database_type: 'PostgreSQL'\n`;
             dbml += `  Note: 'Generated from SQL Schema via ${typedSchema.metadata?.source || 'unknown parser'}'\n`;
@@ -238,13 +233,13 @@ export class SchemaVisualizationService {
                     if (column.isUnique) attributes.push('unique');
                     if (column.defaultValue) attributes.push(`default: '${column.defaultValue}'`);
                     
-                    // Add FK reference inline if this column is a foreign key
+                    // Add FK reference inline if this column is a foreign key (only for single-column FKs)
                     const fkRef = typedSchema.foreignKeys.find(fk => 
-                        fk.sourceTable === table.name && fk.sourceColumn === column.name
+                        fk.sourceTable === table.name && 
+                        (typeof fk.sourceColumn === 'string' && fk.sourceColumn === column.name)
                     );
-                    if (fkRef) {
+                    if (fkRef && typeof fkRef.targetColumn === 'string') {
                         attributes.push(`ref: > ${fkRef.targetTable}.${fkRef.targetColumn}`);
-                        console.log(`   ✅ Added FK reference: ${column.name} -> ${fkRef.targetTable}.${fkRef.targetColumn}`);
                     }
                     
                     if (attributes.length > 0) {
@@ -257,9 +252,18 @@ export class SchemaVisualizationService {
                 dbml += `}\n\n`;
             }
 
-            // Add relationships (foreign keys) - keeping this for backward compatibility
+            // Add relationships (foreign keys) - for all FKs including multi-column ones
             for (const fk of typedSchema.foreignKeys) {
-                dbml += `Ref: ${fk.sourceTable}.${fk.sourceColumn} > ${fk.targetTable}.${fk.targetColumn}`;
+                const sourceColumns = Array.isArray(fk.sourceColumn) ? fk.sourceColumn : [fk.sourceColumn];
+                const targetColumns = Array.isArray(fk.targetColumn) ? fk.targetColumn : [fk.targetColumn];
+                
+                // For multi-column FKs, create composite reference
+                if (sourceColumns.length > 1 && targetColumns.length > 1) {
+                    dbml += `Ref: (${sourceColumns.map(col => `${fk.sourceTable}.${col}`).join(', ')}) > (${targetColumns.map(col => `${fk.targetTable}.${col}`).join(', ')})`;
+                } else {
+                    dbml += `Ref: ${fk.sourceTable}.${sourceColumns[0]} > ${fk.targetTable}.${targetColumns[0]}`;
+                }
+                
                 if (fk.onDelete) dbml += ` [delete: ${fk.onDelete.toLowerCase()}]`;
                 dbml += '\n';
             }
@@ -267,9 +271,6 @@ export class SchemaVisualizationService {
             if (typedSchema.foreignKeys.length > 0) {
                 dbml += '\n';
             }
-
-            console.log('📋 Generated DBML:');
-            console.log(dbml);
 
             return dbml;
         } catch (error) {
@@ -284,30 +285,20 @@ export class SchemaVisualizationService {
      * @returns {{ tables: TableNodeDto[], relationships: RelationshipDto[] }} - The mapped tables and relationships.
      */
     private mapTypedSchemaToDto(typedSchema: TypedJsonSchema): { tables: TableNodeDto[], relationships: RelationshipDto[] } {
-        console.log('🔍 [AUDIT] Mapping TypedSchema to DTO:');
-        console.log('   Input Schema Tables:', typedSchema.tables?.length || 0);
-        console.log('   Input Schema Foreign Keys:', typedSchema.foreignKeys?.length || 0);
-        
         const tables: TableNodeDto[] = [];
         const relationships: RelationshipDto[] = [];
 
         // Map tables
         for (const table of typedSchema.tables) {
-            console.log(`   📊 Processing Table: ${table.name}`);
-            
-            const columns: ColumnDto[] = table.columns.map(column => {
-                console.log(`      📝 Column: ${column.name} (PK: ${column.isPrimaryKey}, FK: ${column.isForeignKey}, Type: ${column.type})`);
-                
-                return {
-                    name: column.name,
-                    type: column.type,
-                    isPrimaryKey: column.isPrimaryKey,
-                    isForeignKey: column.isForeignKey,
-                    isUnique: column.isUnique,
-                    isNullable: column.isNullable,
-                    constraints: column.constraints?.join(' ') || ''
-                };
-            });
+            const columns: ColumnDto[] = table.columns.map(column => ({
+                name: column.name,
+                type: column.type,
+                isPrimaryKey: column.isPrimaryKey,
+                isForeignKey: column.isForeignKey,
+                isUnique: column.isUnique,
+                isNullable: column.isNullable,
+                constraints: column.constraints?.join(' ') || ''
+            }));
 
             tables.push({
                 id: table.name,
@@ -322,22 +313,19 @@ export class SchemaVisualizationService {
 
         // Map relationships from foreign keys
         for (const fk of typedSchema.foreignKeys) {
-            console.log(`   🔗 Processing FK: ${fk.sourceTable}.${fk.sourceColumn} -> ${fk.targetTable}.${fk.targetColumn}`);
+            const sourceColumns = Array.isArray(fk.sourceColumn) ? fk.sourceColumn : [fk.sourceColumn];
+            const targetColumns = Array.isArray(fk.targetColumn) ? fk.targetColumn : [fk.targetColumn];
             
             relationships.push({
-                id: `${fk.sourceTable}.${fk.sourceColumn}_to_${fk.targetTable}.${fk.targetColumn}`,
+                id: `${fk.sourceTable}.${sourceColumns.join('_')}_to_${fk.targetTable}.${targetColumns.join('_')}`,
                 fromTable: fk.sourceTable,
-                fromColumn: fk.sourceColumn,
+                fromColumn: fk.sourceColumn, // Keep original format (string | string[])
                 toTable: fk.targetTable,
-                toColumn: fk.targetColumn,
+                toColumn: fk.targetColumn, // Keep original format (string | string[])
                 type: 'many-to-one',
                 label: fk.constraintName || '',
             });
         }
-
-        console.log(`🎯 [AUDIT] Mapping Result: ${tables.length} tables, ${relationships.length} relationships`);
-        console.log('   Final Tables:', tables.map(t => ({ name: t.name, columns: t.columns.length })));
-        console.log('   Final Relationships:', relationships.map(r => `${r.fromTable}.${r.fromColumn} -> ${r.toTable}.${r.toColumn}`));
 
         return { tables, relationships };
     }

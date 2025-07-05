@@ -206,6 +206,117 @@
         color: #666;
         font-family: 'Courier New', monospace;
         font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        &.composite-fk {
+          color: #1976d2;
+          font-weight: 500;
+          
+          .composite-badge {
+            background: #e3f2fd;
+            color: #0d47a1;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+        }
+
+        &.single-fk {
+          color: #666;
+        }
+      }
+    }
+  }
+
+  // Relationships section styling
+  .relationships-section {
+    margin-top: 30px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+
+    h4 {
+      margin: 0 0 16px 0;
+      color: #1976d2;
+      font-weight: 600;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      &:before {
+        content: "🔗";
+        font-size: 1.2rem;
+      }
+    }
+
+    .relationships-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        margin-bottom: 8px;
+        background: white;
+        border-radius: 6px;
+        border: 1px solid #e0e0e0;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: #f5f5f5;
+          border-color: #bbdefb;
+        }
+
+        &.composite-fk {
+          border-left: 4px solid #ff5722;
+          background: #fff3e0;
+
+          &:hover {
+            background: #ffe0b2;
+          }
+        }
+
+        &.single-fk {
+          border-left: 4px solid #4caf50;
+          background: #f1f8e9;
+
+          &:hover {
+            background: #e8f5e8;
+          }
+        }
+
+        .relationship-icon {
+          color: #757575;
+          font-size: 1.2rem;
+        }
+
+        .relationship-text {
+          flex: 1;
+          font-family: 'Roboto Mono', monospace;
+          font-size: 0.9rem;
+          color: #424242;
+        }
+
+        .composite-badge {
+          background: #ff5722;
+          color: white;
+          padding: 4px 8px;
+          border-radius: 12px;
+          font-size: 0.75rem;
+          font-weight: 500;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
       }
     }
   }
