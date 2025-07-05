@@ -48,27 +48,7 @@
           </div>
         </div>
         
-        <!-- Relationships section -->
-        <div class="relationships-section" *ngIf="parsedRelationships && parsedRelationships.length > 0">
-          <h4>Beziehungen:</h4>
-          <ul class="relationships-list">
-            <li *ngFor="let relationship of parsedRelationships" 
-                [class.composite-fk]="isCompositeRelationship(relationship)"
-                [class.single-fk]="!isCompositeRelationship(relationship)"
-                [matTooltip]="getRelationshipTooltip(relationship)">
-              <mat-icon class="relationship-icon">compare_arrows</mat-icon>
-              <span class="relationship-text">
-                {{ relationship.fromTable }}.[{{ formatColumns(relationship.fromColumn) }}] → 
-                {{ relationship.toTable }}.[{{ formatColumns(relationship.toColumn) }}]
-              </span>
-              <span *ngIf="isCompositeRelationship(relationship)" 
-                    class="composite-badge"
-                    [matTooltip]="getCompositeTooltip(relationship)">
-                Zusammengesetzt
-              </span>
-            </li>
-          </ul>
-        </div>
+        <!-- Relationships section entfernt -->
       </div>
     </div>
     

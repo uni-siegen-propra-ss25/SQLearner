@@ -453,9 +453,8 @@ export class ErDiagramComponent implements OnInit, OnDestroy {
       rel.fromColumn.includes(columnName)
     );
     if (compositeRel) {
-      const fromCols = (compositeRel.fromColumn as string[]).join(', ');
       const toCols = (compositeRel.toColumn as string[]).join(', ');
-      return `FK → ${compositeRel.toTable}.[${toCols}] (Teil von [${fromCols}])`;
+      return `FK → ${compositeRel.toTable}.[${toCols}]`;
     }
     // Fallback: Einzelspalten-FK
     const singleRel = this.parsedRelationships.find(rel =>

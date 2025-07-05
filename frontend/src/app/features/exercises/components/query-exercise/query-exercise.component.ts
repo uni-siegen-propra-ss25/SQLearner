@@ -12,7 +12,7 @@ import { DockerService } from '../../services/docker.service';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { DatabaseService } from '../../../database/services/database.service';
-import { SchemaVisualizationService } from '../../../../core/services/schema-visualization.service';
+import { SchemaVisualizationService } from '../../../../features/schema-visualization/services/schema-visualization.service';
 import { ErDiagramComponent } from '../../../schema-visualization/components/er-diagram/er-diagram.component';
 @Component({
     selector: 'app-query-exercise',
