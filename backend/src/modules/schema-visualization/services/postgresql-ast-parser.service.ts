@@ -150,7 +150,17 @@ export class PostgreSQLASTParser {
             isForeignKey = true;
             constraints.push('FOREIGN KEY');
             break;
+          case 'reference':
+            isForeignKey = true;
+            constraints.push('FOREIGN KEY');
+            break;
         }
+      }
+
+      // Check for inline REFERENCES syntax (e.g., user_id INTEGER REFERENCES users(id))
+      if (column.references) {
+        isForeignKey = true;
+        constraints.push('FOREIGN KEY');
       }
       
       return {
@@ -288,48 +298,85 @@ export class PostgreSQLASTParser {
     const foreignKeys: ForeignKeySchema[] = [];
     const tableName = statement.name?.name;
     
-    console.log(`🔍 Extracting FKs from table: ${tableName}`);
-    
-    // Column-level foreign keys (weniger häufig, aber möglich)
+    // Column-level foreign keys (inline REFERENCES syntax)
     for (const column of statement.columns || []) {
+      
+      // Check column constraints for FK
       for (const constraint of column.constraints || []) {
         if (constraint.type === 'foreign key') {
-          console.log(`   Found column-level FK: ${column.name?.name}`);
           const fk = this.mapForeignKeyConstraint(constraint, tableName, column.name?.name);
           if (fk) foreignKeys.push(fk);
+        }
+        // Handle inline REFERENCES syntax (e.g., user_id INTEGER REFERENCES users(id))
+        if (constraint.type === 'reference') {
+          const targetTable = this.getTableNameOnly(constraint.foreignTable);
+          const targetColumn = constraint.foreignColumns?.[0]?.name;
+          
+          if (targetTable && targetColumn) {
+            const fk: ForeignKeySchema = {
+              sourceTable: tableName,
+              sourceColumn: column.name?.name,
+              targetTable,
+              targetColumn,
+              constraintName: undefined, // Inline FKs usually don't have names
+              onDelete: constraint.onDelete?.toUpperCase(),
+              onUpdate: constraint.onUpdate?.toUpperCase()
+            };
+            foreignKeys.push(fk);
+          }
+        }
+      }
+
+      // Check for inline REFERENCES syntax (e.g., user_id INTEGER REFERENCES users(id))
+      if (column.references) {
+        const targetTable = this.getQualifiedTableName(column.references.table);
+        const targetColumn = column.references.columns?.[0]?.name;
+        
+        if (targetTable && targetColumn) {
+          const fk: ForeignKeySchema = {
+            sourceTable: tableName,
+            sourceColumn: column.name?.name,
+            targetTable,
+            targetColumn,
+            constraintName: undefined, // Inline FKs usually don't have names
+            onDelete: column.references.onDelete,
+            onUpdate: column.references.onUpdate
+          };
+          foreignKeys.push(fk);
         }
       }
     }
 
-    // Table-level foreign keys (Hauptfall für FOREIGN KEY statements)
+    // Table-level foreign keys (FOREIGN KEY statements)
     for (const constraint of statement.constraints || []) {
       if (constraint.type === 'foreign key') {
-        // Korrigierte Zugriffe für pgsql-ast-parser v13+
-        const sourceColumn = constraint.localColumns?.[0]?.name;
-        const targetTable = constraint.foreignTable?.name;
-        const targetColumn = constraint.foreignColumns?.[0]?.name;
+        // Support for multi-column foreign keys
+        const sourceColumns = constraint.localColumns?.map(col => col.name).filter(name => name);
+        const targetTable = this.getTableNameOnly(constraint.foreignTable);
+        const targetColumns = constraint.foreignColumns?.map(col => col.name).filter(name => name);
         
-        console.log(`   Found table-level FK: ${sourceColumn} -> ${targetTable}.${targetColumn}`);
-        
-        if (sourceColumn && targetTable && targetColumn) {
+        if (sourceColumns?.length && targetTable && targetColumns?.length) {
+          // Validate column count match
+          if (sourceColumns.length !== targetColumns.length) {
+            console.warn(`⚠️  Warning: Foreign key column count mismatch: ${sourceColumns.length} source columns vs ${targetColumns.length} target columns`);
+            continue; // Skip this FK
+          }
+          
           const fk: ForeignKeySchema = {
             sourceTable: tableName,
-            sourceColumn,
+            sourceColumn: sourceColumns.length === 1 ? sourceColumns[0] : sourceColumns,
             targetTable,
-            targetColumn,
+            targetColumn: targetColumns.length === 1 ? targetColumns[0] : targetColumns,
             constraintName: constraint.name?.name,
-            onDelete: constraint.onDelete,
-            onUpdate: constraint.onUpdate
+            onDelete: constraint.onDelete?.toUpperCase(),
+            onUpdate: constraint.onUpdate?.toUpperCase()
           };
+          
           foreignKeys.push(fk);
-          console.log(`   ✅ Added FK: ${tableName}.${sourceColumn} -> ${targetTable}.${targetColumn}`);
-        } else {
-          console.warn(`   ❌ Incomplete FK data: source=${sourceColumn}, target=${targetTable}.${targetColumn}`);
         }
       }
     }
     
-    console.log(`   Extracted ${foreignKeys.length} FKs for table ${tableName}`);
     return foreignKeys;
   }
   
@@ -342,12 +389,11 @@ export class PostgreSQLASTParser {
    */
   private mapForeignKeyConstraint(constraint: any, sourceTable: string, sourceColumn: string): ForeignKeySchema | null {
     try {
-      // Korrigierte Zugriffe für pgsql-ast-parser v13+
-      const targetTable = constraint.foreignTable?.name || constraint.references?.table?.name;
+      // Remove schema qualification - use only table name
+      const targetTable = this.getTableNameOnly(constraint.foreignTable || constraint.references?.table);
       const targetColumn = constraint.foreignColumns?.[0]?.name || constraint.references?.columns?.[0]?.name;
       
       if (!targetTable || !targetColumn) {
-        console.warn(`   ❌ Missing target info: table=${targetTable}, column=${targetColumn}`);
         return null;
       }
 
@@ -357,17 +403,62 @@ export class PostgreSQLASTParser {
         targetTable,
         targetColumn,
         constraintName: constraint.name?.name,
-        onDelete: constraint.onDelete,
-        onUpdate: constraint.onUpdate
+        onDelete: constraint.onDelete?.toUpperCase(),
+        onUpdate: constraint.onUpdate?.toUpperCase()
       };
       
-      console.log(`   ✅ Created FK schema: ${sourceTable}.${sourceColumn} -> ${targetTable}.${targetColumn}`);
       return fkSchema;
       
     } catch (error) {
-      console.warn(`Failed to map foreign key constraint: ${error.message}`);
       return null;
     }
+  }
+
+  /**
+   * Extracts qualified table name from AST node, supporting schema.table format.
+   * @param {any} tableNode - The AST node representing a table reference.
+   * @returns {string} - The qualified table name (schema.table or just table).
+   */
+  private getQualifiedTableName(tableNode: any): string {
+    if (!tableNode) return '';
+    
+    // Handle schema-qualified table names
+    if (tableNode.schema && tableNode.name) {
+      return `${tableNode.schema}.${tableNode.name}`;
+    }
+    
+    // Handle simple table names
+    if (tableNode.name) {
+      return tableNode.name;
+    }
+    
+    // Fallback for older parser versions
+    if (typeof tableNode === 'string') {
+      return tableNode;
+    }
+    
+    return '';
+  }
+  
+  /**
+   * Extracts only the table name from AST node, ignoring schema qualification.
+   * @param {any} tableNode - The AST node representing a table reference.
+   * @returns {string} - The table name without schema prefix.
+   */
+  private getTableNameOnly(tableNode: any): string {
+    if (!tableNode) return '';
+    
+    // Handle simple table names
+    if (tableNode.name) {
+      return tableNode.name;
+    }
+    
+    // Fallback for older parser versions
+    if (typeof tableNode === 'string') {
+      return tableNode;
+    }
+    
+    return '';
   }
   
   /**
@@ -421,29 +512,70 @@ export class PostgreSQLASTParser {
    * @param {ForeignKeySchema[]} foreignKeys - The array of foreign key constraints.
    */
   private markForeignKeyColumns(tables: TableSchema[], foreignKeys: ForeignKeySchema[]): void {
-    console.log(`🔍 Marking FK columns. Total FKs to process: ${foreignKeys.length}`);
-    
+    // First, validate all foreign keys
     for (const fk of foreignKeys) {
-      console.log(`   Processing FK: ${fk.sourceTable}.${fk.sourceColumn} -> ${fk.targetTable}.${fk.targetColumn}`);
+      // Normalize source and target columns to arrays
+      const sourceColumns = Array.isArray(fk.sourceColumn) ? fk.sourceColumn : [fk.sourceColumn];
+      const targetColumns = Array.isArray(fk.targetColumn) ? fk.targetColumn : [fk.targetColumn];
+
+      // Validate source table exists
+      const sourceTable = tables.find(t => t.name === fk.sourceTable);
+      if (!sourceTable) {
+        throw new SchemaParsingError(
+          `Foreign key validation error: Source table '${fk.sourceTable}' not found`,
+          undefined,
+          undefined,
+          `FK: ${fk.sourceTable}.[${sourceColumns.join(', ')}] -> ${fk.targetTable}.[${targetColumns.join(', ')}]`
+        );
+      }
+
+      // Validate all source columns exist
+      for (const sourceColumnName of sourceColumns) {
+        const sourceColumn = sourceTable.columns.find(c => c.name === sourceColumnName);
+        if (!sourceColumn) {
+          throw new SchemaParsingError(
+            `Foreign key validation error: Source column '${sourceColumnName}' not found in table '${fk.sourceTable}'`,
+            undefined,
+            undefined,
+            `FK: ${fk.sourceTable}.[${sourceColumns.join(', ')}] -> ${fk.targetTable}.[${targetColumns.join(', ')}]`
+          );
+        }
+      }
+
+      // Validate target table exists (warn if not found, as it may be external)
+      const targetTable = tables.find(t => t.name === fk.targetTable);
+      if (!targetTable) {
+        console.warn(`⚠️  Warning: Target table '${fk.targetTable}' not found. FK will be processed but may be invalid.`);
+      } else {
+        // Validate all target columns exist if target table is found
+        for (const targetColumnName of targetColumns) {
+          const targetColumn = targetTable.columns.find(c => c.name === targetColumnName);
+          if (!targetColumn) {
+            console.warn(`⚠️  Warning: Target column '${targetColumnName}' not found in table '${fk.targetTable}'. FK will be processed but may be invalid.`);
+          }
+        }
+      }
+    }
+    
+    // Mark columns as foreign keys if validation passed
+    for (const fk of foreignKeys) {
+      const sourceColumns = Array.isArray(fk.sourceColumn) ? fk.sourceColumn : [fk.sourceColumn];
       
       const table = tables.find(t => t.name === fk.sourceTable);
+      
       if (table) {
-        const column = table.columns.find(c => c.name === fk.sourceColumn);
-        if (column) {
-          console.log(`   Before: ${fk.sourceTable}.${fk.sourceColumn} isForeignKey=${column.isForeignKey}`);
-          column.isForeignKey = true;
-          // Add FOREIGN KEY to constraints if not already present
-          if (!column.constraints?.includes('FOREIGN KEY')) {
-            column.constraints = column.constraints || [];
-            column.constraints.push('FOREIGN KEY');
+        // Mark all source columns as foreign keys
+        for (const sourceColumnName of sourceColumns) {
+          const column = table.columns.find(c => c.name === sourceColumnName);
+          if (column) {
+            column.isForeignKey = true;
+            // Add FOREIGN KEY to constraints if not already present
+            if (!column.constraints?.includes('FOREIGN KEY')) {
+              column.constraints = column.constraints || [];
+              column.constraints.push('FOREIGN KEY');
+            }
           }
-          console.log(`   After: ${fk.sourceTable}.${fk.sourceColumn} isForeignKey=${column.isForeignKey}`);
-          console.log(`✅ Marked ${fk.sourceTable}.${fk.sourceColumn} as foreign key`);
-        } else {
-          console.warn(`   ❌ Column ${fk.sourceColumn} not found in table ${fk.sourceTable}`);
         }
-      } else {
-        console.warn(`   ❌ Table ${fk.sourceTable} not found`);
       }
     }
   }

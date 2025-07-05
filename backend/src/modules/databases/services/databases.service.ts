@@ -148,10 +148,12 @@ export class DatabasesService {
                 const pkResult = await client.query(pkQuery, [tableName]);
                 const primaryKeys = pkResult.rows.map(row => row.column_name);
                 
-                // Get foreign keys
+                // Get foreign keys - updated query to include constraint_name for grouping
                 const fkQuery = `
                     SELECT 
+                        kcu.constraint_name,
                         kcu.column_name,
+                        kcu.ordinal_position,
                         ccu.table_name AS foreign_table_name,
                         ccu.column_name AS foreign_column_name
                     FROM 
@@ -162,12 +164,36 @@ export class DatabasesService {
                     JOIN 
                         information_schema.key_column_usage AS ccu
                         ON ccu.constraint_name = rc.unique_constraint_name
+                        AND kcu.ordinal_position = ccu.ordinal_position
                     WHERE 
                         kcu.table_schema = 'public' 
-                        AND kcu.table_name = $1;
+                        AND kcu.table_name = $1
+                    ORDER BY 
+                        kcu.constraint_name, kcu.ordinal_position;
                 `;
                 
                 const fkResult = await client.query(fkQuery, [tableName]);
+                
+                // Group foreign keys by constraint_name to handle composite FKs correctly
+                const fkGroups = new Map<string, {
+                    localColumns: string[],
+                    foreignTable: string,
+                    foreignColumns: string[]
+                }>();
+                
+                for (const fk of fkResult.rows) {
+                    if (!fkGroups.has(fk.constraint_name)) {
+                        fkGroups.set(fk.constraint_name, {
+                            localColumns: [],
+                            foreignTable: fk.foreign_table_name,
+                            foreignColumns: []
+                        });
+                    }
+                    
+                    const group = fkGroups.get(fk.constraint_name)!;
+                    group.localColumns.push(fk.column_name);
+                    group.foreignColumns.push(fk.foreign_column_name);
+                }
                 
                 // Build CREATE TABLE statement
                 schemaSQL += `CREATE TABLE ${tableName} (\n`;
@@ -210,9 +236,11 @@ export class DatabasesService {
                     schemaSQL += `,\n    PRIMARY KEY (${primaryKeys.join(', ')})`;
                 }
                 
-                // Add FOREIGN KEY constraints
-                for (const fk of fkResult.rows) {
-                    schemaSQL += `,\n    FOREIGN KEY (${fk.column_name}) REFERENCES ${fk.foreign_table_name}(${fk.foreign_column_name})`;
+                // Add FOREIGN KEY constraints - now properly grouped for composite FKs
+                for (const [constraintName, fkGroup] of fkGroups) {
+                    const localCols = fkGroup.localColumns.join(', ');
+                    const foreignCols = fkGroup.foreignColumns.join(', ');
+                    schemaSQL += `,\n    FOREIGN KEY (${localCols}) REFERENCES ${fkGroup.foreignTable}(${foreignCols})`;
                 }
                 
                 schemaSQL += '\n);\n\n';

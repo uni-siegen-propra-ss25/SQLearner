@@ -38,18 +38,18 @@ export interface TableSchema {
 /**
  * Interface representing a foreign key relationship between tables.
  * @property {string} sourceTable - The name of the source table.
- * @property {string} sourceColumn - The name of the source column.
+ * @property {string | string[]} sourceColumn - The name(s) of the source column(s). Single column as string, multi-column as array.
  * @property {string} targetTable - The name of the target table.
- * @property {string} targetColumn - The name of the target column.
+ * @property {string | string[]} targetColumn - The name(s) of the target column(s). Single column as string, multi-column as array.
  * @property {string} [constraintName] - Optional name of the foreign key constraint.
  * @property {'CASCADE' | 'SET NULL' | 'RESTRICT' | 'NO ACTION'} [onDelete] - Optional ON DELETE action.
  * @property {'CASCADE' | 'SET NULL' | 'RESTRICT' | 'NO ACTION'} [onUpdate] - Optional ON UPDATE action.
  */
 export interface ForeignKeySchema {
   sourceTable: string;
-  sourceColumn: string;
+  sourceColumn: string | string[];
   targetTable: string;
-  targetColumn: string;
+  targetColumn: string | string[];
   constraintName?: string;
   onDelete?: 'CASCADE' | 'SET NULL' | 'RESTRICT' | 'NO ACTION';
   onUpdate?: 'CASCADE' | 'SET NULL' | 'RESTRICT' | 'NO ACTION';

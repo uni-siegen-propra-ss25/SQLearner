@@ -48,18 +48,18 @@ export interface TableNodeDto {
  * Data transfer object representing a relationship (edge) between tables in the ER diagram.
  * @property {string} id - Unique identifier for the relationship.
  * @property {string} fromTable - Name of the source table.
- * @property {string} fromColumn - Name of the source column.
+ * @property {string | string[]} fromColumn - Name(s) of the source column(s). Single column as string, multi-column as array.
  * @property {string} toTable - Name of the target table.
- * @property {string} toColumn - Name of the target column.
+ * @property {string | string[]} toColumn - Name(s) of the target column(s). Single column as string, multi-column as array.
  * @property {'one-to-one' | 'one-to-many' | 'many-to-one' | 'many-to-many'} type - Type of relationship.
  * @property {string} label - Optional label for the relationship (e.g., constraint name).
  */
 export interface RelationshipDto {
   id: string;
   fromTable: string;
-  fromColumn: string;
+  fromColumn: string | string[];
   toTable: string;
-  toColumn: string;
+  toColumn: string | string[];
   type: 'one-to-one' | 'one-to-many' | 'many-to-one' | 'many-to-many';
   label: string;
 }
@@ -118,28 +118,9 @@ export class SchemaVisualizationService {
    * @returns {Observable<ERDiagramDto>} - Observable emitting the ER diagram data.
    */
   parseSchemaString(parseSchemaDto: ParseSchemaDto): Observable<ERDiagramDto> {
-    console.log('🌐 [AUDIT] Frontend Service - parseSchemaString():');
-    console.log('   Request URL:', `${this.baseUrl}/parse-schema`);
-    console.log('   Request Data:', {
-      schema: parseSchemaDto.schema?.substring(0, 100) + '...',
-      name: parseSchemaDto.name,
-      schemaLength: parseSchemaDto.schema?.length || 0
-    });
-    
-    const request = this.http.post<ERDiagramDto>(`${this.baseUrl}/parse-schema`, parseSchemaDto);
-    
-    // Add response logging
-    return request.pipe(
-      tap(response => {
-        console.log('📨 [AUDIT] Frontend Service - Response received:');
-        console.log('   Tables Count:', response.tables?.length || 0);
-        console.log('   Relationships Count:', response.relationships?.length || 0);
-        console.log('   DBML Code Length:', response.dbmlCode?.length || 0);
-        console.log('   Response Tables:', response.tables?.map(t => ({ name: t.name, columns: t.columns?.length || 0 })));
-        console.log('   Response Relationships:', response.relationships?.map(r => `${r.fromTable}.${r.fromColumn} -> ${r.toTable}.${r.toColumn}`));
-      }),
+    return this.http.post<ERDiagramDto>(`${this.baseUrl}/parse-schema`, parseSchemaDto).pipe(
       catchError(error => {
-        console.error('❌ [AUDIT] Frontend Service - Request failed:', error);
+        console.error('Schema parsing failed:', error);
         throw error;
       })
     );

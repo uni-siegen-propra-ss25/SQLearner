@@ -42,18 +42,18 @@ export class TableNodeDto {
  * Data transfer object representing a relationship (edge) between tables in the ER diagram.
  * @property {string} id - Unique identifier for the relationship.
  * @property {string} fromTable - Name of the source table.
- * @property {string} fromColumn - Name of the source column.
+ * @property {string | string[]} fromColumn - Name(s) of the source column(s). Single column as string, multi-column as array.
  * @property {string} toTable - Name of the target table.
- * @property {string} toColumn - Name of the target column.
+ * @property {string | string[]} toColumn - Name(s) of the target column(s). Single column as string, multi-column as array.
  * @property {'one-to-one' | 'one-to-many' | 'many-to-one' | 'many-to-many'} type - Type of relationship.
  * @property {string} label - Optional label for the relationship (e.g., constraint name).
  */
 export class RelationshipDto {
     id: string;
     fromTable: string;
-    fromColumn: string;
+    fromColumn: string | string[];
     toTable: string;
-    toColumn: string;
+    toColumn: string | string[];
     type: 'one-to-one' | 'one-to-many' | 'many-to-one' | 'many-to-many';
     label: string;
 }
