@@ -7,6 +7,55 @@ const prisma = new PrismaClient();
 export async function main() {
   console.log('Starting seed...');
 
+  // Clear existing data to ensure clean state
+  console.log('Clearing existing data...');
+  
+  // Delete in correct order to respect foreign key constraints
+  await prisma.submission.deleteMany({});
+  await prisma.progress.deleteMany({});
+  await prisma.bookmark.deleteMany({});
+  await prisma.chatMessage.deleteMany({});
+  await prisma.dbSession.deleteMany({});
+  await prisma.answerOption.deleteMany({});
+  await prisma.exercise.deleteMany({});
+  await prisma.topic.deleteMany({});
+  await prisma.chapter.deleteMany({});
+  await prisma.user.deleteMany({});
+  
+  // Handle database cleanup - delete actual PostgreSQL databases
+  const existingDatabases = await prisma.database.findMany();
+  for (const db of existingDatabases) {
+    if (db.schemaSql && db.schemaSql.startsWith('db_')) {
+      try {
+        const adminPool = new Pool({
+          host: process.env.DB_HOST,
+          port: parseInt(process.env.DB_PORT || '5432', 10),
+          user: process.env.DB_USER,
+          password: process.env.DB_PASSWORD,
+          database: process.env.DB_NAME
+        });
+
+        // Terminate connections and drop database
+        await adminPool.query(`
+          SELECT pg_terminate_backend(pid) 
+          FROM pg_stat_activity 
+          WHERE datname = $1 AND pid <> pg_backend_pid()
+        `, [db.schemaSql]);
+        
+        await adminPool.query(`DROP DATABASE IF EXISTS "${db.schemaSql}"`);
+        console.log(`Dropped database: ${db.schemaSql}`);
+        await adminPool.end();
+      } catch (error) {
+        console.warn(`Could not drop database ${db.schemaSql}:`, error.message);
+      }
+    }
+  }
+  
+  await prisma.database.deleteMany({});
+  await prisma.settings.deleteMany({});
+  
+  console.log('Data cleared successfully');
+
   const defaultPassword = await bcrypt.hash('password123', 10);
 
   // Create admin user
@@ -527,6 +576,93 @@ export async function main() {
     },
   });
 
+  // Create OpenAI API Key setting
+  await prisma.settings.create({
+    data: {
+      name: 'OPENAI_API_KEY',
+      value: process.env.OPENAI_API_KEY || '',
+      description: 'OpenAI API Key for AI-powered features (SQL query assistance, feedback generation)'
+    }
+  });
+
+  // Create some sample progress for the students
+  await prisma.progress.createMany({
+    data: [
+      {
+        userId: student.id,
+        exerciseId: multipleChoiceExercise.id,
+        attempts: 2,
+        isPassed: true,
+        passedAt: new Date()
+      },
+      {
+        userId: student.id,
+        exerciseId: queryExercise.id,
+        attempts: 1,
+        isPassed: true,
+        passedAt: new Date()
+      },
+      {
+        userId: student2.id,
+        exerciseId: multipleChoiceExercise.id,
+        attempts: 1,
+        isPassed: false
+      },
+      {
+        userId: student2.id,
+        exerciseId: singleChoiceExercise.id,
+        attempts: 3,
+        isPassed: true,
+        passedAt: new Date()
+      }
+    ]
+  });
+
+  // Create some sample bookmarks
+  await prisma.bookmark.createMany({
+    data: [
+      {
+        userId: student.id,
+        exerciseId: complexQueryExercise.id
+      },
+      {
+        userId: student.id,
+        exerciseId: freetextExercise.id
+      },
+      {
+        userId: student2.id,
+        exerciseId: queryExercise.id
+      }
+    ]
+  });
+
+  // Create some sample submissions
+  await prisma.submission.createMany({
+    data: [
+      {
+        userId: student.id,
+        exerciseId: queryExercise.id,
+        answerText: 'SELECT * FROM students;',
+        isCorrect: true,
+        feedback: 'Perfekt! Diese Abfrage gibt alle Studenten zurück.'
+      },
+      {
+        userId: student2.id,
+        exerciseId: queryExercise.id,
+        answerText: 'SELECT name FROM students;',
+        isCorrect: false,
+        feedback: 'Fast richtig! Die Aufgabe verlangt aber alle Spalten (*), nicht nur den Namen.'
+      },
+      {
+        userId: student.id,
+        exerciseId: complexQueryExercise.id,
+        answerText: 'SELECT s.name, c.title FROM students s JOIN enrollments e ON s.id = e.student_id JOIN courses c ON e.course_id = c.id;',
+        isCorrect: true,
+        feedback: 'Exzellent! Sie haben die JOIN-Operation korrekt verwendet.'
+      }
+    ]
+  });
+
   console.log({
     message: 'Seed completed successfully',
     users: {
@@ -538,6 +674,7 @@ export async function main() {
     database: {
       name: sampleDb.name,
       description: sampleDb.description,
+      actualDbName: sampleDb.schemaSql,
     },
     chapters: [
       { id: basicChapter.id, title: basicChapter.title },
@@ -554,7 +691,13 @@ export async function main() {
       { id: queryExercise.id, title: queryExercise.title, type: queryExercise.type },
       { id: complexQueryExercise.id, title: complexQueryExercise.title, type: complexQueryExercise.type },
       { id: freetextExercise.id, title: freetextExercise.title, type: freetextExercise.type },
-    ]
+    ],
+    additionalData: {
+      settings: 2,
+      progressEntries: 4,
+      bookmarks: 3,
+      submissions: 3
+    }
   });
 }
 
