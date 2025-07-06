@@ -76,14 +76,21 @@ export class ExerciseDialogComponent implements OnInit {
 
             // Reset all controls and their validators
             databaseIdControl?.clearValidators();
-            databaseIdControl?.setValue(null);
             solutionControl?.clearValidators();
-            solutionControl?.setValue(null);
+            
+            // Only reset values if not in editing mode or if type actually changed from initial
+            if (!this.isEditing || type !== this.data.type) {
+                databaseIdControl?.setValue(null);
+                solutionControl?.setValue(null);
+            }
 
             // Clear answers array for non-choice exercises
             if (type !== ExerciseType.SINGLE_CHOICE && type !== ExerciseType.MULTIPLE_CHOICE) {
-                while (answersControl.length) {
-                    answersControl.removeAt(0);
+                // Only clear answers if not in editing mode or if type actually changed from initial
+                if (!this.isEditing || type !== this.data.type) {
+                    while (answersControl.length) {
+                        answersControl.removeAt(0);
+                    }
                 }
             } else {
                 // For choice exercises, ensure we have at least 2 answers
@@ -147,16 +154,23 @@ export class ExerciseDialogComponent implements OnInit {
     }
 
     addAnswer(answer?: AnswerOption) {
-        const group = this.fb.group({
+        const groupConfig: any = {
             text: [answer?.text || '', Validators.required],
             isCorrect: [answer?.isCorrect || false],
             order: [answer?.order || this.answers.length],
-        });
+        };
+
+        // Include id if answer already exists (for editing)
+        if (answer?.id) {
+            groupConfig.id = [answer.id];
+        }
+
+        const group = this.fb.group(groupConfig);
 
         // For single choice, if this is the first answer and no other answers are correct,
-        // make it correct by default
+        // make it correct by default (but only if not editing existing data)
         const type = this.exerciseForm.get('type')?.value;
-        if (type === ExerciseType.SINGLE_CHOICE && this.answers.length === 0) {
+        if (type === ExerciseType.SINGLE_CHOICE && this.answers.length === 0 && !answer) {
             group.get('isCorrect')?.setValue(true);
         }
 
@@ -212,9 +226,17 @@ export class ExerciseDialogComponent implements OnInit {
         console.log('Form value before processing:', formValue);
         console.log('Dialog data:', this.data);
 
-        // Always include topicId from dialog data
-        formValue.topicId = this.data.topicId;
-        console.log('TopicId set to:', formValue.topicId);
+        // Include id if editing
+        if (this.isEditing && this.data.id) {
+            formValue.id = this.data.id;
+            console.log('ID set for editing:', formValue.id);
+        }
+
+        // Include topicId from dialog data, but don't overwrite if already set
+        if (!formValue.topicId && this.data.topicId) {
+            formValue.topicId = this.data.topicId;
+            console.log('TopicId set to:', formValue.topicId);
+        }
 
         // Clean up the form value based on exercise type
         if (formValue.type !== ExerciseType.QUERY) {

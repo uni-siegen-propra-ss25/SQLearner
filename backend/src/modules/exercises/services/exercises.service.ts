@@ -95,15 +95,22 @@ export class ExercisesService {    /**
     private validateAnswers(type: ExerciseType, answers?: AnswerOptionDto[]): void {
         if (!answers || answers.length === 0) return;
 
+        console.log('=== DEBUG: validateAnswers ===');
+        console.log('Exercise type:', type);
+        console.log('Answers count:', answers.length);
+        console.log('Answers:', answers.map(a => ({ text: a.text, isCorrect: a.isCorrect })));
+
         if (type === ExerciseType.SINGLE_CHOICE) {
             const correctCount = answers.filter((a) => a.isCorrect).length;
+            console.log('Correct answers count for SINGLE_CHOICE:', correctCount);
             if (correctCount !== 1) {
-                throw new Error('Single choice exercises must have exactly one correct answer');
+                throw new BadRequestException('Single choice exercises must have exactly one correct answer');
             }
         } else if (type === ExerciseType.MULTIPLE_CHOICE) {
             const correctCount = answers.filter((a) => a.isCorrect).length;
+            console.log('Correct answers count for MULTIPLE_CHOICE:', correctCount);
             if (correctCount === 0) {
-                throw new Error('Multiple choice exercises must have at least one correct answer');
+                throw new BadRequestException('Multiple choice exercises must have at least one correct answer');
             }
         }
     }
@@ -164,8 +171,16 @@ export class ExercisesService {    /**
      * @throws {BadRequestException} if the update data is invalid
      */
     async updateExercise(id: number, updateExerciseDto: UpdateExerciseDto): Promise<Exercise> {
+        console.log('=== DEBUG: updateExercise ===');
+        console.log('Exercise ID:', id);
+        console.log('Update DTO:', JSON.stringify(updateExerciseDto, null, 2));
+        
         const existingExercise = await this.getExerciseById(id);
-        const { answers, ...exerciseData } = updateExerciseDto;
+        console.log('Existing exercise type:', existingExercise.type);
+        
+        const { answers, id: exerciseId, ...exerciseData } = updateExerciseDto; // Remove id from exerciseData
+        console.log('Exercise data after destructuring:', exerciseData);
+        console.log('Answers:', answers);
 
         // Validate answers if provided for choice-type exercises
         if (exerciseData.type) {
@@ -174,30 +189,34 @@ export class ExercisesService {    /**
             this.validateAnswers(existingExercise.type, answers);
         }
 
-        // Delete existing answers if new ones are provided
-        if (answers) {
+        // Handle answers update for choice exercises
+        let answersUpdate: any = undefined;
+        if (answers && (
+            exerciseData.type === ExerciseType.SINGLE_CHOICE ||
+            exerciseData.type === ExerciseType.MULTIPLE_CHOICE ||
+            existingExercise.type === ExerciseType.SINGLE_CHOICE ||
+            existingExercise.type === ExerciseType.MULTIPLE_CHOICE
+        )) {
+            // Delete existing answers first
             await this.prisma.answerOption.deleteMany({
                 where: { exerciseId: id },
             });
+
+            // Create new answers (ignore any id from frontend)
+            answersUpdate = {
+                create: answers.map((answer, index) => ({
+                    text: answer.text,
+                    isCorrect: answer.isCorrect,
+                    order: index,
+                })),
+            };
         }
 
         const exercise = await this.prisma.exercise.update({
             where: { id },
             data: {
                 ...exerciseData,
-                answers:
-                    (exerciseData.type === ExerciseType.SINGLE_CHOICE ||
-                        exerciseData.type === ExerciseType.MULTIPLE_CHOICE ||
-                        existingExercise.type === ExerciseType.SINGLE_CHOICE ||
-                        existingExercise.type === ExerciseType.MULTIPLE_CHOICE) &&
-                    answers
-                        ? {
-                              create: answers.map((answer, index) => ({
-                                  ...answer,
-                                  order: index,
-                              })),
-                          }
-                        : undefined,
+                answers: answersUpdate,
             },
             include: {
                 answers: true,

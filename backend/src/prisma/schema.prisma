@@ -108,7 +108,7 @@ model ChatMessage {
 /// Imported or self-created database definitions
 model Database {
   id          Int          @id @default(autoincrement())
-  name        String
+  name        String       @unique
   description String?
   schemaSql   String       // SQL schema definition, actually used for db name
   createdAt   DateTime     @default(now())
@@ -121,7 +121,7 @@ model Database {
 /// Top-level grouping of chapters (e.g. "Relational Algebra", "Joins")
 model Chapter {
   id          Int       @id @default(autoincrement())
-  title       String
+  title       String    @unique
   description String?
   order       Int       @default(0)
 
@@ -138,6 +138,8 @@ model Topic {
 
   chapter     Chapter   @relation(fields: [chapterId], references: [id])
   exercises   Exercise[]
+
+  @@unique([chapterId, title])
 }
 
 /// Isolated DB session/container for SQL execution
