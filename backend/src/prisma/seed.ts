@@ -246,90 +246,105 @@ export async function main() {
     }
   }
 
-  // Create chapters
-  const basicChapter = await prisma.chapter.upsert({
-    where: { title: 'SQL Grundlagen' },
-    update: {
-      description: 'Grundlegende SQL-Befehle und Konzepte',
-      order: 1,
-    },
-    create: {
-      title: 'SQL Grundlagen',
-      description: 'Grundlegende SQL-Befehle und Konzepte',
-      order: 1,
-    },
-  });
+  // Create chapters (now using id for upsert)
+  let basicChapter = await prisma.chapter.findFirst({ where: { title: 'SQL Grundlagen' } });
+  if (!basicChapter) {
+    basicChapter = await prisma.chapter.create({
+      data: {
+        title: 'SQL Grundlagen',
+        description: 'Grundlegende SQL-Befehle und Konzepte',
+        order: 1,
+      },
+    });
+  } else {
+    basicChapter = await prisma.chapter.update({
+      where: { id: basicChapter.id },
+      data: {
+        description: 'Grundlegende SQL-Befehle und Konzepte',
+        order: 1,
+      },
+    });
+  }
 
-  const advancedChapter = await prisma.chapter.upsert({
-    where: { title: 'Erweiterte SQL-Techniken' },
-    update: {
-      description: 'Joins, Subqueries und komplexere Datenbankoperationen',
-      order: 2,
-    },
-    create: {
-      title: 'Erweiterte SQL-Techniken',
-      description: 'Joins, Subqueries und komplexere Datenbankoperationen',
-      order: 2,
-    },
-  });
+  let advancedChapter = await prisma.chapter.findFirst({ where: { title: 'Erweiterte SQL-Techniken' } });
+  if (!advancedChapter) {
+    advancedChapter = await prisma.chapter.create({
+      data: {
+        title: 'Erweiterte SQL-Techniken',
+        description: 'Joins, Subqueries und komplexere Datenbankoperationen',
+        order: 2,
+      },
+    });
+  } else {
+    advancedChapter = await prisma.chapter.update({
+      where: { id: advancedChapter.id },
+      data: {
+        description: 'Joins, Subqueries und komplexere Datenbankoperationen',
+        order: 2,
+      },
+    });
+  }
 
-  // Create topics
-  const selectTopic = await prisma.topic.upsert({
-    where: { 
-      chapterId_title: {
+  // Create topics (now using id for upsert)
+  let selectTopic = await prisma.topic.findFirst({ where: { chapterId: basicChapter.id, title: 'SELECT-Statements' } });
+  if (!selectTopic) {
+    selectTopic = await prisma.topic.create({
+      data: {
         chapterId: basicChapter.id,
-        title: 'SELECT-Statements'
-      }
-    },
-    update: {
-      description: 'Grundlagen der Datenabfrage mit SELECT',
-      order: 1,
-    },
-    create: {
-      chapterId: basicChapter.id,
-      title: 'SELECT-Statements',
-      description: 'Grundlagen der Datenabfrage mit SELECT',
-      order: 1,
-    },
-  });
+        title: 'SELECT-Statements',
+        description: 'Grundlagen der Datenabfrage mit SELECT',
+        order: 1,
+      },
+    });
+  } else {
+    selectTopic = await prisma.topic.update({
+      where: { id: selectTopic.id },
+      data: {
+        description: 'Grundlagen der Datenabfrage mit SELECT',
+        order: 1,
+      },
+    });
+  }
 
-  const filterTopic = await prisma.topic.upsert({
-    where: { 
-      chapterId_title: {
+  let filterTopic = await prisma.topic.findFirst({ where: { chapterId: basicChapter.id, title: 'WHERE-Klauseln' } });
+  if (!filterTopic) {
+    filterTopic = await prisma.topic.create({
+      data: {
         chapterId: basicChapter.id,
-        title: 'WHERE-Klauseln'
-      }
-    },
-    update: {
-      description: 'Filtern von Daten mit WHERE-Bedingungen',
-      order: 2,
-    },
-    create: {
-      chapterId: basicChapter.id,
-      title: 'WHERE-Klauseln',
-      description: 'Filtern von Daten mit WHERE-Bedingungen',
-      order: 2,
-    },
-  });
+        title: 'WHERE-Klauseln',
+        description: 'Filtern von Daten mit WHERE-Bedingungen',
+        order: 2,
+      },
+    });
+  } else {
+    filterTopic = await prisma.topic.update({
+      where: { id: filterTopic.id },
+      data: {
+        description: 'Filtern von Daten mit WHERE-Bedingungen',
+        order: 2,
+      },
+    });
+  }
 
-  const joinTopic = await prisma.topic.upsert({
-    where: { 
-      chapterId_title: {
+  let joinTopic = await prisma.topic.findFirst({ where: { chapterId: advancedChapter.id, title: 'JOIN-Operationen' } });
+  if (!joinTopic) {
+    joinTopic = await prisma.topic.create({
+      data: {
         chapterId: advancedChapter.id,
-        title: 'JOIN-Operationen'
-      }
-    },
-    update: {
-      description: 'Verknüpfung mehrerer Tabellen',
-      order: 1,
-    },
-    create: {
-      chapterId: advancedChapter.id,
-      title: 'JOIN-Operationen',
-      description: 'Verknüpfung mehrerer Tabellen',
-      order: 1,
-    },
-  });
+        title: 'JOIN-Operationen',
+        description: 'Verknüpfung mehrerer Tabellen',
+        order: 1,
+      },
+    });
+  } else {
+    joinTopic = await prisma.topic.update({
+      where: { id: joinTopic.id },
+      data: {
+        description: 'Verknüpfung mehrerer Tabellen',
+        order: 1,
+      },
+    });
+  }
 
   // Create exercises
   
