@@ -23,20 +23,6 @@
       width: 1.5rem;
       height: 1.5rem;
     }
-
-    // Database information row (icon and text)
-    .database-info {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: #666;
-
-      mat-icon {
-        font-size: 20px;
-        width: 20px;
-        height: 20px;
-      }
-    }
   }
 
   // Styles for the exercise description text
