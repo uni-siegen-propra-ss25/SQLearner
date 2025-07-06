@@ -15,6 +15,11 @@ import { Type } from 'class-transformer';
 import { Difficulty, ExerciseType } from '@prisma/client';
 
 export class AnswerOptionDto {
+    @ApiProperty({ description: 'The ID of the answer option (for updates)', required: false })
+    @IsNumber()
+    @IsOptional()
+    id?: number;
+
     @ApiProperty({ description: 'The text of the choice' })
     @IsString()
     @IsNotEmpty()

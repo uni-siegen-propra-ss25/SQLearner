@@ -129,6 +129,7 @@
     width: 100%;
     margin-top: auto;
     padding-top: 1rem;
+    padding-bottom: 2rem;
   }
 
   .language-switcher {
@@ -175,6 +176,9 @@
       color: white;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
       transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
       &:hover {
         background-color: #6c5ce7;
