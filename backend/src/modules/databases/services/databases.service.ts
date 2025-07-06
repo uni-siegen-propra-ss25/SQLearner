@@ -847,4 +847,44 @@ export class DatabasesService {
             await dbPool.end();
         }
     }
+
+    /**
+     * Updates a row in a table in the specified database
+     */
+    async updateRow(databaseId: number, tableName: string, data: Record<string, any>, whereClause: string, user: User): Promise<any> {
+        // Get the database object
+        const database = await this.getDatabaseById(databaseId);
+        if (!database) {
+            throw new NotFoundException(`Database with ID ${databaseId} not found`);
+        }
+        // Database name (dbName) can be stored in the schemaSql field or similar
+        const dbName = database.schemaSql;
+        if (!dbName) {
+            throw new NotFoundException('Database not properly initialized');
+        }
+        // Connecting to the required database
+        const dbPool = new Pool({
+            host: process.env.DB_HOST,
+            port: parseInt(process.env.DB_PORT || '5432', 10),
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: dbName
+        });
+        const client = await dbPool.connect();
+        try {
+            const setClause = Object.keys(data).map((key, index) => `"${key}" = $${index + 1}`).join(', ');
+            const values = Object.values(data);
+            const query = `UPDATE "${tableName}" SET ${setClause} WHERE ${whereClause} RETURNING *;`;
+            const result = await client.query(query, values);
+            if (result.rowCount === 0) {
+                throw new NotFoundException('No rows were updated. Check your WHERE clause.');
+            }
+            return result.rows[0];
+        } catch (error) {
+            throw new BadRequestException('Failed to update row: ' + error.message);
+        } finally {
+            client.release();
+            await dbPool.end();
+        }
+    }
 }

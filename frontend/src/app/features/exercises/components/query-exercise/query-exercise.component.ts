@@ -9,8 +9,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { SqlEditorComponent } from '../../../../shared/components/sql-editor/sql-editor.component';
 import { DockerService } from '../../services/docker.service';
-import { ActivatedRoute, ParamMap } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router, RouterEvent, NavigationStart } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import { DatabaseService } from '../../../database/services/database.service';
 import { SchemaVisualizationService } from '../../../../features/schema-visualization/services/schema-visualization.service';
 import { ErDiagramComponent } from '../../../schema-visualization/components/er-diagram/er-diagram.component';
@@ -110,6 +111,11 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
     private containerSubscription: Subscription | null = null;
 
     /**
+     * Subscription for router navigation events to delete container on URL change.
+     */
+    private routerSubscription: Subscription | null = null;
+
+    /**
      * Pagination: number of rows per page.
      * @type {number}
      */
@@ -148,6 +154,7 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
         private snackBar: MatSnackBar,
         private dockerService: DockerService,
         private route: ActivatedRoute,
+        private router: Router,
         private databaseService: DatabaseService,
         private dialog: MatDialog,
         private schemaVisualizationService: SchemaVisualizationService
@@ -158,6 +165,16 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
      * @returns {void}
      */
     ngOnInit(): void {
+        // Subscribe to router events to delete container when navigating away
+        this.routerSubscription = this.router.events.pipe(
+            filter((event: any): event is NavigationStart => event instanceof NavigationStart)
+        ).subscribe((event: NavigationStart) => {
+            // Delete container when navigating to a different URL
+            if (this.containerId) {
+                this.deleteContainer();
+            }
+        });
+
         // Load the actual database schema if available
         if (this.exercise?.database?.id) {
             console.log('Loading database schema...');
@@ -199,15 +216,11 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
         if (this.containerSubscription) {
             this.containerSubscription.unsubscribe();
         }
+        if (this.routerSubscription) {
+            this.routerSubscription.unsubscribe();
+        }
         if (this.containerId) {
-            this.dockerService.deleteContainer(this.containerId).subscribe({
-                next: () => {
-                    // Container deleted successfully
-                },
-                error: (error: any) => {
-                    // Handle error, maybe log it
-                }
-            });
+            this.deleteContainer();
         }
     }
 
@@ -441,5 +454,24 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
             disableClose: false,
             panelClass: 'er-diagram-dialog'
         });
+    }
+
+    /**
+     * Deletes the Docker container associated with the current exercise.
+     * This is called when the user navigates away from the exercise page.
+     */
+    private deleteContainer(): void {
+        if (this.containerId) {
+            this.dockerService.deleteContainer(this.containerId).subscribe({
+                next: () => {
+                    console.log('Container deleted successfully:', this.containerId);
+                    this.containerId = null;
+                    this.connectionDetails = null;
+                },
+                error: (error: any) => {
+                    console.error('Failed to delete container:', error);
+                }
+            });
+        }
     }
 }

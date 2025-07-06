@@ -155,4 +155,17 @@ export class DatabasesController {
     ) {
         return this.databasesService.insertRow(databaseId, tableName, data, user);
     }
+
+    @Put(':id/tables/:tableName/rows')
+    @ApiOperation({ summary: 'Update a row in a table' })
+    @ApiResponse({ status: 200, description: 'Row updated successfully' })
+    async updateRow(
+        @Param('id', ParseIntPipe) databaseId: number,
+        @Param('tableName') tableName: string,
+        @Body('data') data: Record<string, any>,
+        @Body('whereClause') whereClause: string,
+        @GetUser() user: User,
+    ) {
+        return this.databasesService.updateRow(databaseId, tableName, data, whereClause, user);
+    }
 }

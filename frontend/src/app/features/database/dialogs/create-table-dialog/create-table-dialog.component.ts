@@ -10,6 +10,7 @@ export interface ColumnDefinition {
   isNullable: boolean;
   isPrimaryKey: boolean;
   isUnique: boolean;
+  isForeignKey: boolean;
   defaultValue: string;
   length: number;
 }
@@ -67,6 +68,7 @@ export class CreateTableDialogComponent {
       isNullable: [true],
       isPrimaryKey: [false],
       isUnique: [false],
+      isForeignKey: [false],
       defaultValue: [''],
       length: [255]
     });

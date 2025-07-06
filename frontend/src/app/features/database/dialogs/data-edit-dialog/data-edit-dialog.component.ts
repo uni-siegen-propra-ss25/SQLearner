@@ -113,8 +113,8 @@ export class DataEditDialogComponent implements OnInit {
   }
 
   isFieldDisabled(column: DatabaseColumn): boolean {
-    // Disable fields for editing if it is a primary key
-    return this.mode === 'edit' && column.isPrimaryKey;
+    // Disable fields only for autoincremental primary keys
+    return this.mode === 'edit' && column.isPrimaryKey && column.type.includes('SERIAL');
   }
 
   isFieldRequired(column: DatabaseColumn): boolean {
