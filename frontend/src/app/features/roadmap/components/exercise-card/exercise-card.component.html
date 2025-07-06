@@ -67,7 +67,9 @@
   <!-- Card content with description and metadata -->
   <mat-card-content>
     <!-- Exercise description text -->
-    <p class="exercise-description">{{ exercise.description }}</p>
+    <ng-container *ngIf="isTutor">
+      <p class="exercise-description">{{ exercise.description }}</p>
+    </ng-container>
 
     <!-- Exercise metadata section -->
     <div class="exercise-metadata">
