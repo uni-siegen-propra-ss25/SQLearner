@@ -19,6 +19,7 @@ export class ExerciseDialogComponent implements OnInit {
     exerciseTypes = Object.values(ExerciseType);
     difficultyLevels = Object.values(Difficulty);
     databases: Database[] = [];
+    aiGenerated = false;
 
     constructor(
         private readonly fb: FormBuilder,
@@ -252,26 +253,27 @@ export class ExerciseDialogComponent implements OnInit {
     }
 
     openAIGenerationDialog(): void {
-  const dialogRef = this.dialog.open(ExerciseAIGenerationDialogComponent, {
-    width: '500px',
-    data: {
-      databases: this.databases,
-      defaultType: this.exerciseForm.get('type')?.value,
-      defaultDifficulty: this.exerciseForm.get('difficulty')?.value
+        const dialogRef = this.dialog.open(ExerciseAIGenerationDialogComponent, {
+            width: '500px',
+            data: {
+                databases: this.databases,
+                defaultType: this.exerciseForm.get('type')?.value,
+                defaultDifficulty: this.exerciseForm.get('difficulty')?.value
+            }
+        });
+        dialogRef.afterClosed().subscribe((result: any) => {
+            if (result && this.exerciseForm) {
+                this.exerciseForm.patchValue({
+                    title: result.title,
+                    description: result.description,
+                    solution: result.solution,
+                    difficulty: result.difficulty || this.exerciseForm.get('difficulty')?.value,
+                    databaseId: result.databaseId || this.exerciseForm.get('databaseId')?.value
+                });
+                this.aiGenerated = true;
+            }
+        });
     }
-  });
-  dialogRef.afterClosed().subscribe((result: any) => {
-    if (result && this.exerciseForm) {
-      this.exerciseForm.patchValue({
-        title: result.title,
-        description: result.description,
-        solution: result.solution,
-        difficulty: result.difficulty || this.exerciseForm.get('difficulty')?.value,
-        databaseId: result.databaseId || this.exerciseForm.get('databaseId')?.value
-      });
-    }
-  });
-}
 
     onSingleChoiceSelect(selectedIndex: number) {
         // Uncheck all other answers
