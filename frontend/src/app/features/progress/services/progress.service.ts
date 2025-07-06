@@ -290,4 +290,14 @@ export class ProgressService {
             .post<void>(`${this.baseUrl}/exercise/${exerciseId}`, { isPassed })
             .pipe(catchError((error) => this.handleError(error)));
     }
+
+    /**
+     * Checks if a specific exercise has been completed correctly by the user.
+     * @param {number} exerciseId - The ID of the exercise to check
+     * @returns {boolean} True if the exercise has been completed correctly, false otherwise
+     */
+    isCorrectAnswer(exerciseId: number): boolean {
+        const currentProgress = this.progressSubject.value;
+        return currentProgress.completedExerciseIds.includes(exerciseId);
+    }
 }

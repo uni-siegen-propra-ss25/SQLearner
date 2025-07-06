@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { Exercise } from '../../../roadmap/models/exercise.model';
 import { SubmissionService } from '../../services/submission.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -9,7 +9,7 @@ import { ProgressService } from '../../../progress/services/progress.service';
     templateUrl: './freetext-exercise.component.html',
     styleUrls: ['./freetext-exercise.component.scss'],
 })
-export class FreetextExerciseComponent {
+export class FreetextExerciseComponent implements OnInit {
     @Input() exercise!: Exercise;
     answer = '';
     isSubmitting = false;
@@ -21,6 +21,11 @@ export class FreetextExerciseComponent {
         private snackBar: MatSnackBar,
         private progressService: ProgressService
     ) {}
+
+    ngOnInit(): void {
+        // Check if the user has already answered this exercise correctly
+        this.isCorrectAnswer = this.progressService.isCorrectAnswer(this.exercise.id);
+    }
 
     submitAnswer(): void {
         if (!this.answer.trim()) return;

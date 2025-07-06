@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { Exercise, ExerciseType } from '../../../roadmap/models/exercise.model';
 import { SubmissionService } from '../../services/submission.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -9,7 +9,7 @@ import { ProgressService } from '../../../progress/services/progress.service';
     templateUrl: './choice-exercise.component.html',
     styleUrls: ['./choice-exercise.component.scss'],
 })
-export class ChoiceExerciseComponent {
+export class ChoiceExerciseComponent implements OnInit {
     @Input() exercise!: Exercise;
     @Output() completed = new EventEmitter<number>();
     selectedOptions: number[] = [];
@@ -24,9 +24,15 @@ export class ChoiceExerciseComponent {
         private submissionService: SubmissionService,
         private snackBar: MatSnackBar,
         private progressService: ProgressService
-    ) {}    toggleOption(optionId: number): void {
-        if (this.isCorrectAnswer) return; // Only prevent changes if answer was correct
-        
+    ) {}
+
+    ngOnInit(): void {
+        // Check if the user has already answered this exercise correctly
+        this.isCorrectAnswer = this.progressService.isCorrectAnswer(this.exercise.id);
+        this.isAnswered = this.isCorrectAnswer;
+    }
+
+    toggleOption(optionId: number): void {
         const index = this.selectedOptions.indexOf(optionId);
         if (index > -1) {
             this.selectedOptions.splice(index, 1);

@@ -15,6 +15,7 @@ import { filter } from 'rxjs/operators';
 import { DatabaseService } from '../../../database/services/database.service';
 import { SchemaVisualizationService } from '../../../../features/schema-visualization/services/schema-visualization.service';
 import { ErDiagramComponent } from '../../../schema-visualization/components/er-diagram/er-diagram.component';
+import { ProgressService } from '../../../progress/services/progress.service';
 @Component({
     selector: 'app-query-exercise',
     templateUrl: './query-exercise.component.html',
@@ -157,7 +158,8 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
         private router: Router,
         private databaseService: DatabaseService,
         private dialog: MatDialog,
-        private schemaVisualizationService: SchemaVisualizationService
+        private schemaVisualizationService: SchemaVisualizationService,
+        private progressService: ProgressService
     ) {}
 
     /**
@@ -165,6 +167,9 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
      * @returns {void}
      */
     ngOnInit(): void {
+        // Check if the user has already answered this exercise correctly
+        this.isCorrectAnswer = this.progressService.isCorrectAnswer(this.exercise.id);
+        
         // Subscribe to router events to delete container when navigating away
         this.routerSubscription = this.router.events.pipe(
             filter((event: any): event is NavigationStart => event instanceof NavigationStart)

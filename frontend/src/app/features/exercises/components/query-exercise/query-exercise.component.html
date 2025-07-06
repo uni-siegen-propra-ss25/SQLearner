@@ -9,7 +9,13 @@
       <h2 class="exercise-title">
         {{ exercise.title }}
         <!-- Icon shown if the answer is correct -->
-        <mat-icon *ngIf="isCorrectAnswer" class="completed-icon">check_circle</mat-icon>
+        <mat-icon 
+          *ngIf="isCorrectAnswer" 
+          class="completed-icon"
+          matTooltip="Du hast diese Aufgabe bereits gelöst!"
+          matTooltipPosition="above">
+          check_circle
+        </mat-icon>
       </h2>
       <!-- Database information (icon and name) -->
       <div class="database-info" *ngIf="exercise.database">
