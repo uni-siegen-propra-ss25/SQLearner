@@ -14,6 +14,8 @@ import {
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { ExercisesService } from '../services/exercises.service';
 import { DatabasesService } from '../../databases/services/databases.service';
+import { ExerciseGenerationService } from '../services/exercise-generation.service';
+import { ExerciseType, Difficulty } from '@prisma/client';
 import { Exercise } from '@prisma/client';
 import { CreateExerciseDto } from '../models/create-exercise.dto';
 import { UpdateExerciseDto } from '../models/update-exercise.dto';
@@ -37,7 +39,43 @@ export class ExercisesController {
     constructor(
         private readonly exercisesService: ExercisesService,
         private readonly databasesService: DatabasesService,
+        private readonly exerciseGenerationService: ExerciseGenerationService,
     ) {}
+    /**
+     * Generates a new exercise using AI (OpenAI).
+     *
+     * @param body - The parameters for generation (type, difficulty, databaseId, syntaxElements, sqlConcepts)
+     * @returns Promise resolving to generated exercise fields
+     */
+    @Post('generate')
+    @Roles(Role.TUTOR, Role.ADMIN)
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Generate a new exercise using AI' })
+    @ApiResponse({ status: 200, description: 'Generated exercise fields' })
+    async generateExercise(@Body() body: {
+        type: string;
+        difficulty: string;
+        databaseId?: number;
+        syntaxElements?: string[];
+        sqlConcepts?: string[];
+    }): Promise<{ title: string; description: string; solution: string }> {
+        // Typen in Enum casten
+        let type: ExerciseType;
+        let difficulty: Difficulty;
+        try {
+            type = ExerciseType[body.type as keyof typeof ExerciseType];
+            difficulty = Difficulty[body.difficulty as keyof typeof Difficulty];
+        } catch {
+            throw new Error('Ungültiger Typ oder Schwierigkeitsgrad');
+        }
+        return this.exerciseGenerationService.generateExercise({
+            type,
+            difficulty,
+            databaseId: body.databaseId,
+            syntaxElements: body.syntaxElements,
+            sqlConcepts: body.sqlConcepts,
+        });
+    }
 
     /**
      * Retrieves exercises. If topicId is provided, returns exercises for that topic.
