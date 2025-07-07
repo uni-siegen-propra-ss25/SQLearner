@@ -11,17 +11,17 @@ import { BookmarkData } from '../models/bookmark.model';
  * Provides error handling and type-safe observables for all bookmark-related operations.
  */
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
 export class BookmarkService {
     private readonly baseUrl = `${environment.apiUrl}/bookmarks`;
 
-    constructor(private readonly http: HttpClient) { }
+    constructor(private readonly http: HttpClient) {}
 
     /**
      * Handles HTTP errors and provides user-friendly error messages.
      * Differentiates between client-side and server-side errors for better debugging.
-     * 
+     *
      * @private
      * @param {HttpErrorResponse} error - The HTTP error response from the server
      * @returns {Observable<never>} Observable that throws a formatted error message
@@ -42,7 +42,7 @@ export class BookmarkService {
     /**
      * Retrieves all bookmarks for the authenticated user.
      * Fetches the complete list of exercises that the user has saved for later review.
-     * 
+     *
      * @returns {Observable<BookmarkData[]>} Observable containing array of bookmark data with exercise information
      * @throws {Error} When API request fails or user is not authenticated
      */
@@ -55,7 +55,7 @@ export class BookmarkService {
     /**
      * Creates a new bookmark for the specified exercise.
      * Allows users to save exercises they want to revisit later for practice or review.
-     * 
+     *
      * @param {number} exerciseId - The unique identifier of the exercise to bookmark
      * @returns {Observable<BookmarkData>} Observable containing the created bookmark data
      * @throws {Error} When API request fails, exercise doesn't exist, user is not authenticated, or bookmark already exists
@@ -69,7 +69,7 @@ export class BookmarkService {
     /**
      * Removes an existing bookmark by its ID.
      * Allows users to delete bookmarks they no longer need or want to keep.
-     * 
+     *
      * @param {number} id - The unique identifier of the bookmark to remove
      * @returns {Observable<void>} Observable that completes when the bookmark is successfully deleted
      * @throws {Error} When API request fails, bookmark doesn't exist, or user is not authorized to delete the bookmark

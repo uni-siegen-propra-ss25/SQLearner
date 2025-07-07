@@ -26,7 +26,14 @@ import { SettingsModule } from '../settings/settings.module';
  * @module ExercisesModule
  */
 @Module({
-    imports: [PrismaModule, TopicsModule, DatabasesModule, ProgressModule, SqlEvaluationModule, SettingsModule],
+    imports: [
+        PrismaModule,
+        TopicsModule,
+        DatabasesModule,
+        ProgressModule,
+        SqlEvaluationModule,
+        SettingsModule,
+    ],
     controllers: [ExercisesController],
     providers: [ExercisesService, ExerciseGenerationService],
     exports: [ExercisesService],

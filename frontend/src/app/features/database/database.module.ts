@@ -26,7 +26,7 @@ import { EditTableDialogComponent } from './dialogs/edit-table-dialog/edit-table
         ConfirmDialogComponent,
         CreateTableDialogComponent,
         DataEditDialogComponent,
-        EditTableDialogComponent
+        EditTableDialogComponent,
     ],
     imports: [
         CommonModule,
@@ -34,7 +34,7 @@ import { EditTableDialogComponent } from './dialogs/edit-table-dialog/edit-table
         ReactiveFormsModule,
         MaterialModule,
         SharedModule,
-        DatabaseRoutingModule
-    ]
+        DatabaseRoutingModule,
+    ],
 })
-export class DatabaseModule { }
+export class DatabaseModule {}

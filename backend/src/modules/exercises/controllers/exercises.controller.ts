@@ -52,13 +52,16 @@ export class ExercisesController {
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Generate a new exercise using AI' })
     @ApiResponse({ status: 200, description: 'Generated exercise fields' })
-    async generateExercise(@Body() body: {
-        type: string;
-        difficulty: string;
-        databaseId?: number;
-        syntaxElements?: string[];
-        sqlConcepts?: string[];
-    }): Promise<{ title: string; description: string; solution: string }> {
+    async generateExercise(
+        @Body()
+        body: {
+            type: string;
+            difficulty: string;
+            databaseId?: number;
+            syntaxElements?: string[];
+            sqlConcepts?: string[];
+        },
+    ): Promise<{ title: string; description: string; solution: string }> {
         // Typen in Enum casten
         let type: ExerciseType;
         let difficulty: Difficulty;
@@ -130,7 +133,7 @@ export class ExercisesController {
     @Post()
     @Roles(Role.TUTOR, Role.ADMIN)
     @HttpCode(HttpStatus.CREATED)
-    @ApiOperation({ summary: 'Create a new exercise' }) 
+    @ApiOperation({ summary: 'Create a new exercise' })
     @ApiResponse({ status: 201, description: 'The exercise has been created' })
     async createExercise(@Body() createExerciseDto: CreateExerciseDto): Promise<number> {
         const exerciseId = await this.exercisesService.createExercise(createExerciseDto);
@@ -192,8 +195,8 @@ export class ExercisesController {
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Submit and evaluate an answer for an exercise' })
     @ApiParam({ name: 'id', description: 'Exercise ID' })
-    @ApiResponse({ 
-        status: 200, 
+    @ApiResponse({
+        status: 200,
         description: 'Answer submitted successfully',
         schema: {
             type: 'object',
@@ -201,17 +204,22 @@ export class ExercisesController {
                 isCorrect: { type: 'boolean', description: 'Whether the answer was correct' },
                 feedback: { type: 'string', description: 'Feedback message about the answer' },
                 exerciseId: { type: 'number', description: 'ID of the exercise' },
-                userId: { type: 'number', description: 'ID of the user who submitted the answer' }
-            }
-        }
+                userId: { type: 'number', description: 'ID of the user who submitted the answer' },
+            },
+        },
     })
     @ApiResponse({ status: 404, description: 'Exercise not found' })
     async submitAnswer(
         @Param('id') id: number,
-        @Body() body: { answerText: string, connectionDetails?: { host: string; port: number } },
+        @Body() body: { answerText: string; connectionDetails?: { host: string; port: number } },
         @GetUser('id') userId: number,
     ) {
-        return this.exercisesService.submitAnswer(id, body.answerText, userId, body.connectionDetails);
+        return this.exercisesService.submitAnswer(
+            id,
+            body.answerText,
+            userId,
+            body.connectionDetails,
+        );
     }
 
     /**
@@ -230,14 +238,14 @@ export class ExercisesController {
     @ApiResponse({ status: 404, description: 'Exercise or database not found' })
     async runQuery(
         @Param('id') id: number,
-        @Body() body: { query: string, connectionDetails?: { host: string; port: number } },
+        @Body() body: { query: string; connectionDetails?: { host: string; port: number } },
     ): Promise<{ columns: string[]; rows: any[] }> {
         console.log('=== DEBUG: ExercisesController.runQuery ===');
         console.log('Exercise ID:', id);
         console.log('Request body:', body);
         console.log('Query:', body.query);
         console.log('Connection Details:', body.connectionDetails);
-        
+
         const result = await this.exercisesService.runQuery(id, body.query, body.connectionDetails);
         console.log('Controller result:', result);
         return result;

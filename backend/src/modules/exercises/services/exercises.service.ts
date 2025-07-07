@@ -12,13 +12,14 @@ import { SqlEvaluationService } from '../../sql-evaluation/services/sql-evaluati
  * Manages the creation, update, deletion, and ordering of exercises within topics.
  * Supports various exercise types including SQL queries, multiple choice, and free text.
  * Provides evaluation logic for Single Choice and Multiple Choice exercises with instant feedback.
- * 
+ *
  * @class ExercisesService
  */
 @Injectable()
-export class ExercisesService {    /**
+export class ExercisesService {
+    /**
      * Erstellt eine neue Instanz des ExercisesService.
-     * 
+     *
      * @param {PrismaService} prisma - Prisma ORM Service für Datenbankoperationen
      * @param {DatabasesService} databasesService - Service für SQL Query-Ausführung
      * @param {ProgressService} progressService - Service für Lernfortschritt-Tracking
@@ -98,19 +99,26 @@ export class ExercisesService {    /**
         console.log('=== DEBUG: validateAnswers ===');
         console.log('Exercise type:', type);
         console.log('Answers count:', answers.length);
-        console.log('Answers:', answers.map(a => ({ text: a.text, isCorrect: a.isCorrect })));
+        console.log(
+            'Answers:',
+            answers.map((a) => ({ text: a.text, isCorrect: a.isCorrect })),
+        );
 
         if (type === ExerciseType.SINGLE_CHOICE) {
             const correctCount = answers.filter((a) => a.isCorrect).length;
             console.log('Correct answers count for SINGLE_CHOICE:', correctCount);
             if (correctCount !== 1) {
-                throw new BadRequestException('Single choice exercises must have exactly one correct answer');
+                throw new BadRequestException(
+                    'Single choice exercises must have exactly one correct answer',
+                );
             }
         } else if (type === ExerciseType.MULTIPLE_CHOICE) {
             const correctCount = answers.filter((a) => a.isCorrect).length;
             console.log('Correct answers count for MULTIPLE_CHOICE:', correctCount);
             if (correctCount === 0) {
-                throw new BadRequestException('Multiple choice exercises must have at least one correct answer');
+                throw new BadRequestException(
+                    'Multiple choice exercises must have at least one correct answer',
+                );
             }
         }
     }
@@ -174,10 +182,10 @@ export class ExercisesService {    /**
         console.log('=== DEBUG: updateExercise ===');
         console.log('Exercise ID:', id);
         console.log('Update DTO:', JSON.stringify(updateExerciseDto, null, 2));
-        
+
         const existingExercise = await this.getExerciseById(id);
         console.log('Existing exercise type:', existingExercise.type);
-        
+
         const { answers, id: exerciseId, ...exerciseData } = updateExerciseDto; // Remove id from exerciseData
         console.log('Exercise data after destructuring:', exerciseData);
         console.log('Answers:', answers);
@@ -191,12 +199,13 @@ export class ExercisesService {    /**
 
         // Handle answers update for choice exercises
         let answersUpdate: any = undefined;
-        if (answers && (
-            exerciseData.type === ExerciseType.SINGLE_CHOICE ||
-            exerciseData.type === ExerciseType.MULTIPLE_CHOICE ||
-            existingExercise.type === ExerciseType.SINGLE_CHOICE ||
-            existingExercise.type === ExerciseType.MULTIPLE_CHOICE
-        )) {
+        if (
+            answers &&
+            (exerciseData.type === ExerciseType.SINGLE_CHOICE ||
+                exerciseData.type === ExerciseType.MULTIPLE_CHOICE ||
+                existingExercise.type === ExerciseType.SINGLE_CHOICE ||
+                existingExercise.type === ExerciseType.MULTIPLE_CHOICE)
+        ) {
             // Delete existing answers first
             await this.prisma.answerOption.deleteMany({
                 where: { exerciseId: id },
@@ -249,12 +258,16 @@ export class ExercisesService {    /**
      * @returns {Promise<{columns: string[]; rows: any[]}>} Promise resolving to the query result
      * @throws {NotFoundException} if the exercise or database does not exist
      */
-    async runQuery(id: number, query: string, connectionDetails?: { host: string; port: number }): Promise<{ columns: string[]; rows: any[] }> {
+    async runQuery(
+        id: number,
+        query: string,
+        connectionDetails?: { host: string; port: number },
+    ): Promise<{ columns: string[]; rows: any[] }> {
         console.log('=== DEBUG: ExercisesService.runQuery ===');
         console.log('Exercise ID:', id);
         console.log('Query:', query);
         console.log('Connection Details:', connectionDetails);
-        
+
         const exercise = await this.prisma.exercise.findUnique({
             where: { id },
             include: {
@@ -272,19 +285,22 @@ export class ExercisesService {    /**
 
         if (!exercise.database) {
             throw new NotFoundException('Exercise has no associated database');
-        }        
-        
+        }
+
         // If it's a query exercise, a container may be needed.
         if (exercise.type === ExerciseType.QUERY) {
             console.log('Running query for QUERY exercise type');
             console.log('Using connectionDetails:', !!connectionDetails);
-            
+
             const result = connectionDetails
-            ? await this.databasesService.runQueryInContainer({
-                ...connectionDetails,
-                database: 'exercise_db' // Use the correct database name from the container
-              }, query)
-            : await this.databasesService.runQuery(exercise.database.id, query);
+                ? await this.databasesService.runQueryInContainer(
+                      {
+                          ...connectionDetails,
+                          database: 'exercise_db', // Use the correct database name from the container
+                      },
+                      query,
+                  )
+                : await this.databasesService.runQuery(exercise.database.id, query);
 
             console.log('Query result received:', result);
 
@@ -327,7 +343,7 @@ export class ExercisesService {    /**
         id: number,
         answerText: string,
         userId: number,
-        connectionDetails?: { host: string; port: number }
+        connectionDetails?: { host: string; port: number },
     ) {
         const exercise = await this.getExerciseById(id);
 
@@ -337,9 +353,14 @@ export class ExercisesService {    /**
             result = this.evaluateSingleChoice(exercise, answerText);
         } else if (exercise.type === ExerciseType.MULTIPLE_CHOICE) {
             result = this.evaluateMultipleChoice(exercise, answerText);
-        } else if (exercise.type === ExerciseType.QUERY || exercise.type === ExerciseType.FREETEXT) {
+        } else if (
+            exercise.type === ExerciseType.QUERY ||
+            exercise.type === ExerciseType.FREETEXT
+        ) {
             if (!exercise.databaseId || !exercise.solution) {
-                throw new BadRequestException('Exercise is not configured correctly for evaluation.');
+                throw new BadRequestException(
+                    'Exercise is not configured correctly for evaluation.',
+                );
             }
             const evaluationResult = await this.sqlEvaluationService.evaluateQuery(
                 answerText,
@@ -356,13 +377,16 @@ export class ExercisesService {    /**
         }
 
         if (result.isCorrect) {
-            await this.progressService.updateExerciseProgress(userId, id, { exerciseId: id, isPassed: true });
+            await this.progressService.updateExerciseProgress(userId, id, {
+                exerciseId: id,
+                isPassed: true,
+            });
         }
 
         return {
             ...result,
             exerciseId: id,
-            userId
+            userId,
         };
     }
 
@@ -380,7 +404,7 @@ export class ExercisesService {    /**
         answerText: string,
     ): { isCorrect: boolean; feedback: string } {
         const selectedOptionId = parseInt(answerText, 10);
-        
+
         if (isNaN(selectedOptionId)) {
             return {
                 isCorrect: false,
@@ -388,15 +412,18 @@ export class ExercisesService {    /**
             };
         }
 
-        const selectedOption = exercise.answers.find((option: any) => option.id === selectedOptionId);
-        
+        const selectedOption = exercise.answers.find(
+            (option: any) => option.id === selectedOptionId,
+        );
+
         if (!selectedOption) {
             return {
                 isCorrect: false,
                 feedback: 'Ausgewählte Option wurde nicht gefunden.',
             };
-        }        const isCorrect = selectedOption.isCorrect;
-        
+        }
+        const isCorrect = selectedOption.isCorrect;
+
         const feedback = isCorrect
             ? '✅ Richtig! Gut gemacht.'
             : '❌ Falsch. Versuchen Sie es noch einmal!';
@@ -419,8 +446,8 @@ export class ExercisesService {    /**
     ): { isCorrect: boolean; feedback: string } {
         const selectedOptionIds = answerText
             .split(',')
-            .map(id => parseInt(id.trim(), 10))
-            .filter(id => !isNaN(id));
+            .map((id) => parseInt(id.trim(), 10))
+            .filter((id) => !isNaN(id));
 
         if (selectedOptionIds.length === 0) {
             return {
@@ -433,7 +460,7 @@ export class ExercisesService {    /**
         const correctOptionIds = exercise.answers
             .filter((option: any) => option.isCorrect)
             .map((option: any) => option.id)
-            .sort();        // Prüfen ob die ausgewählten Optionen exakt den korrekten entsprechen
+            .sort(); // Prüfen ob die ausgewählten Optionen exakt den korrekten entsprechen
         const selectedSorted = selectedOptionIds.sort();
         const isCorrect = JSON.stringify(selectedSorted) === JSON.stringify(correctOptionIds);
 

@@ -1,9 +1,15 @@
-<h2 mat-dialog-title>{{ isEditing ? ('TOPIC_DIALOG.EDIT_TITLE' | translate) : ('TOPIC_DIALOG.NEW_TITLE' | translate) }}</h2>
+<h2 mat-dialog-title>
+  {{ isEditing ? ('TOPIC_DIALOG.EDIT_TITLE' | translate) : ('TOPIC_DIALOG.NEW_TITLE' | translate) }}
+</h2>
 <form [formGroup]="topicForm" (ngSubmit)="onSubmit()">
   <mat-dialog-content>
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>{{ 'TOPIC_DIALOG.TITLE' | translate }}</mat-label>
-      <input matInput formControlName="title" [placeholder]="'TOPIC_DIALOG.TITLE_PLACEHOLDER' | translate" />
+      <input
+        matInput
+        formControlName="title"
+        [placeholder]="'TOPIC_DIALOG.TITLE_PLACEHOLDER' | translate"
+      />
       <mat-error *ngIf="topicForm.get('title')?.hasError('required')">
         {{ 'TOPIC_DIALOG.TITLE_REQUIRED' | translate }}
       </mat-error>
@@ -18,7 +24,6 @@
         rows="4"
       >
       </textarea>
-
     </mat-form-field>
   </mat-dialog-content>
 

@@ -23,10 +23,18 @@
 
   <div class="nav-footer" *ngIf="!userRole">
     <div class="language-switcher">
-      <button class="lang-btn" (click)="onLanguageChange('de')" [class.active]="currentLang === 'de'">
+      <button
+        class="lang-btn"
+        (click)="onLanguageChange('de')"
+        [class.active]="currentLang === 'de'"
+      >
         🇩🇪
       </button>
-      <button class="lang-btn" (click)="onLanguageChange('en')" [class.active]="currentLang === 'en'">
+      <button
+        class="lang-btn"
+        (click)="onLanguageChange('en')"
+        [class.active]="currentLang === 'en'"
+      >
         🇬🇧
       </button>
     </div>

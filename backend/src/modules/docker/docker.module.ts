@@ -7,6 +7,6 @@ import { PrismaModule } from '../../prisma/prisma.module';
     imports: [PrismaModule],
     controllers: [DockerController],
     providers: [DockerService],
-    exports: [DockerService] // Export DockerService for use in other modules
+    exports: [DockerService], // Export DockerService for use in other modules
 })
 export class DockerModule {}

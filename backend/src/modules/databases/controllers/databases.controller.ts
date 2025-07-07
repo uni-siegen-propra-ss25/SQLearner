@@ -12,7 +12,14 @@ import {
     UseInterceptors,
     Patch,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
+import {
+    ApiTags,
+    ApiOperation,
+    ApiResponse,
+    ApiBearerAuth,
+    ApiConsumes,
+    ApiBody,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth/jwt-auth.guard';
 import { RolesGuard } from '../../../common/guards/role/role.guard';
 import { Roles } from '../../../common/decorators/role.decorator';
@@ -35,20 +42,18 @@ import { UpdateDatabaseDto } from '../models/update-database.dto';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
 export class DatabasesController {
-    constructor(
-        private readonly databasesService: DatabasesService,
-    ) {}
+    constructor(private readonly databasesService: DatabasesService) {}
 
     @Post('upload')
     @Roles(Role.TUTOR)
     @ApiConsumes('multipart/form-data')
     @UseInterceptors(FileInterceptor('file'))
     @ApiOperation({ summary: 'Upload SQL file to create database' })
-    @ApiResponse({ status: 201, description: 'SQL file uploaded and database created successfully' })
-    uploadDatabase(
-        @UploadedFile() file: Express.Multer.File,
-        @GetUser() user: User,
-    ) {
+    @ApiResponse({
+        status: 201,
+        description: 'SQL file uploaded and database created successfully',
+    })
+    uploadDatabase(@UploadedFile() file: Express.Multer.File, @GetUser() user: User) {
         return this.databasesService.uploadDatabase(file, user);
     }
 
@@ -71,10 +76,7 @@ export class DatabasesController {
     @Roles(Role.TUTOR)
     @ApiOperation({ summary: 'Create a new empty database' })
     @ApiResponse({ status: 201, description: 'Database created successfully' })
-    createDatabase(
-        @Body() dto: CreateDatabaseDto,
-        @GetUser() user: User,
-    ) {
+    createDatabase(@Body() dto: CreateDatabaseDto, @GetUser() user: User) {
         return this.databasesService.createDatabase(dto, user);
     }
 
@@ -96,7 +98,7 @@ export class DatabasesController {
     @ApiResponse({ status: 200, description: 'Database updated successfully' })
     async updateDatabasePut(
         @Param('id', ParseIntPipe) databaseId: number,
-        @Body() dto: UpdateDatabaseDto, 
+        @Body() dto: UpdateDatabaseDto,
         @GetUser() user: User,
     ) {
         return this.databasesService.updateDatabase(databaseId, dto, user);
@@ -119,7 +121,7 @@ export class DatabasesController {
     @ApiResponse({ status: 400, description: 'Invalid query' })
     async runQuery(
         @Param('id', ParseIntPipe) id: number, // Session ID for the database
-        @Body() dto: QueryDto
+        @Body() dto: QueryDto,
     ) {
         // This operation stays in DatabasesService since it's a database-level operation
         return this.databasesService.runQuery(id, dto.query);
@@ -131,7 +133,7 @@ export class DatabasesController {
     @ApiResponse({ status: 201, description: 'Table created successfully' })
     async createTable(
         @Param('id', ParseIntPipe) databaseId: number,
-        @Body() dto: any, 
+        @Body() dto: any,
         @GetUser() user: User,
     ) {
         return this.databasesService.createTable(databaseId, dto, user.id, user.role);

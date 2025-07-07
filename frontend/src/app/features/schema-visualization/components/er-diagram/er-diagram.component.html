@@ -15,7 +15,7 @@
       <mat-icon>close</mat-icon>
     </button>
   </div>
-  
+
   <!-- Main content area: diagram or error state -->
   <mat-dialog-content class="er-dialog-content">
     <div class="er-container" *ngIf="parsedTables && parsedTables.length > 0; else errorState">
@@ -26,32 +26,44 @@
             <strong>{{ table.name }}</strong>
           </div>
           <div class="table-columns">
-            <div class="column-row" 
-                 *ngFor="let column of table.columns"
-                 [class.primary-key-row]="column.isPrimaryKey">
+            <div
+              class="column-row"
+              *ngFor="let column of table.columns"
+              [class.primary-key-row]="column.isPrimaryKey"
+            >
               <span class="column-icons">
-                <mat-icon *ngIf="column.isPrimaryKey" 
-                         class="pk-icon" 
-                         matTooltip="Primärschlüssel">vpn_key</mat-icon>
-                <mat-icon *ngIf="column.isForeignKey"
-                         class="fk-icon"
-                         [ngClass]="{'composite-fk-icon': isColumnInCompositeFK(table.name, column.name)}"
-                         [matTooltip]="getForeignKeyTooltip(table.name, column.name)">link</mat-icon>
-                <span *ngIf="isColumnInCompositeFK(table.name, column.name)" class="composite-fk-badge" matTooltip="Teil eines zusammengesetzten Fremdschlüssels">FK-Gruppe</span>
-                <mat-icon *ngIf="column.isUnique" 
-                         class="uq-icon" 
-                         matTooltip="Eindeutig">star</mat-icon>
+                <mat-icon *ngIf="column.isPrimaryKey" class="pk-icon" matTooltip="Primärschlüssel"
+                  >vpn_key</mat-icon
+                >
+                <mat-icon
+                  *ngIf="column.isForeignKey"
+                  class="fk-icon"
+                  [ngClass]="{
+                    'composite-fk-icon': isColumnInCompositeFK(table.name, column.name),
+                  }"
+                  [matTooltip]="getForeignKeyTooltip(table.name, column.name)"
+                  >link</mat-icon
+                >
+                <span
+                  *ngIf="isColumnInCompositeFK(table.name, column.name)"
+                  class="composite-fk-badge"
+                  matTooltip="Teil eines zusammengesetzten Fremdschlüssels"
+                  >FK-Gruppe</span
+                >
+                <mat-icon *ngIf="column.isUnique" class="uq-icon" matTooltip="Eindeutig"
+                  >star</mat-icon
+                >
               </span>
               <span class="column-name">{{ column.name }}</span>
               <span class="column-type">{{ column.type }}</span>
             </div>
           </div>
         </div>
-        
+
         <!-- Relationships section entfernt -->
       </div>
     </div>
-    
+
     <!-- Error state if diagram generation fails -->
     <ng-template #errorState>
       <div class="error-state">
@@ -66,7 +78,7 @@
       </div>
     </ng-template>
   </mat-dialog-content>
-  
+
   <!-- Dialog actions (footer) -->
   <mat-dialog-actions align="end">
     <button mat-button mat-dialog-close>Schließen</button>

@@ -7,12 +7,7 @@ import { ApiKeyDialogComponent } from './dialogs/api-key-dialog.component';
 import { SettingsRoutingModule } from './settings-routing.module';
 
 @NgModule({
-  declarations: [SettingsPageComponent, ApiKeyDialogComponent],
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MaterialModule,
-    SettingsRoutingModule
-  ]
+    declarations: [SettingsPageComponent, ApiKeyDialogComponent],
+    imports: [CommonModule, ReactiveFormsModule, MaterialModule, SettingsRoutingModule],
 })
 export class SettingsModule {}

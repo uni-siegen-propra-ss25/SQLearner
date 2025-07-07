@@ -14,31 +14,42 @@
   </div>
 
   <div class="database-grid">
-    <mat-card class="database-card" *ngFor="let database of databases" (click)="openDatabase(database)">
+    <mat-card
+      class="database-card"
+      *ngFor="let database of databases"
+      (click)="openDatabase(database)"
+    >
       <mat-card-header>
         <mat-card-title>{{ database.name }}</mat-card-title>
-        <mat-card-subtitle>{{ 'DATABASE_MANAGEMENT_PAGE.CREATED' | translate }}: {{ database.createdAt | date:'medium' }}</mat-card-subtitle>
+        <mat-card-subtitle
+          >{{ 'DATABASE_MANAGEMENT_PAGE.CREATED' | translate }}:
+          {{ database.createdAt | date: 'medium' }}</mat-card-subtitle
+        >
         <div class="header-actions" *ngIf="isTutor">
           <button
             mat-icon-button
             color="accent"
             (click)="openEditDialog(database); $event.stopPropagation()"
-            matTooltip="{{ 'DATABASE_MANAGEMENT_PAGE.EDIT' | translate }}">
+            matTooltip="{{ 'DATABASE_MANAGEMENT_PAGE.EDIT' | translate }}"
+          >
             <mat-icon>edit</mat-icon>
           </button>
         </div>
       </mat-card-header>
-      
+
       <mat-card-content>
-        <p class="description">{{ database.description || ('DATABASE_MANAGEMENT_PAGE.NO_DESCRIPTION' | translate) }}</p>
+        <p class="description">
+          {{ database.description || ('DATABASE_MANAGEMENT_PAGE.NO_DESCRIPTION' | translate) }}
+        </p>
       </mat-card-content>
-      
+
       <mat-card-actions *ngIf="isTutor">
         <button
           mat-button
           color="warn"
           (click)="deleteDatabase(database.id); $event.stopPropagation()"
-          class="delete-btn">
+          class="delete-btn"
+        >
           <mat-icon>delete</mat-icon>
           {{ 'DATABASE_MANAGEMENT_PAGE.DELETE' | translate }}
         </button>

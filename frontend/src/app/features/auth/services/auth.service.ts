@@ -51,8 +51,8 @@ export class AuthService {
                 const user = this.getUserFromToken();
                 this._logStatusSubject$.next(true);
                 this._userSubject$.next(this.getUserFromToken());
-              if (user?.role) {
-                localStorage.setItem('role', user.role);
+                if (user?.role) {
+                    localStorage.setItem('role', user.role);
                 }
             }),
         );

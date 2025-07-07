@@ -178,7 +178,7 @@ export class TopicCardComponent implements OnInit {
         console.log('=== DEBUG: Opening exercise dialog ===');
         console.log('Topic ID:', this.topic.id);
         console.log('Dialog data:', dialogData);
-        
+
         const dialogRef = this.dialog.open(ExerciseDialogComponent, {
             width: '800px',
             data: dialogData,
@@ -312,7 +312,7 @@ export class TopicCardComponent implements OnInit {
 
     getCompletedCount(): number {
         return this.exercises.filter(
-            ex => this.isExerciseCompleted(ex.id) || this.isLocallyCompleted(ex.id)
+            (ex) => this.isExerciseCompleted(ex.id) || this.isLocallyCompleted(ex.id),
         ).length;
     }
 

@@ -17,7 +17,7 @@ export const DockerConfig = {
             readOnlyRootfs: true,
             noNewPrivileges: true,
             securityOpts: ['no-new-privileges'],
-        }
+        },
     },
     // Database settings
     database: {
@@ -28,18 +28,18 @@ export const DockerConfig = {
             interval: '30s',
             timeout: '10s',
             retries: 3,
-            command: ['pg_isready', '-U', 'postgres']
-        }
+            command: ['pg_isready', '-U', 'postgres'],
+        },
     },
     // Network settings
     network: {
         mode: 'bridge',
-        dns: ['8.8.8.8', '8.8.4.4']
+        dns: ['8.8.8.8', '8.8.4.4'],
     },
     // Cleanup settings
     cleanup: {
         autoRemove: true,
         stopTimeout: 10,
-        idleTimeout: 3600 // 1 hour
-    }
+        idleTimeout: 3600, // 1 hour
+    },
 };

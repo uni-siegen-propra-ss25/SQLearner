@@ -1,9 +1,17 @@
-<h2 mat-dialog-title>{{ isEditing ? ('CHAPTER_DIALOG.EDIT_TITLE' | translate) : ('CHAPTER_DIALOG.NEW_TITLE' | translate) }}</h2>
+<h2 mat-dialog-title>
+  {{
+    isEditing ? ('CHAPTER_DIALOG.EDIT_TITLE' | translate) : ('CHAPTER_DIALOG.NEW_TITLE' | translate)
+  }}
+</h2>
 <form [formGroup]="chapterForm" (ngSubmit)="onSubmit()">
   <mat-dialog-content>
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>{{ 'CHAPTER_DIALOG.TITLE' | translate }}</mat-label>
-      <input matInput formControlName="title" [placeholder]="'CHAPTER_DIALOG.TITLE_PLACEHOLDER' | translate" />
+      <input
+        matInput
+        formControlName="title"
+        [placeholder]="'CHAPTER_DIALOG.TITLE_PLACEHOLDER' | translate"
+      />
       <mat-error *ngIf="chapterForm.get('title')?.hasError('required')">
         {{ 'CHAPTER_DIALOG.TITLE_REQUIRED' | translate }}
       </mat-error>

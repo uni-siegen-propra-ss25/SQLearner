@@ -15,13 +15,13 @@ import { environment } from '../../../../environments/environment';
  * @property {string} constraints - String representation of all constraints for the column.
  */
 export interface ColumnDto {
-  name: string;
-  type: string;
-  isPrimaryKey: boolean;
-  isForeignKey: boolean;
-  isUnique: boolean;
-  isNullable: boolean;
-  constraints: string;
+    name: string;
+    type: string;
+    isPrimaryKey: boolean;
+    isForeignKey: boolean;
+    isUnique: boolean;
+    isNullable: boolean;
+    constraints: string;
 }
 
 /**
@@ -35,13 +35,13 @@ export interface ColumnDto {
  * @property {number} height - Height of the table node in the diagram.
  */
 export interface TableNodeDto {
-  id: string;
-  name: string;
-  columns: ColumnDto[];
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+    id: string;
+    name: string;
+    columns: ColumnDto[];
+    x: number;
+    y: number;
+    width: number;
+    height: number;
 }
 
 /**
@@ -55,13 +55,13 @@ export interface TableNodeDto {
  * @property {string} label - Optional label for the relationship (e.g., constraint name).
  */
 export interface RelationshipDto {
-  id: string;
-  fromTable: string;
-  fromColumn: string | string[];
-  toTable: string;
-  toColumn: string | string[];
-  type: 'one-to-one' | 'one-to-many' | 'many-to-one' | 'many-to-many';
-  label: string;
+    id: string;
+    fromTable: string;
+    fromColumn: string | string[];
+    toTable: string;
+    toColumn: string | string[];
+    type: 'one-to-one' | 'one-to-many' | 'many-to-one' | 'many-to-many';
+    label: string;
 }
 
 /**
@@ -71,9 +71,9 @@ export interface RelationshipDto {
  * @property {number} relationshipCount - Number of relationships in the diagram.
  */
 export interface ERDiagramMetadataDto {
-  databaseName: string;
-  tableCount: number;
-  relationshipCount: number;
+    databaseName: string;
+    tableCount: number;
+    relationshipCount: number;
 }
 
 /**
@@ -86,12 +86,12 @@ export interface ERDiagramMetadataDto {
  * @property {string} [svgContent] - Optional: SVG content for the diagram (if available).
  */
 export interface ERDiagramDto {
-  tables: TableNodeDto[];
-  relationships: RelationshipDto[];
-  metadata: ERDiagramMetadataDto;
-  dbmlCode: string;
-  jsonSchema?: any;
-  svgContent?: string;
+    tables: TableNodeDto[];
+    relationships: RelationshipDto[];
+    metadata: ERDiagramMetadataDto;
+    dbmlCode: string;
+    jsonSchema?: any;
+    svgContent?: string;
 }
 
 /**
@@ -100,38 +100,38 @@ export interface ERDiagramDto {
  * @property {string} [name] - Optional name for the schema/database.
  */
 export interface ParseSchemaDto {
-  schema: string;
-  name?: string;
+    schema: string;
+    name?: string;
 }
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root',
 })
 export class SchemaVisualizationService {
-  private readonly baseUrl = `${environment.apiUrl}/schema-visualization`;
+    private readonly baseUrl = `${environment.apiUrl}/schema-visualization`;
 
-  constructor(private http: HttpClient) {}
+    constructor(private http: HttpClient) {}
 
-  /**
-   * Parse a schema string (DDL) and return ER diagram data.
-   * @param {ParseSchemaDto} parseSchemaDto - DTO containing the schema string and optional name.
-   * @returns {Observable<ERDiagramDto>} - Observable emitting the ER diagram data.
-   */
-  parseSchemaString(parseSchemaDto: ParseSchemaDto): Observable<ERDiagramDto> {
-    return this.http.post<ERDiagramDto>(`${this.baseUrl}/parse-schema`, parseSchemaDto).pipe(
-      catchError(error => {
-        console.error('Schema parsing failed:', error);
-        throw error;
-      })
-    );
-  }
+    /**
+     * Parse a schema string (DDL) and return ER diagram data.
+     * @param {ParseSchemaDto} parseSchemaDto - DTO containing the schema string and optional name.
+     * @returns {Observable<ERDiagramDto>} - Observable emitting the ER diagram data.
+     */
+    parseSchemaString(parseSchemaDto: ParseSchemaDto): Observable<ERDiagramDto> {
+        return this.http.post<ERDiagramDto>(`${this.baseUrl}/parse-schema`, parseSchemaDto).pipe(
+            catchError((error) => {
+                console.error('Schema parsing failed:', error);
+                throw error;
+            }),
+        );
+    }
 
-  /**
-   * Get ER diagram data for a specific database.
-   * @param {number} databaseId - The ID of the database.
-   * @returns {Observable<ERDiagramDto>} - Observable emitting the ER diagram data.
-   */
-  visualizeDatabase(databaseId: number): Observable<ERDiagramDto> {
-    return this.http.get<ERDiagramDto>(`${this.baseUrl}/database/${databaseId}`);
-  }
+    /**
+     * Get ER diagram data for a specific database.
+     * @param {number} databaseId - The ID of the database.
+     * @returns {Observable<ERDiagramDto>} - Observable emitting the ER diagram data.
+     */
+    visualizeDatabase(databaseId: number): Observable<ERDiagramDto> {
+        return this.http.get<ERDiagramDto>(`${this.baseUrl}/database/${databaseId}`);
+    }
 }

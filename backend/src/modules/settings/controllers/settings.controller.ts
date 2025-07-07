@@ -1,15 +1,15 @@
-import { 
-    Controller, 
-    Get, 
-    Post, 
-    Body, 
-    Delete, 
-    Param, 
-    UseGuards, 
+import {
+    Controller,
+    Get,
+    Post,
+    Body,
+    Delete,
+    Param,
+    UseGuards,
     BadRequestException,
     NotFoundException,
     HttpStatus,
-    HttpCode
+    HttpCode,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { SettingsService } from '../services/settings.service';
@@ -36,10 +36,10 @@ export class SettingsController {
     @ApiResponse({ status: 200, description: 'List of all settings' })
     async getAllSettings() {
         const settings = await this.settingsService.getAllSettings();
-        return settings.map(setting => ({
+        return settings.map((setting) => ({
             name: setting.name,
             description: setting.description,
-            hasValue: !!setting.value
+            hasValue: !!setting.value,
         }));
     }
 
@@ -52,7 +52,7 @@ export class SettingsController {
         if (!Object.values(SETTINGS_KEYS).includes(name as any)) {
             throw new BadRequestException(`Invalid setting name: ${name}`);
         }
-        
+
         const value = await this.settingsService.getSetting(name);
         return { value };
     }
@@ -91,7 +91,7 @@ export class SettingsController {
         if (!setting) {
             throw new NotFoundException(`Setting ${name} not found`);
         }
-        
+
         await this.settingsService.deleteSetting(name);
     }
 }

@@ -17,10 +17,7 @@ export class DockerController {
     @Post('containers/:exerciseId')
     @ApiOperation({ summary: 'Create a new database container' })
     @ApiResponse({ status: 201, description: 'Container created successfully' })
-    async createContainer(
-        @Param('exerciseId') exerciseId: number,
-        @GetUser() user: User
-    ) {
+    async createContainer(@Param('exerciseId') exerciseId: number, @GetUser() user: User) {
         return this.dockerService.createContainer(exerciseId, user);
     }
 
@@ -30,10 +27,7 @@ export class DockerController {
     @Delete('containers/:containerId')
     @ApiOperation({ summary: 'Delete a database container' })
     @ApiResponse({ status: 200, description: 'Container deleted successfully' })
-    async deleteContainer(
-        @Param('containerId') containerId: string,
-        @GetUser() user: User
-    ) {
+    async deleteContainer(@Param('containerId') containerId: string, @GetUser() user: User) {
         return this.dockerService.deleteContainer(containerId, user);
     }
 
@@ -43,10 +37,7 @@ export class DockerController {
     @Post('containers/:containerId/reset')
     @ApiOperation({ summary: 'Reset a database container' })
     @ApiResponse({ status: 200, description: 'Container reset successfully' })
-    async resetContainer(
-        @Param('containerId') containerId: string,
-        @GetUser() user: User
-    ) {
+    async resetContainer(@Param('containerId') containerId: string, @GetUser() user: User) {
         // Implementation coming in next step
     }
 
@@ -56,10 +47,7 @@ export class DockerController {
     @Get('containers/:containerId/status')
     @ApiOperation({ summary: 'Get container status' })
     @ApiResponse({ status: 200, description: 'Container status retrieved' })
-    async getContainerStatus(
-        @Param('containerId') containerId: string,
-        @GetUser() user: User
-    ) {
+    async getContainerStatus(@Param('containerId') containerId: string, @GetUser() user: User) {
         // Implementation coming in next step
         return null;
     }

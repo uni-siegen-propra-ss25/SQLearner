@@ -63,7 +63,9 @@ export class ProgressController {
      */
     @Get('user/:id')
     @Roles('TUTOR', 'ADMIN')
-    async getUserProgressById(@Param('id', ParseIntPipe) userId: number): Promise<UserProgressSummary> {
+    async getUserProgressById(
+        @Param('id', ParseIntPipe) userId: number,
+    ): Promise<UserProgressSummary> {
         return this.progressService.getUserProgress(userId);
     }
 

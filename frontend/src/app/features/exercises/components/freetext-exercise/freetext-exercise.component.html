@@ -3,13 +3,14 @@
     <div class="exercise-header">
       <h2 class="exercise-title">
         {{ exercise.title }}
-<mat-icon 
-  *ngIf="isCorrectAnswer" 
-  class="completed-icon"
-  matTooltip="Du hast diese Aufgabe bereits gelöst!"
-  matTooltipPosition="above">
-  check_circle
-</mat-icon>
+        <mat-icon
+          *ngIf="isCorrectAnswer"
+          class="completed-icon"
+          matTooltip="Du hast diese Aufgabe bereits gelöst!"
+          matTooltipPosition="above"
+        >
+          check_circle
+        </mat-icon>
       </h2>
     </div>
     <p class="exercise-description">{{ exercise.description }}</p>

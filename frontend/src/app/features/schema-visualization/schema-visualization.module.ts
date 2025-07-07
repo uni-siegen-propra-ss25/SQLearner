@@ -4,15 +4,8 @@ import { MaterialModule } from '../../material.module';
 import { ErDiagramComponent } from './components/er-diagram/er-diagram.component';
 
 @NgModule({
-  declarations: [
-    ErDiagramComponent
-  ],
-  imports: [
-    CommonModule,
-    MaterialModule
-  ],
-  exports: [
-    ErDiagramComponent
-  ]
+    declarations: [ErDiagramComponent],
+    imports: [CommonModule, MaterialModule],
+    exports: [ErDiagramComponent],
 })
-export class SchemaVisualizationModule { }
+export class SchemaVisualizationModule {}

@@ -13,7 +13,13 @@
           mode="determinate"
           [value]="(getCompletedCount() / exercises.length) * 100"
           color="primary"
-          style="margin-top: 4px; min-width: 120px; max-width: 200px; height: 8px; border-radius: 4px;"
+          style="
+            margin-top: 4px;
+            min-width: 120px;
+            max-width: 200px;
+            height: 8px;
+            border-radius: 4px;
+          "
         ></mat-progress-bar>
       </span>
     </mat-panel-title>
@@ -49,7 +55,7 @@
   <div class="exercises-container">
     <!-- Loading indicator while exercises are being fetched -->
     <mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
-    
+
     <!-- Exercise cards with bookmark functionality -->
     <div class="exercises-list">
       <app-exercise-card
@@ -64,13 +70,13 @@
         (completed)="onExerciseCompleted($event)"
       >
       </app-exercise-card>
-      
+
       <!-- Empty state when no exercises exist -->
       <div *ngIf="!isLoading && exercises.length === 0" class="empty-exercises">
         <mat-icon>assignment</mat-icon>
         <p>{{ 'ROADMAP_PAGE.NO_EXERCISES' | translate }}</p>
       </div>
-      
+
       <!-- Add new exercise button for tutors -->
       <button
         *ngIf="isTutor"

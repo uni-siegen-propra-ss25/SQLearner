@@ -10,11 +10,11 @@ import { ProgressService } from '../../../progress/services/progress.service';
  * Component for displaying individual exercise cards with interactive features.
  * Handles exercise navigation, bookmark functionality, and provides different views for students and tutors.
  * Supports drag-and-drop operations and integrates with the bookmark system for personalized learning.
- * 
+ *
  * @example
  * ```html
- * <app-exercise-card 
- *   [exercise]="exercise" 
+ * <app-exercise-card
+ *   [exercise]="exercise"
  *   [isTutor]="false"
  *   [isBookmarked]="true"
  *   (bookmarkToggled)="onBookmarkChange($event)">
@@ -33,7 +33,7 @@ export class ExerciseCardComponent implements OnInit, OnDestroy {
      * @required
      */
     @Input() exercise!: Exercise;
-    
+
     /**
      * Flag indicating if the current user is a tutor with editing privileges.
      * When true, shows edit/delete buttons instead of bookmark functionality.
@@ -41,7 +41,7 @@ export class ExerciseCardComponent implements OnInit, OnDestroy {
      * @default false
      */
     @Input() isTutor = false;
-    
+
     /**
      * Flag indicating if the card is currently being dragged for reordering operations.
      * Used to apply special styling during drag operations.
@@ -49,7 +49,7 @@ export class ExerciseCardComponent implements OnInit, OnDestroy {
      * @default false
      */
     @Input() isDragging = false;
-    
+
     /**
      * Flag indicating if the exercise is bookmarked by the current user.
      * Controls the visual state of the bookmark button and icon display.
@@ -57,28 +57,28 @@ export class ExerciseCardComponent implements OnInit, OnDestroy {
      * @default false
      */
     @Input() isBookmarked = false;
-    
+
     /**
      * Flag indicating if the exercise is completed by the user
      * @type {boolean}
      * @default false
      */
     @Input() isCompleted = false;
-    
+
     /**
      * Event emitter for exercise edit operations triggered by tutors.
      * Emits the complete exercise object to parent component for editing.
      * @type {EventEmitter<Exercise>}
      */
     @Output() edit = new EventEmitter<Exercise>();
-    
+
     /**
      * Event emitter for exercise deletion operations triggered by tutors.
      * Emits the exercise ID to parent component for deletion confirmation and processing.
      * @type {EventEmitter<number>}
      */
     @Output() delete = new EventEmitter<number>();
-    
+
     /**
      * Event emitter for bookmark toggle operations.
      * Emits object containing exercise ID and new bookmark status for parent component synchronization.
@@ -95,16 +95,16 @@ export class ExerciseCardComponent implements OnInit, OnDestroy {
 
     /** Reference to ExerciseType enum for template usage and type checking */
     ExerciseType = ExerciseType;
-    
+
     /** Reference to Difficulty enum for template usage and badge display */
     Difficulty = Difficulty;
-    
+
     /** Subject for managing component lifecycle and preventing memory leaks in subscriptions */
     private destroy$ = new Subject<void>();
-    
+
     /** Internal bookmark ID used for API delete operations when removing bookmarks */
     private bookmarkId: number | null = null;
-    
+
     /** Flag indicating if bookmark operation is currently in progress to prevent duplicate requests */
     isBookmarkLoading = false;
 
@@ -119,7 +119,7 @@ export class ExerciseCardComponent implements OnInit, OnDestroy {
         private router: Router,
         private bookmarkService: BookmarkService,
         private authService: AuthService,
-        private progressService: ProgressService
+        private progressService: ProgressService,
     ) {}
 
     /**
@@ -153,17 +153,18 @@ export class ExerciseCardComponent implements OnInit, OnDestroy {
      */
     private loadBookmarkStatus(): void {
         if (!this.exercise?.id) return;
-        
-        this.bookmarkService.getUserBookmarks()
+
+        this.bookmarkService
+            .getUserBookmarks()
             .pipe(
                 takeUntil(this.destroy$),
-                catchError(error => {
+                catchError((error) => {
                     console.error('Error loading bookmark status:', error);
                     return of([]);
-                })
+                }),
             )
-            .subscribe(bookmarks => {
-                const bookmark = bookmarks.find(b => b.exercise.id === this.exercise.id);
+            .subscribe((bookmarks) => {
+                const bookmark = bookmarks.find((b) => b.exercise.id === this.exercise.id);
                 this.isBookmarked = !!bookmark;
                 this.bookmarkId = bookmark?.id || null;
             });
@@ -177,9 +178,10 @@ export class ExerciseCardComponent implements OnInit, OnDestroy {
      */
     private loadCompletionStatus(): void {
         if (!this.exercise?.id) return;
-        
+
         // Subscribe to progress updates using the unified ProgressDto
-        this.progressService.getUserProgress()
+        this.progressService
+            .getUserProgress()
             .pipe(takeUntil(this.destroy$))
             .subscribe({
                 next: (progress) => {
@@ -187,7 +189,7 @@ export class ExerciseCardComponent implements OnInit, OnDestroy {
                 },
                 error: (error) => {
                     console.error('Error loading completion status:', error);
-                }
+                },
             });
     }
 
@@ -199,45 +201,47 @@ export class ExerciseCardComponent implements OnInit, OnDestroy {
      */
     toggleBookmark(): void {
         if (!this.exercise?.id || this.isBookmarkLoading) return;
-        
+
         this.isBookmarkLoading = true;
-        
+
         if (this.isBookmarked && this.bookmarkId) {
             // Remove existing bookmark from backend
-            this.bookmarkService.removeBookmark(this.bookmarkId)
+            this.bookmarkService
+                .removeBookmark(this.bookmarkId)
                 .pipe(
                     takeUntil(this.destroy$),
-                    catchError(error => {
+                    catchError((error) => {
                         console.error('Error removing bookmark:', error);
                         return of(null);
-                    })
+                    }),
                 )
                 .subscribe(() => {
                     this.isBookmarked = false;
                     this.bookmarkId = null;
                     this.isBookmarkLoading = false;
-                    this.bookmarkToggled.emit({ 
-                        exerciseId: this.exercise.id!, 
-                        isBookmarked: false 
+                    this.bookmarkToggled.emit({
+                        exerciseId: this.exercise.id!,
+                        isBookmarked: false,
                     });
                 });
         } else {
             // Create new bookmark in backend
-            this.bookmarkService.addBookmark(this.exercise.id)
+            this.bookmarkService
+                .addBookmark(this.exercise.id)
                 .pipe(
                     takeUntil(this.destroy$),
-                    catchError(error => {
+                    catchError((error) => {
                         console.error('Error adding bookmark:', error);
                         return of(null);
-                    })
+                    }),
                 )
-                .subscribe(bookmark => {
+                .subscribe((bookmark) => {
                     if (bookmark) {
                         this.isBookmarked = true;
                         this.bookmarkId = bookmark.id;
-                        this.bookmarkToggled.emit({ 
-                            exerciseId: this.exercise.id!, 
-                            isBookmarked: true 
+                        this.bookmarkToggled.emit({
+                            exerciseId: this.exercise.id!,
+                            isBookmarked: true,
                         });
                     }
                     this.isBookmarkLoading = false;
@@ -329,5 +333,4 @@ export class ExerciseCardComponent implements OnInit, OnDestroy {
             this.router.navigate(['/exercises', this.exercise.id]);
         }
     }
-
 }

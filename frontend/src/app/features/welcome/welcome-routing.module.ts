@@ -15,74 +15,74 @@ import { BeantwortetComponent } from './components/welcome-tutor/questions/beant
 import { FragenChatComponent } from './components/welcome-student/fragen-chat/fragen-chat.component';
 
 const routes: Routes = [
-  {
-    path: '',
-    component: WelcomeRedirectComponent,
-  },
     {
-    path: 'default',
-    component: WelcomeComponent, 
-  },
-  {
-    path: 'student',
-    component: WelcomeStudentComponent,
-    canActivate: [RoleGuard],
-    data: { allowedRoles: [Role.STUDENT] }
-  },
-  {
-    path: 'tutor',
-    component: WelcomeTutorComponent,
-    canActivate: [RoleGuard],
-    data: { allowedRoles: [Role.TUTOR] },
-  },
-  {
-    path: 'tutor/questions',
-    component: QuestionComponent,
-    canActivate: [RoleGuard],
-    data: { allowedRoles: [Role.TUTOR] },
-  },
+        path: '',
+        component: WelcomeRedirectComponent,
+    },
+    {
+        path: 'default',
+        component: WelcomeComponent,
+    },
+    {
+        path: 'student',
+        component: WelcomeStudentComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [Role.STUDENT] },
+    },
+    {
+        path: 'tutor',
+        component: WelcomeTutorComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [Role.TUTOR] },
+    },
+    {
+        path: 'tutor/questions',
+        component: QuestionComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [Role.TUTOR] },
+    },
 
-  {
-  path: 'tutor/papierkorb',
-  redirectTo: 'tutor/trash',
-  pathMatch: 'full'
-  },
-  {
-  path: 'tutor/trash',
-  component: PapierkorbComponent,
-  canActivate: [RoleGuard],
-  data: { allowedRoles: [Role.TUTOR] },
-  },
+    {
+        path: 'tutor/papierkorb',
+        redirectTo: 'tutor/trash',
+        pathMatch: 'full',
+    },
+    {
+        path: 'tutor/trash',
+        component: PapierkorbComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [Role.TUTOR] },
+    },
 
-  {
-    path: 'tutor/archiv',
-    component: ArchivComponent,
-    canActivate: [RoleGuard],
-    data: { allowedRoles: [Role.TUTOR] },
-  },
+    {
+        path: 'tutor/archiv',
+        component: ArchivComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [Role.TUTOR] },
+    },
 
-  {
-  path: 'tutor/beantwortet',
-  redirectTo: 'tutor/answered',
-  pathMatch: 'full'
-  },
-  {
-  path: 'tutor/answered',
-  component: BeantwortetComponent,
-  canActivate: [RoleGuard],
-  data: { allowedRoles: [Role.TUTOR] },
-  },
+    {
+        path: 'tutor/beantwortet',
+        redirectTo: 'tutor/answered',
+        pathMatch: 'full',
+    },
+    {
+        path: 'tutor/answered',
+        component: BeantwortetComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [Role.TUTOR] },
+    },
 
-  {
-  path: 'student/questions',
-  component: FragenChatComponent,  
-  canActivate: [RoleGuard],
-  data: { allowedRoles: [Role.STUDENT] },
-  },
+    {
+        path: 'student/questions',
+        component: FragenChatComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [Role.STUDENT] },
+    },
 ];
 
 @NgModule({
-  imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+    imports: [RouterModule.forChild(routes)],
+    exports: [RouterModule],
 })
 export class WelcomeRoutingModule {}

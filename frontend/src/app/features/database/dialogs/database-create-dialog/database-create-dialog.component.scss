@@ -13,13 +13,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 24px 0;
-  
+
   h2 {
     display: flex;
     align-items: center;
     gap: 8px;
     margin: 0;
-    
+
     mat-icon {
       color: #1976d2;
     }
@@ -217,4 +217,4 @@ mat-dialog-actions {
   .monaco-editor-container {
     background: #1e1e1e;
   }
-} 
+}

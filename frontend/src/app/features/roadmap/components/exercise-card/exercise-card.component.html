@@ -1,5 +1,10 @@
 <!-- Main exercise card container with click navigation -->
-<mat-card class="exercise-card" (click)="onCardClick()" [class.clickable]="!isTutor" [class.completed]="!isTutor && isCompleted">
+<mat-card
+  class="exercise-card"
+  (click)="onCardClick()"
+  [class.clickable]="!isTutor"
+  [class.completed]="!isTutor && isCompleted"
+>
   <!-- Card header with title, badges, and action buttons -->
   <mat-card-header>
     <div class="header-content">
@@ -25,22 +30,37 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Action buttons section -->
-      <div class="action-buttons" style="display: flex; align-items: center; gap: 0px; margin-left: auto;">
-        <mat-icon *ngIf="!isTutor && isCompleted" class="completed-icon" matTooltip="{{ 'COMPLETED' | translate }}">check_circle</mat-icon>
+      <div
+        class="action-buttons"
+        style="display: flex; align-items: center; gap: 0px; margin-left: auto"
+      >
+        <mat-icon
+          *ngIf="!isTutor && isCompleted"
+          class="completed-icon"
+          matTooltip="{{ 'COMPLETED' | translate }}"
+          >check_circle</mat-icon
+        >
         <button
           *ngIf="!isTutor"
           mat-icon-button
           [color]="isBookmarked ? 'accent' : ''"
           (click)="onBookmarkClick($event)"
           [disabled]="isBookmarkLoading"
-          matTooltip="{{ isBookmarked ? ('REMOVE_BOOKMARK' | translate) : ('ADD_BOOKMARK' | translate) }}"
+          matTooltip="{{
+            isBookmarked ? ('REMOVE_BOOKMARK' | translate) : ('ADD_BOOKMARK' | translate)
+          }}"
           class="bookmark-button"
         >
           <mat-icon>{{ isBookmarked ? 'bookmark' : 'bookmark_border' }}</mat-icon>
         </button>
-        <mat-icon *ngIf="isTutor && isBookmarked" class="bookmark-icon" matTooltip="{{ 'BOOKMARKED_EXERCISE' | translate }}">bookmark</mat-icon>
+        <mat-icon
+          *ngIf="isTutor && isBookmarked"
+          class="bookmark-icon"
+          matTooltip="{{ 'BOOKMARKED_EXERCISE' | translate }}"
+          >bookmark</mat-icon
+        >
         <!-- Edit und Delete Buttons für Tutoren -->
         <ng-container *ngIf="isTutor">
           <button

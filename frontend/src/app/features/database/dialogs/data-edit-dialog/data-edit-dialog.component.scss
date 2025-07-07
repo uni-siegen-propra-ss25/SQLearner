@@ -9,13 +9,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 24px 0;
-  
+
   h2 {
     display: flex;
     align-items: center;
     gap: 8px;
     margin: 0;
-    
+
     mat-icon {
       color: #1976d2;
     }
@@ -33,7 +33,7 @@ mat-dialog-content {
   padding: 12px;
   border-radius: 4px;
   margin-bottom: 16px;
-  
+
   p {
     margin: 0;
     font-size: 14px;
@@ -53,7 +53,7 @@ mat-dialog-content {
 
 .form-field {
   width: 100%;
-  
+
   .required {
     color: #f44336;
   }
@@ -73,10 +73,10 @@ mat-dialog-content {
 mat-dialog-actions {
   padding: 16px 24px;
   gap: 8px;
-  
+
   button {
     min-width: 100px;
-    
+
     mat-spinner {
       margin-right: 8px;
     }
@@ -89,22 +89,22 @@ mat-dialog-actions {
     min-width: 90vw;
     max-width: 90vw;
   }
-  
+
   mat-dialog-content {
     padding: 12px 16px;
   }
-  
+
   .dialog-header {
     padding: 12px 16px 0;
   }
-  
+
   mat-dialog-actions {
     padding: 12px 16px;
   }
 }
 
 // Custom styles for different input types
-input[type="datetime-local"] {
+input[type='datetime-local'] {
   font-family: inherit;
 }
 
@@ -130,4 +130,4 @@ textarea {
   .mat-form-field-outline {
     color: #4caf50;
   }
-} 
+}

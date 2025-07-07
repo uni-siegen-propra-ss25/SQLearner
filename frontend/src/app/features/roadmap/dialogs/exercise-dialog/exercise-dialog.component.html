@@ -1,9 +1,19 @@
-<h2 mat-dialog-title>{{ isEditing ? ('EXERCISE_DIALOG.EDIT_TITLE' | translate) : ('EXERCISE_DIALOG.NEW_TITLE' | translate) }}</h2>
+<h2 mat-dialog-title>
+  {{
+    isEditing
+      ? ('EXERCISE_DIALOG.EDIT_TITLE' | translate)
+      : ('EXERCISE_DIALOG.NEW_TITLE' | translate)
+  }}
+</h2>
 <form [formGroup]="exerciseForm" (ngSubmit)="onSubmit()">
   <mat-dialog-content>
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>{{ 'EXERCISE_DIALOG.TITLE' | translate }}</mat-label>
-      <input matInput formControlName="title" [placeholder]="'EXERCISE_DIALOG.TITLE_PLACEHOLDER' | translate" />
+      <input
+        matInput
+        formControlName="title"
+        [placeholder]="'EXERCISE_DIALOG.TITLE_PLACEHOLDER' | translate"
+      />
       <mat-error *ngIf="exerciseForm.get('title')?.hasError('required')">
         {{ 'EXERCISE_DIALOG.TITLE_REQUIRED' | translate }}
       </mat-error>
@@ -94,11 +104,11 @@
           class="answer-row"
         >
           <mat-form-field appearance="outline" class="answer-text">
-            <mat-label>{{ 'EXERCISE_DIALOG.ANSWER' | translate:{num: i + 1} }}</mat-label>
+            <mat-label>{{ 'EXERCISE_DIALOG.ANSWER' | translate: { num: i + 1 } }}</mat-label>
             <input
               matInput
               formControlName="text"
-              [placeholder]="('EXERCISE_DIALOG.ANSWER_PLACEHOLDER' | translate:{num: i + 1})"
+              [placeholder]="'EXERCISE_DIALOG.ANSWER_PLACEHOLDER' | translate: { num: i + 1 }"
             />
           </mat-form-field>
 
@@ -146,15 +156,23 @@
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">
-    <button mat-button type="button" (click)="onCancel()">{{ 'EXERCISE_DIALOG.CANCEL' | translate }}</button>
+    <button mat-button type="button" (click)="onCancel()">
+      {{ 'EXERCISE_DIALOG.CANCEL' | translate }}
+    </button>
     <button mat-flat-button color="primary" type="submit" [disabled]="!exerciseForm.valid">
-      {{ isEditing ? ('EXERCISE_DIALOG.SAVE' | translate) : ('EXERCISE_DIALOG.CREATE' | translate) }}
+      {{
+        isEditing ? ('EXERCISE_DIALOG.SAVE' | translate) : ('EXERCISE_DIALOG.CREATE' | translate)
+      }}
     </button>
   </mat-dialog-actions>
 
   <div class="ai-generate-row">
-    <button mat-stroked-button color="accent" (click)="openAIGenerationDialog()"
-      [disabled]="exerciseForm.get('type')?.value !== 'QUERY' || aiGenerated">
+    <button
+      mat-stroked-button
+      color="accent"
+      (click)="openAIGenerationDialog()"
+      [disabled]="exerciseForm.get('type')?.value !== 'QUERY' || aiGenerated"
+    >
       <mat-icon>auto_awesome</mat-icon>
       Mit KI generieren
     </button>

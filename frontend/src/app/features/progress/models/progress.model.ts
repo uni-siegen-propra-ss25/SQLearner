@@ -80,9 +80,9 @@ export interface UserProgressSummary {
     completionPercentage: number; // Geändert von totalProgressPercentage
     chapterProgress: ChapterProgress[];
     difficultyStats?: {
-        easy: { completed: number, total: number, percentage: number },
-        medium: { completed: number, total: number, percentage: number },
-        hard: { completed: number, total: number, percentage: number }
+        easy: { completed: number; total: number; percentage: number };
+        medium: { completed: number; total: number; percentage: number };
+        hard: { completed: number; total: number; percentage: number };
     };
     lastActivityDate?: Date | null;
 }

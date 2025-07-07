@@ -29,13 +29,21 @@
       </div>
 
       <div class="columns-container" formArrayName="columns">
-        <div class="column-item" *ngFor="let column of columns.controls; let i = index" [formGroupName]="i">
+        <div
+          class="column-item"
+          *ngFor="let column of columns.controls; let i = index"
+          [formGroupName]="i"
+        >
           <div class="column-header">
             <h4>Spalte {{ i + 1 }}</h4>
-            <button type="button" mat-icon-button color="warn" 
-                    (click)="removeColumn(i)" 
-                    [disabled]="columns.length === 1"
-                    matTooltip="Spalte löschen">
+            <button
+              type="button"
+              mat-icon-button
+              color="warn"
+              (click)="removeColumn(i)"
+              [disabled]="columns.length === 1"
+              matTooltip="Spalte löschen"
+            >
               <mat-icon>delete</mat-icon>
             </button>
           </div>
@@ -55,15 +63,24 @@
 
               <mat-form-field appearance="fill">
                 <mat-label>Datentyp</mat-label>
-                <mat-select formControlName="dataType" 
-                           (selectionChange)="onDataTypeChange(i, $event.value)" required>
+                <mat-select
+                  formControlName="dataType"
+                  (selectionChange)="onDataTypeChange(i, $event.value)"
+                  required
+                >
                   <mat-option *ngFor="let type of dataTypes" [value]="type">
                     {{ type }}
                   </mat-option>
                 </mat-select>
               </mat-form-field>
 
-              <mat-form-field appearance="fill" *ngIf="column.get('dataType')?.value === 'VARCHAR' || column.get('dataType')?.value === 'CHAR'">
+              <mat-form-field
+                appearance="fill"
+                *ngIf="
+                  column.get('dataType')?.value === 'VARCHAR' ||
+                  column.get('dataType')?.value === 'CHAR'
+                "
+              >
                 <mat-label>Länge</mat-label>
                 <input matInput type="number" formControlName="length" min="1" />
               </mat-form-field>
@@ -78,18 +95,10 @@
             </div>
 
             <div class="field-row checkboxes">
-              <mat-checkbox formControlName="isNullable">
-                NULL erlaubt
-              </mat-checkbox>
-              <mat-checkbox formControlName="isPrimaryKey">
-                Primärschlüssel
-              </mat-checkbox>
-              <mat-checkbox formControlName="isUnique">
-                Eindeutig (UNIQUE)
-              </mat-checkbox>
-              <mat-checkbox formControlName="isForeignKey">
-                Fremdschlüssel
-              </mat-checkbox>
+              <mat-checkbox formControlName="isNullable"> NULL erlaubt </mat-checkbox>
+              <mat-checkbox formControlName="isPrimaryKey"> Primärschlüssel </mat-checkbox>
+              <mat-checkbox formControlName="isUnique"> Eindeutig (UNIQUE) </mat-checkbox>
+              <mat-checkbox formControlName="isForeignKey"> Fremdschlüssel </mat-checkbox>
             </div>
           </div>
         </div>
@@ -110,4 +119,4 @@
       Tabelle erstellen
     </button>
   </div>
-</form> 
+</form>

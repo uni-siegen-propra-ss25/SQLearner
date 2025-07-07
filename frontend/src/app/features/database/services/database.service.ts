@@ -100,13 +100,15 @@ export class DatabaseService {
     }
 
     deleteTableRow(databaseId: number, tableId: number, rowId: any): Observable<void> {
-        return this.http.delete<void>(`${this.baseUrl}/${databaseId}/tables/${tableId}/rows/${rowId}`);
+        return this.http.delete<void>(
+            `${this.baseUrl}/${databaseId}/tables/${tableId}/rows/${rowId}`,
+        );
     }
 
     uploadDatabase(file: File): Observable<Database> {
         const formData = new FormData();
         formData.append('file', file);
-        const headers = new HttpHeaders({ 'enctype': 'multipart/form-data' });
+        const headers = new HttpHeaders({ enctype: 'multipart/form-data' });
         return this.http.post<Database>(`${this.baseUrl}/upload`, formData, { headers });
     }
 
@@ -118,7 +120,9 @@ export class DatabaseService {
      * @returns Observable of the inserted row
      */
     insertRow(databaseId: number, tableName: string, data: Record<string, any>): Observable<any> {
-        return this.http.post<any>(`${this.baseUrl}/${databaseId}/tables/${tableName}/rows`, { data });
+        return this.http.post<any>(`${this.baseUrl}/${databaseId}/tables/${tableName}/rows`, {
+            data,
+        });
     }
 
     /**
@@ -129,10 +133,15 @@ export class DatabaseService {
      * @param whereClause - The WHERE clause for the update
      * @returns Observable of the updated row
      */
-    updateRow(databaseId: number, tableName: string, data: Record<string, any>, whereClause: string): Observable<any> {
-        return this.http.put<any>(`${this.baseUrl}/${databaseId}/tables/${tableName}/rows`, { 
-            data, 
-            whereClause 
+    updateRow(
+        databaseId: number,
+        tableName: string,
+        data: Record<string, any>,
+        whereClause: string,
+    ): Observable<any> {
+        return this.http.put<any>(`${this.baseUrl}/${databaseId}/tables/${tableName}/rows`, {
+            data,
+            whereClause,
         });
     }
 
@@ -144,8 +153,8 @@ export class DatabaseService {
      * @returns Observable of the deletion result
      */
     deleteRow(databaseId: number, tableName: string, whereClause: string): Observable<any> {
-        return this.http.delete<any>(`${this.baseUrl}/${databaseId}/tables/${tableName}/rows`, { 
-            body: { whereClause } 
+        return this.http.delete<any>(`${this.baseUrl}/${databaseId}/tables/${tableName}/rows`, {
+            body: { whereClause },
         });
     }
 }

@@ -9,13 +9,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 24px 0;
-  
+
   h2 {
     display: flex;
     align-items: center;
     gap: 8px;
     margin: 0;
-    
+
     mat-icon {
       color: #1976d2;
     }
@@ -229,7 +229,7 @@ mat-form-field {
   .section-header {
     flex-direction: column;
     align-items: stretch;
-    
+
     button {
       width: 100%;
     }
@@ -251,4 +251,4 @@ mat-form-field {
     background: rgba(255, 255, 255, 0.05);
     border-color: rgba(255, 255, 255, 0.1);
   }
-} 
+}

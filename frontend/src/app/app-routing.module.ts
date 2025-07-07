@@ -36,7 +36,8 @@ const routes: Routes = [
     },
     {
         path: 'progress',
-        loadChildren: () => import('./features/progress/progress.module').then((m) => m.ProgressModule),
+        loadChildren: () =>
+            import('./features/progress/progress.module').then((m) => m.ProgressModule),
         canActivate: [RoleGuard],
         data: {
             allowedRoles: [Role.STUDENT, Role.TUTOR, Role.ADMIN],

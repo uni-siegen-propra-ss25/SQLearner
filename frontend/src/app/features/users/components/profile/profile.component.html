@@ -16,7 +16,10 @@
 
       <div class="profile-info-row" *ngIf="user.role === 'STUDENT'">
         <mat-icon>badge</mat-icon>
-        <span>{{ 'PROFILE_DIALOG.MATRICULATION_NUMBER' | translate }}: {{ user.matriculationNumber || '-' }}</span>
+        <span
+          >{{ 'PROFILE_DIALOG.MATRICULATION_NUMBER' | translate }}:
+          {{ user.matriculationNumber || '-' }}</span
+        >
       </div>
 
       <!-- Temporarily disabled until completedExercises is implemented
@@ -38,7 +41,9 @@
     </mat-card-content>
 
     <mat-card-actions align="end">
-      <button mat-stroked-button color="primary" mat-dialog-close>{{ 'PROFILE_DIALOG.CLOSE' | translate }}</button>
+      <button mat-stroked-button color="primary" mat-dialog-close>
+        {{ 'PROFILE_DIALOG.CLOSE' | translate }}
+      </button>
       <button mat-stroked-button color="warn" (click)="logout()">
         <mat-icon>logout</mat-icon>
         {{ 'PROFILE_DIALOG.LOGOUT' | translate }}

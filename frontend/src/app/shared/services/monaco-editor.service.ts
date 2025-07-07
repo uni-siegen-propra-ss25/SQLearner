@@ -5,7 +5,7 @@ import { editor } from 'monaco-editor';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
 export class MonacoEditorService {
     private initialized = false;
@@ -18,8 +18,8 @@ export class MonacoEditorService {
         // Configure Monaco loader
         loader.config({
             paths: {
-                vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs'
-            }
+                vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs',
+            },
         });
     }
 
@@ -27,14 +27,14 @@ export class MonacoEditorService {
         if (this.initialized) {
             return this.waitForInitialization();
         }
-        
+
         try {
             this.initialized = true;
             await loader.init();
-            
+
             // Configure default themes and languages
             this.configureDefaults();
-            
+
             this.initializationComplete$.next(true);
         } catch (error) {
             this.initialized = false;
@@ -67,8 +67,8 @@ export class MonacoEditorService {
                 'editor.background': '#ffffff',
                 'editor.lineHighlightBackground': '#f5f5f5',
                 'editorCursor.foreground': '#666666',
-                'editor.selectionBackground': '#e3e3e3'
-            }
+                'editor.selectionBackground': '#e3e3e3',
+            },
         });
 
         monaco.editor.defineTheme('sqlLearnerDark', {
@@ -79,8 +79,8 @@ export class MonacoEditorService {
                 'editor.background': '#1e1e1e',
                 'editor.lineHighlightBackground': '#282828',
                 'editorCursor.foreground': '#cccccc',
-                'editor.selectionBackground': '#404040'
-            }
+                'editor.selectionBackground': '#404040',
+            },
         });
     }
 
@@ -91,7 +91,9 @@ export class MonacoEditorService {
         }
     }
 
-    getEditorOptions(customOptions: Partial<editor.IStandaloneEditorConstructionOptions> = {}): editor.IStandaloneEditorConstructionOptions {
+    getEditorOptions(
+        customOptions: Partial<editor.IStandaloneEditorConstructionOptions> = {},
+    ): editor.IStandaloneEditorConstructionOptions {
         const defaultOptions: editor.IStandaloneEditorConstructionOptions = {
             language: 'sql',
             theme: 'sqlLearnerLight',
@@ -105,7 +107,7 @@ export class MonacoEditorService {
             quickSuggestions: {
                 other: true,
                 comments: false,
-                strings: true
+                strings: true,
             },
             fixedOverflowWidgets: true,
             snippetSuggestions: 'inline',
@@ -116,23 +118,27 @@ export class MonacoEditorService {
                 snippetsPreventQuickSuggestions: false,
                 showIcons: true,
                 filterGraceful: true,
-                insertMode: 'insert'
+                insertMode: 'insert',
             },
             formatOnType: true,
             formatOnPaste: true,
             multiCursorModifier: 'ctrlCmd',
             wordWrap: 'on',
             bracketPairColorization: {
-                enabled: true
+                enabled: true,
             },
             autoClosingBrackets: 'always',
-            matchBrackets: 'always'
+            matchBrackets: 'always',
         };
 
         return { ...defaultOptions, ...customOptions };
     }
 
-    async createEditor(element: HTMLElement, initialValue: string = '', customOptions: Partial<editor.IStandaloneEditorConstructionOptions> = {}): Promise<editor.IStandaloneCodeEditor> {
+    async createEditor(
+        element: HTMLElement,
+        initialValue: string = '',
+        customOptions: Partial<editor.IStandaloneEditorConstructionOptions> = {},
+    ): Promise<editor.IStandaloneCodeEditor> {
         if (!element) {
             throw new Error('Invalid element reference provided to create editor');
         }
@@ -153,7 +159,12 @@ export class MonacoEditorService {
         });
     }
 
-    registerSqlLanguageFeatures(getSuggestions: (word: editor.IWordAtPosition, range: monaco.Range) => monaco.languages.CompletionItem[]): void {
+    registerSqlLanguageFeatures(
+        getSuggestions: (
+            word: editor.IWordAtPosition,
+            range: monaco.Range,
+        ) => monaco.languages.CompletionItem[],
+    ): void {
         if (this.languageFeaturesRegistered) {
             return;
         }
@@ -166,13 +177,13 @@ export class MonacoEditorService {
                         position.lineNumber,
                         word.startColumn,
                         position.lineNumber,
-                        word.endColumn
+                        word.endColumn,
                     );
                     return {
-                        suggestions: getSuggestions(word, range)
+                        suggestions: getSuggestions(word, range),
                     };
                 },
-                triggerCharacters: [' ', '.', ',']
+                triggerCharacters: [' ', '.', ','],
             });
         });
 
@@ -185,7 +196,7 @@ export class MonacoEditorService {
     }
 
     disposeAll(): void {
-        this.activeEditors.forEach(editor => {
+        this.activeEditors.forEach((editor) => {
             editor.dispose();
         });
         this.activeEditors.clear();

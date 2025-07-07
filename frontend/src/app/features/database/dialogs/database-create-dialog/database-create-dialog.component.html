@@ -14,7 +14,12 @@
       <div class="form-section">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>{{ 'DATABASE_CREATE_DIALOG.NAME' | translate }}</mat-label>
-          <input matInput formControlName="name" [placeholder]="'DATABASE_CREATE_DIALOG.NAME_PLACEHOLDER' | translate" required>
+          <input
+            matInput
+            formControlName="name"
+            [placeholder]="'DATABASE_CREATE_DIALOG.NAME_PLACEHOLDER' | translate"
+            required
+          />
           <mat-error *ngIf="form.get('name')?.hasError('required')">
             {{ 'DATABASE_CREATE_DIALOG.NAME_REQUIRED' | translate }}
           </mat-error>
@@ -28,9 +33,12 @@
       <div class="form-section">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>{{ 'DATABASE_CREATE_DIALOG.DESCRIPTION' | translate }}</mat-label>
-          <textarea matInput formControlName="description" 
-                    [placeholder]="'DATABASE_CREATE_DIALOG.DESCRIPTION_PLACEHOLDER' | translate"
-                    rows="3"></textarea>
+          <textarea
+            matInput
+            formControlName="description"
+            [placeholder]="'DATABASE_CREATE_DIALOG.DESCRIPTION_PLACEHOLDER' | translate"
+            rows="3"
+          ></textarea>
         </mat-form-field>
       </div>
 
@@ -42,15 +50,25 @@
             <span>{{ 'DATABASE_CREATE_DIALOG.SCHEMA_INFO' | translate }}</span>
           </div>
         </div>
-        
+
         <div class="sql-editor-container">
           <div class="editor-header">
             <span class="editor-label">{{ 'DATABASE_CREATE_DIALOG.SQL_CODE' | translate }}</span>
             <div class="editor-actions">
-              <button type="button" mat-icon-button [matTooltip]="'DATABASE_CREATE_DIALOG.LOAD_EXAMPLE' | translate" (click)="loadExample()">
+              <button
+                type="button"
+                mat-icon-button
+                [matTooltip]="'DATABASE_CREATE_DIALOG.LOAD_EXAMPLE' | translate"
+                (click)="loadExample()"
+              >
                 <mat-icon>code</mat-icon>
               </button>
-              <button type="button" mat-icon-button [matTooltip]="'DATABASE_CREATE_DIALOG.FORMAT_CODE' | translate" (click)="formatCode()">
+              <button
+                type="button"
+                mat-icon-button
+                [matTooltip]="'DATABASE_CREATE_DIALOG.FORMAT_CODE' | translate"
+                (click)="formatCode()"
+              >
                 <mat-icon>format_align_left</mat-icon>
               </button>
             </div>
@@ -69,9 +87,13 @@
     <button mat-button type="button" (click)="onCancel()" [disabled]="isLoading">
       {{ 'DATABASE_CREATE_DIALOG.CANCEL' | translate }}
     </button>
-    <button mat-raised-button color="primary" type="submit" 
-            [disabled]="!form.valid || isLoading"
-            (click)="onSubmit()">
+    <button
+      mat-raised-button
+      color="primary"
+      type="submit"
+      [disabled]="!form.valid || isLoading"
+      (click)="onSubmit()"
+    >
       <mat-spinner diameter="20" *ngIf="isLoading"></mat-spinner>
       <span *ngIf="!isLoading">{{ 'DATABASE_CREATE_DIALOG.CREATE' | translate }}</span>
       <span *ngIf="isLoading">{{ 'DATABASE_CREATE_DIALOG.CREATING' | translate }}</span>

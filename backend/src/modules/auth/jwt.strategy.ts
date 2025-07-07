@@ -30,7 +30,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
         // Ensure role is properly converted to Role enum
         const role = user.role as Role;
-    
+
         return {
             id: user.id,
             email: user.email,

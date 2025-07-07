@@ -27,11 +27,11 @@ export class DatabaseListComponent implements OnInit, OnDestroy {
         private dialog: MatDialog,
         private authService: AuthService,
         private router: Router,
-        private snackBar: MatSnackBar
+        private snackBar: MatSnackBar,
     ) {}
 
     ngOnInit(): void {
-        this.userSubscription = this.authService.user$.subscribe(user => {
+        this.userSubscription = this.authService.user$.subscribe((user) => {
             this.isTutor = user?.role === Role.TUTOR;
         });
         this.loadDatabases();
@@ -61,23 +61,23 @@ export class DatabaseListComponent implements OnInit, OnDestroy {
             }
         });
     }
-    
+
     openEditDialog(database: Database): void {
         console.log('=== DEBUG: Opening edit dialog ===');
         console.log('Database to edit:', database);
-        
+
         const dialogRef = this.dialog.open(DatabaseEditDialogComponent, {
-          width: '500px',
-          data: { ...database }
+            width: '500px',
+            data: { ...database },
         });
-    
+
         dialogRef.afterClosed().subscribe((result: any) => {
-          console.log('=== DEBUG: Edit dialog closed ===');
-          console.log('Result:', result);
-          if (result) {
-            console.log('=== DEBUG: Reloading databases ===');
-            this.loadDatabases();
-          }
+            console.log('=== DEBUG: Edit dialog closed ===');
+            console.log('Result:', result);
+            if (result) {
+                console.log('=== DEBUG: Reloading databases ===');
+                this.loadDatabases();
+            }
         });
     }
 
@@ -89,7 +89,8 @@ export class DatabaseListComponent implements OnInit, OnDestroy {
         const dialogRef = this.dialog.open(ConfirmDialogComponent, {
             data: {
                 title: 'Datenbank löschen',
-                message: 'Möchten Sie diese Datenbank wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.',
+                message:
+                    'Möchten Sie diese Datenbank wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.',
             },
         });
 
@@ -97,12 +98,16 @@ export class DatabaseListComponent implements OnInit, OnDestroy {
             if (result) {
                 this.databaseService.deleteDatabase(databaseId).subscribe({
                     next: () => {
-                        this.snackBar.open('Datenbank erfolgreich gelöscht.', 'OK', { duration: 3000 });
+                        this.snackBar.open('Datenbank erfolgreich gelöscht.', 'OK', {
+                            duration: 3000,
+                        });
                         this.loadDatabases();
                     },
                     error: (error: any) => {
                         console.error('Error deleting database', error);
-                        this.snackBar.open('Fehler beim Löschen der Datenbank.', 'OK', { duration: 3000 });
+                        this.snackBar.open('Fehler beim Löschen der Datenbank.', 'OK', {
+                            duration: 3000,
+                        });
                     },
                 });
             }
@@ -112,7 +117,7 @@ export class DatabaseListComponent implements OnInit, OnDestroy {
     openUploadDialog(): void {
         const dialogRef = this.dialog.open(DatabaseUploadDialogComponent, {
             width: '500px',
-            data: {}
+            data: {},
         });
         dialogRef.afterClosed().subscribe((result: any) => {
             if (result) {

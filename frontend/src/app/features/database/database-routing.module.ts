@@ -11,11 +11,11 @@ const routes: Routes = [
     {
         path: ':id',
         component: DatabaseTableViewerComponent,
-    }
+    },
 ];
 
 @NgModule({
     imports: [RouterModule.forChild(routes)],
-    exports: [RouterModule]
+    exports: [RouterModule],
 })
-export class DatabaseRoutingModule { }
+export class DatabaseRoutingModule {}

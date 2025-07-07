@@ -1,10 +1,11 @@
 <div class="fragenforum-container">
-
   <!-- Header area with app title and description -->
   <div class="fragenforum-header">
     <h1>SQLearner</h1>
     <p>{{ 'QUESTION_FORUM_HEADER' | translate }}</p>
-    <button class="back-button" mat-button (click)="goBack()">{{ 'BACK_TO_HOME' | translate }}</button>
+    <button class="back-button" mat-button (click)="goBack()">
+      {{ 'BACK_TO_HOME' | translate }}
+    </button>
   </div>
 
   <!-- Chat message area -->
@@ -37,6 +38,8 @@
       <mat-label>{{ 'YOUR_QUESTION' | translate }}</mat-label>
       <input matInput [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" />
     </mat-form-field>
-    <button mat-raised-button color="primary" (click)="sendMessage()">{{ 'SEND' | translate }}</button>
+    <button mat-raised-button color="primary" (click)="sendMessage()">
+      {{ 'SEND' | translate }}
+    </button>
   </div>
 </div>

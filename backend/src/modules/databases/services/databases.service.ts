@@ -1,4 +1,11 @@
-import { Injectable, ForbiddenException, NotFoundException, Logger, BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import {
+    Injectable,
+    ForbiddenException,
+    NotFoundException,
+    Logger,
+    BadRequestException,
+    InternalServerErrorException,
+} from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { Role, User, ContainerStatus, Database } from '@prisma/client';
 import { SqlErrorException } from '../../../common/exceptions/sql-error.exception';
@@ -29,7 +36,7 @@ export class DatabasesService {
             port: parseInt(process.env.DB_PORT || '5432', 10),
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
-            database: process.env.DB_NAME
+            database: process.env.DB_NAME,
         });
     }
 
@@ -69,7 +76,7 @@ export class DatabasesService {
      */
     async getDatabaseSchema(id: number): Promise<{ schema: string }> {
         const database = await this.getDatabaseById(id);
-        
+
         // Get the actual database name from schemaSql field
         const dbName = database.schemaSql;
         if (!dbName) {
@@ -82,7 +89,7 @@ export class DatabasesService {
             port: parseInt(process.env.DB_PORT || '5432', 10),
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
-            database: dbName
+            database: dbName,
         });
 
         const client = await dbPool.connect();
@@ -99,12 +106,12 @@ export class DatabasesService {
                 ORDER BY 
                     table_name;
             `;
-            
+
             const tablesResult = await client.query(tableQuery);
-            const tableNames = tablesResult.rows.map(row => row.table_name);
-            
+            const tableNames = tablesResult.rows.map((row) => row.table_name);
+
             let schemaSQL = '';
-            
+
             // For each table, get its CREATE TABLE statement
             for (const tableName of tableNames) {
                 // Get table structure
@@ -125,9 +132,9 @@ export class DatabasesService {
                     ORDER BY 
                         ordinal_position;
                 `;
-                
+
                 const columnsResult = await client.query(columnsQuery, [tableName]);
-                
+
                 // Get primary keys
                 const pkQuery = `
                     SELECT 
@@ -144,10 +151,10 @@ export class DatabasesService {
                     ORDER BY 
                         kcu.ordinal_position;
                 `;
-                
+
                 const pkResult = await client.query(pkQuery, [tableName]);
-                const primaryKeys = pkResult.rows.map(row => row.column_name);
-                
+                const primaryKeys = pkResult.rows.map((row) => row.column_name);
+
                 // Get foreign keys - updated query to include constraint_name for grouping
                 const fkQuery = `
                     SELECT 
@@ -171,40 +178,49 @@ export class DatabasesService {
                     ORDER BY 
                         kcu.constraint_name, kcu.ordinal_position;
                 `;
-                
+
                 const fkResult = await client.query(fkQuery, [tableName]);
-                
+
                 // Group foreign keys by constraint_name to handle composite FKs correctly
-                const fkGroups = new Map<string, {
-                    localColumns: string[],
-                    foreignTable: string,
-                    foreignColumns: string[]
-                }>();
-                
+                const fkGroups = new Map<
+                    string,
+                    {
+                        localColumns: string[];
+                        foreignTable: string;
+                        foreignColumns: string[];
+                    }
+                >();
+
                 for (const fk of fkResult.rows) {
                     if (!fkGroups.has(fk.constraint_name)) {
                         fkGroups.set(fk.constraint_name, {
                             localColumns: [],
                             foreignTable: fk.foreign_table_name,
-                            foreignColumns: []
+                            foreignColumns: [],
                         });
                     }
-                    
+
                     const group = fkGroups.get(fk.constraint_name)!;
                     group.localColumns.push(fk.column_name);
                     group.foreignColumns.push(fk.foreign_column_name);
                 }
-                
+
                 // Build CREATE TABLE statement
                 schemaSQL += `CREATE TABLE ${tableName} (\n`;
-                
-                const columnDefinitions = columnsResult.rows.map(column => {
+
+                const columnDefinitions = columnsResult.rows.map((column) => {
                     let def = `    ${column.column_name} `;
-                    
+
                     // Handle data type
-                    if (column.data_type === 'character varying' && column.character_maximum_length) {
+                    if (
+                        column.data_type === 'character varying' &&
+                        column.character_maximum_length
+                    ) {
                         def += `VARCHAR(${column.character_maximum_length})`;
-                    } else if (column.data_type === 'character' && column.character_maximum_length) {
+                    } else if (
+                        column.data_type === 'character' &&
+                        column.character_maximum_length
+                    ) {
                         def += `CHAR(${column.character_maximum_length})`;
                     } else if (column.data_type === 'numeric' && column.numeric_precision) {
                         if (column.numeric_scale) {
@@ -215,42 +231,41 @@ export class DatabasesService {
                     } else {
                         def += column.data_type.toUpperCase();
                     }
-                    
+
                     // Handle NOT NULL
                     if (column.is_nullable === 'NO') {
                         def += ' NOT NULL';
                     }
-                    
+
                     // Handle DEFAULT
                     if (column.column_default) {
                         def += ` DEFAULT ${column.column_default}`;
                     }
-                    
+
                     return def;
                 });
-                
+
                 schemaSQL += columnDefinitions.join(',\n');
-                
+
                 // Add PRIMARY KEY constraint
                 if (primaryKeys.length > 0) {
                     schemaSQL += `,\n    PRIMARY KEY (${primaryKeys.join(', ')})`;
                 }
-                
+
                 // Add FOREIGN KEY constraints - now properly grouped for composite FKs
                 for (const [constraintName, fkGroup] of fkGroups) {
                     const localCols = fkGroup.localColumns.join(', ');
                     const foreignCols = fkGroup.foreignColumns.join(', ');
                     schemaSQL += `,\n    FOREIGN KEY (${localCols}) REFERENCES ${fkGroup.foreignTable}(${foreignCols})`;
                 }
-                
+
                 schemaSQL += '\n);\n\n';
             }
-            
+
             // Clean up PostgreSQL-specific syntax before returning
             schemaSQL = this.sanitizePostgreSQLSchema(schemaSQL);
-            
+
             return { schema: schemaSQL.trim() };
-            
         } catch (error) {
             console.error('Error retrieving database schema:', error);
             throw new InternalServerErrorException('Failed to retrieve database schema');
@@ -279,21 +294,21 @@ export class DatabasesService {
             data: {
                 name: file.originalname,
                 description: 'Uploaded SQL file',
-                schemaSql: schema
+                schemaSql: schema,
             },
         });
 
         try {
             // Create a new PostgreSQL database
             const dbName = `db_${database.id}_${file.originalname.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
-            
+
             // Connect to default database to create new database
             const adminPool = new Pool({
                 host: process.env.DB_HOST,
                 port: parseInt(process.env.DB_PORT || '5432', 10),
                 user: process.env.DB_USER,
                 password: process.env.DB_PASSWORD,
-                database: process.env.DB_NAME
+                database: process.env.DB_NAME,
             });
 
             // Create the new database
@@ -306,9 +321,9 @@ export class DatabasesService {
             // Update the database record with the actual database name
             await this.prisma.database.update({
                 where: { id: database.id },
-                data: { 
-                    schemaSql: dbName // Store the actual database name instead of SQL schema
-                }
+                data: {
+                    schemaSql: dbName, // Store the actual database name instead of SQL schema
+                },
             });
 
             // Execute SQL schema from file in the new database
@@ -318,14 +333,13 @@ export class DatabasesService {
                     port: parseInt(process.env.DB_PORT || '5432', 10),
                     user: process.env.DB_USER,
                     password: process.env.DB_PASSWORD,
-                    database: dbName
+                    database: dbName,
                 });
 
                 await newDbPool.query(schema);
                 console.log('SQL schema from file executed successfully in new database');
                 await newDbPool.end();
             }
-
         } catch (error) {
             console.error('Error creating database from file:', error);
             // Delete the database record if creation fails
@@ -346,7 +360,6 @@ export class DatabasesService {
      * @throws {ForbiddenException|SqlErrorException} - If the user is not a tutor or creation fails.
      */
     async createDatabase(dto: CreateDatabaseDto, user: User) {
-        
         if (user.role !== Role.TUTOR) {
             throw new ForbiddenException('Only tutors can create databases');
         }
@@ -356,21 +369,21 @@ export class DatabasesService {
             data: {
                 name: dto.name,
                 description: dto.description,
-                schemaSql: dto.schemaSql || ''
+                schemaSql: dto.schemaSql || '',
             },
         });
 
         try {
             // Create a new PostgreSQL database
             const dbName = `db_${database.id}_${dto.name.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
-            
+
             // Connect to default database to create new database
             const adminPool = new Pool({
                 host: process.env.DB_HOST,
                 port: parseInt(process.env.DB_PORT || '5432', 10),
                 user: process.env.DB_USER,
                 password: process.env.DB_PASSWORD,
-                database: process.env.DB_NAME
+                database: process.env.DB_NAME,
             });
 
             // Create the new database
@@ -383,9 +396,9 @@ export class DatabasesService {
             // Update the database record with the actual database name
             await this.prisma.database.update({
                 where: { id: database.id },
-                data: { 
-                    schemaSql: dbName // Store the actual database name instead of SQL schema
-                }
+                data: {
+                    schemaSql: dbName, // Store the actual database name instead of SQL schema
+                },
             });
 
             // If there's initial schema SQL, execute it in the new database
@@ -395,25 +408,24 @@ export class DatabasesService {
                     port: parseInt(process.env.DB_PORT || '5432', 10),
                     user: process.env.DB_USER,
                     password: process.env.DB_PASSWORD,
-                    database: dbName
+                    database: dbName,
                 });
 
                 await newDbPool.query(dto.schemaSql);
                 console.log('Initial SQL schema executed successfully in new database');
                 await newDbPool.end();
             }
-
         } catch (error) {
             console.error('Error creating database:', error);
             // Delete the database record if creation fails
             await this.prisma.database.delete({
                 where: { id: database.id },
             });
-            
+
             throw new SqlErrorException({
                 message: `Failed to create database: ${error instanceof Error ? error.message : 'Unknown error'}`,
                 name: 'DatabaseCreationError',
-                code: 'DB_CREATE_ERROR'
+                code: 'DB_CREATE_ERROR',
             });
         }
 
@@ -428,11 +440,7 @@ export class DatabasesService {
      * @returns {Promise<Database>} - The updated database record.
      * @throws {ForbiddenException} - If the user is not a tutor.
      */
-    async updateDatabase(
-        id: number,
-        dto: UpdateDatabaseDto,
-        user: User,
-    ) {
+    async updateDatabase(id: number, dto: UpdateDatabaseDto, user: User) {
         const database = await this.getDatabaseById(id);
 
         if (user.role !== Role.TUTOR) {
@@ -474,15 +482,18 @@ export class DatabasesService {
                     port: parseInt(process.env.DB_PORT || '5432', 10),
                     user: process.env.DB_USER,
                     password: process.env.DB_PASSWORD,
-                    database: process.env.DB_NAME
+                    database: process.env.DB_NAME,
                 });
 
                 // Terminate all connections to the database first
-                await adminPool.query(`
+                await adminPool.query(
+                    `
                     SELECT pg_terminate_backend(pid) 
                     FROM pg_stat_activity 
                     WHERE datname = $1 AND pid <> pg_backend_pid()
-                `, [dbName]);
+                `,
+                    [dbName],
+                );
 
                 // Drop the database
                 await adminPool.query(`DROP DATABASE "${dbName}"`);
@@ -506,7 +517,8 @@ export class DatabasesService {
      */
     private extractTableNames(schemaSql: string): string[] {
         const tableNames: string[] = [];
-        const createTableRegex = /CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?["']?([^"'\s(]+)["']?/gi;
+        const createTableRegex =
+            /CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?["']?([^"'\s(]+)["']?/gi;
         let match;
 
         while ((match = createTableRegex.exec(schemaSql)) !== null) {
@@ -536,7 +548,7 @@ export class DatabasesService {
             'dbsession',
             'bookmark',
             'progress',
-            'chatmessage'
+            'chatmessage',
         ];
         return systemTables.includes(tableName.toLowerCase());
     }
@@ -551,9 +563,12 @@ export class DatabasesService {
      * @throws SqlErrorException for SQL errors
      * @throws ForbiddenException for attempts to modify system tables
      */
-    async runQuery(id: number, query: string): Promise<{ 
-        columns: string[]; 
-        rows: any[]; 
+    async runQuery(
+        id: number,
+        query: string,
+    ): Promise<{
+        columns: string[];
+        rows: any[];
         rowCount?: number;
         command?: string;
         error?: string;
@@ -572,11 +587,11 @@ export class DatabasesService {
 
         // Check if query tries to modify system tables
         const affectedTables = this.extractAffectedTables(query);
-        const systemTables = affectedTables.filter(table => this.isSystemTable(table));
-        
+        const systemTables = affectedTables.filter((table) => this.isSystemTable(table));
+
         if (systemTables.length > 0) {
             throw new ForbiddenException(
-                `Operation not allowed on system tables: ${systemTables.join(', ')}`
+                `Operation not allowed on system tables: ${systemTables.join(', ')}`,
             );
         }
 
@@ -586,7 +601,7 @@ export class DatabasesService {
             port: parseInt(process.env.DB_PORT || '5432', 10),
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
-            database: dbName
+            database: dbName,
         });
 
         const client = await dbPool.connect();
@@ -598,25 +613,25 @@ export class DatabasesService {
             }
 
             const result = await client.query(query);
-            
+
             if (isWriteOperation) {
                 await client.query('COMMIT');
             }
 
             // Extract column names from fields
-            const columns = result.fields ? result.fields.map(field => field.name) : [];
-            
+            const columns = result.fields ? result.fields.map((field) => field.name) : [];
+
             return {
                 columns,
                 rows: result.rows || [],
                 rowCount: result.rowCount || undefined,
-                command: result.command
+                command: result.command,
             };
         } catch (error) {
             if (this.isWriteOperation(query)) {
                 await client.query('ROLLBACK');
             }
-            
+
             throw error;
         } finally {
             client.release();
@@ -632,11 +647,11 @@ export class DatabasesService {
     private extractAffectedTables(query: string): string[] {
         const tables = new Set<string>();
         const patterns = [
-            /FROM\s+["']?([^"'\s,;()]+)["']?/gi,  // SELECT FROM
-            /JOIN\s+["']?([^"'\s,;()]+)["']?/gi,  // JOIN
+            /FROM\s+["']?([^"'\s,;()]+)["']?/gi, // SELECT FROM
+            /JOIN\s+["']?([^"'\s,;()]+)["']?/gi, // JOIN
             /UPDATE\s+["']?([^"'\s,;()]+)["']?/gi, // UPDATE
-            /INTO\s+["']?([^"'\s,;()]+)["']?/gi,  // INSERT INTO
-            /TABLE\s+["']?([^"'\s,;()]+)["']?/gi  // CREATE/DROP TABLE
+            /INTO\s+["']?([^"'\s,;()]+)["']?/gi, // INSERT INTO
+            /TABLE\s+["']?([^"'\s,;()]+)["']?/gi, // CREATE/DROP TABLE
         ];
 
         for (const pattern of patterns) {
@@ -660,7 +675,7 @@ export class DatabasesService {
     private isWriteOperation(query: string): boolean {
         const writeCommands = ['INSERT', 'UPDATE', 'DELETE', 'DROP', 'ALTER', 'CREATE', 'TRUNCATE'];
         const normalizedQuery = query.trim().toUpperCase();
-        return writeCommands.some(cmd => normalizedQuery.startsWith(cmd));
+        return writeCommands.some((cmd) => normalizedQuery.startsWith(cmd));
     }
 
     /**
@@ -673,7 +688,7 @@ export class DatabasesService {
         console.log('=== DEBUG: DatabasesService.runQueryInContainer ===');
         console.log('Connection Details received:', connectionDetails);
         console.log('Query to execute:', query);
-        
+
         let client: Client | null = null;
         const startTime = Date.now();
         try {
@@ -682,22 +697,25 @@ export class DatabasesService {
                 host: connectionDetails.host,
                 port: connectionDetails.port,
                 database: connectionDetails.database,
-                user: connectionDetails.user
+                user: connectionDetails.user,
             });
             console.log('Connecting to database...');
             await client.connect();
             console.log('Connected successfully, executing query...');
             const result = await client.query(query);
             const executionTimeMs = Date.now() - startTime;
-            
+
             console.log('Query executed successfully');
-            console.log('Fields:', result.fields?.map(f => f.name));
+            console.log(
+                'Fields:',
+                result.fields?.map((f) => f.name),
+            );
             console.log('Row count:', result.rowCount);
             console.log('First row sample:', result.rows[0]);
             console.log('Execution time:', executionTimeMs, 'ms');
-            
+
             return {
-                columns: result.fields.map(field => field.name),
+                columns: result.fields.map((field) => field.name),
                 rows: result.rows,
                 rowCount: result.rowCount ?? 0,
                 command: result.command,
@@ -715,8 +733,7 @@ export class DatabasesService {
                 executionTimeMs,
                 error: error.message,
             };
-        }
-        finally {
+        } finally {
             if (client) {
                 console.log('Closing database connection...');
                 await client.end();
@@ -742,16 +759,18 @@ export class DatabasesService {
         if (!database) {
             throw new NotFoundException('Database not found');
         }
-        
+
         // Generate SQL for table creation
-        const columnsSql = dto.columns.map((col: any) => {
-            let colDef = `"${col.name}" ${col.type}`;
-            if (col.isPrimaryKey) colDef += ' PRIMARY KEY';
-            if (col.autoIncrement) colDef += ' GENERATED ALWAYS AS IDENTITY';
-            if (col.nullable === false) colDef += ' NOT NULL';
-            if (col.defaultValue) colDef += ` DEFAULT ${col.defaultValue}`;
-            return colDef;
-        }).join(', ');
+        const columnsSql = dto.columns
+            .map((col: any) => {
+                let colDef = `"${col.name}" ${col.type}`;
+                if (col.isPrimaryKey) colDef += ' PRIMARY KEY';
+                if (col.autoIncrement) colDef += ' GENERATED ALWAYS AS IDENTITY';
+                if (col.nullable === false) colDef += ' NOT NULL';
+                if (col.defaultValue) colDef += ` DEFAULT ${col.defaultValue}`;
+                return colDef;
+            })
+            .join(', ');
         const createTableSql = `CREATE TABLE "${dto.name}" (${columnsSql})`;
         // Execute SQL in the required database
         const dbPool = new Pool({
@@ -759,7 +778,7 @@ export class DatabasesService {
             port: parseInt(process.env.DB_PORT || '5432', 10),
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
-            database: database.schemaSql
+            database: database.schemaSql,
         });
         await dbPool.query(createTableSql);
         await dbPool.end();
@@ -775,45 +794,56 @@ export class DatabasesService {
      */
     private sanitizePostgreSQLSchema(schemaSQL: string): string {
         let cleanSchema = schemaSQL;
-        
+
         // 1. Remove ::regclass casts (common in foreign key references)
         cleanSchema = cleanSchema.replace(/::regclass/g, '');
-        
+
         // 2. Remove all other ::type casts (::text, ::integer, ::boolean, etc.)
         cleanSchema = cleanSchema.replace(/::[a-zA-Z_][a-zA-Z0-9_]*/g, '');
-        
+
         // 3. Clean up quoted values with type casts: 'value'::type → 'value'
         cleanSchema = cleanSchema.replace(/'([^']+)'::[a-zA-Z_][a-zA-Z0-9_]*/g, "'$1'");
-        
+
         // 4. Clean up unquoted values with type casts: value::type → value
         cleanSchema = cleanSchema.replace(/\b([a-zA-Z0-9_]+)::[a-zA-Z_][a-zA-Z0-9_]*/g, '$1');
-        
+
         // 5. Clean up numeric casts: 123::integer → 123
         cleanSchema = cleanSchema.replace(/\b(\d+(?:\.\d+)?)::[a-zA-Z_][a-zA-Z0-9_]*/g, '$1');
-        
+
         // 6. Remove PostgreSQL-specific function calls in defaults that might have casts
-        cleanSchema = cleanSchema.replace(/nextval\(([^)]+)\)::[a-zA-Z_][a-zA-Z0-9_]*/g, 'nextval($1)');
+        cleanSchema = cleanSchema.replace(
+            /nextval\(([^)]+)\)::[a-zA-Z_][a-zA-Z0-9_]*/g,
+            'nextval($1)',
+        );
 
         // 6a. Remove DEFAULT nextval('...') (with or without cast)
         cleanSchema = cleanSchema.replace(/DEFAULT\s+nextval\([^)]*\)/gi, '');
-        cleanSchema = cleanSchema.replace(/DEFAULT\s+nextval\([^)]*\)::[a-zA-Z_][a-zA-Z0-9_]*/gi, '');
-        
+        cleanSchema = cleanSchema.replace(
+            /DEFAULT\s+nextval\([^)]*\)::[a-zA-Z_][a-zA-Z0-9_]*/gi,
+            '',
+        );
+
         // 7. Clean up any remaining double colons that might be left over
         cleanSchema = cleanSchema.replace(/\s+::\s+/g, ' ');
-        
+
         // 8. Normalize whitespace and remove empty lines
         cleanSchema = cleanSchema
             .replace(/\n\s*\n\s*\n/g, '\n\n') // Remove triple+ newlines
             .replace(/\s+$/gm, '') // Remove trailing whitespace
             .replace(/^\s+$/gm, ''); // Remove lines with only whitespace
-        
+
         return cleanSchema;
     }
 
     /**
      * Inserts a new row into a table in the specified database
      */
-    async insertRow(databaseId: number, tableName: string, data: Record<string, any>, user: User): Promise<any> {
+    async insertRow(
+        databaseId: number,
+        tableName: string,
+        data: Record<string, any>,
+        user: User,
+    ): Promise<any> {
         // Getting the database
         const database = await this.getDatabaseById(databaseId);
         if (!database) {
@@ -830,11 +860,13 @@ export class DatabasesService {
             port: parseInt(process.env.DB_PORT || '5432', 10),
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
-            database: dbName
+            database: dbName,
         });
         const client = await dbPool.connect();
         try {
-            const columns = Object.keys(data).map(key => `"${key}"`).join(', ');
+            const columns = Object.keys(data)
+                .map((key) => `"${key}"`)
+                .join(', ');
             const values = Object.values(data);
             const placeholders = values.map((_, i) => `$${i + 1}`).join(', ');
             const query = `INSERT INTO "${tableName}" (${columns}) VALUES (${placeholders}) RETURNING *;`;
@@ -851,7 +883,13 @@ export class DatabasesService {
     /**
      * Updates a row in a table in the specified database
      */
-    async updateRow(databaseId: number, tableName: string, data: Record<string, any>, whereClause: string, user: User): Promise<any> {
+    async updateRow(
+        databaseId: number,
+        tableName: string,
+        data: Record<string, any>,
+        whereClause: string,
+        user: User,
+    ): Promise<any> {
         // Get the database object
         const database = await this.getDatabaseById(databaseId);
         if (!database) {
@@ -868,11 +906,13 @@ export class DatabasesService {
             port: parseInt(process.env.DB_PORT || '5432', 10),
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
-            database: dbName
+            database: dbName,
         });
         const client = await dbPool.connect();
         try {
-            const setClause = Object.keys(data).map((key, index) => `"${key}" = $${index + 1}`).join(', ');
+            const setClause = Object.keys(data)
+                .map((key, index) => `"${key}" = $${index + 1}`)
+                .join(', ');
             const values = Object.values(data);
             const query = `UPDATE "${tableName}" SET ${setClause} WHERE ${whereClause} RETURNING *;`;
             const result = await client.query(query, values);

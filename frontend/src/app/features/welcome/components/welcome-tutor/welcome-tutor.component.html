@@ -6,10 +6,8 @@
 
 <!-- Main content area -->
 <div class="main-content">
-
   <!-- Top row containing two side-by-side boxes -->
   <div class="top-row">
-
     <!-- Hint box for students -->
     <mat-card class="box hint-box">
       <mat-card-title>{{ 'WELCOME_TUTOR_PAGE.HINTS_TITLE' | translate }}</mat-card-title>
@@ -17,7 +15,7 @@
         <ul class="hinweis-liste">
           <!-- Loop through all hints, displaying each with a warning icon, text, and a delete button -->
           <li *ngFor="let hint of hints; let i = index" class="einzelner-hinweis">
-              <mat-icon class="warn-icon">warning</mat-icon>
+            <mat-icon class="warn-icon">warning</mat-icon>
             <span class="hinweis-text">{{ hint.text }}</span>
             <button mat-icon-button color="warn" (click)="removeHint(i)">
               <mat-icon>delete</mat-icon>
@@ -25,7 +23,9 @@
           </li>
         </ul>
         <!-- Message shown if no hints exist -->
-        <p *ngIf="hints.length === 0" class="keine-eintraege">{{ 'WELCOME_TUTOR_PAGE.HINTS_EMPTY' | translate }}</p>
+        <p *ngIf="hints.length === 0" class="keine-eintraege">
+          {{ 'WELCOME_TUTOR_PAGE.HINTS_EMPTY' | translate }}
+        </p>
       </mat-card-content>
 
       <!-- Input field to add a new hint -->
@@ -56,7 +56,9 @@
           </li>
         </ul>
         <!-- Message shown if no to-dos exist -->
-        <p *ngIf="todos.length === 0" class="keine-eintraege">{{ 'WELCOME_TUTOR_PAGE.TODOS_EMPTY' | translate }}</p>
+        <p *ngIf="todos.length === 0" class="keine-eintraege">
+          {{ 'WELCOME_TUTOR_PAGE.TODOS_EMPTY' | translate }}
+        </p>
 
         <!-- Input to add a new to-do -->
         <div class="todo-add">
@@ -75,7 +77,9 @@
   <!-- Bottom row with the latest student questions -->
   <div class="bottom-row">
     <mat-card class="box question-box">
-      <mat-card-title>{{ 'WELCOME_TUTOR_PAGE.STUDENT_QUESTIONS_TITLE' | translate }}</mat-card-title>
+      <mat-card-title>{{
+        'WELCOME_TUTOR_PAGE.STUDENT_QUESTIONS_TITLE' | translate
+      }}</mat-card-title>
       <mat-card-content>
         <div class="fragenliste">
           <!-- Conditionally display questions if any exist; otherwise show fallback message -->
@@ -83,21 +87,26 @@
             <!-- Show up to 3 most recent questions -->
             <div *ngFor="let frage of fragen.slice(0, 3)" class="frage-item">
               <div class="frage-details">
-                <strong>{{ frage.student_name }}</strong><br>
+                <strong>{{ frage.student_name }}</strong
+                ><br />
                 <small>{{ frage.erstellt_am | date: 'dd.MM.yyyy, HH:mm' }}</small>
                 <p class="frage-text">{{ frage.frage }}</p>
               </div>
             </div>
           </ng-container>
           <ng-template #keineFragen>
-            <p class="keine-fragen">{{ 'WELCOME_TUTOR_PAGE.STUDENT_QUESTIONS_EMPTY' | translate }}</p>
+            <p class="keine-fragen">
+              {{ 'WELCOME_TUTOR_PAGE.STUDENT_QUESTIONS_EMPTY' | translate }}
+            </p>
           </ng-template>
         </div>
       </mat-card-content>
 
       <!-- Button linking to the full questions list -->
       <mat-card-actions class="fragen-actions">
-        <button mat-button color="primary" (click)="goToFragen()">{{ 'WELCOME_TUTOR_PAGE.SHOW_ALL' | translate }}</button>
+        <button mat-button color="primary" (click)="goToFragen()">
+          {{ 'WELCOME_TUTOR_PAGE.SHOW_ALL' | translate }}
+        </button>
       </mat-card-actions>
     </mat-card>
   </div>

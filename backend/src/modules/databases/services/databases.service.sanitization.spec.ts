@@ -32,15 +32,15 @@ describe('DatabasesService - PostgreSQL Schema Sanitization', () => {
                 id INTEGER PRIMARY KEY,
                 table_ref OID REFERENCES other_table::regclass
             );`;
-            
+
             const expected = `CREATE TABLE users (
                 id INTEGER PRIMARY KEY,
                 table_ref OID REFERENCES other_table
             );`;
-            
+
             // Access private method via type assertion for testing
             const result = (service as any).sanitizePostgreSQLSchema(input);
-            
+
             expect(result).not.toContain('::regclass');
             expect(result).toContain('REFERENCES other_table');
         });
@@ -53,12 +53,12 @@ describe('DatabasesService - PostgreSQL Schema Sanitization', () => {
                 is_active BOOLEAN DEFAULT true::boolean,
                 score DECIMAL DEFAULT 0.0::numeric
             );`;
-            
+
             const result = (service as any).sanitizePostgreSQLSchema(input);
-            
+
             // Should not contain any :: casts
             expect(result).not.toMatch(/::[a-zA-Z_]/);
-            
+
             // Should preserve the actual values
             expect(result).toContain("DEFAULT 'default'");
             expect(result).toContain('DEFAULT 25');
@@ -79,12 +79,12 @@ describe('DatabasesService - PostgreSQL Schema Sanitization', () => {
                 id INTEGER,
                 value VARCHAR(50) DEFAULT 'test'::character varying
             );`;
-            
+
             const result = (service as any).sanitizePostgreSQLSchema(input);
-            
+
             // Should not contain any casts
             expect(result).not.toMatch(/::/);
-            
+
             // Should preserve table structure
             expect(result).toContain('CREATE TABLE complex_table');
             expect(result).toContain('CREATE TABLE another_table');
@@ -105,12 +105,12 @@ describe('DatabasesService - PostgreSQL Schema Sanitization', () => {
             CREATE TABLE test2 (
                 name VARCHAR    
             );`;
-            
+
             const result = (service as any).sanitizePostgreSQLSchema(input);
-            
+
             // Should not have triple newlines
             expect(result).not.toMatch(/\n\s*\n\s*\n/);
-            
+
             // Should not have trailing whitespace
             expect(result).not.toMatch(/\s+$/m);
         });
@@ -121,13 +121,11 @@ describe('DatabasesService - PostgreSQL Schema Sanitization', () => {
                 name VARCHAR(100) NOT NULL,
                 created_at TIMESTAMP
             );`;
-            
+
             const result = (service as any).sanitizePostgreSQLSchema(input);
-            
+
             // Should remain unchanged (no casts to remove)
-            expect(result.replace(/\s+/g, ' ').trim()).toEqual(
-                input.replace(/\s+/g, ' ').trim()
-            );
+            expect(result.replace(/\s+/g, ' ').trim()).toEqual(input.replace(/\s+/g, ' ').trim());
         });
 
         it('should handle nextval function calls with casts', () => {
@@ -135,9 +133,9 @@ describe('DatabasesService - PostgreSQL Schema Sanitization', () => {
                 id INTEGER DEFAULT nextval('my_sequence'::regclass),
                 code VARCHAR DEFAULT concat('prefix', nextval('code_seq')::bigint)
             );`;
-            
+
             const result = (service as any).sanitizePostgreSQLSchema(input);
-            
+
             expect(result).toContain("nextval('my_sequence')");
             expect(result).not.toContain('::regclass');
             expect(result).not.toContain('::bigint');
@@ -150,24 +148,24 @@ describe('DatabasesService - PostgreSQL Schema Sanitization', () => {
             const mockDatabase = {
                 id: 1,
                 name: 'test_db',
-                schemaSql: 'test_database_name'
+                schemaSql: 'test_database_name',
             };
-            
+
             (prismaService.database.findUnique as jest.Mock).mockResolvedValue(mockDatabase);
-            
+
             // Since we can't easily mock the PostgreSQL connection in this test,
             // we'll test that the method calls the sanitization correctly
             const sanitizeSpy = jest.spyOn(service as any, 'sanitizePostgreSQLSchema');
-            
+
             try {
                 await service.getDatabaseSchema(1);
             } catch (error) {
                 // Expected to fail due to DB connection, but we can verify the sanitization call
             }
-            
+
             // Verify that sanitization would be called (even if the method fails on DB connection)
             expect(prismaService.database.findUnique).toHaveBeenCalledWith({
-                where: { id: 1 }
+                where: { id: 1 },
             });
         });
     });

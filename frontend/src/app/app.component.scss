@@ -33,8 +33,11 @@
   }
 }
 
-:root, .dark-theme {
-  transition: background-color 0.3s, color 0.3s;
+:root,
+.dark-theme {
+  transition:
+    background-color 0.3s,
+    color 0.3s;
 }
 
 :root {
@@ -51,7 +54,11 @@
   --text-color: rgba(255, 255, 255, 0.87);
 }
 
-html, body, .app-container, .sidenav-content, .sidenav-content-wrapper {
+html,
+body,
+.app-container,
+.sidenav-content,
+.sidenav-content-wrapper {
   background-color: #fff !important;
   color: #222 !important;
 }

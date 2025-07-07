@@ -7,8 +7,8 @@ export class RowDataDto {
         example: {
             name: 'John Doe',
             email: 'john@example.com',
-            age: 25
-        }
+            age: 25,
+        },
     })
     @IsObject()
     data: Record<string, any>;
@@ -16,8 +16,8 @@ export class RowDataDto {
     @ApiProperty({
         description: 'Optional WHERE clause for UPDATE operations',
         required: false,
-        example: 'id = 1'
+        example: 'id = 1',
     })
     @IsOptional()
     whereClause?: string;
-} 
+}

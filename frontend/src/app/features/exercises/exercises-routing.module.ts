@@ -10,7 +10,7 @@ const routes: Routes = [
         path: ':exerciseId',
         component: DynamicExerciseComponent,
         resolve: {
-            exercise: ExerciseResolver
+            exercise: ExerciseResolver,
         },
         canActivate: [RoleGuard],
         data: {

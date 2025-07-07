@@ -4,7 +4,7 @@ import { ResultComparatorService } from './result-comparator.service';
 import { EvaluationResult, EvaluationCategory } from '../models/evaluation-result.dto';
 import { SqlEvaluationException } from '../exceptions/sql-evaluation.exception';
 import { AiFeedbackService } from './ai-feedback.service';
-import { DatabasesService } from '../../databases/services/databases.service'; 
+import { DatabasesService } from '../../databases/services/databases.service';
 
 /**
  * Main orchestrator service for SQL query evaluation and assessment.
@@ -18,7 +18,7 @@ export class SqlEvaluationService {
         private readonly queryExecutor: QueryExecutorService,
         private readonly resultComparator: ResultComparatorService,
         private readonly aiFeedbackService: AiFeedbackService,
-        private readonly databasesService: DatabasesService // for schema extraction
+        private readonly databasesService: DatabasesService, // for schema extraction
     ) {}
 
     /**
@@ -27,24 +27,23 @@ export class SqlEvaluationService {
      * @param {ResultComparatorService} resultComparator - Service for result set comparison
      */
 
-
     /**
      * Evaluates a student's SQL query against a reference solution.
      * Executes both queries, compares results, and generates comprehensive feedback.
-     * 
+     *
      * @param {string} studentQuery - The SQL query submitted by the student
      * @param {string} solutionQuery - The reference solution query from the tutor
      * @param {number} databaseId - The ID of the database to execute queries against
      * @param {object} connectionDetails - Optional connection details for the database
      * @returns {Promise<EvaluationResult>} Complete evaluation with correctness, feedback, and suggestions
-     * 
+     *
      * @description Evaluation process:
      * 1. Executes student and solution queries in parallel
      * 2. Compares result sets for correctness assessment
      * 3. Generates detailed feedback based on differences
      * 4. Categorizes performance and provides improvement suggestions
      * 5. Handles errors gracefully with appropriate feedback
-     * 
+     *
      * @example
      * ```typescript
      * const evaluation = await sqlEvaluator.evaluateQuery(
@@ -53,7 +52,7 @@ export class SqlEvaluationService {
      *   123,
      *   { host: 'localhost', port: 3306 }
      * );
-     * 
+     *
      * if (evaluation.isCorrect) {
      *   console.log('Query is correct!');
      * } else {
@@ -66,21 +65,28 @@ export class SqlEvaluationService {
         studentQuery: string,
         solutionQuery: string,
         databaseId: number,
-        connectionDetails?: { host: string; port: number }
+        connectionDetails?: { host: string; port: number },
     ): Promise<EvaluationResult> {
         this.logger.log(`Starting SQL evaluation for database ${databaseId}`);
         try {
             // Execute both queries in parallel
             const [studentResult, solutionResult] = await Promise.all([
-                this.queryExecutor.executeQuerySafely(databaseId, studentQuery, 'student', connectionDetails),
-                this.queryExecutor.executeQuerySafely(databaseId, solutionQuery, 'solution', connectionDetails)
+                this.queryExecutor.executeQuerySafely(
+                    databaseId,
+                    studentQuery,
+                    'student',
+                    connectionDetails,
+                ),
+                this.queryExecutor.executeQuerySafely(
+                    databaseId,
+                    solutionQuery,
+                    'solution',
+                    connectionDetails,
+                ),
             ]);
 
             // Compare results
-            const comparison = this.resultComparator.compareResults(
-                studentResult,
-                solutionResult
-            );
+            const comparison = this.resultComparator.compareResults(studentResult, solutionResult);
 
             // Generate evaluation
             let evaluation = this.generateEvaluation(comparison, studentResult);
@@ -101,7 +107,7 @@ export class SqlEvaluationService {
                     schema,
                     studentResult,
                     solutionResult,
-                    errorCategory: evaluation.category
+                    errorCategory: evaluation.category,
                 });
                 evaluation.feedback = aiFeedback;
             }
@@ -112,29 +118,26 @@ export class SqlEvaluationService {
             this.logger.error(`SQL evaluation failed: ${error.message}`);
             return this.createErrorEvaluation(error);
         }
-    } 
+    }
 
     /**
      * Generates a comprehensive evaluation result based on the comparison analysis.
      * Categorizes the result and provides appropriate feedback messages.
-     * 
+     *
      * @param {any} comparison - The detailed comparison result from ResultComparatorService
      * @param {any} studentResult - The student's query execution result with performance data
      * @returns {EvaluationResult} Complete evaluation with category, feedback, and technical details
-     * 
+     *
      * @private
      * @description Evaluation categorization logic:
      * - CORRECT: Perfect match in all aspects
      * - WRONG_COLUMNS: Column structure mismatch
      * - WRONG_ROW_COUNT: Incorrect number of rows
      * - WRONG_DATA: Data content differences
-     * 
+     *
      * Each category provides specific feedback to help students understand their mistakes.
      */
-    private generateEvaluation(
-        comparison: any,
-        studentResult: any
-    ): EvaluationResult {
+    private generateEvaluation(comparison: any, studentResult: any): EvaluationResult {
         let category: EvaluationCategory;
         let feedback: string;
         let isCorrect: boolean;
@@ -150,7 +153,8 @@ export class SqlEvaluationService {
         } else if (!comparison.rowCountMatch) {
             category = EvaluationCategory.WRONG_ROW_COUNT;
             feedback = 'Die Anzahl der Zeilen ist nicht korrekt.';
-            isCorrect = false;        } else {
+            isCorrect = false;
+        } else {
             category = EvaluationCategory.WRONG_DATA;
             feedback = 'Die Daten sind nicht korrekt.';
             isCorrect = false;
@@ -161,24 +165,24 @@ export class SqlEvaluationService {
             category,
             feedback,
             executionTimeMs: studentResult.executionTimeMs,
-            technicalDetails: comparison
+            technicalDetails: comparison,
         };
-    } 
+    }
 
     /**
      * Creates an evaluation result for error scenarios.
      * Maps different error types to appropriate categories and user-friendly feedback.
-     * 
+     *
      * @param {any} error - The error that occurred during query evaluation
      * @returns {EvaluationResult} Evaluation result with error information and feedback
-     * 
+     *
      * @private
      * @description Error handling covers:
      * - TIMEOUT: Query execution exceeded time limits
      * - FORBIDDEN_OPERATION: Security violations (unsafe SQL operations)
      * - SYNTAX_ERROR: SQL syntax or complexity issues
      * - EXECUTION_ERROR: General execution failures
-     * 
+     *
      * Provides educational feedback to help students understand and fix their queries.
      */
     private createErrorEvaluation(error: any): EvaluationResult {
@@ -210,7 +214,7 @@ export class SqlEvaluationService {
             isCorrect: false,
             category,
             feedback,
-            executionTimeMs: 0
+            executionTimeMs: 0,
         };
     }
 }

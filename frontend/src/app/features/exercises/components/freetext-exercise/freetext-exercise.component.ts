@@ -16,10 +16,11 @@ export class FreetextExerciseComponent implements OnInit {
     showFeedback = false;
     feedback: string | null = null;
     isCorrectAnswer = false;
-    @Output() completed = new EventEmitter<number>();    constructor(
+    @Output() completed = new EventEmitter<number>();
+    constructor(
         private submissionService: SubmissionService,
         private snackBar: MatSnackBar,
-        private progressService: ProgressService
+        private progressService: ProgressService,
     ) {}
 
     ngOnInit(): void {

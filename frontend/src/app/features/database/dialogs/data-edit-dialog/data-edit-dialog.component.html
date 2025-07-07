@@ -23,42 +23,44 @@
           </mat-label>
 
           <!-- Text/Number input -->
-          <input 
+          <input
             *ngIf="getFieldType(column) === 'text' || getFieldType(column) === 'number'"
-            matInput 
+            matInput
             [formControlName]="column.name"
             [type]="getFieldType(column)"
             [placeholder]="getPlaceholder(column)"
             [disabled]="isFieldDisabled(column)"
-          >
+          />
 
           <!-- Date/Time input -->
-          <input 
+          <input
             *ngIf="getFieldType(column) === 'datetime-local'"
-            matInput 
+            matInput
             [formControlName]="column.name"
             type="datetime-local"
             [placeholder]="getPlaceholder(column)"
             [disabled]="isFieldDisabled(column)"
-          >
+          />
 
           <!-- Checkbox for boolean -->
-          <mat-checkbox 
+          <mat-checkbox
             *ngIf="getFieldType(column) === 'checkbox'"
             [formControlName]="column.name"
             [disabled]="isFieldDisabled(column)"
-            class="checkbox-field">
+            class="checkbox-field"
+          >
             {{ column.name }}
           </mat-checkbox>
 
           <!-- Textarea for long text -->
-          <textarea 
+          <textarea
             *ngIf="column.type.includes('text') && !column.type.includes('varchar')"
-            matInput 
+            matInput
             [formControlName]="column.name"
             [placeholder]="getPlaceholder(column)"
             [disabled]="isFieldDisabled(column)"
-            rows="3">
+            rows="3"
+          >
           </textarea>
 
           <mat-error *ngIf="form.get(column.name)?.invalid && form.get(column.name)?.touched">
@@ -75,23 +77,20 @@
     </form>
 
     <div class="form-errors" *ngIf="form.invalid && form.touched">
-      <mat-error>
-        Bitte korrigieren Sie die Fehler im Formular.
-      </mat-error>
+      <mat-error> Bitte korrigieren Sie die Fehler im Formular. </mat-error>
     </div>
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">
-    <button mat-button (click)="onCancel()" [disabled]="isLoading">
-      Abbrechen
-    </button>
-    <button 
-      mat-raised-button 
-      color="primary" 
-      (click)="onSubmit()" 
-      [disabled]="form.invalid || isLoading">
+    <button mat-button (click)="onCancel()" [disabled]="isLoading">Abbrechen</button>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="onSubmit()"
+      [disabled]="form.invalid || isLoading"
+    >
       <mat-spinner diameter="20" *ngIf="isLoading"></mat-spinner>
       <span *ngIf="!isLoading">{{ mode === 'add' ? 'Hinzufügen' : 'Speichern' }}</span>
     </button>
   </mat-dialog-actions>
-</div> 
+</div>

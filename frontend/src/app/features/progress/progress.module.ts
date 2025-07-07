@@ -8,16 +8,7 @@ import { BookmarkedExercisesComponent } from './components/bookmarked-exercises/
 import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
-    declarations: [
-        ProgressViewComponent,
-        ChapterProgressComponent,
-        BookmarkedExercisesComponent
-    ],
-    imports: [
-        CommonModule,
-        ProgressRoutingModule,
-        MaterialModule,
-        TranslateModule
-    ]
+    declarations: [ProgressViewComponent, ChapterProgressComponent, BookmarkedExercisesComponent],
+    imports: [CommonModule, ProgressRoutingModule, MaterialModule, TranslateModule],
 })
-export class ProgressModule { }
+export class ProgressModule {}

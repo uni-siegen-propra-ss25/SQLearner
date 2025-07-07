@@ -12,18 +12,14 @@
       <div class="info-card">
         <h3>Datenbank Informationen</h3>
         <div class="info-content">
-          <div class="info-item">
-            <strong>Name:</strong> {{ data.database.name }}
-          </div>
+          <div class="info-item"><strong>Name:</strong> {{ data.database.name }}</div>
           <div class="info-item" *ngIf="data.database.description">
             <strong>Beschreibung:</strong> {{ data.database.description }}
           </div>
           <div class="info-item">
             <strong>Erstellt:</strong> {{ formatDate(data.database.createdAt) }}
           </div>
-          <div class="info-item">
-            <strong>Datenbank ID:</strong> {{ data.database.schemaSql }}
-          </div>
+          <div class="info-item"><strong>Datenbank ID:</strong> {{ data.database.schemaSql }}</div>
         </div>
       </div>
     </div>
@@ -52,9 +48,12 @@
               <mat-icon>clear</mat-icon>
               Clear
             </button>
-            <button mat-raised-button color="primary" 
-                    (click)="executeQuery()"
-                    [disabled]="!queryForm.valid || isLoading">
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="executeQuery()"
+              [disabled]="!queryForm.valid || isLoading"
+            >
               <mat-icon>play_arrow</mat-icon>
               {{ isLoading ? 'Executing...' : 'Execute' }}
             </button>
@@ -71,7 +70,10 @@
       <div *ngIf="queryResult" class="results-section">
         <div class="results-header">
           <h3>Query Results</h3>
-          <div class="results-info" *ngIf="queryResult && queryResult.rows && queryResult.rows.length > 0">
+          <div
+            class="results-info"
+            *ngIf="queryResult && queryResult.rows && queryResult.rows.length > 0"
+          >
             {{ queryResult.rows.length }} row{{ queryResult.rows.length !== 1 ? 's' : '' }}
             {{ queryResult.executionTime ? ' (in ' + queryResult.executionTime + 'ms)' : '' }}
           </div>
@@ -99,4 +101,4 @@
       </div>
     </div>
   </div>
-</div> 
+</div>

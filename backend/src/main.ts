@@ -10,7 +10,7 @@ async function checkAndSeedDatabase() {
     try {
         // Check if any users exist
         const userCount = await prisma.user.count();
-        
+
         if (userCount === 0) {
             console.log('No users found. Running database seed...');
             await seedDB();
@@ -28,7 +28,7 @@ async function checkAndSeedDatabase() {
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
-    
+
     // Log loaded JWT_SECRET for debugging
     // (Achtung: Niemals in Produktion so lassen!)
     // eslint-disable-next-line no-console

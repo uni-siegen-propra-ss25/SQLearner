@@ -16,7 +16,7 @@ import { catchError } from 'rxjs/operators';
  * Main component for displaying and managing the learning roadmap with chapters and bookmark functionality.
  * Handles the complete roadmap view including chapter management, bookmark synchronization, and role-based access control.
  * Provides different interfaces for students (bookmark-focused) and tutors (content management).
- * 
+ *
  * @example
  * ```html
  * <app-roadmap-view></app-roadmap-view>
@@ -28,34 +28,34 @@ import { catchError } from 'rxjs/operators';
     styleUrls: ['./roadmap-view.component.scss'],
 })
 export class RoadmapViewComponent implements OnInit, OnDestroy {
-    /** 
+    /**
      * Array of chapters loaded from the backend, sorted by display order.
      * Contains all chapter data including topics and exercises hierarchy.
      * @type {Chapter[]}
      */
     chapters: Chapter[] = [];
-    
-    /** 
+
+    /**
      * Flag indicating if the current user has tutor privileges for content management.
      * Determines visibility of edit/delete buttons and bookmark functionality.
      * @type {boolean}
      */
     isTutor = false;
-    
-    /** 
+
+    /**
      * Current progress data from the unified ProgressService.
      * Contains completed exercise IDs and total counts for real-time UI updates.
      * @type {ProgressDto}
      */
     roadmapProgress: ProgressDto = { completedExerciseIds: [], totalCount: 0 };
-    
-    /** 
+
+    /**
      * Set of exercise IDs that are bookmarked by the current user.
      * Used for efficient O(1) bookmark status lookups across all exercise cards.
      * @type {Set<number>}
      */
     bookmarkedExerciseIds: Set<number> = new Set();
-    
+
     /**
      * Converts the completed exercise IDs array to a Set for template usage.
      * The chapter-card component expects a Set<number> for completedExerciseIds.
@@ -64,16 +64,16 @@ export class RoadmapViewComponent implements OnInit, OnDestroy {
     get completedExerciseIdsAsSet(): Set<number> {
         return new Set(this.roadmapProgress.completedExerciseIds);
     }
-    
-    /** 
+
+    /**
      * Array of RxJS subscriptions for proper cleanup and memory leak prevention.
      * Contains all active subscriptions that need to be unsubscribed on component destroy.
      * @type {Subscription[]}
      * @private
      */
     private subscriptions: Subscription[] = [];
-    
-    /** 
+
+    /**
      * Backup state of chapters for potential rollback operations.
      * Stores previous chapter configuration for undo functionality.
      * @type {Chapter[]}
@@ -111,7 +111,7 @@ export class RoadmapViewComponent implements OnInit, OnDestroy {
         this.subscriptions.push(
             this.authService.user$.subscribe((user) => {
                 this.isTutor = user?.role === Role.TUTOR || user?.role === Role.ADMIN;
-                
+
                 // Load chapters and bookmarks based on user state
                 if (user) {
                     this.loadData();
@@ -133,8 +133,8 @@ export class RoadmapViewComponent implements OnInit, OnDestroy {
                 error: (error) => {
                     console.error('Failed to load progress:', error);
                     this.showErrorMessage('Fortschritt konnte nicht geladen werden');
-                }
-            })
+                },
+            }),
         );
     }
 
@@ -154,26 +154,27 @@ export class RoadmapViewComponent implements OnInit, OnDestroy {
      */
     private loadData(): void {
         const chaptersRequest = this.roadmapService.getChapters();
-        const bookmarksRequest = !this.isTutor && this.authService.hasToken() 
-            ? this.bookmarkService.getUserBookmarks().pipe(
-                catchError(error => {
-                    console.error('Failed to load bookmarks:', error);
-                    return of([]);
-                })
-              )
-            : of([]);
+        const bookmarksRequest =
+            !this.isTutor && this.authService.hasToken()
+                ? this.bookmarkService.getUserBookmarks().pipe(
+                      catchError((error) => {
+                          console.error('Failed to load bookmarks:', error);
+                          return of([]);
+                      }),
+                  )
+                : of([]);
 
         forkJoin({
             chapters: chaptersRequest,
-            bookmarks: bookmarksRequest
+            bookmarks: bookmarksRequest,
         }).subscribe({
             next: ({ chapters, bookmarks }) => {
                 this.chapters = chapters.sort((a, b) => a.order - b.order);
                 this.previousChaptersState = [...this.chapters];
-                
+
                 // Store bookmarked exercise IDs for efficient lookup operations
                 this.bookmarkedExerciseIds = new Set(
-                    bookmarks.map(bookmark => bookmark.exercise.id)
+                    bookmarks.map((bookmark) => bookmark.exercise.id),
                 );
             },
             error: (error) => {
@@ -181,7 +182,7 @@ export class RoadmapViewComponent implements OnInit, OnDestroy {
                 this.showErrorMessage('Daten konnten nicht geladen werden');
                 // Graceful fallback: load chapters only if loading fails
                 this.loadChapters();
-            }
+            },
         });
     }
 
@@ -193,7 +194,7 @@ export class RoadmapViewComponent implements OnInit, OnDestroy {
         this.snackBar.open(message, 'Schließen', {
             duration: 5000,
             horizontalPosition: 'center',
-            verticalPosition: 'bottom'
+            verticalPosition: 'bottom',
         });
     }
 
@@ -313,7 +314,7 @@ export class RoadmapViewComponent implements OnInit, OnDestroy {
             error: (error) => {
                 console.error('Failed to record exercise completion:', error);
                 this.showErrorMessage('Fortschritt konnte nicht gespeichert werden');
-            }
+            },
         });
     }
 
@@ -327,7 +328,7 @@ export class RoadmapViewComponent implements OnInit, OnDestroy {
         return this.roadmapProgress.completedExerciseIds.includes(exerciseId);
     }
 
-    /** 
+    /**
      * Converts the completed exercise IDs array to a Set for efficient lookups.
      * Used by child components that expect Set<number> for performance reasons.
      * @returns {Set<number>} Set of completed exercise IDs

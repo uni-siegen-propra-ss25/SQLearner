@@ -15,16 +15,19 @@ export class DockerService {
     constructor(private prisma: PrismaService) {
         this.docker = new Docker();
     }
-    
+
     /**
      * Creates a new database container for a specific exercise and user
      * @param exerciseId - The ID of the exercise for which to create the container
      * @param user - The user for whom the container is being created
      * @returns The container ID and connection details
      */
-    async createContainer(exerciseId: number, user: User): Promise<{ containerId: string; connectionDetails: any }> {
+    async createContainer(
+        exerciseId: number,
+        user: User,
+    ): Promise<{ containerId: string; connectionDetails: any }> {
         console.log(`Creating container for exercise ${exerciseId} and user ${user.id}`);
-        
+
         const exercise = await this.prisma.exercise.findUnique({
             where: { id: exerciseId },
             include: { database: true },
@@ -42,11 +45,7 @@ export class DockerService {
         const container = await this.docker.createContainer({
             Image: 'postgres:15-alpine',
             name: containerName,
-            Env: [
-                'POSTGRES_PASSWORD=secret',
-                'POSTGRES_USER=postgres',
-                'POSTGRES_DB=exercise_db'
-            ],
+            Env: ['POSTGRES_PASSWORD=secret', 'POSTGRES_USER=postgres', 'POSTGRES_DB=exercise_db'],
             ExposedPorts: { '5432/tcp': {} },
             HostConfig: {
                 PortBindings: { '5432/tcp': [{ HostPort: '0' }] },
@@ -60,11 +59,11 @@ export class DockerService {
 
         await container.start();
         console.log(`Container started successfully`);
-        
+
         // Wait for PostgreSQL to be ready
         console.log('Waiting for PostgreSQL to be ready...');
-        await new Promise(resolve => setTimeout(resolve, 5000));
-        
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+
         const containerInfo = await container.inspect();
         const port = containerInfo.NetworkSettings.Ports['5432/tcp'][0].HostPort;
 
@@ -77,7 +76,7 @@ export class DockerService {
             port: parseInt(port),
             database: 'exercise_db',
             user: 'postgres',
-            password: 'secret'
+            password: 'secret',
         };
 
         console.log('Testing connection to container...');
@@ -88,7 +87,7 @@ export class DockerService {
                 console.log(`Connection attempt ${attempt}/10`);
                 const testClient = new Client({
                     ...connectionDetails,
-                    connectionTimeoutMillis: 5000
+                    connectionTimeoutMillis: 5000,
                 });
                 await testClient.connect();
                 await testClient.query('SELECT 1');
@@ -107,9 +106,11 @@ export class DockerService {
                     } catch (cleanupError) {
                         console.error('Failed to cleanup container:', cleanupError);
                     }
-                    throw new Error(`Could not connect to PostgreSQL container after 10 attempts: ${error.message}`);
+                    throw new Error(
+                        `Could not connect to PostgreSQL container after 10 attempts: ${error.message}`,
+                    );
                 }
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                await new Promise((resolve) => setTimeout(resolve, 2000));
             }
         }
 
@@ -132,26 +133,26 @@ export class DockerService {
     private async initializeDatabase(connectionDetails: any, sourceDbName: string): Promise<void> {
         let containerClient: Client | null = null;
         let sourceClient: Client | null = null;
-        
+
         try {
             console.log(`Copying schema and data from database: ${sourceDbName}`);
-            
+
             // Connect to the source database (exercise database in main PostgreSQL)
             sourceClient = new Client({
                 host: process.env.DB_HOST || 'db', // Use the main database host
                 port: parseInt(process.env.DB_PORT || '5432', 10),
                 user: process.env.DB_USER || 'postgres',
                 password: process.env.DB_PASSWORD || 'postgres',
-                database: sourceDbName // Connect to the specific exercise database
+                database: sourceDbName, // Connect to the specific exercise database
             });
             await sourceClient.connect();
             console.log('Connected to source database successfully');
-            
+
             // Connect to the container database
             containerClient = new Client(connectionDetails);
             await containerClient.connect();
             console.log('Connected to container database successfully');
-            
+
             // Get all tables from source database
             const tablesResult = await sourceClient.query(`
                 SELECT table_name 
@@ -160,15 +161,16 @@ export class DockerService {
                 AND table_type = 'BASE TABLE'
                 ORDER BY table_name
             `);
-            
-            const tables = tablesResult.rows.map(row => row.table_name);
+
+            const tables = tablesResult.rows.map((row) => row.table_name);
             console.log(`Found ${tables.length} tables to copy: ${tables.join(', ')}`);
-            
+
             for (const tableName of tables) {
                 console.log(`Copying table: ${tableName}`);
-                
+
                 // Get table structure
-                const structureResult = await sourceClient.query(`
+                const structureResult = await sourceClient.query(
+                    `
                     SELECT 
                         c.column_name, 
                         c.data_type, 
@@ -180,33 +182,41 @@ export class DockerService {
                     FROM information_schema.columns c
                     WHERE c.table_name = $1 
                     ORDER BY c.ordinal_position
-                `, [tableName]);
-                
+                `,
+                    [tableName],
+                );
+
                 // First, create any sequences needed
                 for (const col of structureResult.rows) {
                     if (col.column_default && col.column_default.includes('nextval')) {
-                        const sequenceMatch = col.column_default.match(/nextval\('([^']+)'::regclass\)/);
+                        const sequenceMatch = col.column_default.match(
+                            /nextval\('([^']+)'::regclass\)/,
+                        );
                         if (sequenceMatch) {
                             const sequenceName = sequenceMatch[1];
                             console.log(`Creating sequence: ${sequenceName}`);
                             try {
-                                await containerClient.query(`CREATE SEQUENCE IF NOT EXISTS "${sequenceName}"`);
+                                await containerClient.query(
+                                    `CREATE SEQUENCE IF NOT EXISTS "${sequenceName}"`,
+                                );
                             } catch (seqError) {
-                                console.log(`Sequence ${sequenceName} might already exist: ${seqError.message}`);
+                                console.log(
+                                    `Sequence ${sequenceName} might already exist: ${seqError.message}`,
+                                );
                             }
                         }
                     }
                 }
-                
+
                 // Create table in container
-                const columns = structureResult.rows.map(col => {
+                const columns = structureResult.rows.map((col) => {
                     let colDef = `"${col.column_name}" ${col.data_type}`;
-                    
+
                     // Handle character varying with length
                     if (col.data_type === 'character varying' && col.character_maximum_length) {
                         colDef = `"${col.column_name}" varchar(${col.character_maximum_length})`;
                     }
-                    
+
                     // Handle numeric types
                     if (col.data_type === 'numeric' && col.numeric_precision) {
                         if (col.numeric_scale) {
@@ -215,41 +225,41 @@ export class DockerService {
                             colDef = `"${col.column_name}" numeric(${col.numeric_precision})`;
                         }
                     }
-                    
+
                     if (col.is_nullable === 'NO') colDef += ' NOT NULL';
                     if (col.column_default) {
                         colDef += ` DEFAULT ${col.column_default}`;
                     }
                     return colDef;
                 });
-                
+
                 const createTableSql = `CREATE TABLE IF NOT EXISTS "${tableName}" (${columns.join(', ')})`;
                 console.log(`Creating table ${tableName}: ${createTableSql}`);
-                
+
                 try {
                     await containerClient.query(createTableSql);
                     console.log(`Table ${tableName} created successfully`);
                 } catch (error) {
                     console.log(`Table ${tableName} might already exist: ${error.message}`);
                 }
-                
+
                 // Copy data
                 const dataResult = await sourceClient.query(`SELECT * FROM "${tableName}"`);
                 if (dataResult.rows.length > 0) {
                     console.log(`Copying ${dataResult.rows.length} rows from table ${tableName}`);
-                    
+
                     for (const row of dataResult.rows) {
                         const columns = Object.keys(row);
                         const values = Object.values(row);
                         const placeholders = values.map((_, i) => `$${i + 1}`).join(', ');
-                        
-                        const insertSql = `INSERT INTO "${tableName}" (${columns.map(col => `"${col}"`).join(', ')}) VALUES (${placeholders})`;
+
+                        const insertSql = `INSERT INTO "${tableName}" (${columns.map((col) => `"${col}"`).join(', ')}) VALUES (${placeholders})`;
                         await containerClient.query(insertSql, values);
                     }
                     console.log(`Data copied to table ${tableName} successfully`);
                 }
             }
-            
+
             console.log('Database initialization completed successfully');
         } catch (error) {
             console.error('Failed to initialize database:', error);
@@ -291,11 +301,14 @@ export class DockerService {
      * @param user - The user requesting the status
      * @returns Container status information
      */
-    async getContainerStatus(containerId: string, user: User | null): Promise<{ status: string; details: any }> {
+    async getContainerStatus(
+        containerId: string,
+        user: User | null,
+    ): Promise<{ status: string; details: any }> {
         // Implementation coming in next step
         return {
             status: '',
-            details: {}
+            details: {},
         };
     }
 

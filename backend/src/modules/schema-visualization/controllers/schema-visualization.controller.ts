@@ -24,16 +24,24 @@ export class SchemaVisualizationController {
         console.log('🚀 [AUDIT] API Request - parse-schema:');
         console.log('   Schema Length:', parseSchemaDto.schema?.length || 0);
         console.log('   Schema Name:', parseSchemaDto.name || 'None');
-        
+
         const result = await this.schemaVisualizationService.parseSchemaString(parseSchemaDto);
-        
+
         console.log('📤 [AUDIT] API Response - parse-schema:');
         console.log('   Tables Count:', result.tables?.length || 0);
         console.log('   Relationships Count:', result.relationships?.length || 0);
         console.log('   DBML Code Length:', result.dbmlCode?.length || 0);
-        console.log('   Tables:', result.tables?.map(t => ({ name: t.name, columns: t.columns?.length || 0 })));
-        console.log('   Relationships:', result.relationships?.map(r => `${r.fromTable}.${r.fromColumn} -> ${r.toTable}.${r.toColumn}`));
-        
+        console.log(
+            '   Tables:',
+            result.tables?.map((t) => ({ name: t.name, columns: t.columns?.length || 0 })),
+        );
+        console.log(
+            '   Relationships:',
+            result.relationships?.map(
+                (r) => `${r.fromTable}.${r.fromColumn} -> ${r.toTable}.${r.toColumn}`,
+            ),
+        );
+
         return result;
     }
 

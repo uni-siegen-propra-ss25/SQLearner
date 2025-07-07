@@ -19,11 +19,7 @@ import { DockerModule } from '../docker/docker.module';
 @Module({
     imports: [PrismaModule, DockerModule],
     controllers: [DatabasesController],
-    providers: [
-        DatabasesService
-    ],
-    exports: [
-        DatabasesService
-    ],
+    providers: [DatabasesService],
+    exports: [DatabasesService],
 })
 export class DatabasesModule {}

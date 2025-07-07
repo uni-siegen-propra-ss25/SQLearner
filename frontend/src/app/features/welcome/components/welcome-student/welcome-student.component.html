@@ -6,19 +6,15 @@
 
 <!-- Main content layout container -->
 <div class="main-content">
-
   <!-- Top row with hints and to-do list side by side -->
   <div class="top-row">
-
     <!-- Tutor hints card -->
     <mat-card class="box hint-box">
       <mat-card-title>{{ 'TUTOR_HINTS' | translate }}</mat-card-title>
       <mat-card-content>
         <!-- List of available hints -->
         <ul class="hinweis-liste">
-          <li *ngFor="let hinweis of hinweise">
-            ⚠️ {{ hinweis }}
-          </li>
+          <li *ngFor="let hinweis of hinweise">⚠️ {{ hinweis }}</li>
         </ul>
 
         <!-- Message when no hints are available -->
@@ -32,7 +28,6 @@
     <mat-card class="box todo-box">
       <mat-card-title>{{ 'MY_TODOS' | translate }}</mat-card-title>
       <mat-card-content>
-
         <!-- To-do items list -->
         <ul>
           <li *ngFor="let task of todos; let i = index" class="todo-item">
@@ -60,10 +55,8 @@
             <mat-icon>arrow_upward</mat-icon>
           </button>
         </div>
-
       </mat-card-content>
     </mat-card>
-
   </div>
 
   <!-- Bottom row with forum preview -->
@@ -71,7 +64,6 @@
     <mat-card class="box question-box">
       <mat-card-title>{{ 'QUESTION_FORUM' | translate }}</mat-card-title>
       <mat-card-content>
-
         <!-- Last forum message preview (question or answer) -->
         <div *ngIf="lastMessage; else noMessages" class="last-message">
           <div class="message-header">
@@ -82,16 +74,18 @@
         </div>
 
         <!-- Message when there are no questions/answers -->
-          <ng-template #noMessages>
-             <div class="placeholder-box">
-                <p class="placeholder-text">{{ 'NO_QUESTIONS' | translate }}</p>
-              </div>
-          </ng-template>
+        <ng-template #noMessages>
+          <div class="placeholder-box">
+            <p class="placeholder-text">{{ 'NO_QUESTIONS' | translate }}</p>
+          </div>
+        </ng-template>
       </mat-card-content>
 
       <!-- Button to navigate to full forum -->
       <mat-card-actions align="end">
-        <button mat-button color="primary" (click)="goToFragen()">{{ 'ASK_QUESTION' | translate }}</button>
+        <button mat-button color="primary" (click)="goToFragen()">
+          {{ 'ASK_QUESTION' | translate }}
+        </button>
       </mat-card-actions>
     </mat-card>
   </div>

@@ -81,7 +81,7 @@ export class ExerciseDialogComponent implements OnInit {
             // Reset all controls and their validators
             databaseIdControl?.clearValidators();
             solutionControl?.clearValidators();
-            
+
             // Only reset values if not in editing mode or if type actually changed from initial
             if (!this.isEditing || type !== this.data.type) {
                 databaseIdControl?.setValue(null);
@@ -199,17 +199,26 @@ export class ExerciseDialogComponent implements OnInit {
 
         if (type === ExerciseType.MULTIPLE_CHOICE || type === ExerciseType.SINGLE_CHOICE) {
             if (!formValue.answers || formValue.answers.length < 2) {
-                return { valid: false, error: 'Choice exercises must have at least two answer options.' };
+                return {
+                    valid: false,
+                    error: 'Choice exercises must have at least two answer options.',
+                };
             }
 
             const correctAnswers = formValue.answers.filter((a: any) => a.isCorrect) || [];
 
             if (type === ExerciseType.SINGLE_CHOICE && correctAnswers.length !== 1) {
-                return { valid: false, error: 'Single choice exercises must have exactly one correct answer.' };
+                return {
+                    valid: false,
+                    error: 'Single choice exercises must have exactly one correct answer.',
+                };
             }
 
             if (type === ExerciseType.MULTIPLE_CHOICE && correctAnswers.length === 0) {
-                return { valid: false, error: 'Multiple choice exercises must have at least one correct answer.' };
+                return {
+                    valid: false,
+                    error: 'Multiple choice exercises must have at least one correct answer.',
+                };
             }
         }
 
@@ -221,7 +230,9 @@ export class ExerciseDialogComponent implements OnInit {
         const validation = this.validateForm();
         if (!validation.valid) {
             console.log('=== DEBUG: Form validation failed ===');
-            this.snackBar.open(validation.error || 'Form validation failed', 'Close', { duration: 5000 });
+            this.snackBar.open(validation.error || 'Form validation failed', 'Close', {
+                duration: 5000,
+            });
             return;
         }
 
@@ -254,7 +265,7 @@ export class ExerciseDialogComponent implements OnInit {
             console.log('solution type:', typeof formValue.solution);
             console.log('solution length:', formValue.solution?.length);
         }
-        
+
         if (
             formValue.type !== ExerciseType.SINGLE_CHOICE &&
             formValue.type !== ExerciseType.MULTIPLE_CHOICE
@@ -280,8 +291,8 @@ export class ExerciseDialogComponent implements OnInit {
             data: {
                 databases: this.databases,
                 defaultType: this.exerciseForm.get('type')?.value,
-                defaultDifficulty: this.exerciseForm.get('difficulty')?.value
-            }
+                defaultDifficulty: this.exerciseForm.get('difficulty')?.value,
+            },
         });
         dialogRef.afterClosed().subscribe((result: any) => {
             if (result && this.exerciseForm) {
@@ -290,7 +301,7 @@ export class ExerciseDialogComponent implements OnInit {
                     description: result.description,
                     solution: result.solution,
                     difficulty: result.difficulty || this.exerciseForm.get('difficulty')?.value,
-                    databaseId: result.databaseId || this.exerciseForm.get('databaseId')?.value
+                    databaseId: result.databaseId || this.exerciseForm.get('databaseId')?.value,
                 });
                 this.aiGenerated = true;
             }

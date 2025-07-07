@@ -5,18 +5,20 @@
         {{ exercise.title }}
 
         <!-- Icon shown if the answer is correct -->
-         <mat-icon 
-          *ngIf="isCorrectAnswer" 
+        <mat-icon
+          *ngIf="isCorrectAnswer"
           class="completed-icon"
           matTooltip="Du hast diese Aufgabe bereits gelöst!"
-          matTooltipPosition="above">
+          matTooltipPosition="above"
+        >
           check_circle
         </mat-icon>
       </h2>
     </div>
     <p class="exercise-description">{{ exercise.description }}</p>
 
-    <div class="options-container">      <!-- Single Choice -->
+    <div class="options-container">
+      <!-- Single Choice -->
       <mat-radio-group
         *ngIf="exercise.type === ExerciseType.SINGLE_CHOICE"
         [(ngModel)]="selectedOptions[0]"
@@ -28,14 +30,12 @@
           class="option clickable-option"
           [for]="'single-choice-' + option.id"
         >
-          <mat-radio-button 
-            [id]="'single-choice-' + option.id"
-            [value]="option.id"
-          >
+          <mat-radio-button [id]="'single-choice-' + option.id" [value]="option.id">
             {{ option.text }}
           </mat-radio-button>
-        </label>
-      </mat-radio-group><!-- Multiple Choice -->      <div *ngIf="exercise.type === ExerciseType.MULTIPLE_CHOICE" class="multiple-choice">
+        </label> </mat-radio-group
+      ><!-- Multiple Choice -->
+      <div *ngIf="exercise.type === ExerciseType.MULTIPLE_CHOICE" class="multiple-choice">
         <label
           *ngFor="let option of exercise.answers"
           class="option clickable-option"
@@ -50,13 +50,17 @@
           </mat-checkbox>
         </label>
       </div>
-    </div>    <div class="actions">      <button
+    </div>
+    <div class="actions">
+      <button
         mat-flat-button
         color="primary"
         [disabled]="selectedOptions.length === 0 || isSubmitting || isCorrectAnswer"
         (click)="submitAnswer()"
       >
-        <mat-icon>{{ isSubmitting ? 'hourglass_empty' : (isCorrectAnswer ? 'check_circle' : 'check') }}</mat-icon>
+        <mat-icon>{{
+          isSubmitting ? 'hourglass_empty' : isCorrectAnswer ? 'check_circle' : 'check'
+        }}</mat-icon>
         <span *ngIf="!isSubmitting && !isCorrectAnswer">Submit Answer</span>
         <span *ngIf="isSubmitting">Submitting...</span>
         <span *ngIf="isCorrectAnswer">Correct Answer!</span>

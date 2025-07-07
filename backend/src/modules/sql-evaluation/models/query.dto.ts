@@ -5,7 +5,7 @@ import { Type } from 'class-transformer';
 export class ExampleQueryDto {
     @ApiProperty({
         description: 'Name/title of the example query',
-        example: 'Find all active users'
+        example: 'Find all active users',
     })
     @IsString()
     @IsNotEmpty()
@@ -13,7 +13,7 @@ export class ExampleQueryDto {
 
     @ApiProperty({
         description: 'The SQL query text',
-        example: 'SELECT * FROM users WHERE active = true'
+        example: 'SELECT * FROM users WHERE active = true',
     })
     @IsString()
     @IsNotEmpty()
@@ -22,7 +22,7 @@ export class ExampleQueryDto {
     @ApiProperty({
         description: 'Detailed description of what the query does',
         required: false,
-        example: 'Retrieves all users that have an active status'
+        example: 'Retrieves all users that have an active status',
     })
     @IsString()
     @IsOptional()
@@ -32,7 +32,7 @@ export class ExampleQueryDto {
 export class ExecuteQueryDto {
     @ApiProperty({
         description: 'The SQL query to execute',
-        example: 'SELECT * FROM users WHERE active = true'
+        example: 'SELECT * FROM users WHERE active = true',
     })
     @IsString()
     @IsNotEmpty()
@@ -41,7 +41,7 @@ export class ExecuteQueryDto {
     @ApiProperty({
         description: 'Parameters for the query',
         required: false,
-        example: { userId: 1, status: true }
+        example: { userId: 1, status: true },
     })
     @IsOptional()
     params?: Record<string, any>;
@@ -50,7 +50,7 @@ export class ExecuteQueryDto {
 export class QueryResultDto {
     @ApiProperty({
         description: 'Column names of the result set',
-        example: ['id', 'name', 'email']
+        example: ['id', 'name', 'email'],
     })
     @IsArray()
     @IsString({ each: true })
@@ -58,19 +58,19 @@ export class QueryResultDto {
 
     @ApiProperty({
         description: 'Result rows',
-        example: [{ id: 1, name: 'John', email: 'john@example.com' }]
+        example: [{ id: 1, name: 'John', email: 'john@example.com' }],
     })
     rows: Record<string, any>[];
 
     @ApiProperty({
         description: 'Number of rows returned',
-        example: 1
+        example: 1,
     })
     rowCount: number;
 
     @ApiProperty({
         description: 'Query execution time in milliseconds',
-        example: 42
+        example: 42,
     })
     executionTimeMs: number;
 }

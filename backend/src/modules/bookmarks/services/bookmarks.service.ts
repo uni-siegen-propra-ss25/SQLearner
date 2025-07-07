@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, ForbiddenException, ConflictException } from '@nestjs/common';
+import {
+    Injectable,
+    NotFoundException,
+    ForbiddenException,
+    ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { BookmarkData } from '../models/bookmark.model';
 
@@ -21,7 +26,8 @@ export class BookmarksService {
                 },
             },
             orderBy: { createdAt: 'desc' },
-        });        return bookmarks.map(bookmark => ({
+        });
+        return bookmarks.map((bookmark) => ({
             id: bookmark.id,
             userId: bookmark.userId,
             exerciseId: bookmark.exerciseId,
@@ -92,7 +98,8 @@ export class BookmarksService {
                     },
                 },
             },
-        });        return {
+        });
+        return {
             id: bookmark.id,
             userId: bookmark.userId,
             exerciseId: bookmark.exerciseId,

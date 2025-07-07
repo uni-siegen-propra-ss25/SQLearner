@@ -7,6 +7,6 @@ import { DatabasesModule } from '../databases/databases.module';
     imports: [DatabasesModule],
     controllers: [SchemaVisualizationController],
     providers: [SchemaVisualizationService],
-    exports: [SchemaVisualizationService]
+    exports: [SchemaVisualizationService],
 })
 export class SchemaVisualizationModule {}

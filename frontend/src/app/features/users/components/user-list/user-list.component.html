@@ -14,7 +14,9 @@
     <mat-card-content>
       <mat-table [dataSource]="users" class="user-table">
         <ng-container matColumnDef="name">
-          <mat-header-cell *matHeaderCellDef> {{ 'USER_MANAGEMENT_PAGE.NAME' | translate }} </mat-header-cell>
+          <mat-header-cell *matHeaderCellDef>
+            {{ 'USER_MANAGEMENT_PAGE.NAME' | translate }}
+          </mat-header-cell>
           <mat-cell *matCellDef="let user">
             <div class="user-info">
               <span class="full-name">{{ user.firstName }} {{ user.lastName }}</span>
@@ -23,19 +25,25 @@
         </ng-container>
 
         <ng-container matColumnDef="email">
-          <mat-header-cell *matHeaderCellDef> {{ 'USER_MANAGEMENT_PAGE.EMAIL' | translate }} </mat-header-cell>
+          <mat-header-cell *matHeaderCellDef>
+            {{ 'USER_MANAGEMENT_PAGE.EMAIL' | translate }}
+          </mat-header-cell>
           <mat-cell *matCellDef="let user"> {{ user.email }} </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="role">
-          <mat-header-cell *matHeaderCellDef> {{ 'USER_MANAGEMENT_PAGE.ROLE' | translate }} </mat-header-cell>
+          <mat-header-cell *matHeaderCellDef>
+            {{ 'USER_MANAGEMENT_PAGE.ROLE' | translate }}
+          </mat-header-cell>
           <mat-cell *matCellDef="let user">
             <span class="role-badge" [class]="user.role.toLowerCase()">{{ user.role }}</span>
           </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="matriculationNumber">
-          <mat-header-cell *matHeaderCellDef> {{ 'USER_MANAGEMENT_PAGE.MATRICULATION_NUMBER' | translate }} </mat-header-cell>
+          <mat-header-cell *matHeaderCellDef>
+            {{ 'USER_MANAGEMENT_PAGE.MATRICULATION_NUMBER' | translate }}
+          </mat-header-cell>
           <mat-cell *matCellDef="let user">
             <span [class.no-value]="!user.matriculationNumber">
               {{ user.matriculationNumber || '-' }}
@@ -44,18 +52,25 @@
         </ng-container>
 
         <ng-container matColumnDef="progress">
-          <mat-header-cell *matHeaderCellDef> {{ 'USER_MANAGEMENT_PAGE.PROGRESS' | translate }} </mat-header-cell>
+          <mat-header-cell *matHeaderCellDef>
+            {{ 'USER_MANAGEMENT_PAGE.PROGRESS' | translate }}
+          </mat-header-cell>
           <mat-cell *matCellDef="let user">
             <div *ngIf="user.role === 'STUDENT'" class="progress-cell">
-              <mat-progress-bar mode="determinate" [value]="user.completionPercentage"></mat-progress-bar>
-              <span class="progress-value">{{user.completionPercentage}}%</span>
+              <mat-progress-bar
+                mode="determinate"
+                [value]="user.completionPercentage"
+              ></mat-progress-bar>
+              <span class="progress-value">{{ user.completionPercentage }}%</span>
             </div>
             <span *ngIf="user.role !== 'STUDENT'" class="no-value">-</span>
           </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="actions">
-          <mat-header-cell *matHeaderCellDef>{{ 'USER_MANAGEMENT_PAGE.ACTIONS' | translate }}</mat-header-cell>
+          <mat-header-cell *matHeaderCellDef>{{
+            'USER_MANAGEMENT_PAGE.ACTIONS' | translate
+          }}</mat-header-cell>
           <mat-cell *matCellDef="let user" class="actions-cell">
             <div
               class="action-buttons"

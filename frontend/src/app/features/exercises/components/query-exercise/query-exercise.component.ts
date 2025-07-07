@@ -2,7 +2,15 @@
  * Component for SQL query exercises.
  * Handles container setup, query execution, answer submission, schema loading, and ER diagram visualization.
  */
-import { Component, Input, ViewChild, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
+import {
+    Component,
+    Input,
+    ViewChild,
+    Output,
+    EventEmitter,
+    OnInit,
+    OnDestroy,
+} from '@angular/core';
 import { Exercise } from '../../../roadmap/models/exercise.model';
 import { SubmissionService } from '../../services/submission.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -38,7 +46,7 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
      * @type {SqlEditorComponent}
      */
     @ViewChild(SqlEditorComponent) sqlEditor!: SqlEditorComponent;
-    
+
     /**
      * The current SQL query entered by the user.
      * @type {string}
@@ -133,7 +141,7 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
      * @type {number}
      */
     pageIndex = 0;
-    
+
     /**
      * Emits the exercise ID when the user completes the exercise.
      * @type {EventEmitter<number>}
@@ -159,7 +167,7 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
         private databaseService: DatabaseService,
         private dialog: MatDialog,
         private schemaVisualizationService: SchemaVisualizationService,
-        private progressService: ProgressService
+        private progressService: ProgressService,
     ) {}
 
     /**
@@ -169,44 +177,48 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         // Check if the user has already answered this exercise correctly
         this.isCorrectAnswer = this.progressService.isCorrectAnswer(this.exercise.id);
-        
+
         // Subscribe to router events to delete container when navigating away
-        this.routerSubscription = this.router.events.pipe(
-            filter((event: any): event is NavigationStart => event instanceof NavigationStart)
-        ).subscribe((event: NavigationStart) => {
-            // Delete container when navigating to a different URL
-            if (this.containerId) {
-                this.deleteContainer();
-            }
-        });
+        this.routerSubscription = this.router.events
+            .pipe(
+                filter((event: any): event is NavigationStart => event instanceof NavigationStart),
+            )
+            .subscribe((event: NavigationStart) => {
+                // Delete container when navigating to a different URL
+                if (this.containerId) {
+                    this.deleteContainer();
+                }
+            });
 
         // Load the actual database schema if available
         if (this.exercise?.database?.id) {
             console.log('Loading database schema...');
             this.loadDatabaseSchema(this.exercise.database.id);
         }
-        
+
         this.route.paramMap.subscribe((params: ParamMap) => {
             const exerciseId = Number(params.get('exerciseId'));
-            
+
             if (exerciseId) {
                 console.log('Creating container for exerciseId:', exerciseId);
-                this.containerSubscription = this.dockerService.createContainer(exerciseId).subscribe({
-                    next: (response: { containerId: string; connectionDetails: any }) => {
-                        console.log('Container created successfully:', response);
-                        console.log('Container ID:', response.containerId);
-                        console.log('Connection details:', response.connectionDetails);
-                        this.containerId = response.containerId;
-                        this.connectionDetails = response.connectionDetails;
-                        console.log('Container setup complete - ready for queries');
-                    },
-                    error: (error: any) => {
-                        console.error('Failed to create container:', error);
-                        this.snackBar.open('Failed to create exercise environment.', 'Close', {
-                            duration: 5000,
-                        });
-                    }
-                });
+                this.containerSubscription = this.dockerService
+                    .createContainer(exerciseId)
+                    .subscribe({
+                        next: (response: { containerId: string; connectionDetails: any }) => {
+                            console.log('Container created successfully:', response);
+                            console.log('Container ID:', response.containerId);
+                            console.log('Connection details:', response.connectionDetails);
+                            this.containerId = response.containerId;
+                            this.connectionDetails = response.connectionDetails;
+                            console.log('Container setup complete - ready for queries');
+                        },
+                        error: (error: any) => {
+                            console.error('Failed to create container:', error);
+                            this.snackBar.open('Failed to create exercise environment.', 'Close', {
+                                duration: 5000,
+                            });
+                        },
+                    });
             } else {
                 console.error('No exerciseId found in route params');
             }
@@ -266,24 +278,30 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
         if (!this.sqlQuery.trim()) return;
 
         this.isLoading = true;
-        this.submissionService.runQuery(this.exercise.id, this.sqlQuery, this.connectionDetails || undefined).subscribe({
-            next: (result: any) => {
-                this.queryResult = result;
-                this.isLoading = false;
-                this.currentView = 'result';
-            },
-            error: (error: any) => {
-                console.error('Query execution error:', error);
-                this.isLoading = false;
-                this.queryResult = null;
-                const errorMessage = error.error?.detail || error.error?.message || error.message || 'Failed to run query';
-                console.error('Error message:', errorMessage);
-                this.snackBar.open(errorMessage, 'Close', {
-                    duration: 5000,
-                    panelClass: ['error-snackbar']
-                });
-            },
-        });
+        this.submissionService
+            .runQuery(this.exercise.id, this.sqlQuery, this.connectionDetails || undefined)
+            .subscribe({
+                next: (result: any) => {
+                    this.queryResult = result;
+                    this.isLoading = false;
+                    this.currentView = 'result';
+                },
+                error: (error: any) => {
+                    console.error('Query execution error:', error);
+                    this.isLoading = false;
+                    this.queryResult = null;
+                    const errorMessage =
+                        error.error?.detail ||
+                        error.error?.message ||
+                        error.message ||
+                        'Failed to run query';
+                    console.error('Error message:', errorMessage);
+                    this.snackBar.open(errorMessage, 'Close', {
+                        duration: 5000,
+                        panelClass: ['error-snackbar'],
+                    });
+                },
+            });
     }
 
     /**
@@ -295,28 +313,30 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
         if (!this.sqlQuery.trim() || this.isLoading || this.cooldown > 0) return;
 
         this.isLoading = true;
-        this.submissionService.submitAnswer(this.exercise.id, this.sqlQuery, this.connectionDetails || undefined).subscribe({
-            next: (submission: any) => {
-                this.isLoading = false;
-                this.isCorrectAnswer = submission.isCorrect;
-                if (submission.isCorrect) {
-                    this.completed.emit(this.exercise.id);
-                }
-                // Store feedback for potential display in UI
-                if (submission.feedback) {
-                    this.feedback = submission.feedback;
-                    this.showFeedback = true;
-                }
-                this.startCooldown(10);
-            },
-            error: (error: any) => {
-                this.isLoading = false;
-                this.snackBar.open(error.message || 'Failed to submit answer', 'Close', {
-                    duration: 3000,
-                });
-                this.startCooldown(10);
-            }
-        });
+        this.submissionService
+            .submitAnswer(this.exercise.id, this.sqlQuery, this.connectionDetails || undefined)
+            .subscribe({
+                next: (submission: any) => {
+                    this.isLoading = false;
+                    this.isCorrectAnswer = submission.isCorrect;
+                    if (submission.isCorrect) {
+                        this.completed.emit(this.exercise.id);
+                    }
+                    // Store feedback for potential display in UI
+                    if (submission.feedback) {
+                        this.feedback = submission.feedback;
+                        this.showFeedback = true;
+                    }
+                    this.startCooldown(10);
+                },
+                error: (error: any) => {
+                    this.isLoading = false;
+                    this.snackBar.open(error.message || 'Failed to submit answer', 'Close', {
+                        duration: 3000,
+                    });
+                    this.startCooldown(10);
+                },
+            });
     }
 
     /**
@@ -372,7 +392,7 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
         this.databaseService.getDatabaseSchema(databaseId).subscribe({
             next: (response) => {
                 this.actualDatabaseSchema = response.schema;
-                
+
                 // Update SQL editor with new schema if it's already initialized
                 if (this.sqlEditor) {
                     // The SQL editor component will automatically pick up the schema change
@@ -383,7 +403,7 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
                 console.error('Failed to load database schema:', error);
                 // Fallback to static schema if available
                 this.actualDatabaseSchema = this.exercise?.database?.schemaSql || '';
-            }
+            },
         });
     }
 
@@ -394,10 +414,10 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
      */
     showErDiagram(): void {
         const schemaToUse = this.actualDatabaseSchema || this.exercise?.database?.schemaSql || '';
-        
+
         if (!schemaToUse.trim()) {
             this.snackBar.open('Kein Schema verfügbar für das ER-Diagramm', 'Schließen', {
-                duration: 3000
+                duration: 3000,
             });
             return;
         }
@@ -411,7 +431,7 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
                 error: (error) => {
                     console.error('Failed to visualize database:', error);
                     this.fallbackToSchemaString(schemaToUse);
-                }
+                },
             });
         } else {
             // Fallback to parsing the schema string
@@ -425,20 +445,26 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
      * @returns {void}
      */
     private fallbackToSchemaString(schema: string): void {
-        this.schemaVisualizationService.parseSchemaString({
-            schema: schema,
-            name: this.exercise?.database?.name || 'Schema'
-        }).subscribe({
-            next: (erDiagram) => {
-                this.openErDiagramDialog(erDiagram);
-            },
-            error: (error) => {
-                console.error('Failed to parse schema:', error);
-                this.snackBar.open('Fehler beim Generieren des ER-Diagramms. Bitte SQL-Schema prüfen.', 'Schließen', {
-                    duration: 5000
-                });
-            }
-        });
+        this.schemaVisualizationService
+            .parseSchemaString({
+                schema: schema,
+                name: this.exercise?.database?.name || 'Schema',
+            })
+            .subscribe({
+                next: (erDiagram) => {
+                    this.openErDiagramDialog(erDiagram);
+                },
+                error: (error) => {
+                    console.error('Failed to parse schema:', error);
+                    this.snackBar.open(
+                        'Fehler beim Generieren des ER-Diagramms. Bitte SQL-Schema prüfen.',
+                        'Schließen',
+                        {
+                            duration: 5000,
+                        },
+                    );
+                },
+            });
     }
 
     /**
@@ -450,14 +476,14 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
         this.dialog.open(ErDiagramComponent, {
             data: {
                 dbmlCode: erDiagram.dbmlCode,
-                databaseName: this.exercise?.database?.name
+                databaseName: this.exercise?.database?.name,
             },
             width: '90vw',
             height: '90vh',
             maxWidth: '1200px',
             maxHeight: '800px',
             disableClose: false,
-            panelClass: 'er-diagram-dialog'
+            panelClass: 'er-diagram-dialog',
         });
     }
 
@@ -475,7 +501,7 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
                 },
                 error: (error: any) => {
                     console.error('Failed to delete container:', error);
-                }
+                },
             });
         }
     }

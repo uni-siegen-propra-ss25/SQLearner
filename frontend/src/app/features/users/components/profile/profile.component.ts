@@ -21,7 +21,7 @@ export class ProfileComponent implements OnInit {
     constructor(
         private authService: AuthService,
         private dialogRef: MatDialogRef<ProfileComponent>,
-        private translate: TranslateService
+        private translate: TranslateService,
     ) {}
 
     /**
@@ -40,7 +40,9 @@ export class ProfileComponent implements OnInit {
      */
     getRegistrationDate(): string {
         if (!this.user?.createdAt) return '-';
-        return new Date(this.user.createdAt).toLocaleDateString(this.translate.currentLang === 'de' ? 'de-DE' : 'en-GB');
+        return new Date(this.user.createdAt).toLocaleDateString(
+            this.translate.currentLang === 'de' ? 'de-DE' : 'en-GB',
+        );
     }
 
     /**

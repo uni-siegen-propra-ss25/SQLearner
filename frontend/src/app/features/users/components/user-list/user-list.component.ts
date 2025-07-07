@@ -23,22 +23,29 @@ import { User } from '../../models/user.model';
 export class UserListComponent implements OnInit {
     /** List of users with their associated progress data */
     @Input() users: User[] = [];
-    
+
     /** Whether users with appropriate roles can edit other users' roles */
     @Input() canEditRoles = false;
-    
+
     /** Event emitted when a user's role is changed */
     @Output() roleChange = new EventEmitter<{ userId: number; newRole: Role }>();
 
     /** Columns to display in the users table */
-    displayedColumns: string[] = ['name', 'email', 'role', 'matriculationNumber', 'progress', 'actions'];
-    
+    displayedColumns: string[] = [
+        'name',
+        'email',
+        'role',
+        'matriculationNumber',
+        'progress',
+        'actions',
+    ];
+
     /** Available role options for user management */
     roleOptions = Object.values(Role);
-    
+
     /** Whether the current user has admin privileges */
     isAdmin = false;
-    
+
     /** Whether the current user has tutor or admin privileges */
     isTutorOrAdmin = false;
 
@@ -68,40 +75,39 @@ export class UserListComponent implements OnInit {
     async loadUsers() {
         forkJoin({
             users: this.userService.getAllUsers(),
-            progress: this.progressService.getAllUsersProgress()
-        }).pipe(
-            catchError(error => {
-                console.error('Error loading data:', error);
-                this.snackBar.open(
-                    'Fehler beim Laden der Daten. Bitte versuchen Sie es später erneut.',
-                    'Schließen',
-                    { duration: 5000 }
-                );
-                return EMPTY;
-            })
-        ).subscribe({
-            next: ({ users, progress }) => {
-                // Create a Map for O(1) lookup of progress data
-                const progressMap = new Map(
-                    progress.map(p => [p.userId, p.completionPercentage])
-                );
-                
-                // Map users with their progress data
-                this.users = users.map(user => ({
-                    ...user,
-                    completionPercentage: progressMap.get(user.id) ?? 0
-                }));
-            },
-            error: (error) => {
-                console.error('Error in data processing:', error);
-                this.snackBar.open(
-                    'Fehler bei der Datenverarbeitung',
-                    'Schließen',
-                    { duration: 3000 }
-                );
-            },
-        });
-        
+            progress: this.progressService.getAllUsersProgress(),
+        })
+            .pipe(
+                catchError((error) => {
+                    console.error('Error loading data:', error);
+                    this.snackBar.open(
+                        'Fehler beim Laden der Daten. Bitte versuchen Sie es später erneut.',
+                        'Schließen',
+                        { duration: 5000 },
+                    );
+                    return EMPTY;
+                }),
+            )
+            .subscribe({
+                next: ({ users, progress }) => {
+                    // Create a Map for O(1) lookup of progress data
+                    const progressMap = new Map(
+                        progress.map((p) => [p.userId, p.completionPercentage]),
+                    );
+
+                    // Map users with their progress data
+                    this.users = users.map((user) => ({
+                        ...user,
+                        completionPercentage: progressMap.get(user.id) ?? 0,
+                    }));
+                },
+                error: (error) => {
+                    console.error('Error in data processing:', error);
+                    this.snackBar.open('Fehler bei der Datenverarbeitung', 'Schließen', {
+                        duration: 3000,
+                    });
+                },
+            });
     }
 
     /**
@@ -157,7 +163,7 @@ export class UserListComponent implements OnInit {
                     next: (updatedUser) => {
                         // Preserve existing progress when updating user
                         this.users = this.users.map((u) =>
-                            u.id === updatedUser.id ? { ...updatedUser } : u
+                            u.id === updatedUser.id ? { ...updatedUser } : u,
                         );
                         this.snackBar.open('Nutzer erfolgreich aktualisiert', 'Schließen', {
                             duration: 3000,
@@ -199,7 +205,7 @@ export class UserListComponent implements OnInit {
             next: (updatedUser) => {
                 // Preserve existing progress when updating role
                 this.users = this.users.map((u) =>
-                    u.id === updatedUser.id ? { ...updatedUser } : u
+                    u.id === updatedUser.id ? { ...updatedUser } : u,
                 );
                 this.snackBar.open('Rolle erfolgreich geändert', 'Schließen', {
                     duration: 3000,

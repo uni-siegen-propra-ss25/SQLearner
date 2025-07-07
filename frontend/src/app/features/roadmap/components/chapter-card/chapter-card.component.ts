@@ -18,7 +18,7 @@ import { TopicDialogComponent } from '../../dialogs/topic-dialog/topic-dialog.co
 export class ChapterCardComponent implements OnInit {
     @Input() chapter!: Chapter;
     @Input() isTutor = false;
-    
+
     /**
      * Set of exercise IDs that are currently bookmarked by the user.
      * Used to determine bookmark status for exercises within this chapter.
@@ -26,7 +26,7 @@ export class ChapterCardComponent implements OnInit {
      * @type {Set<number>}
      */
     @Input() bookmarkedExerciseIds: Set<number> = new Set();
-    
+
     /**
      * Set of exercise IDs that are completed by the user.
      * Used to determine completion status for exercises within this chapter.
@@ -34,10 +34,10 @@ export class ChapterCardComponent implements OnInit {
      * @type {Set<number>}
      */
     @Input() completedExerciseIds: Set<number> = new Set();
-    
+
     @Output() edit = new EventEmitter<Chapter>();
     @Output() delete = new EventEmitter<number>();
-    
+
     /**
      * Emits bookmark toggle events from child topic components to parent roadmap component.
      * Enables real-time bookmark synchronization across the entire roadmap hierarchy.

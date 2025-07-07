@@ -23,12 +23,12 @@ export class DatabaseCreateDialogComponent implements OnInit, AfterViewInit, OnD
         private dialogRef: MatDialogRef<DatabaseCreateDialogComponent>,
         private databaseService: DatabaseService,
         private snackBar: MatSnackBar,
-        private monacoEditorService: MonacoEditorService
+        private monacoEditorService: MonacoEditorService,
     ) {
         this.form = this.fb.group({
             name: ['', [Validators.required, Validators.pattern(/^[a-zA-Z_][a-zA-Z0-9_]*$/)]],
             description: [''],
-            schemaSql: ['']
+            schemaSql: [''],
         });
     }
 
@@ -66,24 +66,25 @@ export class DatabaseCreateDialogComponent implements OnInit, AfterViewInit, OnD
                     roundedSelection: false,
                     scrollbar: {
                         vertical: 'visible',
-                        horizontal: 'visible'
+                        horizontal: 'visible',
                     },
                     folding: true,
                     wordWrap: 'on',
                     suggestOnTriggerCharacters: true,
                     quickSuggestions: true,
                     parameterHints: {
-                        enabled: true
+                        enabled: true,
                     },
                     hover: {
-                        enabled: true
-                    }
-                }
+                        enabled: true,
+                    },
+                },
             );
 
             // Register SQL language features
             this.monacoEditorService.registerSqlLanguageFeatures(
-                (word: monaco.editor.IWordAtPosition, range: monaco.Range) => this.getSqlSuggestions(word, range)
+                (word: monaco.editor.IWordAtPosition, range: monaco.Range) =>
+                    this.getSqlSuggestions(word, range),
             );
 
             // Update form value when editor content changes
@@ -99,14 +100,16 @@ export class DatabaseCreateDialogComponent implements OnInit, AfterViewInit, OnD
                     this.editor.setValue(initialValue);
                 }
             }
-
         } catch (error) {
             console.error('Failed to initialize Monaco Editor:', error);
             this.snackBar.open('Fehler beim Laden des SQL-Editors', 'OK', { duration: 3000 });
         }
     }
 
-    private getSqlSuggestions(word: monaco.editor.IWordAtPosition, range: monaco.Range): monaco.languages.CompletionItem[] {
+    private getSqlSuggestions(
+        word: monaco.editor.IWordAtPosition,
+        range: monaco.Range,
+    ): monaco.languages.CompletionItem[] {
         const suggestions: monaco.languages.CompletionItem[] = [
             // SQL Keywords
             {
@@ -115,15 +118,16 @@ export class DatabaseCreateDialogComponent implements OnInit, AfterViewInit, OnD
                 insertText: 'CREATE TABLE ${1:table_name} (\n\t${2:column_name} ${3:data_type}\n);',
                 insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                 documentation: 'Create a new table',
-                range: range
+                range: range,
             },
             {
                 label: 'INSERT INTO',
                 kind: monaco.languages.CompletionItemKind.Keyword,
-                insertText: 'INSERT INTO ${1:table_name} (${2:column1}, ${3:column2}) VALUES (${4:value1}, ${5:value2});',
+                insertText:
+                    'INSERT INTO ${1:table_name} (${2:column1}, ${3:column2}) VALUES (${4:value1}, ${5:value2});',
                 insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                 documentation: 'Insert data into a table',
-                range: range
+                range: range,
             },
             {
                 label: 'SELECT',
@@ -131,15 +135,16 @@ export class DatabaseCreateDialogComponent implements OnInit, AfterViewInit, OnD
                 insertText: 'SELECT ${1:*} FROM ${2:table_name};',
                 insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                 documentation: 'Select data from a table',
-                range: range
+                range: range,
             },
             {
                 label: 'ALTER TABLE',
                 kind: monaco.languages.CompletionItemKind.Keyword,
-                insertText: 'ALTER TABLE ${1:table_name} ADD COLUMN ${2:column_name} ${3:data_type};',
+                insertText:
+                    'ALTER TABLE ${1:table_name} ADD COLUMN ${2:column_name} ${3:data_type};',
                 insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                 documentation: 'Modify table structure',
-                range: range
+                range: range,
             },
             // Data types
             {
@@ -147,7 +152,7 @@ export class DatabaseCreateDialogComponent implements OnInit, AfterViewInit, OnD
                 kind: monaco.languages.CompletionItemKind.Class,
                 insertText: 'INTEGER',
                 documentation: 'Integer data type',
-                range: range
+                range: range,
             },
             {
                 label: 'VARCHAR',
@@ -155,42 +160,42 @@ export class DatabaseCreateDialogComponent implements OnInit, AfterViewInit, OnD
                 insertText: 'VARCHAR(${1:255})',
                 insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                 documentation: 'Variable-length character string',
-                range: range
+                range: range,
             },
             {
                 label: 'TEXT',
                 kind: monaco.languages.CompletionItemKind.Class,
                 insertText: 'TEXT',
                 documentation: 'Variable unlimited length character string',
-                range: range
+                range: range,
             },
             {
                 label: 'BOOLEAN',
                 kind: monaco.languages.CompletionItemKind.Class,
                 insertText: 'BOOLEAN',
                 documentation: 'Boolean data type',
-                range: range
+                range: range,
             },
             {
                 label: 'DATE',
                 kind: monaco.languages.CompletionItemKind.Class,
                 insertText: 'DATE',
                 documentation: 'Date data type',
-                range: range
+                range: range,
             },
             {
                 label: 'TIMESTAMP',
                 kind: monaco.languages.CompletionItemKind.Class,
                 insertText: 'TIMESTAMP',
                 documentation: 'Timestamp data type',
-                range: range
+                range: range,
             },
             {
                 label: 'SERIAL',
                 kind: monaco.languages.CompletionItemKind.Class,
                 insertText: 'SERIAL',
                 documentation: 'Auto-incrementing integer',
-                range: range
+                range: range,
             },
             // Constraints
             {
@@ -198,7 +203,7 @@ export class DatabaseCreateDialogComponent implements OnInit, AfterViewInit, OnD
                 kind: monaco.languages.CompletionItemKind.Keyword,
                 insertText: 'PRIMARY KEY',
                 documentation: 'Primary key constraint',
-                range: range
+                range: range,
             },
             {
                 label: 'FOREIGN KEY',
@@ -206,21 +211,21 @@ export class DatabaseCreateDialogComponent implements OnInit, AfterViewInit, OnD
                 insertText: 'FOREIGN KEY (${1:column}) REFERENCES ${2:table}(${3:column})',
                 insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                 documentation: 'Foreign key constraint',
-                range: range
+                range: range,
             },
             {
                 label: 'UNIQUE',
                 kind: monaco.languages.CompletionItemKind.Keyword,
                 insertText: 'UNIQUE',
                 documentation: 'Unique constraint',
-                range: range
+                range: range,
             },
             {
                 label: 'NOT NULL',
                 kind: monaco.languages.CompletionItemKind.Keyword,
                 insertText: 'NOT NULL',
                 documentation: 'Not null constraint',
-                range: range
+                range: range,
             },
             {
                 label: 'DEFAULT',
@@ -228,8 +233,8 @@ export class DatabaseCreateDialogComponent implements OnInit, AfterViewInit, OnD
                 insertText: 'DEFAULT ${1:value}',
                 insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                 documentation: 'Default value constraint',
-                range: range
-            }
+                range: range,
+            },
         ];
 
         return suggestions;
@@ -292,13 +297,15 @@ INSERT INTO posts (user_id, title, content) VALUES
                     this.snackBar.open(
                         error.error?.message || 'Fehler beim Erstellen der Datenbank',
                         'OK',
-                        { duration: 5000 }
+                        { duration: 5000 },
                     );
                     this.isLoading = false;
-                }
+                },
             });
         } else {
-            this.snackBar.open('Bitte füllen Sie alle erforderlichen Felder aus.', 'OK', { duration: 3000 });
+            this.snackBar.open('Bitte füllen Sie alle erforderlichen Felder aus.', 'OK', {
+                duration: 3000,
+            });
         }
     }
 

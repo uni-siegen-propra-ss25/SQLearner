@@ -12,11 +12,11 @@ import { ProgressDto } from '../models/progress-dto.model';
  * Eliminates need for localStorage fallbacks by maintaining server-side synchronization.
  */
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
 export class ProgressService {
     private readonly baseUrl = `${environment.apiUrl}/progress`;
-    
+
     /**
      * Central state holder for progress data.
      * Emits updates to all subscribed components when progress changes.
@@ -24,7 +24,7 @@ export class ProgressService {
     private progressSubject = new BehaviorSubject<ProgressDto>({
         completedExerciseIds: [],
         totalCount: 0,
-        chapterProgress: []
+        chapterProgress: [],
     });
 
     /**
@@ -41,7 +41,7 @@ export class ProgressService {
     /**
      * Handles HTTP errors and provides user-friendly error messages.
      * Differentiates between client-side and server-side errors for better debugging.
-     * 
+     *
      * @private
      * @param {HttpErrorResponse} error - The HTTP error response from the server
      * @returns {Observable<never>} Observable that throws a formatted error message
@@ -75,7 +75,7 @@ export class ProgressService {
             error: (error) => {
                 console.error('🚨 FAILED TO LOAD INITIAL PROGRESS:', error);
                 // Keep empty default state on error
-            }
+            },
         });
     }
 
@@ -88,46 +88,48 @@ export class ProgressService {
      */
     private getUserProgressInternal(): Observable<ProgressDto> {
         console.log('🔄 STARTING getUserProgressInternal - API URL:', `${this.baseUrl}/user`);
-        
-        return this.http
-            .get<UserProgressSummary>(`${this.baseUrl}/user`)
-            .pipe(
-                tap((response) => {
-                    console.log('🔄 RAW API RESPONSE received:', response);
-                    console.log('🔄 RAW API RESPONSE type:', typeof response);
-                    console.log('🔄 RAW API RESPONSE keys:', Object.keys(response || {}));
-                }),
-                switchMap((summary: UserProgressSummary) => {
-                    console.log('🔄 PROCESSING summary in switchMap:', summary);
-                    
-                    // Check if detailed exercise data is available
-                    const hasDetailedData = summary.chapterProgress?.some(
-                        (chapter: ChapterProgress) => chapter.exercises && chapter.exercises.length > 0
+
+        return this.http.get<UserProgressSummary>(`${this.baseUrl}/user`).pipe(
+            tap((response) => {
+                console.log('🔄 RAW API RESPONSE received:', response);
+                console.log('🔄 RAW API RESPONSE type:', typeof response);
+                console.log('🔄 RAW API RESPONSE keys:', Object.keys(response || {}));
+            }),
+            switchMap((summary: UserProgressSummary) => {
+                console.log('🔄 PROCESSING summary in switchMap:', summary);
+
+                // Check if detailed exercise data is available
+                const hasDetailedData = summary.chapterProgress?.some(
+                    (chapter: ChapterProgress) => chapter.exercises && chapter.exercises.length > 0,
+                );
+
+                console.log('🔄 DETAILED DATA CHECK:', hasDetailedData);
+                console.log('🔄 CHAPTER PROGRESS:', summary.chapterProgress);
+
+                if (hasDetailedData) {
+                    console.log('✅ Using detailed data transformation');
+                    // Use detailed data if available
+                    return of(this.transformToProgressDto(summary));
+                } else {
+                    // Fallback: fetch completed exercise IDs separately
+                    console.warn(
+                        '⚠️ No detailed exercise data in UserProgressSummary, using fallback',
                     );
-                    
-                    console.log('🔄 DETAILED DATA CHECK:', hasDetailedData);
-                    console.log('🔄 CHAPTER PROGRESS:', summary.chapterProgress);
-                    
-                    if (hasDetailedData) {
-                        console.log('✅ Using detailed data transformation');
-                        // Use detailed data if available
-                        return of(this.transformToProgressDto(summary));
-                    } else {
-                        // Fallback: fetch completed exercise IDs separately
-                        console.warn('⚠️ No detailed exercise data in UserProgressSummary, using fallback');
-                        return this.getCompletedExerciseIds().pipe(
-                            map((completedIds: number[]) => this.createProgressDtoWithFallback(summary, completedIds))
-                        );
-                    }
-                }),
-                tap((finalDto) => {
-                    console.log('🔄 FINAL DTO before emission:', finalDto);
-                }),
-                catchError((error) => {
-                    console.error('🚨 ERROR in getUserProgressInternal:', error);
-                    return this.handleError(error);
-                })
-            );
+                    return this.getCompletedExerciseIds().pipe(
+                        map((completedIds: number[]) =>
+                            this.createProgressDtoWithFallback(summary, completedIds),
+                        ),
+                    );
+                }
+            }),
+            tap((finalDto) => {
+                console.log('🔄 FINAL DTO before emission:', finalDto);
+            }),
+            catchError((error) => {
+                console.error('🚨 ERROR in getUserProgressInternal:', error);
+                return this.handleError(error);
+            }),
+        );
     }
 
     /**
@@ -138,18 +140,22 @@ export class ProgressService {
      * @param {number[]} completedIds - Array of completed exercise IDs
      * @returns {ProgressDto} The constructed progress DTO
      */
-    private createProgressDtoWithFallback(summary: UserProgressSummary, completedIds: number[]): ProgressDto {
-        const chapterProgress = summary.chapterProgress?.map(chapter => ({
-            chapterId: chapter.chapterId,
-            chapterTitle: chapter.chapterTitle,
-            completedExerciseIds: [], // Will be empty since we don't have per-chapter breakdown
-            totalExercises: chapter.totalExercises
-        })) || [];
+    private createProgressDtoWithFallback(
+        summary: UserProgressSummary,
+        completedIds: number[],
+    ): ProgressDto {
+        const chapterProgress =
+            summary.chapterProgress?.map((chapter) => ({
+                chapterId: chapter.chapterId,
+                chapterTitle: chapter.chapterTitle,
+                completedExerciseIds: [], // Will be empty since we don't have per-chapter breakdown
+                totalExercises: chapter.totalExercises,
+            })) || [];
 
         return {
             completedExerciseIds: completedIds,
             totalCount: summary.totalExercises,
-            chapterProgress
+            chapterProgress,
         };
     }
 
@@ -162,32 +168,39 @@ export class ProgressService {
      */
     private transformToProgressDto(summary: UserProgressSummary): ProgressDto {
         console.log('🔄 TRANSFORM - Input summary:', summary);
-        
+
         const completedExerciseIds: number[] = [];
-        const chapterProgress = summary.chapterProgress?.map(chapter => {
-            console.log('🔄 TRANSFORM - Processing chapter:', chapter.chapterTitle, 'with', chapter.exercises?.length || 0, 'exercises');
-            
-            const chapterCompletedIds = chapter.exercises
-                ?.filter(ex => ex.isPassed)
-                ?.map(ex => ex.exerciseId) || [];
-            
-            console.log('🔄 TRANSFORM - Chapter completed IDs:', chapterCompletedIds);
-            completedExerciseIds.push(...chapterCompletedIds);
-            
-            return {
-                chapterId: chapter.chapterId,
-                chapterTitle: chapter.chapterTitle,
-                completedExerciseIds: chapterCompletedIds,
-                totalExercises: chapter.totalExercises
-            };
-        }) || [];
+        const chapterProgress =
+            summary.chapterProgress?.map((chapter) => {
+                console.log(
+                    '🔄 TRANSFORM - Processing chapter:',
+                    chapter.chapterTitle,
+                    'with',
+                    chapter.exercises?.length || 0,
+                    'exercises',
+                );
+
+                const chapterCompletedIds =
+                    chapter.exercises?.filter((ex) => ex.isPassed)?.map((ex) => ex.exerciseId) ||
+                    [];
+
+                console.log('🔄 TRANSFORM - Chapter completed IDs:', chapterCompletedIds);
+                completedExerciseIds.push(...chapterCompletedIds);
+
+                return {
+                    chapterId: chapter.chapterId,
+                    chapterTitle: chapter.chapterTitle,
+                    completedExerciseIds: chapterCompletedIds,
+                    totalExercises: chapter.totalExercises,
+                };
+            }) || [];
 
         const result: ProgressDto = {
             completedExerciseIds,
             totalCount: summary.totalExercises,
-            chapterProgress
+            chapterProgress,
         };
-        
+
         console.log('🔄 TRANSFORM - Final ProgressDto:', result);
         return result;
     }
@@ -200,7 +213,7 @@ export class ProgressService {
     reloadUserProgress(): void {
         this.getUserProgressInternal().subscribe({
             next: (progress) => this.progressSubject.next(progress),
-            error: (error) => console.error('Failed to reload progress:', error)
+            error: (error) => console.error('Failed to reload progress:', error),
         });
     }
 
@@ -215,7 +228,7 @@ export class ProgressService {
             .post<void>(`${this.baseUrl}/exercise/${exerciseId}`, { isPassed: true })
             .pipe(
                 tap(() => this.reloadUserProgress()),
-                catchError((error) => this.handleError(error))
+                catchError((error) => this.handleError(error)),
             );
     }
 
@@ -245,18 +258,18 @@ export class ProgressService {
      * @returns {Observable<number[]>} Observable containing array of completed exercise IDs
      */
     getCompletedExerciseIds(): Observable<number[]> {
-        return this.http
-            .get<number[]>(`${this.baseUrl}/user/completed-exercises`)
-            .pipe(catchError((error) => {
+        return this.http.get<number[]>(`${this.baseUrl}/user/completed-exercises`).pipe(
+            catchError((error) => {
                 console.error('Failed to load completed exercise IDs:', error);
                 return of([]);
-            }));
+            }),
+        );
     }
 
     /**
      * Retrieves progress summary for a specific user by ID.
      * Only accessible by tutors and admins.
-     * 
+     *
      * @param {number} userId - The ID of the user to get progress for
      * @returns {Observable<UserProgressSummary>} Observable containing progress data
      */
@@ -269,7 +282,7 @@ export class ProgressService {
     /**
      * Retrieves progress summaries for all users.
      * Only accessible by tutors and admins.
-     * 
+     *
      * @returns {Observable<UserProgressSummary[]>} Observable containing array of progress summaries
      */
     getAllUsersProgress(): Observable<UserProgressSummary[]> {

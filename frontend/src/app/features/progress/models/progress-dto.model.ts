@@ -8,13 +8,13 @@ export interface ProgressDto {
      * Used for O(1) lookup of completion status across roadmap and progress views.
      */
     completedExerciseIds: number[];
-    
+
     /**
      * Total number of exercises available in the system.
      * Used for calculating overall progress percentages.
      */
     totalCount: number;
-    
+
     /**
      * Optional breakdown by chapter for detailed progress display.
      */

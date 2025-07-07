@@ -57,19 +57,22 @@ body {
     background-color: #d32f2f !important;
     color: white !important;
   }
-  
+
   .mat-simple-snackbar-action {
     color: white !important;
   }
 }
 
-mat-card, .mat-mdc-card {
+mat-card,
+.mat-mdc-card {
   background-color: var(--surface-color) !important;
   color: var(--text-color) !important;
-  box-shadow: var(--card-shadow, 0 2px 8px rgba(0,0,0,0.04));
+  box-shadow: var(--card-shadow, 0 2px 8px rgba(0, 0, 0, 0.04));
 }
 
-mat-card-title, .mat-mdc-card-title,
-mat-card-content, .mat-mdc-card-content {
+mat-card-title,
+.mat-mdc-card-title,
+mat-card-content,
+.mat-mdc-card-content {
   color: var(--text-color) !important;
 }

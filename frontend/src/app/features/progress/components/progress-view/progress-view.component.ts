@@ -15,18 +15,18 @@ import { Subscription } from 'rxjs';
 @Component({
     selector: 'app-progress-view',
     templateUrl: './progress-view.component.html',
-    styleUrls: ['./progress-view.component.scss']
+    styleUrls: ['./progress-view.component.scss'],
 })
 export class ProgressViewComponent implements OnInit, OnDestroy {
     /** User's comprehensive progress data including completion statistics and chapter breakdown */
     userProgress: UserProgressSummary | null = null;
-    
+
     /** Array of exercises that the user has bookmarked for later review */
     bookmarks: BookmarkData[] = [];
-    
+
     /** Indicates whether data is currently being loaded from the server */
     loading: boolean = true;
-    
+
     /** Error message to display if data loading fails */
     error: string | null = null;
 
@@ -36,8 +36,8 @@ export class ProgressViewComponent implements OnInit, OnDestroy {
     constructor(
         private progressService: ProgressService,
         private bookmarkService: BookmarkService,
-        private translate: TranslateService
-    ) { }
+        private translate: TranslateService,
+    ) {}
 
     /**
      * Angular lifecycle hook that initializes the component.
@@ -58,7 +58,7 @@ export class ProgressViewComponent implements OnInit, OnDestroy {
     /**
      * Subscribes to progress changes to automatically refresh detailed progress
      * when exercises are completed through other components.
-     * 
+     *
      * @private
      */
     private subscribeToProgressChanges(): void {
@@ -69,14 +69,14 @@ export class ProgressViewComponent implements OnInit, OnDestroy {
             },
             error: (error) => {
                 console.error('Error monitoring progress changes:', error);
-            }
+            },
         });
     }
 
     /**
      * Fetches the user's detailed progress summary from the backend API.
      * Updates the component state with progress data or error information.
-     * 
+     *
      * @private
      */
     private loadUserProgress(): void {
@@ -91,14 +91,14 @@ export class ProgressViewComponent implements OnInit, OnDestroy {
                 console.error('Fehler beim Laden des Fortschritts:', error);
                 this.error = this.translate.instant('PROGRESS_LOAD_ERROR');
                 this.loading = false;
-            }
+            },
         });
     }
 
     /**
      * Retrieves all bookmarks for the authenticated user from the backend API.
      * Updates the bookmarks array or sets error state if the request fails.
-     * 
+     *
      * @private
      */
     private loadBookmarks(): void {
@@ -109,7 +109,7 @@ export class ProgressViewComponent implements OnInit, OnDestroy {
             error: (error) => {
                 console.error('Fehler beim Laden der Lesezeichen:', error);
                 this.setBookmarkError();
-            }
+            },
         });
     }
 
@@ -122,11 +122,11 @@ export class ProgressViewComponent implements OnInit, OnDestroy {
     removeBookmark(bookmarkId: number): void {
         this.bookmarkService.removeBookmark(bookmarkId).subscribe({
             next: () => {
-                this.bookmarks = this.bookmarks.filter(bookmark => bookmark.id !== bookmarkId);
+                this.bookmarks = this.bookmarks.filter((bookmark) => bookmark.id !== bookmarkId);
             },
             error: (error) => {
                 console.error('Fehler beim Entfernen des Lesezeichens:', error);
-            }
+            },
         });
     }
 

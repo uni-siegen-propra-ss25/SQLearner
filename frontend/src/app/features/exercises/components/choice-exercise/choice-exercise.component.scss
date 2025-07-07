@@ -13,7 +13,7 @@
   }
 
   .completed-icon {
-    color: #4CAF50;
+    color: #4caf50;
     font-size: 1.5rem;
     width: 1.5rem;
     height: 1.5rem;
@@ -63,20 +63,20 @@
         width: 100%;
       }
     }
-      // Für Label-basierte clickable Optionen
+    // Für Label-basierte clickable Optionen
     &.clickable-option {
       display: block;
       width: 100%;
       margin: 0;
-      
+
       // Entferne pointer-events: none - Labels brauchen das nicht
       // Das Label übernimmt automatisch die Click-Behandlung
-      
+
       // Stelle sicher, dass der gesamte Bereich klickbar ist
       &:hover {
         background: rgba(0, 0, 0, 0.06);
       }
-      
+
       &:active {
         background: rgba(0, 0, 0, 0.08);
       }

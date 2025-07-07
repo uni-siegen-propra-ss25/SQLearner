@@ -36,7 +36,7 @@
   }
 
   &.completed {
-    border-left-color: #4CAF50;
+    border-left-color: #4caf50;
     background-color: rgba(76, 175, 80, 0.05);
   }
 }
@@ -120,19 +120,19 @@ mat-card-header {
 .action-buttons {
   display: flex; // Horizontal layout
   gap: 8px; // Space between buttons
-  
+
   // Bookmark button specific styling
   .bookmark-button {
     transition: all 0.2s ease-in-out; // Smooth transitions
-    
+
     &:hover {
       transform: scale(1.1); // Scale on hover
     }
-    
+
     &:disabled {
       opacity: 0.6; // Disabled state
     }
-    
+
     mat-icon {
       transition: color 0.2s ease-in-out; // Color transition
     }
@@ -258,7 +258,7 @@ mat-card-content {
 }
 
 .completed-icon {
-  color: #4CAF50;
+  color: #4caf50;
   font-size: 1.5rem;
   margin-right: 2rem;
 }

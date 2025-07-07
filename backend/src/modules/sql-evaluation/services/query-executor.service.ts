@@ -33,45 +33,44 @@ export class QueryExecutorService {
         databaseId: number,
         query: string,
         context: string = 'unknown',
-        connectionDetails?: { host: string; port: number }
+        connectionDetails?: { host: string; port: number },
     ): Promise<QueryResultDto> {
         this.logger.debug(`Executing ${context} query on database ${databaseId}`);
-        
+
         // 1. Validate query safety
         this.validateQuerySafety(query);
-        
+
         // 2. Sanitize query
         const sanitizedQuery = this.sanitizeQuery(query);
-        
+
         // 3. Execute with timeout
         const startTime = performance.now();
-          try {
+        try {
             const rawResult = connectionDetails
-                ? await this.databasesService.runQueryInContainer({
-                    ...connectionDetails,
-                    database: 'exercise_db' // Connect to the correct container database
-                }, sanitizedQuery)
+                ? await this.databasesService.runQueryInContainer(
+                      {
+                          ...connectionDetails,
+                          database: 'exercise_db', // Connect to the correct container database
+                      },
+                      sanitizedQuery,
+                  )
                 : await this.databasesService.runQuery(databaseId, sanitizedQuery);
 
             return rawResult as QueryResultDto;
-
         } catch (error) {
             this.logger.error(`${context} query execution failed: ${error.message}`);
-            
+
             if (error instanceof SqlEvaluationException) {
                 throw error;
             }
-            
+
             if (error instanceof TimeoutError) {
-                throw new SqlEvaluationException(
-                    'Query execution timeout (10 seconds)',
-                    'TIMEOUT'
-                );
+                throw new SqlEvaluationException('Query execution timeout (10 seconds)', 'TIMEOUT');
             }
-            
+
             throw new SqlEvaluationException(
                 `Query execution failed: ${this.sanitizeErrorMessage(error.message)}`,
-                'EXECUTION_ERROR'
+                'EXECUTION_ERROR',
             );
         }
     }
@@ -80,10 +79,10 @@ export class QueryExecutorService {
      * Validates the safety of a SQL query before execution.
      * Prevents execution of dangerous operations like DROP, DELETE, UPDATE, etc.
      * Also checks for query complexity limits to prevent performance issues.
-     * 
+     *
      * @param {string} query - The SQL query to validate
      * @throws {SqlEvaluationException} If the query contains forbidden operations or exceeds complexity limits
-     * 
+     *
      * @private
      * @description Security validation includes:
      * - Forbidden SQL operations (DROP, DELETE, UPDATE, INSERT, ALTER, CREATE, TRUNCATE, REPLACE)
@@ -99,14 +98,14 @@ export class QueryExecutorService {
             /\b(DROP|DELETE|UPDATE|INSERT|ALTER|CREATE|TRUNCATE|REPLACE)\b/gi,
             /;\s*(?:DROP|DELETE|UPDATE|INSERT|ALTER|CREATE|TRUNCATE)/gi,
             /LOAD_FILE|INTO\s+OUTFILE|INTO\s+DUMPFILE/gi,
-            /BENCHMARK|SLEEP|WAITFOR/gi
+            /BENCHMARK|SLEEP|WAITFOR/gi,
         ];
 
         for (const pattern of forbiddenPatterns) {
             if (pattern.test(query)) {
                 throw new SqlEvaluationException(
                     'Query contains forbidden operations. Only SELECT statements are allowed.',
-                    'FORBIDDEN_OPERATION'
+                    'FORBIDDEN_OPERATION',
                 );
             }
         }
@@ -115,7 +114,7 @@ export class QueryExecutorService {
         if (query.length > 10000) {
             throw new SqlEvaluationException(
                 'Query too long (max 10,000 characters)',
-                'QUERY_TOO_LONG'
+                'QUERY_TOO_LONG',
             );
         }
 
@@ -123,16 +122,16 @@ export class QueryExecutorService {
         if (parenCount > 20) {
             throw new SqlEvaluationException(
                 'Query too complex (max 20 nested levels)',
-                'QUERY_TOO_COMPLEX'
+                'QUERY_TOO_COMPLEX',
             );
         }
-    }    /**
+    } /**
      * Sanitizes a SQL query by removing comments and normalizing whitespace.
      * This helps prevent comment-based SQL injection and ensures consistent formatting.
-     * 
+     *
      * @param {string} query - The raw SQL query to sanitize
      * @returns {string} The sanitized query with comments removed and normalized whitespace
-     * 
+     *
      * @private
      * @description Sanitization process:
      * - Removes line comments (-- comments)
@@ -147,13 +146,13 @@ export class QueryExecutorService {
             .replace(/\/\*[\s\S]*?\*\//g, '') // Remove block comments
             .replace(/\s+/g, ' ') // Normalize whitespace
             .trim();
-    }    /**
+    } /**
      * Creates a timeout promise that rejects after the configured timeout period.
      * Used in Promise.race() to enforce query execution time limits.
-     * 
+     *
      * @returns {Promise<never>} Promise that never resolves but rejects on timeout
      * @throws {SqlEvaluationException} Always throws when timeout is reached
-     * 
+     *
      * @private
      * @description This method is used with Promise.race() to ensure queries don't run indefinitely.
      * The timeout is configurable via the QUERY_TIMEOUT_MS constant (default: 10 seconds).
@@ -161,10 +160,9 @@ export class QueryExecutorService {
     private createTimeoutPromise(): Promise<never> {
         return new Promise((_, reject) => {
             setTimeout(() => {
-                reject(new SqlEvaluationException(
-                    'Query execution timeout (10 seconds)',
-                    'TIMEOUT'
-                ));
+                reject(
+                    new SqlEvaluationException('Query execution timeout (10 seconds)', 'TIMEOUT'),
+                );
             }, this.QUERY_TIMEOUT_MS);
         });
     }
@@ -172,12 +170,12 @@ export class QueryExecutorService {
     /**
      * Validates the structure and content of query execution results.
      * Ensures results are properly formatted and within acceptable limits.
-     * 
+     *
      * @param {object} result - The raw result object from query execution
      * @param {string[]} result.columns - Array of column names
      * @param {any[]} result.rows - Array of result rows
      * @throws {SqlEvaluationException} If result format is invalid or exceeds limits
-     * 
+     *
      * @private
      * @description Validation checks include:
      * - Result object structure validation
@@ -188,23 +186,17 @@ export class QueryExecutorService {
      */
     private validateResult(result: { columns: string[]; rows: any[] }): void {
         if (!result || !Array.isArray(result.columns) || !Array.isArray(result.rows)) {
-            throw new SqlEvaluationException(
-                'Invalid query result format',
-                'INVALID_RESULT'
-            );
+            throw new SqlEvaluationException('Invalid query result format', 'INVALID_RESULT');
         }
 
         if (result.columns.length === 0) {
-            throw new SqlEvaluationException(
-                'Query must return at least one column',
-                'NO_COLUMNS'
-            );
+            throw new SqlEvaluationException('Query must return at least one column', 'NO_COLUMNS');
         }
 
         if (result.rows.length > this.MAX_RESULT_ROWS) {
             throw new SqlEvaluationException(
                 `Query returned too many rows (${result.rows.length}). Maximum allowed: ${this.MAX_RESULT_ROWS}`,
-                'TOO_MANY_ROWS'
+                'TOO_MANY_ROWS',
             );
         }
     }
@@ -212,10 +204,10 @@ export class QueryExecutorService {
     /**
      * Sanitizes error messages to remove sensitive information before logging or returning to users.
      * Prevents exposure of credentials, tokens, or other sensitive data in error messages.
-     * 
+     *
      * @param {string} message - The raw error message to sanitize
      * @returns {string} The sanitized error message with sensitive data removed and length limited
-     * 
+     *
      * @private
      * @description Security measures applied:
      * - Replaces password values with asterisks

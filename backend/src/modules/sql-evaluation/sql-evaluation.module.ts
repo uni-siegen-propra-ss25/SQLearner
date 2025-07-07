@@ -12,8 +12,8 @@ import { SettingsModule } from '../settings/settings.module';
         SqlEvaluationService,
         QueryExecutorService,
         ResultComparatorService,
-        AiFeedbackService
+        AiFeedbackService,
     ],
-    exports: [SqlEvaluationService]
+    exports: [SqlEvaluationService],
 })
 export class SqlEvaluationModule {}
