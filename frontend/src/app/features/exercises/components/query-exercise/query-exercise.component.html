@@ -81,18 +81,20 @@
           <div class="schema-header">
             <mat-icon>schema</mat-icon>
             <span>Datenbankschema</span>
-            <!-- Button to open the ER diagram dialog -->
-            <button
-              mat-icon-button
-              color="primary"
-              (click)="showErDiagram()"
-              matTooltip="ER-Diagramm anzeigen"
-              class="er-diagram-button"
-            >
-              <mat-icon>account_tree</mat-icon>
-            </button>
           </div>
         </h3>
+        <!-- ER diagram button appears only in schema view, below the header -->
+        <div class="er-diagram-action">
+          <button
+            mat-stroked-button
+            color="primary"
+            (click)="showErDiagram()"
+            matTooltip="ER-Diagramm anzeigen"
+          >
+            <mat-icon>account_tree</mat-icon>
+            ER-Diagramm anzeigen
+          </button>
+        </div>
         <!-- SQL schema content display -->
         <div class="schema-content mat-elevation-z1">
           <pre>{{

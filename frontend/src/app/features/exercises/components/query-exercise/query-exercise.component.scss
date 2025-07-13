@@ -169,16 +169,23 @@
         }
       }
     }
-  }
 
-  // Styles for the feedback section (feedback panel)
-  .feedback-section {
-    margin-top: 24px;
+    // Styles for the feedback section (feedback panel)
+    .feedback-section {
+      margin-top: 24px;
 
-    .mat-expansion-panel-header-title {
+      .mat-expansion-panel-header-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+    }
+
+    // Styles for den ER-Diagramm-Button unter dem Schema-Header
+    .er-diagram-action {
+      margin: 12px 0 16px 0;
       display: flex;
-      align-items: center;
-      gap: 8px;
+      justify-content: flex-start;
     }
   }
 }
