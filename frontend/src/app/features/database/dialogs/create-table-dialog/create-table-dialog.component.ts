@@ -5,14 +5,20 @@ import { DatabaseService } from '../../services/database.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 export interface ColumnDefinition {
-    name: string;
-    dataType: string;
-    isNullable: boolean;
-    isPrimaryKey: boolean;
-    isUnique: boolean;
-    isForeignKey: boolean;
-    defaultValue: string;
-    length: number;
+  name: string;
+  dataType: string;
+  isNullable: boolean;
+  isPrimaryKey: boolean;
+  isUnique: boolean;
+  isForeignKey: boolean;
+  foreignKeyTable?: string;
+  foreignKeyColumn?: string;
+  foreignKeyTarget?: {
+    table: string;
+    column: string;
+  };
+  defaultValue: string;
+  length: number;
 }
 
 export interface CreateTableData {
@@ -55,6 +61,7 @@ export class CreateTableDialogComponent {
         'JSON',
         'JSONB',
     ];
+    availableTables: any[] = [];
 
     constructor(
         private fb: FormBuilder,
@@ -70,6 +77,9 @@ export class CreateTableDialogComponent {
 
         // Add initial column
         this.addColumn();
+        
+        // Load available tables for foreign key references
+        this.loadAvailableTables();
     }
 
     get columns() {
@@ -84,8 +94,29 @@ export class CreateTableDialogComponent {
             isPrimaryKey: [false],
             isUnique: [false],
             isForeignKey: [false],
+            foreignKeyTable: [''],
+            foreignKeyColumn: [''],
             defaultValue: [''],
-            length: [255],
+            length: [255]
+        });
+
+        // Subscribe to isForeignKey changes
+        columnGroup.get('isForeignKey')?.valueChanges.subscribe(isFk => {
+            if (!isFk) {
+                columnGroup.patchValue({
+                    foreignKeyTable: '',
+                    foreignKeyColumn: ''
+                });
+                // Remove validators when FK is disabled
+                columnGroup.get('foreignKeyTable')?.clearValidators();
+                columnGroup.get('foreignKeyColumn')?.clearValidators();
+            } else {
+                // Add validators when FK is enabled
+                columnGroup.get('foreignKeyTable')?.setValidators([Validators.required]);
+                columnGroup.get('foreignKeyColumn')?.setValidators([Validators.required]);
+            }
+            columnGroup.get('foreignKeyTable')?.updateValueAndValidity();
+            columnGroup.get('foreignKeyColumn')?.updateValueAndValidity();
         });
 
         this.columns.push(columnGroup);
@@ -95,6 +126,34 @@ export class CreateTableDialogComponent {
         if (this.columns.length > 1) {
             this.columns.removeAt(index);
         }
+    }
+
+    loadAvailableTables() {
+        // Get existing tables from the database for foreign key references
+        this.databaseService.runQuery(this.data.databaseId, `
+            SELECT 
+                table_name as name,
+                (SELECT json_agg(json_build_object('name', column_name, 'type', data_type))
+                 FROM information_schema.columns 
+                 WHERE table_name = t.table_name) as columns
+            FROM information_schema.tables t
+            WHERE table_schema = 'public' 
+            AND table_type = 'BASE TABLE'
+            ORDER BY table_name
+        `).subscribe({
+            next: (result) => {
+                this.availableTables = result.rows || [];
+            },
+            error: (error) => {
+                console.error('Failed to load tables for foreign key:', error);
+                this.availableTables = [];
+            }
+        });
+    }
+
+    getTableColumns(tableName: string) {
+        const table = this.availableTables.find(t => t.name === tableName);
+        return table?.columns || [];
     }
 
     generateSQL(): string {
@@ -111,7 +170,7 @@ export class CreateTableDialogComponent {
 
         columns.forEach((column: ColumnDefinition, index: number) => {
             let columnDef = `  "${column.name}" ${column.dataType}`;
-
+            
             // Add length for VARCHAR/CHAR
             if ((column.dataType === 'VARCHAR' || column.dataType === 'CHAR') && column.length) {
                 columnDef += `(${column.length})`;
@@ -134,9 +193,21 @@ export class CreateTableDialogComponent {
             }
 
             columnDefinitions.push(columnDef);
+
+            // Add FOREIGN KEY constraint
+            if (column.isForeignKey && column.foreignKeyTable && column.foreignKeyColumn) {
+                constraints.push(
+                    `  FOREIGN KEY ("${column.name}") REFERENCES "${column.foreignKeyTable}"("${column.foreignKeyColumn}")`
+                );
+            }
         });
 
         sql += columnDefinitions.join(',\n');
+        
+        if (constraints.length > 0) {
+            sql += ',\n' + constraints.join(',\n');
+        }
+        
         sql += '\n);';
 
         return sql;
@@ -146,7 +217,7 @@ export class CreateTableDialogComponent {
         if (this.form.valid) {
             const sql = this.generateSQL();
 
-            // Выполняем SQL запрос для создания таблицы
+            // Execute SQL query to create a table
             this.databaseService.runQuery(this.data.databaseId, sql).subscribe({
                 next: (result) => {
                     this.snackBar.open('Tabelle erfolgreich erstellt!', 'OK', { duration: 3000 });

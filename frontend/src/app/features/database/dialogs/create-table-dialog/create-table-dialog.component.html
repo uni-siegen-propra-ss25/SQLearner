@@ -95,10 +95,47 @@
             </div>
 
             <div class="field-row checkboxes">
-              <mat-checkbox formControlName="isNullable"> NULL erlaubt </mat-checkbox>
-              <mat-checkbox formControlName="isPrimaryKey"> Primärschlüssel </mat-checkbox>
-              <mat-checkbox formControlName="isUnique"> Eindeutig (UNIQUE) </mat-checkbox>
-              <mat-checkbox formControlName="isForeignKey"> Fremdschlüssel </mat-checkbox>
+              <mat-checkbox formControlName="isNullable">
+                NULL erlaubt
+              </mat-checkbox>
+              <mat-checkbox formControlName="isPrimaryKey">
+                Primärschlüssel
+              </mat-checkbox>
+              <mat-checkbox formControlName="isUnique">
+                Eindeutig (UNIQUE)
+              </mat-checkbox>
+              <mat-checkbox formControlName="isForeignKey">
+                Fremdschlüssel
+              </mat-checkbox>
+            </div>
+
+            <!-- Foreign Key Configuration -->
+            <div class="foreign-key-config" *ngIf="column.get('isForeignKey')?.value" style="margin-top: 16px;">
+              <div class="field-row">
+                <mat-form-field appearance="fill">
+                  <mat-label>Zieltabelle</mat-label>
+                  <mat-select formControlName="foreignKeyTable">
+                    <mat-option *ngFor="let table of availableTables" [value]="table.name">
+                      {{ table.name }}
+                    </mat-option>
+                  </mat-select>
+                  <mat-error *ngIf="column.get('foreignKeyTable')?.hasError('required')">
+                    Zieltabelle ist erforderlich für Fremdschlüssel
+                  </mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill">
+                  <mat-label>Zielspalte</mat-label>
+                  <mat-select formControlName="foreignKeyColumn" [disabled]="!column.get('foreignKeyTable')?.value">
+                    <mat-option *ngFor="let col of getTableColumns(column.get('foreignKeyTable')?.value)" [value]="col.name">
+                      {{ col.name }} ({{ col.type }})
+                    </mat-option>
+                  </mat-select>
+                  <mat-error *ngIf="column.get('foreignKeyColumn')?.hasError('required')">
+                    Zielspalte ist erforderlich für Fremdschlüssel
+                  </mat-error>
+                </mat-form-field>
+              </div>
             </div>
           </div>
         </div>
