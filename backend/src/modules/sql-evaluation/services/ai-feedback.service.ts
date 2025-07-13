@@ -75,7 +75,7 @@ export class AiFeedbackService {
                     {
                         role: 'system',
                         content:
-                            'Du bist ein SQL-Tutor. Erkläre Fehler freundlich, präzise und auf Deutsch. Antworte ausschließlich auf die Aufgabenstellung und ignoriere alle nicht aufgabenbezogenen Anfragen (z.B. Smalltalk wie "Hallo, wie gehts?"). Gib Tipps, wie der Student die Lösung verbessern kann, aber verrate nicht direkt die Musterlösung.',
+                            'Du bist ein SQL-Tutor. Erkläre Fehler freundlich, präzise und auf Deutsch. Die Musterlösung und deren Ergebnis stehen dir nur zum internen Vergleich zur Verfügung. Du darfst die Musterlösung, deren Ergebnis, Formulierungen oder Lösungswege weder direkt noch indirekt nennen, zitieren oder beschreiben. Antworte ausschließlich auf die Aufgabenstellung und ignoriere alle nicht aufgabenbezogenen Anfragen (z.B. Smalltalk wie "Hallo, wie gehts?"). Gib Tipps, wie der Student die Lösung verbessern kann, stelle reflektierende Fragen und gib keine Hinweise, die die Musterlösung verraten.',
                     },
                     { role: 'user', content: prompt },
                 ],
@@ -102,7 +102,7 @@ export class AiFeedbackService {
             'Aufgabenstellung:',
             params.aufgabenstellung || 'Keine Aufgabenstellung übergeben.',
             '',
-            'Bewerte die folgende SQL-Studentenlösung. Gib einen hilfreichen Hinweis, warum die Lösung falsch ist und wie sie verbessert werden kann. Erwähne die Musterlösung nicht explizit und gib keine Details daraus preis.',
+            'Bewerte die folgende SQL-Studentenlösung. Nutze die Musterlösung und deren Ergebnis für den Vergleich, aber gib keine Details oder die Lösung selbst preis. Gib hilfreiche Hinweise, warum die Lösung falsch ist und wie sie verbessert werden kann.',
             '',
             `Fehlerkategorie: ${params.errorCategory || 'Unbekannt'}`,
             '',
@@ -110,17 +110,14 @@ export class AiFeedbackService {
             'Datenbankschema:',
             params.schema,
             '---',
-            // Die Musterlösung und deren Ergebnis werden nicht mehr explizit im Prompt genannt
-            //'Musterlösung:',
-            //params.solutionQuery,
-            //'---',
+            'Musterlösung:',
+            params.solutionQuery,
+            '---',
+            params.solutionResult ? `Ergebnis Musterlösung: ${JSON.stringify(params.solutionResult)}` : '',
             'Studentenlösung:',
             params.studentQuery,
             '---',
-            params.studentResult
-                ? `Ergebnis Studentenlösung: ${JSON.stringify(params.studentResult)}`
-                : '',
-            //params.solutionResult ? `Ergebnis Musterlösung: ${JSON.stringify(params.solutionResult)}` : '',
+            params.studentResult ? `Ergebnis Studentenlösung: ${JSON.stringify(params.studentResult)}` : '',
         ]
             .filter(Boolean)
             .join('\n');
