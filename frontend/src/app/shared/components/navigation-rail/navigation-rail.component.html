@@ -1,9 +1,8 @@
 <nav class="navigation-rail">
   <div class="menu-fab">
-    <a *ngIf="logoUrl" [routerLink]="logoUrl" routerLinkActive="active" class="nav-brand-logo">
-      <mat-icon *ngIf="!logoUrl" class="default-logo">school</mat-icon>
-      <mat-icon *ngIf="logoUrl" class="brand-logo" svgIcon="logo_SQLearner"></mat-icon>
-    </a>
+    <div  class="nav-brand-logo">
+      <mat-icon class="brand-logo" svgIcon="logo_SQLearner"></mat-icon>
+    </div>
   </div>
 
   <div class="segment">

@@ -22,7 +22,6 @@ export interface NavigationItem {
 })
 export class NavigationRailComponent {
     @Input() items: NavigationItem[] = [];
-    @Input() logoUrl: string = '';
     @Input() logoAlt: string = 'Logo';
     @Input() userRole: Role | null = null;
 
