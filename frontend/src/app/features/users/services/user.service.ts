@@ -3,8 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { User } from '../models/user.model';
 import { Role } from '../models/role.model';
-import { RegisterCredentials } from '../../auth/models/register-credentials.model';
 import { environment } from '../../../../environments/environment';
+import { RegisterCredentials } from 'app/features/auth/models/register-credentials.model';
 
 @Injectable({
     providedIn: 'root',

@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import { AuthService } from '../../../features/auth/services/auth.service';
 import { User } from '../../../features/users/models/user.model';
 import { Role } from '../../../features/users/models/role.model';
@@ -15,8 +14,7 @@ export class DashboardComponent implements OnInit {
     Role = Role; // Expose Role enum to template
 
     constructor(
-        private authService: AuthService,
-        private router: Router
+        private authService: AuthService
     ) {}
 
     ngOnInit(): void {
