@@ -49,6 +49,9 @@ export class UserListComponent implements OnInit {
     /** Whether the current user has tutor or admin privileges */
     isTutorOrAdmin = false;
 
+    /** Current user's ID to prevent self-editing/deletion */
+    currentUserId: number | null = null;
+
     constructor(
         private dialog: MatDialog,
         private userService: UserService,
@@ -65,6 +68,7 @@ export class UserListComponent implements OnInit {
         this.authService.user$.subscribe((user) => {
             this.isAdmin = user?.role === Role.ADMIN;
             this.isTutorOrAdmin = user?.role === Role.ADMIN || user?.role === Role.TUTOR;
+            this.currentUserId = user?.id || null;
         });
     }
 
@@ -149,6 +153,13 @@ export class UserListComponent implements OnInit {
      * @param user The user to update
      */
     openUpdateDialog(user: User) {
+        if (!this.canModifyUser(user.id)) {
+            this.snackBar.open('Sie können sich nicht selbst bearbeiten', 'Schließen', {
+                duration: 3000,
+            });
+            return;
+        }
+
         const dialogRef = this.dialog.open(UserUpdateDialogComponent, {
             width: '500px',
             data: {
@@ -201,6 +212,13 @@ export class UserListComponent implements OnInit {
     onRoleChange(userId: number, newRole: Role) {
         if (!this.isAdmin) return;
 
+        if (!this.canModifyUser(userId)) {
+            this.snackBar.open('Sie können Ihre eigene Rolle nicht ändern', 'Schließen', {
+                duration: 3000,
+            });
+            return;
+        }
+
         this.userService.updateUserRole(userId, newRole).subscribe({
             next: (updatedUser) => {
                 // Preserve existing progress when updating role
@@ -227,6 +245,13 @@ export class UserListComponent implements OnInit {
     deleteUser(userId: number) {
         if (!this.isAdmin) return;
 
+        if (!this.canModifyUser(userId)) {
+            this.snackBar.open('Sie können sich nicht selbst löschen', 'Schließen', {
+                duration: 3000,
+            });
+            return;
+        }
+
         this.userService.deleteUser(userId).subscribe({
             next: () => {
                 this.users = this.users.filter((u) => u.id !== userId);
@@ -241,5 +266,20 @@ export class UserListComponent implements OnInit {
                 });
             },
         });
+    }
+
+    /**
+     * Checks if a user can be edited or deleted by the current user
+     * Prevents admins from editing or deleting themselves
+     * @param userId ID of the user to check
+     * @returns true if the user can be modified, false otherwise
+     */
+    canModifyUser(userId: number): boolean {
+        // Prevent users from modifying themselves
+        if (userId === this.currentUserId) {
+            return false;
+        }
+        // Only admins and tutors can modify other users
+        return this.isTutorOrAdmin;
     }
 }

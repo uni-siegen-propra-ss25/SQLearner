@@ -81,6 +81,7 @@
                 color="primary"
                 (click)="openUpdateDialog(user)"
                 matTooltip="{{ 'USER_MANAGEMENT_PAGE.EDIT' | translate }}"
+                *ngIf="canModifyUser(user.id)"
               >
                 <mat-icon>edit</mat-icon>
               </button>
@@ -89,7 +90,7 @@
                 color="warn"
                 (click)="deleteUser(user.id)"
                 matTooltip="{{ 'USER_MANAGEMENT_PAGE.DELETE' | translate }}"
-                *ngIf="isAdmin"
+                *ngIf="isAdmin && canModifyUser(user.id)"
               >
                 <mat-icon>delete</mat-icon>
               </button>
