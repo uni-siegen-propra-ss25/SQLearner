@@ -5,6 +5,8 @@ import { AuthService } from '../../../features/auth/services/auth.service';
 import { ProfileComponent } from '../../../features/users/components/profile/profile.component';
 import { Role } from '../../../features/users/models/role.model';
 import { TranslateService } from '@ngx-translate/core';
+import { DockerService } from '../../../features/exercises/services/docker.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 export interface NavigationItem {
     icon: string;
@@ -38,6 +40,8 @@ export class NavigationRailComponent {
         private dialog: MatDialog,
         private authService: AuthService,
         private translate: TranslateService,
+        private dockerService: DockerService,
+        private snackBar: MatSnackBar,
     ) {
         const savedLang = localStorage.getItem('language') || 'de';
         this.currentLang = savedLang;
@@ -60,7 +64,17 @@ export class NavigationRailComponent {
         );
     }
 
+    // Helper to check if container is initializing (global window property set by QueryExerciseComponent)
+    private isContainerInitializing(): boolean {
+        // This assumes QueryExerciseComponent sets window["containerInitializing"]
+        return (window as any)["containerInitializing"] === true;
+    }
+
     onItemClick(item: NavigationItem): void {
+        if (this.isContainerInitializing()) {
+            this.snackBar.open('Please wait, the environment is being prepared...', 'Close', { duration: 3000 });
+            return;
+        }
         this.itemSelected.emit(item);
     }
 
@@ -86,7 +100,28 @@ export class NavigationRailComponent {
     }
 
     logout(): void {
-        this.authService.logout();
-        this.router.navigate(['/auth/login']);
+        if (this.isContainerInitializing()) {
+            this.snackBar.open('Please wait, the environment is being prepared...', 'Close', { duration: 3000 });
+            return;
+        }
+        // Удаляем контейнер, если есть
+        const containerId = sessionStorage.getItem('activeContainerId');
+        if (containerId) {
+            this.dockerService.deleteContainer(containerId).subscribe({
+                next: () => {
+                    sessionStorage.removeItem('activeContainerId');
+                    this.authService.logout();
+                    this.router.navigate(['/auth/login']);
+                },
+                error: () => {
+                    sessionStorage.removeItem('activeContainerId');
+                    this.authService.logout();
+                    this.router.navigate(['/auth/login']);
+                }
+            });
+        } else {
+            this.authService.logout();
+            this.router.navigate(['/auth/login']);
+        }
     }
 }

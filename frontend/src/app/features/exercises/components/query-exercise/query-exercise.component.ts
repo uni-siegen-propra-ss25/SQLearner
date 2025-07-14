@@ -100,6 +100,12 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
     isContainerReady = false;
 
     /**
+     * Indicates if the Docker container is currently being created (initializing).
+     * Used to block navigation and logout until ready.
+     */
+    public isContainerInitializing = false;
+
+    /**
      * The ID of the running Docker container for this exercise.
      * @type {string | null}
      */
@@ -147,6 +153,11 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
     @Output() completed = new EventEmitter<number>();
 
     /**
+     * Stores the last query error message (e.g., SQL syntax error) to show in the UI.
+     */
+    public queryError: string | null = null;
+
+    /**
      * Constructor for QueryExerciseComponent.
      * @param {SubmissionService} submissionService - Service for submitting answers and running queries.
      * @param {MatSnackBar} snackBar - Service for showing notifications.
@@ -175,52 +186,71 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         // Check if the user has already answered this exercise correctly
         this.isCorrectAnswer = this.progressService.isCorrectAnswer(this.exercise.id);
-        
+
+        // Restore containerId from sessionStorage if present
+        const storedContainerId = sessionStorage.getItem('activeContainerId');
+        if (storedContainerId) {
+            this.containerId = storedContainerId;
+        }
+
+        // Set initializing flag to true before starting container creation
+        this.isContainerInitializing = true;
+        // Set global window property for cross-component access
+        (window as any)["containerInitializing"] = true;
+
         // Subscribe to router events to delete container when navigating away
         this.routerSubscription = this.router.events.pipe(
             filter((event: any): event is NavigationStart => event instanceof NavigationStart)
         ).subscribe((event: NavigationStart) => {
-            // Delete container when navigating to a different URL
+            // If containerId is available, delete the container immediately
             if (this.containerId) {
                 this.deleteContainer();
+            } else if (this.exercise?.id) {
+                // If containerId is not yet available, set a pending delete flag for this exerciseId
+                sessionStorage.setItem('pendingContainerDeleteForExercise', String(this.exercise.id));
             }
         });
 
         // Load the actual database schema if available
         if (this.exercise?.database?.id) {
-            console.log('Loading database schema...');
             this.loadDatabaseSchema(this.exercise.database.id);
         }
-        
+
         this.route.paramMap.subscribe((params: ParamMap) => {
             const exerciseId = Number(params.get('exerciseId'));
-            
+
             if (exerciseId) {
-                console.log('Creating container for exerciseId:', exerciseId);
                 this.isContainerReady = false; // Container is not ready yet
                 this.containerSubscription = this.dockerService.createContainer(exerciseId).subscribe({
                     next: (response: { containerId: string; connectionDetails: any }) => {
-                        console.log('Container created successfully:', response);
-                        console.log('Container ID:', response.containerId);
-                        console.log('Connection details:', response.connectionDetails);
                         this.containerId = response.containerId;
                         this.connectionDetails = response.connectionDetails;
                         this.isContainerReady = true; // Container is now ready for queries
-                        console.log('Container setup complete - ready for queries');
-                        this.snackBar.open('Container bereit - Sie können jetzt Queries ausführen!', 'OK', {
+                        this.isContainerInitializing = false; // Container is done initializing
+                        // Unset global window property
+                        (window as any)["containerInitializing"] = false;
+                        // Store containerId in sessionStorage
+                        sessionStorage.setItem('activeContainerId', this.containerId);
+                        // Check if there is a pending delete for this exerciseId only
+                        const pendingDeleteFor = sessionStorage.getItem('pendingContainerDeleteForExercise');
+                        if (pendingDeleteFor && String(this.exercise.id) === pendingDeleteFor) {
+                            this.deleteContainer();
+                            sessionStorage.removeItem('pendingContainerDeleteForExercise');
+                        }
+                        this.snackBar.open('Container ready - you can now run queries!', 'OK', {
                             duration: 3000,
                         });
                     },
                     error: (error: any) => {
-                        console.error('Failed to create container:', error);
                         this.isContainerReady = false; // Container creation failed
+                        this.isContainerInitializing = false; // Initialization failed
+                        // Unset global window property
+                        (window as any)["containerInitializing"] = false;
                         this.snackBar.open('Failed to create exercise environment.', 'Close', {
                             duration: 5000,
                         });
                     }
                 });
-            } else {
-                console.error('No exerciseId found in route params');
             }
         });
     }
@@ -239,6 +269,8 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
         if (this.containerId) {
             this.deleteContainer();
         }
+        // Always unset the global window property on destroy
+        (window as any)["containerInitializing"] = false;
     }
 
     /**
@@ -278,19 +310,33 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
         if (!this.sqlQuery.trim()) return;
 
         this.isLoading = true;
+        this.queryError = null; // Clear previous error
+
         this.submissionService.runQuery(this.exercise.id, this.sqlQuery, this.connectionDetails || undefined).subscribe({
             next: (result: any) => {
                 this.queryResult = result;
                 this.isLoading = false;
                 this.currentView = 'result';
+                this.queryError = null; // Clear error on success
             },
             error: (error: any) => {
-                console.error('Query execution error:', error);
                 this.isLoading = false;
                 this.queryResult = null;
-                const errorMessage = error.error?.detail || error.error?.message || error.message || 'Failed to run query';
-                console.error('Error message:', errorMessage);
-                this.snackBar.open(errorMessage, 'Close', {
+                // Log the full error object for debugging
+                console.error('Full error object:', error);
+                // Robust error extraction for all backend formats
+                let msg = 'Failed to run query';
+                if (typeof error.error === 'string') {
+                    msg = error.error;
+                } else if (error.error?.detail) {
+                    msg = error.error.detail;
+                } else if (error.error?.message) {
+                    msg = error.error.message;
+                } else if (error.message) {
+                    msg = error.message;
+                }
+                this.queryError = msg;
+                this.snackBar.open(this.queryError || 'Unknown error', 'Close', {
                     duration: 5000,
                     panelClass: ['error-snackbar']
                 });
@@ -478,20 +524,26 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
      * This is called when the user navigates away from the exercise page.
      */
     private deleteContainer(): void {
+        // Always remove both containerId and pending delete flag after attempting deletion
         if (this.containerId) {
             this.dockerService.deleteContainer(this.containerId).subscribe({
                 next: () => {
-                    console.log('Container deleted successfully:', this.containerId);
                     this.containerId = null;
                     this.connectionDetails = null;
-                    this.isContainerReady = false; // Reset container status
+                    this.isContainerReady = false;
+                    sessionStorage.removeItem('activeContainerId');
+                    sessionStorage.removeItem('pendingContainerDeleteForExercise');
                 },
                 error: (error: any) => {
-                    console.error('Failed to delete container:', error);
-                    // Even on error, reset the container status since we can't rely on it
                     this.isContainerReady = false;
+                    sessionStorage.removeItem('activeContainerId');
+                    sessionStorage.removeItem('pendingContainerDeleteForExercise');
                 }
             });
+        } else {
+            // If called without a containerId, just clear the flags
+            sessionStorage.removeItem('activeContainerId');
+            sessionStorage.removeItem('pendingContainerDeleteForExercise');
         }
     }
 
