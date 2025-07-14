@@ -1,0 +1,49 @@
+<div class="todo-widget">
+    <div class="widget-header">
+        <h3 class="widget-title">
+            <mat-icon>checklist</mat-icon>
+            {{ isAdmin ? ('DASHBOARD.MANAGE_STUDENT_TODOS' | translate) : ('DASHBOARD.TODO_LIST' | translate) }}
+        </h3>
+    </div>
+
+    <!-- Add new todo -->
+    <div class="todo-input">
+        <mat-form-field appearance="outline" class="todo-title-field">
+            <input matInput [(ngModel)]="newTodo" 
+                   (keydown.enter)="addTodo()" 
+                   placeholder="{{ 'DASHBOARD.TODO_TITLE_PLACEHOLDER' | translate }}">
+        </mat-form-field>
+        
+        <button mat-icon-button 
+                (click)="addTodo()" 
+                [disabled]="!newTodo.trim()" 
+                class="add-btn"
+                color="primary">
+            <mat-icon>add</mat-icon>
+        </button>
+    </div>
+
+    <!-- Todo list -->
+    <div class="todo-list" *ngIf="todos.length > 0; else noTodos">
+        <div class="todo-item" *ngFor="let todo of todos; let i = index">
+            <div class="todo-content">
+                <span class="todo-title">{{ todo.title }}</span>
+            </div>
+            
+            <button mat-icon-button 
+                    (click)="removeTodo(i)" 
+                    class="delete-btn"
+                    matTooltip="Erledigt - Löschen"
+                    color="primary">
+                <mat-icon>check</mat-icon>
+            </button>
+        </div>
+    </div>
+    
+    <ng-template #noTodos>
+        <div class="no-content">
+            <mat-icon>list</mat-icon>
+            <p>{{ 'DASHBOARD.NO_TODOS' | translate }}</p>
+        </div>
+    </ng-template>
+</div>

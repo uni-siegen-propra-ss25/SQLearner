@@ -1,0 +1,51 @@
+<!-- Dashboard für eingeloggte Nutzer -->
+<div *ngIf="isLoggedIn">
+  <app-dashboard></app-dashboard>
+</div>
+
+<!-- Willkommensnachricht nur anzeigen, wenn nicht eingeloggt -->
+<div *ngIf="!isLoggedIn" class="welcome-container">
+  <h1>{{ 'WELCOME' | translate }}</h1>
+  <p>Ihre Plattform zum Lernen und Üben von SQL</p>
+  
+  <div class="welcome-content">
+    <div class="feature-section">
+      <h2>{{ 'WELCOME.FEATURES_TITLE' | translate }}</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <mat-icon>school</mat-icon>
+          <h3>{{ 'WELCOME.INTERACTIVE_LEARNING' | translate }}</h3>
+          <p>{{ 'WELCOME.INTERACTIVE_LEARNING_DESC' | translate }}</p>
+        </div>
+        <div class="feature-card">
+          <mat-icon>assignment</mat-icon>
+          <h3>{{ 'WELCOME.PRACTICAL_EXERCISES' | translate }}</h3>
+          <p>{{ 'WELCOME.PRACTICAL_EXERCISES_DESC' | translate }}</p>
+        </div>
+        <div class="feature-card">
+          <mat-icon>analytics</mat-icon>
+          <h3>{{ 'WELCOME.PROGRESS_TRACKING' | translate }}</h3>
+          <p>{{ 'WELCOME.PROGRESS_TRACKING_DESC' | translate }}</p>
+        </div>
+        <div class="feature-card">
+          <mat-icon>support</mat-icon>
+          <h3>{{ 'WELCOME.TUTOR_SUPPORT' | translate }}</h3>
+          <p>{{ 'WELCOME.TUTOR_SUPPORT_DESC' | translate }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-section">
+      <h2>{{ 'WELCOME.GET_STARTED' | translate }}</h2>
+      <p>{{ 'WELCOME.GET_STARTED_DESC' | translate }}</p>
+      <div class="cta-buttons">
+        <button mat-raised-button color="primary" routerLink="/auth/register">
+          {{ 'WELCOME.REGISTER_NOW' | translate }}
+        </button>
+        <button mat-button routerLink="/auth/login">
+          {{ 'WELCOME.LOGIN' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

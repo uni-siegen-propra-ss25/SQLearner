@@ -1,0 +1,78 @@
+<div class="hints-widget">
+    <div class="widget-header">
+        <h3 class="widget-title">
+            <mat-icon>lightbulb</mat-icon>
+            {{ canManage ? ('DASHBOARD.MANAGE_HINTS' | translate) : ('DASHBOARD.TUTOR_HINTS' | translate) }}
+        </h3>
+    </div>
+
+    <!-- Add new hint (only for tutors/admins) -->
+    <div class="hint-input" *ngIf="canManage">
+        <div class="input-row">
+            <mat-form-field appearance="outline" class="hint-title-field">
+                <input matInput [(ngModel)]="newHintTitle" 
+                       placeholder="{{ 'DASHBOARD.HINT_TITLE_PLACEHOLDER' | translate }}">
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline" class="role-field">
+                <mat-label>{{ 'DASHBOARD.TARGET_ROLE' | translate }}</mat-label>
+                <mat-select [(ngModel)]="newHintTargetRole">
+                    <mat-option *ngFor="let option of roleOptions; let i = index" [value]="option.value">
+                        {{ option.label }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            
+            <button mat-icon-button 
+                    (click)="addHint()" 
+                    [disabled]="!newHintTitle.trim() || !newHintContent.trim()" 
+                    class="add-btn"
+                    color="primary">
+                <mat-icon>add</mat-icon>
+            </button>
+        </div>
+        
+        <mat-form-field appearance="outline" class="hint-content-field">
+            <textarea matInput [(ngModel)]="newHintContent" 
+                      placeholder="{{ 'DASHBOARD.HINT_CONTENT_PLACEHOLDER' | translate }}"
+                      rows="3"></textarea>
+        </mat-form-field>
+    </div>
+
+    <!-- Hints list -->
+    <div class="hints-container" *ngIf="hints.length > 0; else noHints">
+        <div class="hint-item" *ngFor="let hint of hints; let i = index">
+            <div class="hint-icon">
+                <mat-icon>lightbulb</mat-icon>
+            </div>
+            
+            <div class="item-content">
+                <h4 class="item-title">{{ hint.title }}</h4>
+                <p class="item-description">{{ hint.content }}</p>
+                <div class="item-meta">
+                    <span class="role-badge" [class]="'role-' + (hint.targetRole || 'all').toLowerCase()">
+                        {{ getRoleLabel(hint.targetRole) }}
+                    </span>
+                    <span class="hint-author" *ngIf="hint.author">
+                        {{ getAuthorName(hint) }}
+                    </span>
+                </div>
+            </div>
+            
+            <button mat-icon-button 
+                    (click)="removeHint(i)" 
+                    class="delete-btn"
+                    [matTooltip]="canManage ? 'Löschen' : 'Erledigt - Löschen'"
+                    color="primary">
+                <mat-icon>{{ canManage ? 'delete' : 'check' }}</mat-icon>
+            </button>
+        </div>
+    </div>
+    
+    <ng-template #noHints>
+        <div class="no-content">
+            <mat-icon>lightbulb_outline</mat-icon>
+            <p>{{ 'DASHBOARD.NO_HINTS' | translate }}</p>
+        </div>
+    </ng-template>
+</div>

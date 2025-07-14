@@ -81,12 +81,8 @@ export class DatabaseCreateDialogComponent implements OnInit, AfterViewInit, OnD
                 },
             );
 
-            // Register SQL language features
-            this.monacoEditorService.registerSqlLanguageFeatures(
-                (word: monaco.editor.IWordAtPosition, range: monaco.Range) =>
-                    this.getSqlSuggestions(word, range),
-            );
-
+            // Language features are automatically set up by the service
+            
             // Update form value when editor content changes
             if (this.editor) {
                 this.editor.onDidChangeModelContent(() => {

@@ -1,0 +1,24 @@
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1 class="dashboard-title">
+            {{ 'DASHBOARD.WELCOME' | translate }}
+            <span *ngIf="currentUser">{{ currentUser.firstName }}</span>
+        </h1>
+        <p class="dashboard-subtitle">{{ 'DASHBOARD.SUBTITLE' | translate }}</p>
+    </div>
+
+    <!-- Widgets Grid -->
+    <div class="widgets-grid">
+        <!-- Hints Widget -->
+        <app-hints-widget [canManage]="canManageHints()"></app-hints-widget>
+        
+        <!-- Todo Widget -->
+        <app-todo-widget [isAdmin]="canManageTodos()"></app-todo-widget>
+        
+        <!-- Chat Widget -->
+        <app-chat-widget 
+            [userRole]="userRole || undefined"
+            [userName]="currentUser ? (currentUser.firstName + ' ' + currentUser.lastName) : 'Anonymous'"
+            [userId]="currentUser?.id || 0"></app-chat-widget>
+    </div>
+</div>

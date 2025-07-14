@@ -196,4 +196,43 @@
       justify-content: flex-start;
     }
   }
+
+  // Container status indicator
+  .container-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+
+    &.loading {
+      background-color: #fff3cd;
+      border: 1px solid #ffeaa7;
+      color: #856404;
+
+      mat-icon {
+        color: #f39c12;
+        animation: pulse 1.5s ease-in-out infinite;
+      }
+    }
+
+    &.ready {
+      background-color: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+
+      mat-icon {
+        color: #27ae60;
+      }
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
 }

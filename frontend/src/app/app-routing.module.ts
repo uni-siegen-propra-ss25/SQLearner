@@ -1,16 +1,14 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { NavigationRailComponent } from './shared/components/navigation-rail/navigation-rail.component';
 import { Role } from './features/users/models/role.model';
 import { RoleGuard } from './core/guards/role.guard';
-import { AuthGuard } from './core/guards/auth.guard';
 
 const routes: Routes = [
-    { path: '', redirectTo: 'welcome', pathMatch: 'full' },
+    { path: '', redirectTo: 'landing', pathMatch: 'full' },
     {
-        path: 'welcome',
+        path: 'landing',
         loadChildren: () =>
-            import('./features/welcome/welcome.module').then((m) => m.WelcomeModule),
+            import('./features/landing/landing.module').then((m) => m.LandingModule),
     },
     {
         path: 'auth',

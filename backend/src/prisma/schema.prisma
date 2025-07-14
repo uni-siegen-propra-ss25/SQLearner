@@ -73,11 +73,15 @@ model User {
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
 
-  submissions  Submission[]
-  progress     Progress[]
-  bookmarks    Bookmark[]
-  messages     ChatMessage[]
-  dbSessions   DbSession[]
+  submissions         Submission[]
+  progress            Progress[]
+  bookmarks           Bookmark[]
+  messages            ChatMessage[]
+  dbSessions          DbSession[]
+  todos               Todo[]
+  hints               Hint[]
+  discussionThreads   DiscussionThread[]
+  discussionComments  DiscussionComment[]
 }
 
 /// System settings for the application
@@ -247,6 +251,35 @@ model Progress {
   @@unique([userId, exerciseId])
 }
 
+/// Todos for users to track their personal tasks
+model Todo {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  title       String
+  description String?
+  completed   Boolean   @default(false)
+  dueDate     DateTime?
+  priority    Int       @default(1) // 1=low, 2=medium, 3=high
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/// Hints from tutors for students
+model Hint {
+  id          Int       @id @default(autoincrement())
+  authorId    Int       // Tutor who created the hint
+  title       String
+  content     String    @db.Text
+  isActive    Boolean   @default(true)
+  targetRole  Role?     // If set, only shown to specific role
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
+
 /// User submission for an exercise
 model Submission {
   id          Int       @id @default(autoincrement())
@@ -259,4 +292,36 @@ model Submission {
 
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   exercise    Exercise  @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+}
+
+/// Discussion threads for Q&A and help
+model DiscussionThread {
+  id          Int       @id @default(autoincrement())
+  title       String    @db.VarChar(200)
+  description String    @db.Text
+  authorId    Int
+  isResolved  Boolean   @default(false)
+  isPinned    Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  author      User                @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  comments    DiscussionComment[]
+
+  @@index([isPinned, createdAt])
+}
+
+/// Comments on discussion threads
+model DiscussionComment {
+  id        Int       @id @default(autoincrement())
+  content   String    @db.Text
+  threadId  Int
+  authorId  Int
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  thread    DiscussionThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  author    User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([threadId, createdAt])
 }

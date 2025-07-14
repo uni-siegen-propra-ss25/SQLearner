@@ -12,6 +12,9 @@ import { SqlEvaluationModule } from './modules/sql-evaluation/sql-evaluation.mod
 import { DockerModule } from './modules/docker/docker.module';
 import { SettingsModule } from './modules/settings/settings.module';
 import { SchemaVisualizationModule } from './modules/schema-visualization/schema-visualization.module';
+import { TodosModule } from './modules/todos/todos.module';
+import { HintsModule } from './modules/hints/hints.module';
+import { DiscussionsModule } from './modules/discussions/discussions.module';
 
 @Module({
     imports: [
@@ -30,6 +33,9 @@ import { SchemaVisualizationModule } from './modules/schema-visualization/schema
         DockerModule,
         SettingsModule,
         SchemaVisualizationModule,
+        TodosModule,
+        HintsModule,
+        DiscussionsModule,
     ],
 })
 export class AppModule {}

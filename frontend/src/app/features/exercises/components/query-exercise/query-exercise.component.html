@@ -52,17 +52,18 @@
       <div class="query-actions">
         <button
           mat-stroked-button
-          [disabled]="!sqlQuery.trim() || isLoading"
+          [disabled]="!sqlQuery.trim() || isLoading || !isContainerReady"
           (click)="runQuery()"
-          matTooltip="Testet deine Query direkt in der Datenbank. Das Ergebnis wird dir sofort angezeigt."
+          [matTooltip]="getQueryButtonTooltip()"
         >
           <mat-icon>play_arrow</mat-icon>
-          Query testen
+          <span *ngIf="isContainerReady">Query testen</span>
+          <span *ngIf="!isContainerReady">Container wird vorbereitet...</span>
         </button>
         <button
           mat-flat-button
           color="primary"
-          [disabled]="!sqlQuery.trim() || isLoading || cooldown > 0"
+          [disabled]="!sqlQuery.trim() || isLoading || cooldown > 0 || !isContainerReady"
           (click)="submitAnswer()"
           matTooltip="Reicht deine Lösung ein. Die KI überprüft, ob deine Query das gewünschte Ergebnis liefert."
         >

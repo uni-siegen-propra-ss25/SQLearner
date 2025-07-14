@@ -23,7 +23,7 @@ export class ChoiceExerciseComponent implements OnInit {
     constructor(
         private submissionService: SubmissionService,
         private snackBar: MatSnackBar,
-        private progressService: ProgressService,
+        private progressService: ProgressService
     ) {}
 
     ngOnInit(): void {
@@ -58,30 +58,32 @@ export class ChoiceExerciseComponent implements OnInit {
         if (this.exercise.type === ExerciseType.SINGLE_CHOICE && this.selectedOptions.length > 1)
             return;
 
-        this.isSubmitting = true; // Sortiere die ausgewählten IDs für konsistente Verarbeitung
+        this.isSubmitting = true;        // Sortiere die ausgewählten IDs für konsistente Verarbeitung
         const sortedOptions = [...this.selectedOptions].sort((a, b) => a - b);
-        this.submissionService.submitAnswer(this.exercise.id, sortedOptions.join(',')).subscribe({
-            next: (submission) => {
-                this.isSubmitting = false;
-                this.isAnswered = true;
-                this.isCorrectAnswer = submission.isCorrect;
-                if (submission.isCorrect) {
-                    this.completed.emit(this.exercise.id);
-                    // Record completion through the progress service
-                    this.progressService.recordCompletion(this.exercise.id);
-                }
-
-                const message = submission.feedback || 'Answer submitted successfully';
-                this.snackBar.open(message, 'Close', {
-                    duration: 4000,
-                });
-            },
-            error: (error) => {
-                this.isSubmitting = false;
-                this.snackBar.open(error.message || 'Failed to submit answer', 'Close', {
-                    duration: 3000,
-                });
-            },
-        });
+        this.submissionService
+            .submitAnswer(this.exercise.id, sortedOptions.join(','))
+            .subscribe({
+                next: (submission) => {
+                    this.isSubmitting = false;
+                    this.isAnswered = true;
+                    this.isCorrectAnswer = submission.isCorrect;
+                    if (submission.isCorrect) {
+                        this.completed.emit(this.exercise.id);
+                        // Record completion through the progress service
+                        this.progressService.recordCompletion(this.exercise.id);
+                    }
+                    
+                    const message = submission.feedback || 'Answer submitted successfully';
+                    this.snackBar.open(message, 'Close', {
+                        duration: 4000,
+                    });
+                },
+                error: (error) => {
+                    this.isSubmitting = false;
+                    this.snackBar.open(error.message || 'Failed to submit answer', 'Close', {
+                        duration: 3000,
+                    });
+                },
+            });
     }
 }

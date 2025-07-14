@@ -68,6 +68,30 @@ export class SqlEditorComponent implements OnInit, OnDestroy, OnChanges {
     private destroy$ = new Subject<void>();
     private editorInitialized = false;
 
+    /**
+     * Flag to track if editor initialization is in progress
+     */
+    private isInitializing = false;
+
+    /**
+     * Debounced content change handler to improve performance
+     */
+    private contentChangeHandler = this.debounce((value: string) => {
+        this.valueChange.emit(value);
+        this.updateEditorMarkers();
+    }, 300);
+
+    /**
+     * Debounce utility for performance optimization
+     */
+    private debounce<T extends (...args: any[]) => void>(func: T, delay: number): (...args: Parameters<T>) => void {
+        let timeoutId: any;
+        return (...args: Parameters<T>) => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => func(...args), delay);
+        };
+    }
+
     constructor(private monacoEditorService: MonacoEditorService) {}
 
     async ngOnInit() {
@@ -86,10 +110,17 @@ export class SqlEditorComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     private async initEditor() {
+        // Prevent multiple initializations
+        if (this.isInitializing || this.editorInitialized) {
+            return;
+        }
+
         if (!this.editorContainer?.nativeElement) {
             console.error('Editor container element not found');
             return;
         }
+
+        this.isInitializing = true;
 
         try {
             await this.monacoEditorService.initMonaco(); // Make sure Monaco is initialized first
@@ -112,35 +143,36 @@ export class SqlEditorComponent implements OnInit, OnDestroy, OnChanges {
                 },
             );
 
-            // Create a new model for the editor if it doesn't exist
-            if (!this.editor.getModel()) {
+            // Use existing model or create once
+            const existingModel = this.editor.getModel();
+            if (!existingModel) {
                 const model = monaco.editor.createModel(this.initialValue, 'sql');
                 this.editor.setModel(model);
             }
 
-            this.monacoEditorService.registerSqlLanguageFeatures((word, range) =>
-                this.getSuggestions(word, range),
-            );
+            // Language features are automatically set up by the service
 
             this.editor.onDidChangeModelContent(() => {
                 const value = this.editor?.getValue() || '';
-                this.valueChange.emit(value);
-                this.updateEditorMarkers();
+                this.contentChangeHandler(value);
             });
 
-            // Handle window resize
-            window.addEventListener('resize', () => this.layout());
+            // Handle window resize with debounce
+            const resizeHandler = this.debounce(() => this.layout(), 250);
+            window.addEventListener('resize', resizeHandler);
 
             this.editorInitialized = true;
             this.editorReady.emit();
         } catch (error) {
             console.error('Failed to initialize SQL Editor:', error);
+        } finally {
+            this.isInitializing = false;
         }
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        // React to schema changes
-        if (changes['schema'] && !changes['schema'].firstChange) {
+        // React to schema changes only if editor is initialized
+        if (changes['schema'] && !changes['schema'].firstChange && this.editorInitialized) {
             const newSchema = changes['schema'].currentValue;
             if (newSchema) {
                 this.parseSchema(newSchema);
@@ -148,6 +180,21 @@ export class SqlEditorComponent implements OnInit, OnDestroy, OnChanges {
                 // Clear tables and columns if schema is empty
                 this.tables = [];
                 this.columns = [];
+            }
+        }
+
+        // React to theme changes
+        if (changes['theme'] && !changes['theme'].firstChange && this.editorInitialized) {
+            const isDark = changes['theme'].currentValue === 'dark';
+            this.monacoEditorService.setTheme(isDark);
+        }
+
+        // React to value changes (avoid infinite loops)
+        if (changes['initialValue'] && !changes['initialValue'].firstChange && this.editor) {
+            const newValue = changes['initialValue'].currentValue;
+            const currentValue = this.editor.getValue();
+            if (newValue !== currentValue) {
+                this.editor.setValue(newValue || '');
             }
         }
     }
