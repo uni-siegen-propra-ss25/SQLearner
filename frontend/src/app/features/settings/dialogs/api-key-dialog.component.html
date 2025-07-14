@@ -1,0 +1,27 @@
+<h2 mat-dialog-title>{{ getDialogTitle() }}</h2>
+<form [formGroup]="form" (ngSubmit)="save()">
+    <mat-dialog-content>
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ 'SETTINGS.API_KEY_LABEL' | translate }}</mat-label>
+            <input
+                matInput
+                formControlName="apiKey"
+                type="password"
+                autocomplete="off"
+                [placeholder]="'SETTINGS.API_KEY_PLACEHOLDER' | translate"
+            />
+            <mat-error *ngIf="form.get('apiKey')?.hasError('required')">
+                {{ 'SETTINGS.API_KEY_REQUIRED' | translate }}
+            </mat-error>
+            <mat-error *ngIf="form.get('apiKey')?.hasError('pattern')">
+                {{ 'SETTINGS.API_KEY_PATTERN' | translate }}
+            </mat-error>
+        </mat-form-field>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+        <button mat-button type="button" (click)="cancel()">{{ 'SETTINGS.CANCEL' | translate }}</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
+            {{ 'SETTINGS.SAVE' | translate }}
+        </button>
+    </mat-dialog-actions>
+</form>

@@ -10,7 +10,9 @@
     <!-- Widgets Grid -->
     <div class="widgets-grid">
         <!-- Hints Widget -->
-        <app-hints-widget [canManage]="canManageHints()"></app-hints-widget>
+        <app-hints-widget 
+            [canManage]="canManageHints()"
+            [currentUserId]="currentUser?.id || null"></app-hints-widget>
         
         <!-- Todo Widget -->
         <app-todo-widget [isAdmin]="canManageTodos()"></app-todo-widget>

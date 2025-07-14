@@ -7,7 +7,7 @@
             {{ 'DASHBOARD.DISCUSSIONS' | translate }}
             <span *ngIf="selectedThread && isThreadResolved()" class="resolved-badge">
                 <mat-icon>check_circle</mat-icon>
-                Gelöst
+                {{ 'DASHBOARD.RESOLVED' | translate }}
             </span>
         </h3>
         <mat-icon class="expand-icon" [class.rotated]="isChatExpanded">expand_more</mat-icon>
@@ -21,7 +21,7 @@
             <div class="thread-controls">
                 <button mat-stroked-button (click)="showCreateThreadForm()" class="create-thread-btn">
                     <mat-icon>add</mat-icon>
-                    Neue Frage stellen
+                    {{ 'DASHBOARD.NEW_QUESTION' | translate }}
                 </button>
             </div>
         </div>
@@ -30,26 +30,26 @@
         <div class="create-thread-form" *ngIf="showCreateThread">
             <mat-card>
                 <mat-card-header>
-                    <mat-card-title>Neue Frage stellen</mat-card-title>
+                    <mat-card-title>{{ 'DASHBOARD.NEW_QUESTION' | translate }}</mat-card-title>
                 </mat-card-header>
                 <mat-card-content>
                     <mat-form-field appearance="outline" class="full-width">
-                        <mat-label>Titel</mat-label>
-                        <input matInput [(ngModel)]="newThreadTitle" placeholder="Geben Sie einen aussagekräftigen Titel ein">
+                        <mat-label>{{ 'DASHBOARD.TITLE' | translate }}</mat-label>
+                        <input matInput [(ngModel)]="newThreadTitle" placeholder="{{ 'DASHBOARD.TITLE_PLACEHOLDER' | translate }}">
                     </mat-form-field>
                     
                     <mat-form-field appearance="outline" class="full-width">
-                        <mat-label>Beschreibung</mat-label>
+                        <mat-label>{{ 'DASHBOARD.DESCRIPTION' | translate }}</mat-label>
                         <textarea matInput [(ngModel)]="newThreadDescription" 
-                                  rows="3" placeholder="Beschreiben Sie Ihr Problem detailliert"></textarea>
+                                  rows="3" placeholder="{{ 'DASHBOARD.DESCRIPTION_PLACEHOLDER' | translate }}"></textarea>
                     </mat-form-field>
                 </mat-card-content>
                 <mat-card-actions>
-                    <button mat-button (click)="hideCreateThreadForm()">Abbrechen</button>
+                    <button mat-button (click)="hideCreateThreadForm()">{{ 'DASHBOARD.CANCEL' | translate }}</button>
                     <button mat-raised-button color="primary" 
                             (click)="createNewThread()" 
                             [disabled]="!newThreadTitle.trim() || !newThreadDescription.trim()">
-                        Frage stellen
+                        {{ 'DASHBOARD.ASK_QUESTION' | translate }}
                     </button>
                 </mat-card-actions>
             </mat-card>
@@ -65,18 +65,18 @@
                 <div class="thread-stats">
                     <div class="stat">
                         <span class="stat-number">{{ thread.commentsCount || 0 }}</span>
-                        <span class="stat-label">Antworten</span>
+                        <span class="stat-label">{{ getAnswersCountText(thread.commentsCount || 0) }}</span>
                     </div>
                     <div class="stat votes" *ngIf="thread.isPinned">
                         <mat-icon class="pinned-icon">push_pin</mat-icon>
-                        <span class="stat-label">Angepinnt</span>
+                        <span class="stat-label">{{ 'DASHBOARD.PINNED' | translate }}</span>
                     </div>
                 </div>
 
                 <div class="thread-content" (click)="selectThread(thread)">
                     <h3 class="thread-title">
                         {{ thread.title }}
-                        <mat-icon *ngIf="thread.isResolved" class="resolved-icon" matTooltip="Gelöst">
+                        <mat-icon *ngIf="thread.isResolved" class="resolved-icon" matTooltip="{{ 'DASHBOARD.RESOLVED' | translate }}">
                             check_circle
                         </mat-icon>
                     </h3>
@@ -84,7 +84,7 @@
                     
                     <div class="thread-meta">
                         <span class="thread-author">
-                            Gefragt von 
+                            {{ 'DASHBOARD.ASKED_BY' | translate }}
                             <strong>{{ thread.createdByName }}</strong>
                             <span class="role-badge" 
                                   [class]="'role-' + (thread.createdByRole || 'student').toLowerCase()">
@@ -100,7 +100,7 @@
                     <button mat-icon-button 
                             *ngIf="canResolveThread(thread) && !thread.isResolved" 
                             (click)="markThreadAsResolved(thread)"
-                            matTooltip="Als gelöst markieren"
+                            matTooltip="{{ 'DASHBOARD.MARK_RESOLVED' | translate }}"
                             class="action-btn resolve-btn">
                         <mat-icon>check_circle_outline</mat-icon>
                     </button>
@@ -108,7 +108,7 @@
                     <button mat-icon-button 
                             *ngIf="canPinThread()" 
                             (click)="toggleThreadPinFromList(thread)"
-                            [matTooltip]="thread.isPinned ? 'Anheftung entfernen' : 'Anheften'"
+                            [matTooltip]="thread.isPinned ? ('DASHBOARD.UNPIN' | translate) : ('DASHBOARD.PIN' | translate)"
                             [class.active]="thread.isPinned"
                             class="action-btn pin-btn">
                         <mat-icon>push_pin</mat-icon>
@@ -117,7 +117,7 @@
                     <button mat-icon-button 
                             *ngIf="canDeleteThread(thread)" 
                             (click)="deleteThread(thread)"
-                            matTooltip="Frage löschen"
+                            matTooltip="{{ 'DASHBOARD.DELETE_QUESTION' | translate }}"
                             class="action-btn delete-btn">
                         <mat-icon>delete</mat-icon>
                     </button>
@@ -126,9 +126,9 @@
 
             <div class="no-threads" *ngIf="discussionThreads.length === 0">
                 <mat-icon>help_outline</mat-icon>
-                <p>Noch keine Fragen vorhanden.</p>
+                <p>{{ 'DASHBOARD.NO_QUESTIONS' | translate }}</p>
                 <button mat-raised-button color="primary" (click)="showCreateThreadForm()">
-                    Erste Frage stellen
+                    {{ 'DASHBOARD.FIRST_QUESTION' | translate }}
                 </button>
             </div>
         </div>
@@ -143,13 +143,13 @@
                 <div class="thread-title-section">
                     <h3 class="thread-title">
                         {{ selectedThread.title }}
-                        <mat-icon *ngIf="selectedThread.isResolved" class="resolved-icon" matTooltip="Gelöst">
+                        <mat-icon *ngIf="selectedThread.isResolved" class="resolved-icon" [matTooltip]="'DASHBOARD.RESOLVED' | translate">>
                             check_circle
                         </mat-icon>
                     </h3>
                     <div class="thread-meta">
                         <span class="thread-author">
-                            Gefragt von 
+                            {{ 'DASHBOARD.ASKED_BY' | translate }}
                             <strong>{{ selectedThread.createdByName }}</strong>
                             <span class="role-badge" 
                                   [class]="'role-' + (selectedThread.createdByRole || 'student').toLowerCase()">
@@ -165,14 +165,14 @@
                     <button mat-icon-button 
                             *ngIf="canResolveThread() && !isThreadResolved()" 
                             (click)="markThreadAsResolved()"
-                            matTooltip="Als gelöst markieren">
+                            matTooltip="{{ 'DASHBOARD.MARK_RESOLVED' | translate }}">
                         <mat-icon>check_circle_outline</mat-icon>
                     </button>
                     
                     <button mat-icon-button 
                             *ngIf="canPinThread()" 
                             (click)="toggleThreadPin()"
-                            [matTooltip]="isThreadPinned() ? 'Anheftung entfernen' : 'Anheften'">
+                            [matTooltip]="isThreadPinned() ? ('DASHBOARD.UNPIN' | translate) : ('DASHBOARD.PIN' | translate)">
                         <mat-icon [color]="isThreadPinned() ? 'warn' : 'primary'">
                             push_pin
                         </mat-icon>
@@ -181,7 +181,7 @@
                     <button mat-icon-button 
                             *ngIf="canDeleteThread(selectedThread)" 
                             (click)="deleteThread()"
-                            matTooltip="Frage löschen"
+                            matTooltip="{{ 'DASHBOARD.DELETE_QUESTION' | translate }}"
                             color="warn">
                         <mat-icon>delete</mat-icon>
                     </button>
@@ -196,7 +196,7 @@
             <!-- Chat Messages (Answers) -->
             <div class="answers-section">
                 <h4 class="answers-title" *ngIf="chatMessages.length > 0">
-                    {{ chatMessages.length }} {{ chatMessages.length === 1 ? 'Antwort' : 'Antworten' }}
+                    {{ getAnswersCountText(chatMessages.length) }}
                 </h4>
                 
                 <div class="chat-messages">
@@ -211,7 +211,7 @@
                                 <span class="role-badge" [class]="'role-' + message.type">
                                     {{ message.type.toUpperCase() }}
                                 </span>
-                                <mat-icon *ngIf="message.isThreadCreator" class="creator-icon" matTooltip="Fragesteller">
+                                <mat-icon *ngIf="message.isThreadCreator" class="creator-icon" [matTooltip]="'DASHBOARD.QUESTION_CREATOR' | translate">>
                                     star
                                 </mat-icon>
                             </div>
@@ -222,35 +222,34 @@
                     
                     <div class="no-answers" *ngIf="chatMessages.length === 0">
                         <mat-icon>question_answer</mat-icon>
-                        <p>Noch keine Antworten vorhanden.</p>
-                        <p class="hint">Sei der Erste, der eine Antwort gibt!</p>
+                        <p>{{ 'DASHBOARD.NO_COMMENTS' | translate }}</p>
                     </div>
                 </div>
             </div>
         
             <!-- Answer Input -->
             <div class="answer-input" *ngIf="!isThreadResolved()">
-                <h4 class="input-title">Deine Antwort</h4>
+                <h4 class="input-title">{{ 'DASHBOARD.YOUR_ANSWER' | translate }}</h4>
                 <mat-form-field appearance="outline" class="message-field">
-                    <mat-label>Antwort schreiben...</mat-label>
+                    <mat-label>{{ 'DASHBOARD.TYPE_MESSAGE' | translate }}</mat-label>
                     <textarea matInput [(ngModel)]="newChatMessage" 
                               rows="3"
                               (keydown.ctrl.enter)="sendChatMessage()"
-                              placeholder="Schreibe eine hilfreiche Antwort..."></textarea>
+                              placeholder="{{ 'DASHBOARD.WRITE_HELPFUL_ANSWER' | translate }}"></textarea>
                 </mat-form-field>
                 <div class="input-actions">
                     <button mat-raised-button color="primary" 
                             (click)="sendChatMessage()" 
                             [disabled]="!newChatMessage.trim()" 
                             class="send-btn">
-                        Antwort posten
+                        {{ 'DASHBOARD.POST_ANSWER' | translate }}
                     </button>
                 </div>
             </div>
 
             <div class="thread-resolved-notice" *ngIf="isThreadResolved()">
                 <mat-icon>check_circle</mat-icon>
-                <span>Diese Frage wurde als gelöst markiert. Neue Antworten sind nicht mehr möglich.</span>
+                <span>{{ 'DASHBOARD.THREAD_RESOLVED_NOTICE' | translate }}</span>
             </div>
         </div>
     </div>

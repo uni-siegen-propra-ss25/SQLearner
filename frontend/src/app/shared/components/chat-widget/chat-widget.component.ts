@@ -2,6 +2,7 @@ import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { DiscussionService, DiscussionThread, DiscussionComment, CreateThreadDto, CreateCommentDto, BackendThreadResponse } from '../../services/discussion.service';
 import { Role } from '../../../features/users/models/role.model';
 import { Subject, takeUntil } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
 
 /**
  * Interface representing a chat message for the UI
@@ -64,7 +65,7 @@ export class ChatWidgetComponent implements OnInit, OnDestroy {
     /** Subject for handling component destruction */
     private destroy$ = new Subject<void>();
 
-    constructor(private discussionService: DiscussionService) {}
+    constructor(private discussionService: DiscussionService, private translate: TranslateService) {}
 
     ngOnInit(): void {
         this.loadDiscussionThreads();
@@ -580,5 +581,18 @@ export class ChatWidgetComponent implements OnInit, OnDestroy {
                     console.error('Error toggling thread pin from list:', error);
                 }
             });
+    }
+
+    /**
+     * Gets the localized text for answer count
+     * @param count The number of answers
+     * @returns Localized text for answer count
+     */
+    getAnswersCountText(count: number): string {
+        if (count === 1) {
+            return this.translate.instant('DASHBOARD.ANSWER_COUNT_SINGLE');
+        } else {
+            return this.translate.instant('DASHBOARD.ANSWER_COUNT_PLURAL', { count });
+        }
     }
 }

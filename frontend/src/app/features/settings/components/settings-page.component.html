@@ -1,0 +1,16 @@
+<div class="settings-container">
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title>{{ 'SETTINGS.TITLE' | translate }}</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <section>
+                <h3>{{ 'SETTINGS.OPENAI_SECTION' | translate }}</h3>
+                <p>{{ 'SETTINGS.OPENAI_DESCRIPTION' | translate }}</p>
+                <button mat-raised-button color="primary" (click)="openApiKeyDialog()">
+                    {{ hasApiKey ? ('SETTINGS.CHANGE_API_KEY' | translate) : ('SETTINGS.ADD_API_KEY' | translate) }}
+                </button>
+            </section>
+        </mat-card-content>
+    </mat-card>
+</div>

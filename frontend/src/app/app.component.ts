@@ -46,14 +46,14 @@ export class AppComponent implements OnInit, OnDestroy {
         },
         {
             icon: 'settings',
-            label: 'SETTINGS',
+            label: 'SETTINGS_NAV',
             route: '/settings',
             requiredRoles: [Role.ADMIN],
         },
     ];
 
     private readonly commonItems: NavigationItem[] = [
-        { icon: 'home', label: 'Dashboard', route: '/landing' },
+        { icon: 'home', label: 'DASHBOARD_NAV', route: '/landing' },
     ];
 
     constructor(

@@ -3,46 +3,12 @@ import { MatDialog } from '@angular/material/dialog';
 import { ApiKeyDialogComponent } from '../dialogs/api-key-dialog.component';
 import { SettingsService } from '../services/settings.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-settings-page',
-    template: `
-        <div class="settings-container">
-            <mat-card>
-                <mat-card-header>
-                    <mat-card-title>Systemeinstellungen</mat-card-title>
-                </mat-card-header>
-                <mat-card-content>
-                    <section>
-                        <h3>OpenAI API-Key</h3>
-                        <p>API-Key für die KI-Funktionalitäten des Systems.</p>
-                        <button mat-raised-button color="primary" (click)="openApiKeyDialog()">
-                            {{ hasApiKey ? 'API-Key ändern' : 'API-Key hinzufügen' }}
-                        </button>
-                    </section>
-                </mat-card-content>
-            </mat-card>
-        </div>
-    `,
-    styles: [
-        `
-            .settings-container {
-                padding: 2rem;
-                max-width: 800px;
-                margin: 0 auto;
-            }
-            section {
-                margin: 1.5rem 0;
-            }
-            h3 {
-                margin-bottom: 0.5rem;
-            }
-            p {
-                color: rgba(0, 0, 0, 0.6);
-                margin-bottom: 1rem;
-            }
-        `,
-    ],
+    templateUrl: './settings-page.component.html',
+    styleUrls: ['./settings-page.component.scss'],
 })
 export class SettingsPageComponent implements OnInit {
     hasApiKey = false;
@@ -51,6 +17,7 @@ export class SettingsPageComponent implements OnInit {
         private dialog: MatDialog,
         private settingsService: SettingsService,
         private snackBar: MatSnackBar,
+        private translate: TranslateService,
     ) {}
 
     ngOnInit() {
@@ -80,15 +47,19 @@ export class SettingsPageComponent implements OnInit {
                     if (result) {
                         this.settingsService.setSetting('OPENAI_API_KEY', result).subscribe({
                             next: () => {
-                                this.snackBar.open('API-Key erfolgreich gespeichert', 'OK', {
-                                    duration: 3000,
-                                });
+                                this.snackBar.open(
+                                    this.translate.instant('SETTINGS.API_KEY_SAVED'), 
+                                    'OK', 
+                                    { duration: 3000 }
+                                );
                                 this.checkApiKey();
                             },
                             error: () => {
-                                this.snackBar.open('Fehler beim Speichern des API-Keys', 'OK', {
-                                    duration: 3000,
-                                });
+                                this.snackBar.open(
+                                    this.translate.instant('SETTINGS.API_KEY_ERROR'), 
+                                    'OK', 
+                                    { duration: 3000 }
+                                );
                             },
                         });
                     }

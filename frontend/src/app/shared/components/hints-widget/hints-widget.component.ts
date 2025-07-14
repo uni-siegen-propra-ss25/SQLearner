@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { HintService, Hint, CreateHintDto, Role } from '../../services/hint.service';
 
 /**
@@ -14,6 +15,9 @@ export class HintsWidgetComponent implements OnInit {
     /** Whether the current user can manage hints (tutor/admin privileges) */
     @Input() canManage = false;
     
+    /** Current user's ID to check ownership of hints */
+    @Input() currentUserId: number | null = null;
+    
     /** Array of hints to display */
     hints: Hint[] = [];
     
@@ -28,12 +32,15 @@ export class HintsWidgetComponent implements OnInit {
     
     /** Available role options for hint targeting */
     roleOptions = [
-        { value: "all", label: 'Alle' },
-        { value: Role.STUDENT, label: 'Nur Studenten' },
-        { value: Role.TUTOR, label: 'Nur Tutoren' },
+        { value: "all", label: 'DASHBOARD.ROLE_ALL' },
+        { value: Role.STUDENT, label: 'DASHBOARD.ROLE_STUDENTS' },
+        { value: Role.TUTOR, label: 'DASHBOARD.ROLE_TUTORS' },
     ];
 
-    constructor(private hintService: HintService) {}
+    constructor(
+        private hintService: HintService,
+        private translate: TranslateService
+    ) {}
 
     ngOnInit(): void {
         this.loadHints();
@@ -63,9 +70,9 @@ export class HintsWidgetComponent implements OnInit {
         const content = this.newHintContent.trim();
         
         if (title && content) {
-            // Convert string to Role enum or undefined
+            // Convert string to Role enum or undefined for "all"
             let targetRole: Role | undefined = undefined;
-            if (this.newHintTargetRole && this.newHintTargetRole !== null) {
+            if (this.newHintTargetRole && this.newHintTargetRole !== "all") {
                 targetRole = this.newHintTargetRole as Role;
             }
             
@@ -85,17 +92,23 @@ export class HintsWidgetComponent implements OnInit {
     }
 
     /**
-     * Removes a hint from the system (only for users with manage permissions)
+     * Removes a hint from the system
+     * Authors can delete their own hints, other users can mark hints as "done" (client-side removal)
      * @param index Index of the hint to remove
      */
     removeHint(index: number): void {
-        if (!this.canManage) return;
-        
         const hint = this.hints[index];
-        if (hint.id) {
-            this.hintService.deleteHint(hint.id).subscribe(() => {
-                this.hints.splice(index, 1);
-            });
+        
+        if (this.isAuthor(hint)) {
+            // Author can delete the hint permanently
+            if (hint.id) {
+                this.hintService.deleteHint(hint.id).subscribe(() => {
+                    this.hints.splice(index, 1);
+                });
+            }
+        } else {
+            // Other users can just hide the hint locally (mark as "done")
+            this.hints.splice(index, 1);
         }
     }
 
@@ -118,12 +131,12 @@ export class HintsWidgetComponent implements OnInit {
      * @returns Localized role label
      */
     getRoleLabel(role: Role | null): string {
-        if (!role) return 'Alle';
+        if (!role) return this.translate.instant('DASHBOARD.ROLE_ALL');
         switch (role) {
-            case Role.STUDENT: return 'Studenten';
-            case Role.TUTOR: return 'Tutoren';
-            case Role.ADMIN: return 'Admins';
-            default: return 'Unbekannt';
+            case Role.STUDENT: return this.translate.instant('DASHBOARD.ROLE_STUDENTS');
+            case Role.TUTOR: return this.translate.instant('DASHBOARD.ROLE_TUTORS');
+            case Role.ADMIN: return this.translate.instant('DASHBOARD.ROLE_ADMINS');
+            default: return this.translate.instant('DASHBOARD.AUTHOR_UNKNOWN');
         }
     }
 
@@ -136,6 +149,15 @@ export class HintsWidgetComponent implements OnInit {
         if (hint.author) {
             return `${hint.author.firstName} ${hint.author.lastName}`;
         }
-        return 'Unbekannt';
+        return this.translate.instant('DASHBOARD.AUTHOR_UNKNOWN');
+    }
+
+    /**
+     * Checks if the current user is the author of a hint
+     * @param hint The hint to check
+     * @returns true if the current user is the author, false otherwise
+     */
+    isAuthor(hint: Hint): boolean {
+        return this.currentUserId !== null && hint.authorId === this.currentUserId;
     }
 }
