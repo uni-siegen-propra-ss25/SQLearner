@@ -317,7 +317,11 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
                 this.queryResult = result;
                 this.isLoading = false;
                 this.currentView = 'result';
-                this.queryError = null; // Clear error on success
+                if (result.error) {
+                    this.queryError = result.error;
+                } else {
+                    this.queryError = null;
+                }
             },
             error: (error: any) => {
                 this.isLoading = false;

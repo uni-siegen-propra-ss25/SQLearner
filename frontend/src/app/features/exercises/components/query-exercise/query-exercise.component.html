@@ -106,7 +106,7 @@
 
       <!-- Results View: shows the query result table or loading/empty state -->
       <div class="results-view" *ngIf="currentView === 'result'">
-        <div class="results-section" *ngIf="queryResult || isLoading">
+        <div class="results-section" *ngIf="queryResult || isLoading || queryError">
           <h3>
             <mat-icon>table_chart</mat-icon>
             {{ isLoading ? 'Query wird ausgeführt...' : 'Ergebnis deiner Query' }}
@@ -115,8 +115,10 @@
           <!-- Progress bar shown while loading -->
           <mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
 
-          <!-- Query results table -->
-          <div class="results-table" *ngIf="!isLoading && queryResult">
+          
+
+          <!-- Table only if no error -->
+          <div class="results-table" *ngIf="!isLoading && queryResult && !queryError">
             <div class="table-stats">
               {{ queryResult.rows.length }} Zeile{{ queryResult.rows.length !== 1 ? 'n' : '' }}
               gefunden
@@ -147,11 +149,6 @@
               >
               </mat-paginator>
             </div>
-          </div>
-          <!-- Show query error below the table if present -->
-          <div class="query-error" *ngIf="queryError">
-            <mat-icon color="warn">error</mat-icon>
-            <span>{{ queryError }}</span>
           </div>
         </div>
 

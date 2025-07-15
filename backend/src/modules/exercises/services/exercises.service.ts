@@ -262,7 +262,7 @@ export class ExercisesService {
         id: number,
         query: string,
         connectionDetails?: { host: string; port: number },
-    ): Promise<{ columns: string[]; rows: any[] }> {
+    ): Promise<{ columns: string[]; rows: any[]; error?: string }> {
         console.log('=== DEBUG: ExercisesService.runQuery ===');
         console.log('Exercise ID:', id);
         console.log('Query:', query);
@@ -319,6 +319,7 @@ export class ExercisesService {
             return {
                 columns: columns,
                 rows: result.rows || [],
+                error: result.error, 
             };
         }
 
