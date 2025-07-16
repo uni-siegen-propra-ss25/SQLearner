@@ -1,0 +1,96 @@
+<div class="data-edit-dialog">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon>{{ mode === 'add' ? 'add' : 'edit' }}</mat-icon>
+      {{ mode === 'add' ? 'Datensatz hinzufügen' : 'Datensatz bearbeiten' }}
+    </h2>
+    <button mat-icon-button mat-dialog-close>
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content>
+    <div class="table-info">
+      <p><strong>Tabelle:</strong> {{ tableName }}</p>
+    </div>
+
+    <form [formGroup]="form" class="data-form">
+      <div class="form-row" *ngFor="let column of columns">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>
+            {{ column.name }}
+            <span class="required" *ngIf="isFieldRequired(column)">*</span>
+          </mat-label>
+
+          <!-- Text/Number input -->
+          <input
+            *ngIf="getFieldType(column) === 'text' || getFieldType(column) === 'number'"
+            matInput
+            [formControlName]="column.name"
+            [type]="getFieldType(column)"
+            [placeholder]="getPlaceholder(column)"
+            [disabled]="isFieldDisabled(column)"
+          />
+
+          <!-- Date/Time input -->
+          <input
+            *ngIf="getFieldType(column) === 'datetime-local'"
+            matInput
+            [formControlName]="column.name"
+            type="datetime-local"
+            [placeholder]="getPlaceholder(column)"
+            [disabled]="isFieldDisabled(column)"
+          />
+
+          <!-- Checkbox for boolean -->
+          <mat-checkbox
+            *ngIf="getFieldType(column) === 'checkbox'"
+            [formControlName]="column.name"
+            [disabled]="isFieldDisabled(column)"
+            class="checkbox-field"
+          >
+            {{ column.name }}
+          </mat-checkbox>
+
+          <!-- Textarea for long text -->
+          <textarea
+            *ngIf="column.type.includes('text') && !column.type.includes('varchar')"
+            matInput
+            [formControlName]="column.name"
+            [placeholder]="getPlaceholder(column)"
+            [disabled]="isFieldDisabled(column)"
+            rows="3"
+          >
+          </textarea>
+
+          <mat-error *ngIf="form.get(column.name)?.invalid && form.get(column.name)?.touched">
+            {{ getErrorMessage(column.name) }}
+          </mat-error>
+
+          <mat-hint *ngIf="column.type">
+            Typ: {{ column.type }}
+            <span *ngIf="column.isPrimaryKey"> (Primärschlüssel)</span>
+            <span *ngIf="!column.isNullable"> (Erforderlich)</span>
+          </mat-hint>
+        </mat-form-field>
+      </div>
+    </form>
+
+    <div class="form-errors" *ngIf="form.invalid && form.touched">
+      <mat-error> Bitte korrigieren Sie die Fehler im Formular. </mat-error>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()" [disabled]="isLoading">Abbrechen</button>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="onSubmit()"
+      [disabled]="form.invalid || isLoading"
+    >
+      <mat-spinner diameter="20" *ngIf="isLoading"></mat-spinner>
+      <span *ngIf="!isLoading">{{ mode === 'add' ? 'Hinzufügen' : 'Speichern' }}</span>
+    </button>
+  </mat-dialog-actions>
+</div>

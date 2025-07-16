@@ -17,7 +17,7 @@
           mat-icon-button
           color="primary"
           (click)="$event.stopPropagation(); edit.emit(chapter)"
-          matTooltip="Edit chapter"
+          matTooltip="{{ 'EDIT_CHAPTER' | translate }}"
         >
           <mat-icon>edit</mat-icon>
         </button>
@@ -25,7 +25,7 @@
           mat-icon-button
           color="warn"
           (click)="$event.stopPropagation(); delete.emit(chapter.id)"
-          matTooltip="Delete chapter"
+          matTooltip="{{ 'DELETE_CHAPTER' | translate }}"
         >
           <mat-icon>delete</mat-icon>
         </button>
@@ -44,16 +44,18 @@
       [topic]="topic"
       [isTutor]="isTutor"
       [bookmarkedExerciseIds]="bookmarkedExerciseIds"
+      [completedExerciseIds]="completedExerciseIds"
       (edit)="onTopicEdit($event)"
       (delete)="onTopicDelete($event)"
       (bookmarkToggled)="onBookmarkToggled($event)"
+      (exerciseCompleted)="onExerciseCompleted($event)"
     >
     </app-topic-card>
 
     <!-- Empty state when no topics exist -->
     <div *ngIf="topics.length === 0" class="empty-topics">
       <mat-icon>subject</mat-icon>
-      <p>No topics available in this chapter.</p>
+      <p>{{ 'ROADMAP_PAGE.NO_TOPICS' | translate }}</p>
     </div>
 
     <!-- Add topic button for tutors -->
@@ -65,7 +67,7 @@
       (click)="openNewTopicDialog()"
     >
       <mat-icon>add</mat-icon>
-      Add Topic
+      {{ 'ROADMAP_PAGE.ADD_TOPIC' | translate }}
     </button>
   </div>
 </mat-expansion-panel>

@@ -5,6 +5,23 @@
     <mat-panel-title>
       <!-- Topic title display -->
       <div class="topic-title">{{ topic.title }}</div>
+      <span class="topic-progress" *ngIf="exercises.length > 0 && !isTutor">
+        {{ getCompletedCount() }}/{{ exercises.length }} {{ 'COMPLETED' | translate }}
+        <mat-progress-bar
+          *ngIf="exercises.length > 0"
+          class="topic-progress-bar"
+          mode="determinate"
+          [value]="(getCompletedCount() / exercises.length) * 100"
+          color="primary"
+          style="
+            margin-top: 4px;
+            min-width: 120px;
+            max-width: 200px;
+            height: 8px;
+            border-radius: 4px;
+          "
+        ></mat-progress-bar>
+      </span>
     </mat-panel-title>
     <mat-panel-description>
       <!-- Edit and delete buttons for tutors only -->
@@ -14,7 +31,7 @@
           mat-icon-button
           color="primary"
           (click)="$event.stopPropagation(); edit.emit(topic)"
-          matTooltip="Edit topic"
+          matTooltip="{{ 'EDIT_TOPIC' | translate }}"
         >
           <mat-icon>edit</mat-icon>
         </button>
@@ -23,7 +40,7 @@
           mat-icon-button
           color="warn"
           (click)="$event.stopPropagation(); delete.emit(topic.id)"
-          matTooltip="Delete topic"
+          matTooltip="{{ 'DELETE_TOPIC' | translate }}"
         >
           <mat-icon>delete</mat-icon>
         </button>
@@ -38,36 +55,40 @@
   <div class="exercises-container">
     <!-- Loading indicator while exercises are being fetched -->
     <mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
-    
+
     <!-- Exercise cards with bookmark functionality -->
-    <app-exercise-card
-      *ngFor="let exercise of exercises"
-      [exercise]="exercise"
-      [isTutor]="isTutor"
-      [isBookmarked]="isExerciseBookmarked(exercise.id)"
-      (edit)="onExerciseEdit($event)"
-      (delete)="onExerciseDelete($event)"
-      (bookmarkToggled)="onBookmarkToggled($event)"
-    >
-    </app-exercise-card>
-    
-    <!-- Empty state when no exercises exist -->
-    <div *ngIf="!isLoading && exercises.length === 0" class="empty-exercises">
-      <mat-icon>assignment</mat-icon>
-      <p>No exercises available in this topic.</p>
+    <div class="exercises-list">
+      <app-exercise-card
+        *ngFor="let exercise of exercises"
+        [exercise]="exercise"
+        [isTutor]="isTutor"
+        [isBookmarked]="isExerciseBookmarked(exercise.id!)"
+        [isCompleted]="isExerciseCompleted(exercise.id!)"
+        (edit)="onExerciseEdit($event)"
+        (delete)="onExerciseDelete($event)"
+        (bookmarkToggled)="onBookmarkToggled($event)"
+        (completed)="onExerciseCompleted($event)"
+      >
+      </app-exercise-card>
+
+      <!-- Empty state when no exercises exist -->
+      <div *ngIf="!isLoading && exercises.length === 0" class="empty-exercises">
+        <mat-icon>assignment</mat-icon>
+        <p>{{ 'ROADMAP_PAGE.NO_EXERCISES' | translate }}</p>
+      </div>
+
+      <!-- Add new exercise button for tutors -->
+      <button
+        *ngIf="isTutor"
+        mat-flat-button
+        color="primary"
+        class="add-exercise-button"
+        [disabled]="isLoading"
+        (click)="openNewExerciseDialog()"
+      >
+        <mat-icon>add</mat-icon>
+        {{ 'ROADMAP_PAGE.ADD_EXERCISE' | translate }}
+      </button>
     </div>
-    
-    <!-- Add new exercise button for tutors -->
-    <button
-      *ngIf="isTutor"
-      mat-flat-button
-      color="primary"
-      class="add-exercise-button"
-      [disabled]="isLoading"
-      (click)="openNewExerciseDialog()"
-    >
-      <mat-icon>add</mat-icon>
-      Add Exercise
-    </button>
   </div>
 </mat-expansion-panel>

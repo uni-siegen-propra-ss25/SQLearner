@@ -37,13 +37,8 @@ export class LoginComponent {
                 next: () => {
                     const role = this.authService.getUserRole();
 
-                    if (role === 'TUTOR') {
-                        this.router.navigate(['/welcome/tutor']);
-                    } else if (role === 'STUDENT') {
-                        this.router.navigate(['/welcome/student']);
-                    } else {
-                        this.router.navigate(['/welcome']); // Fallback
-                    }
+                    // Redirect to landing page after successful login
+                    this.router.navigate(['/landing']);
 
                     this.snackBar.open('Login erfolgreich!', 'Schließen', { duration: 2000 });
                 },
@@ -55,4 +50,3 @@ export class LoginComponent {
         }
     }
 }
-

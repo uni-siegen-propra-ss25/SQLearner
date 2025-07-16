@@ -1,0 +1,86 @@
+<!--
+  ER Diagram Dialog
+  - Header: Shows the title and close button
+  - Content: Shows the ER diagram visualization or an error state
+  - Actions: Dialog close button
+-->
+<div class="er-dialog">
+  <!-- Dialog header with title and close button -->
+  <div class="er-dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon>schema</mat-icon>
+      ER-Diagramm{{ data.databaseName ? ' - ' + data.databaseName : '' }}
+    </h2>
+    <button mat-icon-button mat-dialog-close matTooltip="Schließen">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Main content area: diagram or error state -->
+  <mat-dialog-content class="er-dialog-content">
+    <div class="er-container" *ngIf="parsedTables && parsedTables.length > 0; else errorState">
+      <!-- Render the ER diagram using Angular components -->
+      <div class="dbml-visualization">
+        <div class="table-box" *ngFor="let table of parsedTables">
+          <div class="table-header">
+            <strong>{{ table.name }}</strong>
+          </div>
+          <div class="table-columns">
+            <div
+              class="column-row"
+              *ngFor="let column of table.columns"
+              [class.primary-key-row]="column.isPrimaryKey"
+            >
+              <span class="column-icons">
+                <mat-icon *ngIf="column.isPrimaryKey" class="pk-icon" matTooltip="Primärschlüssel"
+                  >vpn_key</mat-icon
+                >
+                <mat-icon
+                  *ngIf="column.isForeignKey"
+                  class="fk-icon"
+                  [ngClass]="{
+                    'composite-fk-icon': isColumnInCompositeFK(table.name, column.name),
+                  }"
+                  [matTooltip]="getForeignKeyTooltip(table.name, column.name)"
+                  >link</mat-icon
+                >
+                <span
+                  *ngIf="isColumnInCompositeFK(table.name, column.name)"
+                  class="composite-fk-badge"
+                  matTooltip="Teil eines zusammengesetzten Fremdschlüssels"
+                  >FK-Gruppe</span
+                >
+                <mat-icon *ngIf="column.isUnique" class="uq-icon" matTooltip="Eindeutig"
+                  >star</mat-icon
+                >
+              </span>
+              <span class="column-name">{{ column.name }}</span>
+              <span class="column-type">{{ column.type }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Relationships section entfernt -->
+      </div>
+    </div>
+
+    <!-- Error state if diagram generation fails -->
+    <ng-template #errorState>
+      <div class="error-state">
+        <mat-icon>error_outline</mat-icon>
+        <h3>Diagramm konnte nicht generiert werden</h3>
+        <p>Bitte überprüfen Sie das SQL-Schema.</p>
+        <mat-divider></mat-divider>
+        <details>
+          <summary>DBML Code anzeigen</summary>
+          <pre><code>{{ data.dbmlCode || 'Kein DBML Code verfügbar' }}</code></pre>
+        </details>
+      </div>
+    </ng-template>
+  </mat-dialog-content>
+
+  <!-- Dialog actions (footer) -->
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Schließen</button>
+  </mat-dialog-actions>
+</div>

@@ -1,11 +1,11 @@
 <div class="user-list-container">
   <div class="header">
-    <h1>Nutzerverwaltung</h1>
+    <h1>{{ 'USER_MANAGEMENT_PAGE.TITLE' | translate }}</h1>
     <div class="actions" *ngIf="isTutorOrAdmin">
       <button mat-raised-button color="primary" (click)="openCreateDialog()">
         <mat-icon>person_add</mat-icon>
-        <span *ngIf="isAdmin">Neuen Nutzer anlegen</span>
-        <span *ngIf="!isAdmin">Neuen Studenten anlegen</span>
+        <span *ngIf="isAdmin">{{ 'USER_MANAGEMENT_PAGE.CREATE_USER' | translate }}</span>
+        <span *ngIf="!isAdmin">{{ 'USER_MANAGEMENT_PAGE.CREATE_STUDENT' | translate }}</span>
       </button>
     </div>
   </div>
@@ -14,7 +14,9 @@
     <mat-card-content>
       <mat-table [dataSource]="users" class="user-table">
         <ng-container matColumnDef="name">
-          <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+          <mat-header-cell *matHeaderCellDef>
+            {{ 'USER_MANAGEMENT_PAGE.NAME' | translate }}
+          </mat-header-cell>
           <mat-cell *matCellDef="let user">
             <div class="user-info">
               <span class="full-name">{{ user.firstName }} {{ user.lastName }}</span>
@@ -23,19 +25,25 @@
         </ng-container>
 
         <ng-container matColumnDef="email">
-          <mat-header-cell *matHeaderCellDef> Email </mat-header-cell>
+          <mat-header-cell *matHeaderCellDef>
+            {{ 'USER_MANAGEMENT_PAGE.EMAIL' | translate }}
+          </mat-header-cell>
           <mat-cell *matCellDef="let user"> {{ user.email }} </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="role">
-          <mat-header-cell *matHeaderCellDef> Rolle </mat-header-cell>
+          <mat-header-cell *matHeaderCellDef>
+            {{ 'USER_MANAGEMENT_PAGE.ROLE' | translate }}
+          </mat-header-cell>
           <mat-cell *matCellDef="let user">
             <span class="role-badge" [class]="user.role.toLowerCase()">{{ user.role }}</span>
           </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="matriculationNumber">
-          <mat-header-cell *matHeaderCellDef> Matrikelnummer </mat-header-cell>
+          <mat-header-cell *matHeaderCellDef>
+            {{ 'USER_MANAGEMENT_PAGE.MATRICULATION_NUMBER' | translate }}
+          </mat-header-cell>
           <mat-cell *matCellDef="let user">
             <span [class.no-value]="!user.matriculationNumber">
               {{ user.matriculationNumber || '-' }}
@@ -44,18 +52,25 @@
         </ng-container>
 
         <ng-container matColumnDef="progress">
-          <mat-header-cell *matHeaderCellDef> Fortschritt </mat-header-cell>
+          <mat-header-cell *matHeaderCellDef>
+            {{ 'USER_MANAGEMENT_PAGE.PROGRESS' | translate }}
+          </mat-header-cell>
           <mat-cell *matCellDef="let user">
             <div *ngIf="user.role === 'STUDENT'" class="progress-cell">
-              <mat-progress-bar mode="determinate" [value]="user.progress"></mat-progress-bar>
-              <span class="progress-value">{{user.progress}}%</span>
+              <mat-progress-bar
+                mode="determinate"
+                [value]="user.completionPercentage"
+              ></mat-progress-bar>
+              <span class="progress-value">{{ user.completionPercentage }}%</span>
             </div>
             <span *ngIf="user.role !== 'STUDENT'" class="no-value">-</span>
           </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="actions">
-          <mat-header-cell *matHeaderCellDef>Aktionen</mat-header-cell>
+          <mat-header-cell *matHeaderCellDef>{{
+            'USER_MANAGEMENT_PAGE.ACTIONS' | translate
+          }}</mat-header-cell>
           <mat-cell *matCellDef="let user" class="actions-cell">
             <div
               class="action-buttons"
@@ -65,7 +80,8 @@
                 mat-icon-button
                 color="primary"
                 (click)="openUpdateDialog(user)"
-                matTooltip="Bearbeiten"
+                matTooltip="{{ 'USER_MANAGEMENT_PAGE.EDIT' | translate }}"
+                *ngIf="canModifyUser(user.id)"
               >
                 <mat-icon>edit</mat-icon>
               </button>
@@ -73,8 +89,8 @@
                 mat-icon-button
                 color="warn"
                 (click)="deleteUser(user.id)"
-                matTooltip="Löschen"
-                *ngIf="isAdmin"
+                matTooltip="{{ 'USER_MANAGEMENT_PAGE.DELETE' | translate }}"
+                *ngIf="isAdmin && canModifyUser(user.id)"
               >
                 <mat-icon>delete</mat-icon>
               </button>
@@ -88,7 +104,7 @@
 
       <div *ngIf="users.length === 0" class="no-data">
         <mat-icon>group</mat-icon>
-        <p>Keine Nutzer gefunden</p>
+        <p>{{ 'USER_MANAGEMENT_PAGE.NO_USERS' | translate }}</p>
       </div>
     </mat-card-content>
   </mat-card>

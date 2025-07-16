@@ -2,30 +2,48 @@
   display: block;
 
   mat-dialog-content {
-    min-width: 800px;
-    max-width: 1200px;
+    min-width: 500px;
+    max-width: 600px;
     padding: 24px;
+    overflow-x: hidden;
+    overflow-y: visible;
   }
 }
 
 .full-width {
   width: 100%;
+  margin-bottom: 20px;
+}
+
+.form-section {
   margin-bottom: 24px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px 24px;
+  margin: 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  background: #fafafa;
+
+  button {
+    min-width: 120px;
+    padding: 8px 24px;
+
+    &[color='primary'] {
+      margin-left: 0;
+    }
+  }
 }
 
 mat-form-field {
   display: block;
-
-  ::ng-deep {
-    .mat-form-field-wrapper {
-      padding-bottom: 0;
-    }
-    
-    .mat-form-field-flex {
-      background-color: #f8f9fa;
-      border-radius: 4px;
-    }
-  }
 
   &:last-of-type {
     margin-bottom: 0;
@@ -54,16 +72,21 @@ textarea {
   }
 }
 
-mat-dialog-actions {
-  padding: 16px 24px;
-  margin: 0;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+// Responsive design
+@media (max-width: 768px) {
+  mat-dialog-content {
+    min-width: 90vw;
+    max-width: 95vw;
+    padding: 16px;
+  }
 
-  button {
-    min-width: 100px;
+  .dialog-actions {
+    padding: 16px;
+    flex-direction: column;
 
-    &[color='primary'] {
-      margin-left: 8px;
+    button {
+      width: 100%;
+      margin-left: 0 !important;
     }
   }
 }
@@ -75,8 +98,9 @@ mat-dialog-actions {
     border-color: rgba(255, 255, 255, 0.08);
   }
 
-  mat-dialog-actions {
-    border-top-color: rgba(255, 255, 255, 0.08);
+  .dialog-actions {
+    border-top-color: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.05);
   }
 
   mat-form-field {
@@ -92,8 +116,8 @@ mat-dialog-actions {
   display: flex;
   flex-direction: column;
   gap: 24px;
-  max-height: 85vh;
-  overflow-y: auto;
+  max-height: none;
+  overflow-y: visible;
   padding: 0 8px;
 }
 
@@ -125,7 +149,7 @@ mat-dialog-actions {
     gap: 8px;
     min-width: 140px;
     height: 40px;
-    
+
     mat-icon {
       font-size: 20px;
       width: 20px;
@@ -136,11 +160,11 @@ mat-dialog-actions {
     &.execute-button {
       background-color: #2196f3;
       color: white;
-      
+
       &:hover:not([disabled]) {
         background-color: #1976d2;
       }
-      
+
       &:disabled {
         background-color: rgba(33, 150, 243, 0.5);
       }
@@ -148,7 +172,7 @@ mat-dialog-actions {
 
     &.clear-button {
       border: 1px solid rgba(0, 0, 0, 0.12);
-      
+
       &:hover:not([disabled]) {
         background-color: rgba(0, 0, 0, 0.04);
       }
@@ -162,7 +186,7 @@ mat-dialog-actions {
     button {
       &.clear-button {
         border-color: rgba(255, 255, 255, 0.12);
-        
+
         &:hover:not([disabled]) {
           background-color: rgba(255, 255, 255, 0.04);
         }
@@ -202,7 +226,8 @@ mat-dialog-actions {
     z-index: 1;
   }
 
-  td, th {
+  td,
+  th {
     padding: 12px 16px;
     text-align: left;
     border-bottom: 1px solid rgba(0, 0, 0, 0.08);

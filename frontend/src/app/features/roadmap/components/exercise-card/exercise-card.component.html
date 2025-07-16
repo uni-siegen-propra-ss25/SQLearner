@@ -1,11 +1,20 @@
 <!-- Main exercise card container with click navigation -->
-<mat-card class="exercise-card" (click)="onCardClick()" [class.clickable]="!isTutor">
+<mat-card
+  class="exercise-card"
+  (click)="onCardClick()"
+  [class.clickable]="!isTutor"
+  [class.completed]="!isTutor && isCompleted"
+>
   <!-- Card header with title, badges, and action buttons -->
   <mat-card-header>
     <div class="header-content">
       <!-- Title and badge section -->
       <div class="title-section">
-        <mat-card-title>{{ exercise.title }}</mat-card-title>
+        <div class="exercise-header">
+          <h2 class="exercise-title">
+            {{ exercise.title }}
+          </h2>
+        </div>
         <div class="badges">
           <!-- Difficulty badge with dynamic color -->
           <div
@@ -21,29 +30,44 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Action buttons section -->
-      <div class="action-buttons">
-        <!-- Bookmark button for students only -->
+      <div
+        class="action-buttons"
+        style="display: flex; align-items: center; gap: 0px; margin-left: auto"
+      >
+        <mat-icon
+          *ngIf="!isTutor && isCompleted"
+          class="completed-icon"
+          matTooltip="{{ 'COMPLETED' | translate }}"
+          >check_circle</mat-icon
+        >
         <button
           *ngIf="!isTutor"
           mat-icon-button
           [color]="isBookmarked ? 'accent' : ''"
           (click)="onBookmarkClick($event)"
           [disabled]="isBookmarkLoading"
-          matTooltip="{{ isBookmarked ? 'Lesezeichen entfernen' : 'Lesezeichen hinzufügen' }}"
+          matTooltip="{{
+            isBookmarked ? ('REMOVE_BOOKMARK' | translate) : ('ADD_BOOKMARK' | translate)
+          }}"
           class="bookmark-button"
         >
           <mat-icon>{{ isBookmarked ? 'bookmark' : 'bookmark_border' }}</mat-icon>
         </button>
-        
-        <!-- Edit and delete buttons for tutors only -->
+        <mat-icon
+          *ngIf="isTutor && isBookmarked"
+          class="bookmark-icon"
+          matTooltip="{{ 'BOOKMARKED_EXERCISE' | translate }}"
+          >bookmark</mat-icon
+        >
+        <!-- Edit und Delete Buttons für Tutoren -->
         <ng-container *ngIf="isTutor">
           <button
             mat-icon-button
             color="primary"
             (click)="edit.emit(exercise)"
-            matTooltip="Edit exercise"
+            matTooltip="{{ 'EDIT_EXERCISE' | translate }}"
           >
             <mat-icon>edit</mat-icon>
           </button>
@@ -51,7 +75,7 @@
             mat-icon-button
             color="warn"
             (click)="delete.emit(exercise.id)"
-            matTooltip="Delete exercise"
+            matTooltip="{{ 'DELETE_EXERCISE' | translate }}"
           >
             <mat-icon>delete</mat-icon>
           </button>
@@ -63,7 +87,9 @@
   <!-- Card content with description and metadata -->
   <mat-card-content>
     <!-- Exercise description text -->
-    <p class="exercise-description">{{ exercise.description }}</p>
+    <ng-container *ngIf="isTutor">
+      <p class="exercise-description">{{ exercise.description }}</p>
+    </ng-container>
 
     <!-- Exercise metadata section -->
     <div class="exercise-metadata">
@@ -86,7 +112,7 @@
         "
       >
         <mat-icon>list</mat-icon>
-        <span>{{ exercise.answers.length }} options</span>
+        <span>{{ exercise.answers.length }} {{ 'OPTIONS' | translate }}</span>
       </div>
 
       <!-- Creation date -->

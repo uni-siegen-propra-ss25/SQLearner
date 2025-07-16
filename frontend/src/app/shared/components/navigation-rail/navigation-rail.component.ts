@@ -4,6 +4,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from '../../../features/auth/services/auth.service';
 import { ProfileComponent } from '../../../features/users/components/profile/profile.component';
 import { Role } from '../../../features/users/models/role.model';
+import { TranslateService } from '@ngx-translate/core';
+import { DockerService } from '../../../features/exercises/services/docker.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 export interface NavigationItem {
     icon: string;
@@ -21,22 +24,30 @@ export interface NavigationItem {
 })
 export class NavigationRailComponent {
     @Input() items: NavigationItem[] = [];
-    @Input() logoUrl: string = '';
     @Input() logoAlt: string = 'Logo';
     @Input() userRole: Role | null = null;
 
     @Output() itemSelected = new EventEmitter<NavigationItem>();
-    @Output() darkModeChanged = new EventEmitter<boolean>();
     @Output() languageChanged = new EventEmitter<string>();
     @Output() logStatusChanged = new EventEmitter<void>();
+    @Output() themeChanged = new EventEmitter<boolean>();
 
-    isDarkMode = false;
+    currentLang = 'de';
+    isDarkTheme = false;
 
     constructor(
         private router: Router,
         private dialog: MatDialog,
         private authService: AuthService,
-    ) {}
+        private translate: TranslateService,
+        private dockerService: DockerService,
+        private snackBar: MatSnackBar,
+    ) {
+        const savedLang = localStorage.getItem('language') || 'de';
+        this.currentLang = savedLang;
+        this.isDarkTheme = localStorage.getItem('theme') === 'dark';
+    }
+
     openProfile(): void {
         const user = this.authService.getUserFromToken();
         this.dialog.open(ProfileComponent, {
@@ -53,13 +64,18 @@ export class NavigationRailComponent {
         );
     }
 
-    onItemClick(item: NavigationItem): void {
-        this.itemSelected.emit(item);
+    // Helper to check if container is initializing (global window property set by QueryExerciseComponent)
+    private isContainerInitializing(): boolean {
+        // This assumes QueryExerciseComponent sets window["containerInitializing"]
+        return (window as any)["containerInitializing"] === true;
     }
 
-    toggleDarkMode(): void {
-        this.isDarkMode = !this.isDarkMode;
-        this.darkModeChanged.emit(this.isDarkMode);
+    onItemClick(item: NavigationItem): void {
+        if (this.isContainerInitializing()) {
+            this.snackBar.open('Please wait, the environment is being prepared...', 'Close', { duration: 3000 });
+            return;
+        }
+        this.itemSelected.emit(item);
     }
 
     onLogStatusChanged(): void {
@@ -71,6 +87,41 @@ export class NavigationRailComponent {
     }
 
     onLanguageChange(language: string): void {
+        this.currentLang = language;
+        this.translate.use(language);
+        localStorage.setItem('language', language);
         this.languageChanged.emit(language);
+    }
+
+    toggleTheme(): void {
+        this.isDarkTheme = !this.isDarkTheme;
+        localStorage.setItem('theme', this.isDarkTheme ? 'dark' : 'light');
+        this.themeChanged.emit(this.isDarkTheme);
+    }
+
+    logout(): void {
+        if (this.isContainerInitializing()) {
+            this.snackBar.open('Please wait, the environment is being prepared...', 'Close', { duration: 3000 });
+            return;
+        }
+        // Удаляем контейнер, если есть
+        const containerId = sessionStorage.getItem('activeContainerId');
+        if (containerId) {
+            this.dockerService.deleteContainer(containerId).subscribe({
+                next: () => {
+                    sessionStorage.removeItem('activeContainerId');
+                    this.authService.logout();
+                    this.router.navigate(['/auth/login']);
+                },
+                error: () => {
+                    sessionStorage.removeItem('activeContainerId');
+                    this.authService.logout();
+                    this.router.navigate(['/auth/login']);
+                }
+            });
+        } else {
+            this.authService.logout();
+            this.router.navigate(['/auth/login']);
+        }
     }
 }

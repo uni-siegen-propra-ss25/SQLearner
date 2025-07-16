@@ -4,6 +4,7 @@ import { NavigationItem } from './shared/components/navigation-rail/navigation-r
 import { AuthService } from './features/auth/services/auth.service';
 import { Subscription } from 'rxjs';
 import { Role } from './features/users/models/role.model';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-root',
@@ -11,7 +12,6 @@ import { Role } from './features/users/models/role.model';
     styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit, OnDestroy {
-    isDarkMode = false;
     logoUrl = 'assets/icons/logo_SQLearner.svg';
     logoAlt = 'SQLearner Logo';
 
@@ -19,45 +19,52 @@ export class AppComponent implements OnInit, OnDestroy {
     private userSubscription: Subscription | null = null;
 
     private readonly studentItems: NavigationItem[] = [
-        { icon: 'timeline', label: 'Roadmap', route: '/roadmap', requiredRoles: [Role.STUDENT] },
+        { icon: 'timeline', label: 'ROADMAP', route: '/roadmap', requiredRoles: [Role.STUDENT] },
         {
             icon: 'analytics',
-            label: 'Fortschritt',
+            label: 'PROGRESS',
             route: '/progress',
             requiredRoles: [Role.STUDENT],
         },
-    ];    private readonly tutorItems: NavigationItem[] = [
-        { icon: 'groups', label: 'Nutzerverwaltung', route: '/users', requiredRoles: [Role.TUTOR] },
-        { icon: 'timeline', label: 'Roadmap', route: '/roadmap', requiredRoles: [Role.TUTOR] },
+    ];
+    private readonly tutorItems: NavigationItem[] = [
+        { icon: 'groups', label: 'USERS', route: '/users', requiredRoles: [Role.TUTOR] },
+        { icon: 'timeline', label: 'ROADMAP', route: '/roadmap', requiredRoles: [Role.TUTOR] },
         {
             icon: 'storage',
-            label: 'Datenbanken',
+            label: 'DATABASES',
             route: '/databases',
             requiredRoles: [Role.TUTOR],
         },
-    ];    private readonly adminItems: NavigationItem[] = [
+    ];
+    private readonly adminItems: NavigationItem[] = [
         {
             icon: 'manage_accounts',
-            label: 'Nutzerverwaltung',
+            label: 'USERS',
             route: '/users',
             requiredRoles: [Role.ADMIN],
         },
         {
             icon: 'settings',
-            label: 'Einstellungen',
+            label: 'SETTINGS_NAV',
             route: '/settings',
             requiredRoles: [Role.ADMIN],
         },
     ];
 
     private readonly commonItems: NavigationItem[] = [
-        { icon: 'home', label: 'Dashboard', route: '/welcome' },
+        { icon: 'home', label: 'DASHBOARD_NAV', route: '/landing' },
     ];
 
     constructor(
         private readonly authService: AuthService,
         private readonly router: Router,
-    ) {}
+        private readonly translate: TranslateService,
+    ) {
+        const savedLang = localStorage.getItem('language') || 'de';
+        this.translate.setDefaultLang('de');
+        this.translate.use(savedLang);
+    }
 
     ngOnInit(): void {
         // Subscribe to user changes
@@ -99,22 +106,12 @@ export class AppComponent implements OnInit, OnDestroy {
         this.router.navigate([item.route]);
     }
 
-    onDarkModeChanged(isDark: boolean): void {
-        this.isDarkMode = isDark;
-        localStorage.setItem('darkMode', JSON.stringify(isDark));
-        this.applyTheme();
-    }
-
     onLanguageChanged(language: string): void {
-        localStorage.setItem('language', language); // TODO: Implement language change DE -> EN
-        window.location.reload(); // Reload to apply language change
+        this.translate.use(language);
+        localStorage.setItem('language', language);
     }
 
     async onLogStatusChanged(): Promise<void> {
         this.authService.logout();
-    }
-
-    private applyTheme(): void {
-        document.body.classList.toggle('dark-theme', this.isDarkMode);
     }
 }

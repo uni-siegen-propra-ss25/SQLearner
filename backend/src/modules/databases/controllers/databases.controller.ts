@@ -7,33 +7,35 @@ import {
     Body,
     Param,
     UseGuards,
-    UseInterceptors,
     UploadedFile,
     ParseIntPipe,
+    UseInterceptors,
+    Patch,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
-import { DatabasesService } from '../services/databases.service';
-import { Database } from '../models/database.model';
-import { CreateDatabaseDto } from '../models/create-database.dto';
-import { UpdateDatabaseDto } from '../models/update-database.dto';
+import {
+    ApiTags,
+    ApiOperation,
+    ApiResponse,
+    ApiBearerAuth,
+    ApiConsumes,
+    ApiBody,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth/jwt-auth.guard';
 import { RolesGuard } from '../../../common/guards/role/role.guard';
 import { Roles } from '../../../common/decorators/role.decorator';
 import { GetUser } from '../../../common/decorators/get-user.decorator';
-import { Role } from '@prisma/client';
-
-interface RunQueryDto {
-    query: string;
-}
-
+import { Database, Role, User } from '@prisma/client';
+import { DatabasesService } from '../services/databases.service';
+import { QueryDto } from '../models/query.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { CreateDatabaseDto } from '../models/create-database.dto';
+import { UpdateDatabaseDto } from '../models/update-database.dto';
 /**
  * Controller managing database operations for the SQL learning system.
- * Handles creation, modification, and deletion of practice databases.
- * Includes functionality for uploading SQL files and managing database access.
+ * Handles:
+ * - File uploads to create databases
+ * - Database management (create, read, update, delete) by updating the file
  * Protected by JWT authentication and role-based access control.
- *
- * @class DatabasesController
  */
 @ApiTags('Databases')
 @Controller('databases')
@@ -42,19 +44,21 @@ interface RunQueryDto {
 export class DatabasesController {
     constructor(private readonly databasesService: DatabasesService) {}
 
-    @Post()
+    @Post('upload')
     @Roles(Role.TUTOR)
-    @ApiOperation({ summary: 'Create a new database' })
-    @ApiResponse({ status: 201, description: 'Database created successfully' })
-    async createDatabase(
-        @Body() dto: CreateDatabaseDto,
-        @GetUser('id') userId: number,
-        @GetUser('role') userRole: string,
-    ) {
-        return this.databasesService.createDatabase(dto, userId, userRole);
+    @ApiConsumes('multipart/form-data')
+    @UseInterceptors(FileInterceptor('file'))
+    @ApiOperation({ summary: 'Upload SQL file to create database' })
+    @ApiResponse({
+        status: 201,
+        description: 'SQL file uploaded and database created successfully',
+    })
+    uploadDatabase(@UploadedFile() file: Express.Multer.File, @GetUser() user: User) {
+        return this.databasesService.uploadDatabase(file, user);
     }
 
     @Get()
+    @Roles(Role.TUTOR)
     @ApiOperation({ summary: 'Get all databases' })
     @ApiResponse({ status: 200, description: 'Return all databases' })
     async getAllDatabases() {
@@ -68,55 +72,102 @@ export class DatabasesController {
         return this.databasesService.getDatabaseById(id);
     }
 
+    @Post()
+    @Roles(Role.TUTOR)
+    @ApiOperation({ summary: 'Create a new empty database' })
+    @ApiResponse({ status: 201, description: 'Database created successfully' })
+    createDatabase(@Body() dto: CreateDatabaseDto, @GetUser() user: User) {
+        return this.databasesService.createDatabase(dto, user);
+    }
+
+    @Patch(':id')
+    @UseInterceptors(FileInterceptor('file'))
+    @ApiOperation({ summary: 'Update database metadata' })
+    @ApiResponse({ status: 200, description: 'Database updated successfully' })
+    updateDatabase(
+        @Param('id', ParseIntPipe) databaseId: number,
+        @Body() dto: UpdateDatabaseDto,
+        @GetUser() user: User,
+    ) {
+        return this.databasesService.updateDatabase(databaseId, dto, user);
+    }
+
     @Put(':id')
     @Roles(Role.TUTOR)
-    @ApiOperation({ summary: 'Update database' })
+    @ApiOperation({ summary: 'Update database metadata' })
     @ApiResponse({ status: 200, description: 'Database updated successfully' })
-    async updateDatabase(
-        @Param('id', ParseIntPipe) id: number,
+    async updateDatabasePut(
+        @Param('id', ParseIntPipe) databaseId: number,
         @Body() dto: UpdateDatabaseDto,
-        @GetUser('id') userId: number,
-        @GetUser('role') userRole: string,
+        @GetUser() user: User,
     ) {
-        return this.databasesService.updateDatabase(id, dto, userId, userRole);
+        return this.databasesService.updateDatabase(databaseId, dto, user);
     }
 
     @Delete(':id')
     @Roles(Role.TUTOR)
     @ApiOperation({ summary: 'Delete database' })
-    @ApiResponse({ status: 200, description: 'Database deleted successfully' })
+    @ApiResponse({ status: 200, description: 'Database and all its tables deleted successfully' })
     async deleteDatabase(
-        @Param('id', ParseIntPipe) id: number,
-        @GetUser('id') userId: number,
-        @GetUser('role') userRole: string,
+        @Param('id', ParseIntPipe) id: number, // Database ID
+        @GetUser() user: User,
     ) {
-        return this.databasesService.deleteDatabase(id, userId, userRole);
-    }
-
-    @Post('upload')
-    @Roles(Role.TUTOR)
-    @UseInterceptors(FileInterceptor('file'))
-    @ApiConsumes('multipart/form-data')
-    @ApiOperation({ summary: 'Upload SQL file' })
-    @ApiResponse({ status: 201, description: 'SQL file uploaded successfully' })
-    async uploadSqlFile(
-        @UploadedFile() file: Express.Multer.File,
-        @GetUser('id') userId: number,
-        @GetUser('role') userRole: string,
-    ) {
-        return this.databasesService.uploadSqlFile(file, userId, userRole);
+        return this.databasesService.deleteDatabase(id, user);
     }
 
     @Post(':id/query')
     @ApiOperation({ summary: 'Run SQL query on database' })
     @ApiResponse({ status: 200, description: 'Query executed successfully' })
     @ApiResponse({ status: 400, description: 'Invalid query' })
-    @ApiResponse({ status: 403, description: 'Operation not allowed' })
-    @ApiResponse({ status: 404, description: 'Database not found' })
     async runQuery(
-        @Param('id', ParseIntPipe) id: number,
-        @Body() dto: RunQueryDto,
+        @Param('id', ParseIntPipe) id: number, // Session ID for the database
+        @Body() dto: QueryDto,
     ) {
+        // This operation stays in DatabasesService since it's a database-level operation
         return this.databasesService.runQuery(id, dto.query);
+    }
+
+    @Post(':id/tables')
+    @Roles(Role.TUTOR)
+    @ApiOperation({ summary: 'Create a new table in the database' })
+    @ApiResponse({ status: 201, description: 'Table created successfully' })
+    async createTable(
+        @Param('id', ParseIntPipe) databaseId: number,
+        @Body() dto: any,
+        @GetUser() user: User,
+    ) {
+        return this.databasesService.createTable(databaseId, dto, user.id, user.role);
+    }
+
+    @Get(':id/schema')
+    @ApiOperation({ summary: 'Get actual PostgreSQL schema from database' })
+    @ApiResponse({ status: 200, description: 'Return the actual database schema as SQL' })
+    async getDatabaseSchema(@Param('id', ParseIntPipe) id: number) {
+        return this.databasesService.getDatabaseSchema(id);
+    }
+
+    @Post(':id/tables/:tableName/rows')
+    @ApiOperation({ summary: 'Insert a new row into a table' })
+    @ApiResponse({ status: 201, description: 'Row inserted successfully' })
+    async insertRow(
+        @Param('id', ParseIntPipe) databaseId: number,
+        @Param('tableName') tableName: string,
+        @Body('data') data: Record<string, any>,
+        @GetUser() user: User,
+    ) {
+        return this.databasesService.insertRow(databaseId, tableName, data, user);
+    }
+
+    @Put(':id/tables/:tableName/rows')
+    @ApiOperation({ summary: 'Update a row in a table' })
+    @ApiResponse({ status: 200, description: 'Row updated successfully' })
+    async updateRow(
+        @Param('id', ParseIntPipe) databaseId: number,
+        @Param('tableName') tableName: string,
+        @Body('data') data: Record<string, any>,
+        @Body('whereClause') whereClause: string,
+        @GetUser() user: User,
+    ) {
+        return this.databasesService.updateRow(databaseId, tableName, data, whereClause, user);
     }
 }

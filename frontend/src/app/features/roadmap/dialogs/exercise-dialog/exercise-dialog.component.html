@@ -1,50 +1,60 @@
-<h2 mat-dialog-title>{{ isEditing ? 'Edit Exercise' : 'New Exercise' }}</h2>
+<h2 mat-dialog-title>
+  {{
+    isEditing
+      ? ('EXERCISE_DIALOG.EDIT_TITLE' | translate)
+      : ('EXERCISE_DIALOG.NEW_TITLE' | translate)
+  }}
+</h2>
 <form [formGroup]="exerciseForm" (ngSubmit)="onSubmit()">
   <mat-dialog-content>
     <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Title</mat-label>
-      <input matInput formControlName="title" placeholder="Enter exercise title" />
+      <mat-label>{{ 'EXERCISE_DIALOG.TITLE' | translate }}</mat-label>
+      <input
+        matInput
+        formControlName="title"
+        [placeholder]="'EXERCISE_DIALOG.TITLE_PLACEHOLDER' | translate"
+      />
       <mat-error *ngIf="exerciseForm.get('title')?.hasError('required')">
-        Title is required
+        {{ 'EXERCISE_DIALOG.TITLE_REQUIRED' | translate }}
       </mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Description</mat-label>
+      <mat-label>{{ 'EXERCISE_DIALOG.DESCRIPTION' | translate }}</mat-label>
       <textarea
         matInput
         formControlName="description"
-        placeholder="Enter exercise description"
+        [placeholder]="'EXERCISE_DIALOG.DESCRIPTION_PLACEHOLDER' | translate"
         rows="4"
       >
       </textarea>
       <mat-error *ngIf="exerciseForm.get('description')?.hasError('required')">
-        Description is required
+        {{ 'EXERCISE_DIALOG.DESCRIPTION_REQUIRED' | translate }}
       </mat-error>
     </mat-form-field>
 
     <div class="form-row">
       <mat-form-field appearance="outline">
-        <mat-label>Type</mat-label>
+        <mat-label>{{ 'EXERCISE_DIALOG.TYPE' | translate }}</mat-label>
         <mat-select formControlName="type">
           <mat-option *ngFor="let type of exerciseTypes" [value]="type">
             {{ type }}
           </mat-option>
         </mat-select>
         <mat-error *ngIf="exerciseForm.get('type')?.hasError('required')">
-          Type is required
+          {{ 'EXERCISE_DIALOG.TYPE_REQUIRED' | translate }}
         </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Difficulty</mat-label>
+        <mat-label>{{ 'EXERCISE_DIALOG.DIFFICULTY' | translate }}</mat-label>
         <mat-select formControlName="difficulty">
           <mat-option *ngFor="let level of difficultyLevels" [value]="level">
             {{ level }}
           </mat-option>
         </mat-select>
         <mat-error *ngIf="exerciseForm.get('difficulty')?.hasError('required')">
-          Difficulty is required
+          {{ 'EXERCISE_DIALOG.DIFFICULTY_REQUIRED' | translate }}
         </mat-error>
       </mat-form-field>
     </div>
@@ -52,29 +62,29 @@
     <!-- Query specific fields -->
     <ng-container *ngIf="exerciseForm.get('type')?.value === 'QUERY'">
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Database</mat-label>
+        <mat-label>{{ 'EXERCISE_DIALOG.DATABASE' | translate }}</mat-label>
         <mat-select formControlName="databaseId" required>
           <mat-option *ngFor="let db of databases" [value]="db.id">
             {{ db.name }}
           </mat-option>
         </mat-select>
         <mat-error *ngIf="exerciseForm.get('databaseId')?.hasError('required')">
-          Database is required for SQL exercises
+          {{ 'EXERCISE_DIALOG.DATABASE_REQUIRED' | translate }}
         </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Solution Query</mat-label>
+        <mat-label>{{ 'EXERCISE_DIALOG.SOLUTION' | translate }}</mat-label>
         <textarea
           matInput
-          formControlName="querySolution"
-          placeholder="SELECT * FROM table WHERE condition"
+          formControlName="solution"
+          [placeholder]="'EXERCISE_DIALOG.SOLUTION_PLACEHOLDER' | translate"
           required
           rows="6"
         ></textarea>
-        <mat-hint>Enter the SQL query that represents the correct solution</mat-hint>
-        <mat-error *ngIf="exerciseForm.get('querySolution')?.hasError('required')">
-          Solution query is required
+        <mat-hint>{{ 'EXERCISE_DIALOG.SOLUTION_HINT' | translate }}</mat-hint>
+        <mat-error *ngIf="exerciseForm.get('solution')?.hasError('required')">
+          {{ 'EXERCISE_DIALOG.SOLUTION_REQUIRED' | translate }}
         </mat-error>
       </mat-form-field>
     </ng-container>
@@ -87,18 +97,18 @@
       "
     >
       <div formArrayName="answers" class="answers-container">
-        <h3>Answer Options</h3>
+        <h3>{{ 'EXERCISE_DIALOG.ANSWER_OPTIONS' | translate }}</h3>
         <div
           *ngFor="let answer of answers.controls; let i = index"
           [formGroupName]="i"
           class="answer-row"
         >
           <mat-form-field appearance="outline" class="answer-text">
-            <mat-label>Answer {{ i + 1 }}</mat-label>
+            <mat-label>{{ 'EXERCISE_DIALOG.ANSWER' | translate: { num: i + 1 } }}</mat-label>
             <input
               matInput
               formControlName="text"
-              [placeholder]="'Enter answer option ' + (i + 1)"
+              [placeholder]="'EXERCISE_DIALOG.ANSWER_PLACEHOLDER' | translate: { num: i + 1 }"
             />
           </mat-form-field>
 
@@ -109,7 +119,7 @@
             (change)="onSingleChoiceSelect(i)"
             [disabled]="false"
           >
-            Correct
+            {{ 'EXERCISE_DIALOG.CORRECT' | translate }}
           </mat-radio-button>
 
           <!-- Multiple Choice: Checkbox -->
@@ -117,7 +127,7 @@
             *ngIf="exerciseForm.get('type')?.value === 'MULTIPLE_CHOICE'"
             formControlName="isCorrect"
           >
-            Correct
+            {{ 'EXERCISE_DIALOG.CORRECT' | translate }}
           </mat-checkbox>
 
           <button
@@ -139,16 +149,32 @@
           class="add-answer-button"
         >
           <mat-icon>add</mat-icon>
-          Add Answer Option
+          {{ 'EXERCISE_DIALOG.ADD_ANSWER' | translate }}
         </button>
       </div>
     </ng-container>
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">
-    <button mat-button (click)="onCancel()">Cancel</button>
+    <button mat-button type="button" (click)="onCancel()">
+      {{ 'EXERCISE_DIALOG.CANCEL' | translate }}
+    </button>
     <button mat-flat-button color="primary" type="submit" [disabled]="!exerciseForm.valid">
-      {{ isEditing ? 'Save' : 'Create' }}
+      {{
+        isEditing ? ('EXERCISE_DIALOG.SAVE' | translate) : ('EXERCISE_DIALOG.CREATE' | translate)
+      }}
     </button>
   </mat-dialog-actions>
+
+  <div class="ai-generate-row">
+    <button
+      mat-stroked-button
+      color="accent"
+      (click)="openAIGenerationDialog()"
+      [disabled]="exerciseForm.get('type')?.value !== 'QUERY' || aiGenerated"
+    >
+      <mat-icon>auto_awesome</mat-icon>
+      Mit KI generieren
+    </button>
+  </div>
 </form>

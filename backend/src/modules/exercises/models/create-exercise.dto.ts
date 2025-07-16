@@ -15,6 +15,11 @@ import { Type } from 'class-transformer';
 import { Difficulty, ExerciseType } from '@prisma/client';
 
 export class AnswerOptionDto {
+    @ApiProperty({ description: 'The ID of the answer option (for updates)', required: false })
+    @IsNumber()
+    @IsOptional()
+    id?: number;
+
     @ApiProperty({ description: 'The text of the choice' })
     @IsString()
     @IsNotEmpty()
@@ -69,7 +74,7 @@ export class CreateExerciseDto {
     @ApiProperty({ description: 'The SQL solution query', required: false })
     @IsString()
     @IsOptional()
-    querySolution?: string;
+    solution?: string;
 
     @ApiProperty({
         description: 'The answers for choice exercises',

@@ -4,6 +4,7 @@ services:
     container_name: sqlearner-db
     ports:
       - "5433:5432"
+
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -15,15 +16,20 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - sqlearner-network
 
   migrations:
-    build: ./backend
-    command: sh -c "while ! nc -z db 5432; do sleep 1; done && npx prisma migrate deploy"
-    environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/sqlearner?schema=public
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     depends_on:
-      db:
-        condition: service_healthy
+      - db
+    environment:
+      DATABASE_URL: 'postgresql://postgres:postgres@db:5432/sqlearner?schema=public'
+    command: sh -c "while ! nc -z db 5432; do sleep 1; done && npx prisma migrate deploy"
+    networks:
+      - sqlearner-network
 
   backend:
     build: ./backend
@@ -32,6 +38,7 @@ services:
     environment:
       - NODE_ENV=development
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/sqlearner?schema=public
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
       - DB_HOST=db
       - DB_PORT=5432
       - DB_USER=postgres
@@ -39,13 +46,27 @@ services:
       - DB_NAME=sqlearner
       - JWT_SECRET=your_jwt_secret_key_here
       - JWT_EXPIRES_IN=1h
+    security_opt:
+      - no-new-privileges:true
+    cpu_count: 2
+    cpu_percent: 50
+    mem_limit: 2g
+    memswap_limit: 2g 
+    ulimits:
+      nproc: 100
+      nofile:
+        soft: 20000
+        hard: 40000
     volumes:
       - ./backend:/app
       - /app/node_modules
+      - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       migrations:
         condition: service_completed_successfully
     command: npm run start:dev
+    networks:
+      - sqlearner-network
 
   frontend:
     build: ./frontend
@@ -58,6 +79,18 @@ services:
       - /app/node_modules
     depends_on:
       - backend
+    deploy:
+      resources:
+        limits:
+          memory: 6G
+        reservations:
+          memory: 3G
+    networks:
+      - sqlearner-network
+
+networks:
+  sqlearner-network:
+    driver: bridge
 
 volumes:
   postgres_data: 

@@ -3,6 +3,9 @@
 @use '@angular/material' as mat;
 // Plus imports for other components in your app.
 
+// Import Material Icons
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined');
+
 // Include the common styles for Angular Material. We include this here so that you only
 // have to load a single css file for Angular Material in your app.
 // Be sure that you only ever include this mixin once!
@@ -54,8 +57,22 @@ body {
     background-color: #d32f2f !important;
     color: white !important;
   }
-  
+
   .mat-simple-snackbar-action {
     color: white !important;
   }
+}
+
+mat-card,
+.mat-mdc-card {
+  background-color: var(--surface-color) !important;
+  color: var(--text-color) !important;
+  box-shadow: var(--card-shadow, 0 2px 8px rgba(0, 0, 0, 0.04));
+}
+
+mat-card-title,
+.mat-mdc-card-title,
+mat-card-content,
+.mat-mdc-card-content {
+  color: var(--text-color) !important;
 }

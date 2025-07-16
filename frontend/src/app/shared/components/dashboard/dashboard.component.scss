@@ -1,0 +1,213 @@
+.dashboard-container {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    min-height: calc(100vh - 80px);
+    background: #ffffff;
+}
+
+.dashboard-header {
+    margin-bottom: 2rem;
+    text-align: center;
+    background: #ffffff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #f1f5f9;
+}
+
+.dashboard-title {
+    font-size: 2rem;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+    font-weight: 400;
+
+    span {
+        font-weight: 600;
+        color: #be3bf6;
+    }
+}
+
+.dashboard-subtitle {
+    font-size: 1rem;
+    color: #64748b;
+    margin: 0;
+    font-weight: 400;
+}
+
+/* Widgets Grid - 2x2 Layout */
+.widgets-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 1.5rem;
+    
+    app-todo-widget {
+        grid-column: 1;
+        grid-row: 1;
+    }
+    
+    app-hints-widget {
+        grid-column: 2;
+        grid-row: 1;
+    }
+    
+    app-chat-widget {
+        grid-column: 1 / -1;
+        grid-row: 2;
+    }
+    
+    .stats-widget {
+        grid-column: 1 / -1;
+        grid-row: 3;
+    }
+}
+
+/* Stats Widget (Admin only) */
+.stats-widget {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+    .widget-header {
+        margin-bottom: 1.5rem;
+
+        .widget-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1e293b;
+
+            mat-icon {
+                color: #3b82f6;
+                font-size: 1.25rem;
+            }
+        }
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 1.5rem;
+        background: #f8fafc;
+        border-radius: 6px;
+        border: 1px solid #f1f5f9;
+        transition: all 0.2s ease;
+
+        &:hover {
+            background: #f1f5f9;
+            border-color: #e2e8f0;
+            transform: translateY(-1px);
+        }
+
+        .stat-number {
+            display: block;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #3b82f6;
+            margin-bottom: 0.5rem;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .widgets-grid {
+        grid-template-columns: 1fr;
+        
+        app-todo-widget,
+        app-hints-widget,
+        app-chat-widget {
+            grid-column: 1;
+        }
+        
+        app-todo-widget {
+            grid-row: 1;
+        }
+        
+        app-hints-widget {
+            grid-row: 2;
+        }
+        
+        app-chat-widget {
+            grid-row: 3;
+        }
+        
+        .stats-widget {
+            grid-row: 4;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 1rem;
+    }
+
+    .dashboard-header {
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .dashboard-title {
+        font-size: 1.75rem;
+    }
+
+    .dashboard-subtitle {
+        font-size: 0.875rem;
+    }
+
+    .widgets-grid {
+        gap: 1rem;
+    }
+
+    .stats-widget {
+        padding: 1rem;
+        
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+        
+        .stat-item {
+            padding: 1rem;
+            
+            .stat-number {
+                font-size: 1.5rem;
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-container {
+        padding: 0.75rem;
+    }
+    
+    .dashboard-title {
+        font-size: 1.5rem;
+    }
+
+    .stats-widget .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+}

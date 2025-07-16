@@ -9,15 +9,21 @@ import {
     HttpCode,
     HttpStatus,
     NotFoundException,
+    UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { ExercisesService } from '../services/exercises.service';
 import { DatabasesService } from '../../databases/services/databases.service';
+import { ExerciseGenerationService } from '../services/exercise-generation.service';
+import { ExerciseType, Difficulty } from '@prisma/client';
 import { Exercise } from '@prisma/client';
 import { CreateExerciseDto } from '../models/create-exercise.dto';
 import { UpdateExerciseDto } from '../models/update-exercise.dto';
 import { Role } from '@prisma/client';
 import { Roles } from 'src/common/decorators/role.decorator';
+import { JwtAuthGuard } from '../../../common/guards/jwt-auth/jwt-auth.guard';
+import { RolesGuard } from '../../../common/guards/role/role.guard';
+import { GetUser } from '../../../common/decorators/get-user.decorator';
 
 /**
  * Controller managing exercise-related operations within topics.
@@ -33,7 +39,46 @@ export class ExercisesController {
     constructor(
         private readonly exercisesService: ExercisesService,
         private readonly databasesService: DatabasesService,
+        private readonly exerciseGenerationService: ExerciseGenerationService,
     ) {}
+    /**
+     * Generates a new exercise using AI (OpenAI).
+     *
+     * @param body - The parameters for generation (type, difficulty, databaseId, syntaxElements, sqlConcepts)
+     * @returns Promise resolving to generated exercise fields
+     */
+    @Post('generate')
+    @Roles(Role.TUTOR, Role.ADMIN)
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Generate a new exercise using AI' })
+    @ApiResponse({ status: 200, description: 'Generated exercise fields' })
+    async generateExercise(
+        @Body()
+        body: {
+            type: string;
+            difficulty: string;
+            databaseId?: number;
+            syntaxElements?: string[];
+            sqlConcepts?: string[];
+        },
+    ): Promise<{ title: string; description: string; solution: string }> {
+        // Typen in Enum casten
+        let type: ExerciseType;
+        let difficulty: Difficulty;
+        try {
+            type = ExerciseType[body.type as keyof typeof ExerciseType];
+            difficulty = Difficulty[body.difficulty as keyof typeof Difficulty];
+        } catch {
+            throw new Error('Ungültiger Typ oder Schwierigkeitsgrad');
+        }
+        return this.exerciseGenerationService.generateExercise({
+            type,
+            difficulty,
+            databaseId: body.databaseId,
+            syntaxElements: body.syntaxElements,
+            sqlConcepts: body.sqlConcepts,
+        });
+    }
 
     /**
      * Retrieves exercises. If topicId is provided, returns exercises for that topic.
@@ -88,7 +133,7 @@ export class ExercisesController {
     @Post()
     @Roles(Role.TUTOR, Role.ADMIN)
     @HttpCode(HttpStatus.CREATED)
-    @ApiOperation({ summary: 'Create a new exercise' }) 
+    @ApiOperation({ summary: 'Create a new exercise' })
     @ApiResponse({ status: 201, description: 'The exercise has been created' })
     async createExercise(@Body() createExerciseDto: CreateExerciseDto): Promise<number> {
         const exerciseId = await this.exercisesService.createExercise(createExerciseDto);
@@ -135,6 +180,49 @@ export class ExercisesController {
     }
 
     /**
+     * Submits an answer for an exercise (choice or text-based).
+     * Requires authentication and evaluates the answer for correctness.
+     *
+     * @param id - The ID of the exercise to submit answer for
+     * @param body - The answer submission data
+     * @param userId - The authenticated user's ID
+     * @returns Promise resolving to the submission result with feedback
+     * @throws NotFoundException if the exercise does not exist
+     */
+    @Post(':id/submit')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.STUDENT)
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Submit and evaluate an answer for an exercise' })
+    @ApiParam({ name: 'id', description: 'Exercise ID' })
+    @ApiResponse({
+        status: 200,
+        description: 'Answer submitted successfully',
+        schema: {
+            type: 'object',
+            properties: {
+                isCorrect: { type: 'boolean', description: 'Whether the answer was correct' },
+                feedback: { type: 'string', description: 'Feedback message about the answer' },
+                exerciseId: { type: 'number', description: 'ID of the exercise' },
+                userId: { type: 'number', description: 'ID of the user who submitted the answer' },
+            },
+        },
+    })
+    @ApiResponse({ status: 404, description: 'Exercise not found' })
+    async submitAnswer(
+        @Param('id') id: number,
+        @Body() body: { answerText: string; connectionDetails?: { host: string; port: number } },
+        @GetUser('id') userId: number,
+    ) {
+        return this.exercisesService.submitAnswer(
+            id,
+            body.answerText,
+            userId,
+            body.connectionDetails,
+        );
+    }
+
+    /**
      * Runs a SQL query for an exercise.
      *
      * @param id - The ID of the exercise to run the query for
@@ -150,8 +238,16 @@ export class ExercisesController {
     @ApiResponse({ status: 404, description: 'Exercise or database not found' })
     async runQuery(
         @Param('id') id: number,
-        @Body() body: { query: string },
+        @Body() body: { query: string; connectionDetails?: { host: string; port: number } },
     ): Promise<{ columns: string[]; rows: any[] }> {
-        return this.exercisesService.runQuery(id, body.query);
+        console.log('=== DEBUG: ExercisesController.runQuery ===');
+        console.log('Exercise ID:', id);
+        console.log('Request body:', body);
+        console.log('Query:', body.query);
+        console.log('Connection Details:', body.connectionDetails);
+
+        const result = await this.exercisesService.runQuery(id, body.query, body.connectionDetails);
+        console.log('Controller result:', result);
+        return result;
     }
 }

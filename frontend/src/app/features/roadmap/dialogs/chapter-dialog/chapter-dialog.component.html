@@ -1,20 +1,28 @@
-<h2 mat-dialog-title>{{ isEditing ? 'Edit Chapter' : 'New Chapter' }}</h2>
+<h2 mat-dialog-title>
+  {{
+    isEditing ? ('CHAPTER_DIALOG.EDIT_TITLE' | translate) : ('CHAPTER_DIALOG.NEW_TITLE' | translate)
+  }}
+</h2>
 <form [formGroup]="chapterForm" (ngSubmit)="onSubmit()">
   <mat-dialog-content>
     <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Title</mat-label>
-      <input matInput formControlName="title" placeholder="Enter chapter title" />
+      <mat-label>{{ 'CHAPTER_DIALOG.TITLE' | translate }}</mat-label>
+      <input
+        matInput
+        formControlName="title"
+        [placeholder]="'CHAPTER_DIALOG.TITLE_PLACEHOLDER' | translate"
+      />
       <mat-error *ngIf="chapterForm.get('title')?.hasError('required')">
-        Title is required
+        {{ 'CHAPTER_DIALOG.TITLE_REQUIRED' | translate }}
       </mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Description</mat-label>
+      <mat-label>{{ 'CHAPTER_DIALOG.DESCRIPTION' | translate }}</mat-label>
       <textarea
         matInput
         formControlName="description"
-        placeholder="Enter chapter description"
+        [placeholder]="'CHAPTER_DIALOG.DESCRIPTION_PLACEHOLDER' | translate"
         rows="4"
       >
       </textarea>
@@ -22,9 +30,9 @@
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">
-    <button mat-button (click)="onCancel()">Cancel</button>
+    <button mat-button (click)="onCancel()">{{ 'CHAPTER_DIALOG.CANCEL' | translate }}</button>
     <button mat-raised-button color="primary" type="submit" [disabled]="chapterForm.invalid">
-      {{ isEditing ? 'Save' : 'Create' }}
+      {{ isEditing ? ('CHAPTER_DIALOG.SAVE' | translate) : ('CHAPTER_DIALOG.CREATE' | translate) }}
     </button>
   </mat-dialog-actions>
 </form>

@@ -1,16 +1,14 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { NavigationRailComponent } from './shared/components/navigation-rail/navigation-rail.component';
 import { Role } from './features/users/models/role.model';
 import { RoleGuard } from './core/guards/role.guard';
-import { AuthGuard } from './core/guards/auth.guard';
 
 const routes: Routes = [
-    { path: '', redirectTo: 'welcome', pathMatch: 'full' },
+    { path: '', redirectTo: 'landing', pathMatch: 'full' },
     {
-        path: 'welcome',
+        path: 'landing',
         loadChildren: () =>
-            import('./features/welcome/welcome.module').then((m) => m.WelcomeModule),
+            import('./features/landing/landing.module').then((m) => m.LandingModule),
     },
     {
         path: 'auth',
@@ -36,7 +34,8 @@ const routes: Routes = [
     },
     {
         path: 'progress',
-        loadChildren: () => import('./features/progress/progress.module').then((m) => m.ProgressModule),
+        loadChildren: () =>
+            import('./features/progress/progress.module').then((m) => m.ProgressModule),
         canActivate: [RoleGuard],
         data: {
             allowedRoles: [Role.STUDENT, Role.TUTOR, Role.ADMIN],
@@ -56,15 +55,18 @@ const routes: Routes = [
             import('./features/database/database.module').then((m) => m.DatabaseModule),
         canActivate: [RoleGuard],
         data: {
-            allowedRoles: [Role.TUTOR],
+            allowedRoles: [Role.STUDENT, Role.TUTOR, Role.ADMIN],
         },
     },
     {
         path: 'settings',
-        loadChildren: () => import('./features/settings/settings.module').then(m => m.SettingsModule),
+        loadChildren: () =>
+            import('./features/settings/settings.module').then((m) => m.SettingsModule),
         canActivate: [RoleGuard],
-        data: { allowedRoles: [Role.ADMIN] }
-    }
+        data: {
+            allowedRoles: [Role.ADMIN],
+        },
+    },
 ];
 
 @NgModule({

@@ -1,0 +1,89 @@
+<!-- Dashboard für eingeloggte Nutzer -->
+<div *ngIf="isLoggedIn">
+  <app-dashboard></app-dashboard>
+</div>
+
+<!-- Willkommensnachricht nur anzeigen, wenn nicht eingeloggt -->
+<div *ngIf="!isLoggedIn" class="welcome-container">
+  <div class="hero-section">
+    <h1>{{ 'WELCOME' | translate }}</h1>
+    <p class="hero-subtitle">{{ 'WELCOME_SUB' | translate }}</p>
+    
+    <div class="cta-section">
+      <h2>{{ 'LANDING.START_LEARNING' | translate }}</h2>
+      <p>{{ 'LANDING.START_LEARNING_DESC' | translate }}</p>
+      <div class="cta-buttons">
+        <button mat-raised-button color="primary" routerLink="/auth/login">
+          <mat-icon>login</mat-icon>
+          {{ 'LOGIN' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="welcome-content">
+    <div class="feature-section">
+      <h2>{{ 'LANDING.FEATURES_TITLE' | translate }}</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <mat-icon>school</mat-icon>
+          <h3>{{ 'LANDING.FEATURE_LEARN_TITLE' | translate }}</h3>
+          <p>{{ 'LANDING.FEATURE_LEARN_DESC' | translate }}</p>
+        </div>
+        
+        <div class="feature-card">
+          <mat-icon>code</mat-icon>
+          <h3>{{ 'LANDING.FEATURE_PRACTICE_TITLE' | translate }}</h3>
+          <p>{{ 'LANDING.FEATURE_PRACTICE_DESC' | translate }}</p>
+        </div>
+        
+        <div class="feature-card">
+          <mat-icon>analytics</mat-icon>
+          <h3>{{ 'LANDING.FEATURE_PROGRESS_TITLE' | translate }}</h3>
+          <p>{{ 'LANDING.FEATURE_PROGRESS_DESC' | translate }}</p>
+        </div>
+        
+        <div class="feature-card">
+          <mat-icon>forum</mat-icon>
+          <h3>{{ 'LANDING.FEATURE_DISCUSS_TITLE' | translate }}</h3>
+          <p>{{ 'LANDING.FEATURE_DISCUSS_DESC' | translate }}</p>
+        </div>
+        
+        <div class="feature-card">
+          <mat-icon>lightbulb</mat-icon>
+          <h3>{{ 'LANDING.FEATURE_HINTS_TITLE' | translate }}</h3>
+          <p>{{ 'LANDING.FEATURE_HINTS_DESC' | translate }}</p>
+        </div>
+        
+        <div class="feature-card">
+          <mat-icon>storage</mat-icon>
+          <h3>{{ 'LANDING.FEATURE_DATABASE_TITLE' | translate }}</h3>
+          <p>{{ 'LANDING.FEATURE_DATABASE_DESC' | translate }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-section">
+      <h2>{{ 'LANDING.HOW_IT_WORKS' | translate }}</h2>
+      <div class="steps-container">
+        <div class="step">
+          <div class="step-number">1</div>
+          <h3>{{ 'LANDING.STEP1_TITLE' | translate }}</h3>
+          <p>{{ 'LANDING.STEP1_DESC' | translate }}</p>
+        </div>
+        
+        <div class="step">
+          <div class="step-number">2</div>
+          <h3>{{ 'LANDING.STEP2_TITLE' | translate }}</h3>
+          <p>{{ 'LANDING.STEP2_DESC' | translate }}</p>
+        </div>
+        
+        <div class="step">
+          <div class="step-number">3</div>
+          <h3>{{ 'LANDING.STEP3_TITLE' | translate }}</h3>
+          <p>{{ 'LANDING.STEP3_DESC' | translate }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

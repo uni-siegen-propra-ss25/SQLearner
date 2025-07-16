@@ -3,8 +3,10 @@ import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Exercise, ExerciseType, Difficulty, AnswerOption } from '../../models/exercise.model';
-import { Database } from '../../../database/models/database.model';
-import { DatabaseService } from '../../../database/services/database.service';
+import { Database } from 'app/features/database/models/database.model';
+import { DatabaseService } from 'app/features/database/services/database.service';
+import { MatDialog } from '@angular/material/dialog';
+import { ExerciseAIGenerationDialogComponent } from './exercise-ai-generation-dialog.component';
 
 @Component({
     selector: 'app-exercise-dialog',
@@ -17,12 +19,14 @@ export class ExerciseDialogComponent implements OnInit {
     exerciseTypes = Object.values(ExerciseType);
     difficultyLevels = Object.values(Difficulty);
     databases: Database[] = [];
+    aiGenerated = false;
 
     constructor(
         private readonly fb: FormBuilder,
         private readonly dialogRef: MatDialogRef<ExerciseDialogComponent>,
         private readonly databaseService: DatabaseService,
         private readonly snackBar: MatSnackBar,
+        private readonly dialog: MatDialog,
         @Inject(MAT_DIALOG_DATA) private readonly data: Partial<Exercise>,
     ) {
         this.isEditing = !!data.id;
@@ -44,7 +48,7 @@ export class ExerciseDialogComponent implements OnInit {
             type: [type, Validators.required],
             difficulty: [this.data.difficulty || Difficulty.EASY, Validators.required],
             databaseId: [this.data.databaseId || null, validators],
-            querySolution: [this.data.querySolution || null, validators],
+            solution: [this.data.solution || ''],
             answers: this.fb.array([]),
             topicId: [this.data.topicId],
             order: [this.data.order || 0],
@@ -71,19 +75,26 @@ export class ExerciseDialogComponent implements OnInit {
     private setupTypeValidation() {
         this.exerciseForm.get('type')?.valueChanges.subscribe((type: ExerciseType) => {
             const databaseIdControl = this.exerciseForm.get('databaseId');
-            const querySolutionControl = this.exerciseForm.get('querySolution');
+            const solutionControl = this.exerciseForm.get('solution');
             const answersControl = this.exerciseForm.get('answers') as FormArray;
 
             // Reset all controls and their validators
             databaseIdControl?.clearValidators();
-            databaseIdControl?.setValue(null);
-            querySolutionControl?.clearValidators();
-            querySolutionControl?.setValue(null);
+            solutionControl?.clearValidators();
+
+            // Only reset values if not in editing mode or if type actually changed from initial
+            if (!this.isEditing || type !== this.data.type) {
+                databaseIdControl?.setValue(null);
+                solutionControl?.setValue(null);
+            }
 
             // Clear answers array for non-choice exercises
             if (type !== ExerciseType.SINGLE_CHOICE && type !== ExerciseType.MULTIPLE_CHOICE) {
-                while (answersControl.length) {
-                    answersControl.removeAt(0);
+                // Only clear answers if not in editing mode or if type actually changed from initial
+                if (!this.isEditing || type !== this.data.type) {
+                    while (answersControl.length) {
+                        answersControl.removeAt(0);
+                    }
                 }
             } else {
                 // For choice exercises, ensure we have at least 2 answers
@@ -97,7 +108,7 @@ export class ExerciseDialogComponent implements OnInit {
             // Set up validators based on type
             if (type === ExerciseType.QUERY) {
                 databaseIdControl?.setValidators([Validators.required]);
-                querySolutionControl?.setValidators([Validators.required]);
+                solutionControl?.setValidators([Validators.required]);
             } else if (
                 type === ExerciseType.SINGLE_CHOICE ||
                 type === ExerciseType.MULTIPLE_CHOICE
@@ -127,7 +138,7 @@ export class ExerciseDialogComponent implements OnInit {
 
             // Update validation status
             databaseIdControl?.updateValueAndValidity();
-            querySolutionControl?.updateValueAndValidity();
+            solutionControl?.updateValueAndValidity();
             if (answersControl.length > 0) {
                 answersControl.controls.forEach((control) => {
                     control.get('text')?.updateValueAndValidity();
@@ -147,16 +158,23 @@ export class ExerciseDialogComponent implements OnInit {
     }
 
     addAnswer(answer?: AnswerOption) {
-        const group = this.fb.group({
+        const groupConfig: any = {
             text: [answer?.text || '', Validators.required],
             isCorrect: [answer?.isCorrect || false],
             order: [answer?.order || this.answers.length],
-        });
+        };
+
+        // Include id if answer already exists (for editing)
+        if (answer?.id) {
+            groupConfig.id = [answer.id];
+        }
+
+        const group = this.fb.group(groupConfig);
 
         // For single choice, if this is the first answer and no other answers are correct,
-        // make it correct by default
+        // make it correct by default (but only if not editing existing data)
         const type = this.exerciseForm.get('type')?.value;
-        if (type === ExerciseType.SINGLE_CHOICE && this.answers.length === 0) {
+        if (type === ExerciseType.SINGLE_CHOICE && this.answers.length === 0 && !answer) {
             group.get('isCorrect')?.setValue(true);
         }
 
@@ -181,17 +199,26 @@ export class ExerciseDialogComponent implements OnInit {
 
         if (type === ExerciseType.MULTIPLE_CHOICE || type === ExerciseType.SINGLE_CHOICE) {
             if (!formValue.answers || formValue.answers.length < 2) {
-                return { valid: false, error: 'Choice exercises must have at least two answer options.' };
+                return {
+                    valid: false,
+                    error: 'Choice exercises must have at least two answer options.',
+                };
             }
 
             const correctAnswers = formValue.answers.filter((a: any) => a.isCorrect) || [];
 
             if (type === ExerciseType.SINGLE_CHOICE && correctAnswers.length !== 1) {
-                return { valid: false, error: 'Single choice exercises must have exactly one correct answer.' };
+                return {
+                    valid: false,
+                    error: 'Single choice exercises must have exactly one correct answer.',
+                };
             }
 
             if (type === ExerciseType.MULTIPLE_CHOICE && correctAnswers.length === 0) {
-                return { valid: false, error: 'Multiple choice exercises must have at least one correct answer.' };
+                return {
+                    valid: false,
+                    error: 'Multiple choice exercises must have at least one correct answer.',
+                };
             }
         }
 
@@ -199,31 +226,86 @@ export class ExerciseDialogComponent implements OnInit {
     }
 
     onSubmit(): void {
+        console.log('=== DEBUG: onSubmit called ===');
         const validation = this.validateForm();
         if (!validation.valid) {
-            this.snackBar.open(validation.error || 'Form validation failed', 'Close', { duration: 5000 });
+            console.log('=== DEBUG: Form validation failed ===');
+            this.snackBar.open(validation.error || 'Form validation failed', 'Close', {
+                duration: 5000,
+            });
             return;
         }
 
         const formValue = { ...this.exerciseForm.value };
+        console.log('=== DEBUG: Form processing ===');
+        console.log('Form value before processing:', formValue);
+        console.log('Dialog data:', this.data);
+
+        // Include id if editing
+        if (this.isEditing && this.data.id) {
+            formValue.id = this.data.id;
+            console.log('ID set for editing:', formValue.id);
+        }
+
+        // Include topicId from dialog data, but don't overwrite if already set
+        if (!formValue.topicId && this.data.topicId) {
+            formValue.topicId = this.data.topicId;
+            console.log('TopicId set to:', formValue.topicId);
+        }
 
         // Clean up the form value based on exercise type
         if (formValue.type !== ExerciseType.QUERY) {
+            console.log('=== DEBUG: Removing query fields ===');
             delete formValue.databaseId;
-            delete formValue.querySolution;
+            delete formValue.solution;
+        } else {
+            console.log('=== DEBUG: QUERY exercise - checking fields ===');
+            console.log('databaseId:', formValue.databaseId);
+            console.log('solution:', formValue.solution);
+            console.log('solution type:', typeof formValue.solution);
+            console.log('solution length:', formValue.solution?.length);
         }
+
         if (
             formValue.type !== ExerciseType.SINGLE_CHOICE &&
             formValue.type !== ExerciseType.MULTIPLE_CHOICE
         ) {
+            console.log('=== DEBUG: Removing answer fields ===');
             delete formValue.answers;
         }
 
+        console.log('=== DEBUG: Final form value ===');
+        console.log('Final form value to be sent:', formValue);
+        console.log('Final form value keys:', Object.keys(formValue));
+        console.log('Final form value stringified:', JSON.stringify(formValue, null, 2));
         this.dialogRef.close(formValue);
     }
 
     onCancel(): void {
         this.dialogRef.close();
+    }
+
+    openAIGenerationDialog(): void {
+        const dialogRef = this.dialog.open(ExerciseAIGenerationDialogComponent, {
+            width: '500px',
+            data: {
+                databases: this.databases,
+                defaultType: this.exerciseForm.get('type')?.value,
+                defaultDifficulty: this.exerciseForm.get('difficulty')?.value,
+            },
+        });
+        dialogRef.afterClosed().subscribe((result: any) => {
+            if (result && this.exerciseForm) {
+                this.exerciseForm.patchValue({
+                    title: result.title,
+                    description: result.description,
+                    solution: result.solution,
+                    difficulty: result.difficulty || this.exerciseForm.get('difficulty')?.value,
+                    databaseId: result.databaseId || this.exerciseForm.get('databaseId')?.value,
+                });
+                this.aiGenerated = true;
+            }
+        });
     }
 
     onSingleChoiceSelect(selectedIndex: number) {

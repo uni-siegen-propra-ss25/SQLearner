@@ -11,6 +11,7 @@ export interface QueryResult {
     rowCount?: number;
     command?: string;
     error?: string;
+    executionTime?: number;
 }
 
 @Injectable({
@@ -45,19 +46,15 @@ export class DatabaseService {
     }
 
     createDatabase(database: CreateDatabaseDto): Observable<Database> {
-        console.log('DatabaseService - Creating database with data:', database);
-        console.log('DatabaseService - Current user role:', this.authService.getUserRole());
-        console.log('DatabaseService - Is user a tutor?', this.authService.isTutor());
-        console.log('DatabaseService - Auth token:', this.authService.getToken());
+        console.log('Creating database:', database);
 
         return this.http.post<Database>(this.baseUrl, database).pipe(
             map((database) => {
-                console.log('DatabaseService - Database created successfully:', database);
+                console.log('Database created successfully:', database);
                 return this.convertDates(database);
             }),
             catchError((error) => {
-                console.error('DatabaseService - Error creating database:', error);
-                console.error('DatabaseService - Error details:', error.error);
+                console.error('Error creating database:', error);
                 throw error;
             }),
         );
@@ -83,5 +80,81 @@ export class DatabaseService {
 
     runQuery(databaseId: number, query: string): Observable<QueryResult> {
         return this.http.post<QueryResult>(`${this.baseUrl}/${databaseId}/query`, { query });
+    }
+
+    /**
+     * Gets the actual PostgreSQL schema from the database
+     * @param databaseId - The ID of the database
+     * @returns Observable with the schema SQL
+     */
+    getDatabaseSchema(databaseId: number): Observable<{ schema: string }> {
+        return this.http.get<{ schema: string }>(`${this.baseUrl}/${databaseId}/schema`);
+    }
+
+    truncateTable(databaseId: number, tableId: number): Observable<void> {
+        return this.http.post<void>(`${this.baseUrl}/${databaseId}/tables/${tableId}/truncate`, {});
+    }
+
+    deleteTable(databaseId: number, tableId: number): Observable<void> {
+        return this.http.delete<void>(`${this.baseUrl}/${databaseId}/tables/${tableId}`);
+    }
+
+    deleteTableRow(databaseId: number, tableId: number, rowId: any): Observable<void> {
+        return this.http.delete<void>(
+            `${this.baseUrl}/${databaseId}/tables/${tableId}/rows/${rowId}`,
+        );
+    }
+
+    uploadDatabase(file: File): Observable<Database> {
+        const formData = new FormData();
+        formData.append('file', file);
+        const headers = new HttpHeaders({ enctype: 'multipart/form-data' });
+        return this.http.post<Database>(`${this.baseUrl}/upload`, formData, { headers });
+    }
+
+    /**
+     * Inserts a new row into a table
+     * @param databaseId - The ID of the database
+     * @param tableName - The name of the table
+     * @param data - The data to insert
+     * @returns Observable of the inserted row
+     */
+    insertRow(databaseId: number, tableName: string, data: Record<string, any>): Observable<any> {
+        return this.http.post<any>(`${this.baseUrl}/${databaseId}/tables/${tableName}/rows`, {
+            data,
+        });
+    }
+
+    /**
+     * Updates a row in a table
+     * @param databaseId - The ID of the database
+     * @param tableName - The name of the table
+     * @param data - The data to update
+     * @param whereClause - The WHERE clause for the update
+     * @returns Observable of the updated row
+     */
+    updateRow(
+        databaseId: number,
+        tableName: string,
+        data: Record<string, any>,
+        whereClause: string,
+    ): Observable<any> {
+        return this.http.put<any>(`${this.baseUrl}/${databaseId}/tables/${tableName}/rows`, {
+            data,
+            whereClause,
+        });
+    }
+
+    /**
+     * Deletes a row from a table
+     * @param databaseId - The ID of the database
+     * @param tableName - The name of the table
+     * @param whereClause - The WHERE clause for the delete
+     * @returns Observable of the deletion result
+     */
+    deleteRow(databaseId: number, tableName: string, whereClause: string): Observable<any> {
+        return this.http.delete<any>(`${this.baseUrl}/${databaseId}/tables/${tableName}/rows`, {
+            body: { whereClause },
+        });
     }
 }

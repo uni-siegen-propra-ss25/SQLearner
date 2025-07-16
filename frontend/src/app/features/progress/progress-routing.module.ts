@@ -10,13 +10,13 @@ const routes: Routes = [
         component: ProgressViewComponent,
         canActivate: [RoleGuard],
         data: {
-            allowedRoles: [Role.STUDENT, Role.TUTOR, Role.ADMIN]
-        }
-    }
+            allowedRoles: [Role.STUDENT, Role.TUTOR, Role.ADMIN],
+        },
+    },
 ];
 
 @NgModule({
     imports: [RouterModule.forChild(routes)],
-    exports: [RouterModule]
+    exports: [RouterModule],
 })
-export class ProgressRoutingModule { }
+export class ProgressRoutingModule {}

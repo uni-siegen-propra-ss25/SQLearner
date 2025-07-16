@@ -7,6 +7,7 @@ import { UserCreateDialogComponent } from './dialogs/user-create-dialog/user-cre
 import { UserUpdateDialogComponent } from './dialogs/user-update-dialog/user-update-dialog.component';
 import { UserListComponent } from './components/user-list/user-list.component';
 import { ProfileComponent } from './components/profile/profile.component';
+import { SharedModule } from 'app/shared/shared.module';
 
 @NgModule({
     declarations: [
@@ -15,7 +16,7 @@ import { ProfileComponent } from './components/profile/profile.component';
         UserListComponent,
         ProfileComponent,
     ],
-    imports: [CommonModule, UsersRoutingModule, MaterialModule, ReactiveFormsModule],
+    imports: [CommonModule, UsersRoutingModule, MaterialModule, ReactiveFormsModule, SharedModule],
     exports: [ProfileComponent],
 })
 export class UsersModule {}

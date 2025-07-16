@@ -7,11 +7,12 @@ import { Database } from '../../models/database.model';
 @Component({
     selector: 'app-upload-database-dialog',
     templateUrl: './database-upload-dialog.component.html',
-    styleUrls: ['./database-upload-dialog.component.scss'],
+    styleUrls: [],
 })
 export class DatabaseUploadDialogComponent {
     form: FormGroup;
     selectedFile: File | null = null;
+    fileInput: any;
 
     constructor(
         private fb: FormBuilder,
@@ -31,9 +32,27 @@ export class DatabaseUploadDialogComponent {
         }
     }
 
+    onFileDrop(event: DragEvent): void {
+        event.preventDefault();
+        if (event.dataTransfer && event.dataTransfer.files.length > 0) {
+            const file = event.dataTransfer.files[0];
+            if (file.name.endsWith('.sql')) {
+                this.selectedFile = file;
+            }
+        }
+    }
+
+    removeFile(event: Event): void {
+        event.stopPropagation();
+        this.selectedFile = null;
+        if (this.fileInput) {
+            this.fileInput.nativeElement.value = '';
+        }
+    }
+
     onSubmit() {
         if (this.form.valid && this.selectedFile) {
-            this.databaseService.uploadSqlFile(this.selectedFile).subscribe({
+            this.databaseService.uploadDatabase(this.selectedFile).subscribe({
                 next: (database: Database) => {
                     this.dialogRef.close(database);
                 },

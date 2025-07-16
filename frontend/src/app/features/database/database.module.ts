@@ -1,48 +1,40 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatTableModule } from '@angular/material/table';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { MatIconModule } from '@angular/material/icon';
-import { MatCardModule } from '@angular/material/card';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MaterialModule } from 'app/material.module';
+import { SharedModule } from '../../shared/shared.module';
 import { DatabaseRoutingModule } from './database-routing.module';
-
 import { DatabaseListComponent } from './components/database-list/database-list.component';
+import { DatabaseTableViewerComponent } from './components/database-table-viewer/database-table-viewer.component';
 import { DatabaseEditDialogComponent } from './dialogs/database-edit-dialog/database-edit-dialog.component';
 import { DatabaseCreateDialogComponent } from './dialogs/database-create-dialog/database-create-dialog.component';
 import { DatabaseUploadDialogComponent } from './dialogs/database-upload-dialog/database-upload-dialog.component';
-import { ErDiagramComponent } from './components/er-diagram/er-diagram.component';
+import { DatabaseViewDialogComponent } from './dialogs/database-view-dialog/database-view-dialog.component';
+import { ConfirmDialogComponent } from './dialogs/confirm-dialog/confirm-dialog.component';
+import { CreateTableDialogComponent } from './dialogs/create-table-dialog/create-table-dialog.component';
+import { DataEditDialogComponent } from './dialogs/data-edit-dialog/data-edit-dialog.component';
+import { EditTableDialogComponent } from './dialogs/edit-table-dialog/edit-table-dialog.component';
 
 @NgModule({
     declarations: [
         DatabaseListComponent,
-        DatabaseEditDialogComponent,
+        DatabaseTableViewerComponent,
         DatabaseCreateDialogComponent,
+        DatabaseEditDialogComponent,
         DatabaseUploadDialogComponent,
-        ErDiagramComponent
+        DatabaseViewDialogComponent,
+        ConfirmDialogComponent,
+        CreateTableDialogComponent,
+        DataEditDialogComponent,
+        EditTableDialogComponent,
     ],
     imports: [
         CommonModule,
         FormsModule,
         ReactiveFormsModule,
-        MatButtonModule,
-        MatDialogModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatTableModule,
-        MatSnackBarModule,
-        MatButtonToggleModule,
-        MatIconModule,
-        MatCardModule,
-        DatabaseRoutingModule
+        MaterialModule,
+        SharedModule,
+        DatabaseRoutingModule,
     ],
-    exports: [
-        DatabaseListComponent
-    ]
 })
-export class DatabaseModule { }
+export class DatabaseModule {}

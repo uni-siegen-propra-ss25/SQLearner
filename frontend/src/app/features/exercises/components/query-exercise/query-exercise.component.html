@@ -1,30 +1,42 @@
+<!--
+  Main container for the SQL query exercise component.
+  Contains header, description, SQL editor, actions, view container (schema/results), and feedback section.
+-->
 <div class="query-exercise">
   <mat-card-content>
+    <!-- Exercise header: title, completion icon, and database info -->
     <div class="exercise-header">
-      <h2 class="exercise-title">{{ exercise.title }}</h2>
-      <div class="database-info" *ngIf="exercise.database">
-        <mat-icon>storage</mat-icon>
-        <span>
-          {{ exercise.database.name }}
-        </span>
-      </div>
+      <h2 class="exercise-title">
+        {{ exercise.title }}
+        <!-- Icon shown if the answer is correct -->
+        <mat-icon
+          *ngIf="isCorrectAnswer"
+          class="completed-icon"
+          matTooltip="Du hast diese Aufgabe bereits gelöst!"
+          matTooltipPosition="above"
+        >
+          check_circle
+        </mat-icon>
+      </h2>
     </div>
+    <!-- Exercise description -->
     <p class="exercise-description">{{ exercise.description }}</p>
 
-    <!-- SQL Editor -->
+    <!-- SQL Editor section -->
     <div class="editor-section">
       <app-sql-editor
         class="sql-editor"
         [initialValue]="sqlQuery"
-        [schema]="exercise.database?.schemaSql || ''"
+        [schema]="actualDatabaseSchema || exercise.database?.schemaSql || ''"
         [theme]="isDarkMode ? 'dark' : 'light'"
         (valueChange)="onSqlChange($event)"
         (editorReady)="onEditorReady()"
       ></app-sql-editor>
     </div>
 
-    <!-- Actions -->
+    <!-- Actions: view toggles and query/submit buttons -->
     <div class="actions">
+      <!-- Toggle between schema and result view -->
       <div class="toggle-view">
         <mat-button-toggle-group [(ngModel)]="currentView">
           <mat-button-toggle value="schema" matTooltip="Datenbankschema anzeigen">
@@ -36,32 +48,35 @@
         </mat-button-toggle-group>
       </div>
 
+      <!-- Query and submit buttons -->
       <div class="query-actions">
         <button
           mat-stroked-button
-          [disabled]="!sqlQuery.trim() || isLoading"
+          [disabled]="!sqlQuery.trim() || isLoading || !isContainerReady"
           (click)="runQuery()"
-          matTooltip="Testet deine Query direkt in der Datenbank. Das Ergebnis wird dir sofort angezeigt."
+          [matTooltip]="getQueryButtonTooltip()"
         >
           <mat-icon>play_arrow</mat-icon>
-          Query testen
+          <span *ngIf="isContainerReady">Query testen</span>
+          <span *ngIf="!isContainerReady">Container wird vorbereitet...</span>
         </button>
         <button
           mat-flat-button
           color="primary"
-          [disabled]="!sqlQuery.trim() || isLoading"
-          (click)="submitQuery()"
+          [disabled]="!sqlQuery.trim() || isLoading || cooldown > 0 || !isContainerReady"
+          (click)="submitAnswer()"
           matTooltip="Reicht deine Lösung ein. Die KI überprüft, ob deine Query das gewünschte Ergebnis liefert."
         >
           <mat-icon>send</mat-icon>
-          Lösung einreichen
+          <ng-container *ngIf="cooldown > 0">Warte {{ cooldown }} s…</ng-container>
+          <ng-container *ngIf="cooldown === 0">Lösung einreichen</ng-container>
         </button>
       </div>
     </div>
 
-    <!-- View Container -->
+    <!-- View container: shows either schema or query results -->
     <div class="view-container">
-      <!-- Schema View -->
+      <!-- Schema View: shows the SQL schema and ER diagram button -->
       <div class="schema-view" *ngIf="currentView === 'schema'">
         <h3>
           <div class="schema-header">
@@ -69,30 +84,48 @@
             <span>Datenbankschema</span>
           </div>
         </h3>
+        <!-- ER diagram button appears only in schema view, below the header -->
+        <div class="er-diagram-action">
+          <button
+            mat-stroked-button
+            color="primary"
+            (click)="showErDiagram()"
+            matTooltip="ER-Diagramm anzeigen"
+          >
+            <mat-icon>account_tree</mat-icon>
+            ER-Diagramm anzeigen
+          </button>
+        </div>
+        <!-- SQL schema content display -->
         <div class="schema-content mat-elevation-z1">
-          <pre>{{ exercise.database?.schemaSql || 'Kein Schema verfügbar' }}</pre>
+          <pre>{{
+            actualDatabaseSchema || exercise.database?.schemaSql || 'Kein Schema verfügbar'
+          }}</pre>
         </div>
       </div>
 
-      <!-- Results View -->
+      <!-- Results View: shows the query result table or loading/empty state -->
       <div class="results-view" *ngIf="currentView === 'result'">
-        <div class="results-section" *ngIf="queryResult || isLoading">
+        <div class="results-section" *ngIf="queryResult || isLoading || queryError">
           <h3>
             <mat-icon>table_chart</mat-icon>
             {{ isLoading ? 'Query wird ausgeführt...' : 'Ergebnis deiner Query' }}
           </h3>
 
+          <!-- Progress bar shown while loading -->
           <mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
 
-          <div class="results-table" *ngIf="!isLoading && queryResult">
+          
+
+          <!-- Table only if no error -->
+          <div class="results-table" *ngIf="!isLoading && queryResult && !queryError">
             <div class="table-stats">
-              {{ queryResult.rows.length }} Zeile{{
-                queryResult.rows.length !== 1 ? 'n' : ''
-              }}
+              {{ queryResult.rows.length }} Zeile{{ queryResult.rows.length !== 1 ? 'n' : '' }}
               gefunden
             </div>
             <div class="table-container mat-elevation-z1">
               <table mat-table [dataSource]="paginatedRows">
+                <!-- Table columns dynamically generated -->
                 <ng-container
                   [matColumnDef]="col"
                   *ngFor="let col of queryResult.columns; let i = index"
@@ -105,6 +138,7 @@
                 <tr mat-row *matRowDef="let row; columns: queryResult.columns"></tr>
               </table>
 
+              <!-- Paginator for result table -->
               <mat-paginator
                 [length]="queryResult.rows.length"
                 [pageSize]="pageSize"
@@ -118,22 +152,30 @@
           </div>
         </div>
 
-        <div class="empty-state" *ngIf="!queryResult && !isLoading">
+        <!-- Empty state if no query has been run -->
+        <div class="empty-state" *ngIf="!queryResult && !isLoading && !queryError">
           <mat-icon>table_chart</mat-icon>
           <p>Führe eine Query aus, um das Ergebnis zu sehen.</p>
+        </div>
+        <!-- Show query error in empty state if present -->
+        <div class="query-error" *ngIf="queryError">
+          <mat-icon color="warn">error</mat-icon>
+          <span>{{ queryError }}</span>
         </div>
       </div>
     </div>
 
     <!-- Feedback Section -->
-    <mat-expansion-panel *ngIf="showFeedback" class="feedback-section">
+    <mat-expansion-panel *ngIf="showFeedback" [expanded]="showFeedback" class="feedback-section">
       <mat-expansion-panel-header>
         <mat-panel-title>
           <mat-icon>chat</mat-icon>
           AI Feedback
         </mat-panel-title>
       </mat-expansion-panel-header>
-      <p>{{ feedback || 'Loading feedback...' }}</p>
+      <div class="feedback-content">
+        <p>{{ feedback || 'Loading feedback...' }}</p>
+      </div>
     </mat-expansion-panel>
   </mat-card-content>
 </div>

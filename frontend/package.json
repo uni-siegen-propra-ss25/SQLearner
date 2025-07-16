@@ -22,6 +22,9 @@
     "@angular/platform-browser-dynamic": "^18.2.0",
     "@angular/router": "^18.2.0",
     "@monaco-editor/loader": "^1.5.0",
+    "@ngx-translate/core": "^16.0.4",
+    "@ngx-translate/http-loader": "^16.0.1",
+    "jwt-decode": "^4.0.0",
     "monaco-editor": "^0.52.2",
     "prettier": "^3.5.3",
     "rxjs": "~7.8.0",
@@ -39,6 +42,7 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.5.2"
+    "typescript": "~5.5.2",
+    "vite-plugin-static-copy": "^3.1.0"
   }
 }

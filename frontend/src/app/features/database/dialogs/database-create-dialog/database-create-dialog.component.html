@@ -1,32 +1,102 @@
-<h2 mat-dialog-title>Neue Datenbank erstellen</h2>
-<form [formGroup]="form" (ngSubmit)="onSubmit()">
+<div class="database-create-dialog">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon>add</mat-icon>
+      {{ 'DATABASE_CREATE_DIALOG.TITLE' | translate }}
+    </h2>
+    <button mat-icon-button mat-dialog-close>
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
   <mat-dialog-content>
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Name</mat-label>
-      <input matInput formControlName="name" required />
-      <mat-error *ngIf="form.get('name')?.hasError('required')"> Name ist erforderlich </mat-error>
-    </mat-form-field>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-section">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>{{ 'DATABASE_CREATE_DIALOG.NAME' | translate }}</mat-label>
+          <input
+            matInput
+            formControlName="name"
+            [placeholder]="'DATABASE_CREATE_DIALOG.NAME_PLACEHOLDER' | translate"
+            required
+          />
+          <mat-error *ngIf="form.get('name')?.hasError('required')">
+            {{ 'DATABASE_CREATE_DIALOG.NAME_REQUIRED' | translate }}
+          </mat-error>
+          <mat-error *ngIf="form.get('name')?.hasError('pattern')">
+            {{ 'DATABASE_CREATE_DIALOG.NAME_PATTERN_ERROR' | translate }}
+          </mat-error>
+          <mat-hint>{{ 'DATABASE_CREATE_DIALOG.NAME_HINT' | translate }}</mat-hint>
+        </mat-form-field>
+      </div>
 
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Beschreibung</mat-label>
-      <textarea matInput formControlName="description" rows="3"></textarea>
-    </mat-form-field>
+      <div class="form-section">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>{{ 'DATABASE_CREATE_DIALOG.DESCRIPTION' | translate }}</mat-label>
+          <textarea
+            matInput
+            formControlName="description"
+            [placeholder]="'DATABASE_CREATE_DIALOG.DESCRIPTION_PLACEHOLDER' | translate"
+            rows="3"
+          ></textarea>
+        </mat-form-field>
+      </div>
 
-    <div class="sql-schema-field">
-      <mat-form-field appearance="fill" class="full-width">
-        <mat-label>SQL-Schema</mat-label>
-        <textarea matInput formControlName="schemaSql" rows="10" required></textarea>
-        <mat-error *ngIf="form.get('schemaSql')?.hasError('required')">
-          SQL-Schema ist erforderlich
-        </mat-error>
-      </mat-form-field>
-    </div>
+      <div class="form-section">
+        <div class="section-header">
+          <h3>{{ 'DATABASE_CREATE_DIALOG.SQL_SCHEMA' | translate }}</h3>
+          <div class="schema-info">
+            <mat-icon>info</mat-icon>
+            <span>{{ 'DATABASE_CREATE_DIALOG.SCHEMA_INFO' | translate }}</span>
+          </div>
+        </div>
+
+        <div class="sql-editor-container">
+          <div class="editor-header">
+            <span class="editor-label">{{ 'DATABASE_CREATE_DIALOG.SQL_CODE' | translate }}</span>
+            <div class="editor-actions">
+              <button
+                type="button"
+                mat-icon-button
+                [matTooltip]="'DATABASE_CREATE_DIALOG.LOAD_EXAMPLE' | translate"
+                (click)="loadExample()"
+              >
+                <mat-icon>code</mat-icon>
+              </button>
+              <button
+                type="button"
+                mat-icon-button
+                [matTooltip]="'DATABASE_CREATE_DIALOG.FORMAT_CODE' | translate"
+                (click)="formatCode()"
+              >
+                <mat-icon>format_align_left</mat-icon>
+              </button>
+            </div>
+          </div>
+          <div #sqlEditorContainer class="monaco-editor-container"></div>
+          <div class="editor-hint">
+            <mat-icon>lightbulb</mat-icon>
+            <span>{{ 'DATABASE_CREATE_DIALOG.EDITOR_HINT' | translate }}</span>
+          </div>
+        </div>
+      </div>
+    </form>
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">
-    <button mat-button type="button" (click)="onCancel()">Abbrechen</button>
-    <button mat-raised-button color="primary" type="submit" [disabled]="!form.valid">
-      Erstellen
+    <button mat-button type="button" (click)="onCancel()" [disabled]="isLoading">
+      {{ 'DATABASE_CREATE_DIALOG.CANCEL' | translate }}
+    </button>
+    <button
+      mat-raised-button
+      color="primary"
+      type="submit"
+      [disabled]="!form.valid || isLoading"
+      (click)="onSubmit()"
+    >
+      <mat-spinner diameter="20" *ngIf="isLoading"></mat-spinner>
+      <span *ngIf="!isLoading">{{ 'DATABASE_CREATE_DIALOG.CREATE' | translate }}</span>
+      <span *ngIf="isLoading">{{ 'DATABASE_CREATE_DIALOG.CREATING' | translate }}</span>
     </button>
   </mat-dialog-actions>
-</form>
+</div>

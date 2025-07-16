@@ -12,7 +12,6 @@ export class SettingsService {
         return setting?.value || null;
     }
 
-    // TODO: Add encryption for sensitive settings like API keys
     async setSetting(name: string, value: string, description?: string): Promise<void> {
         await this.prisma.settings.upsert({
             where: { name },

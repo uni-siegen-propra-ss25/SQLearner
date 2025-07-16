@@ -18,6 +18,7 @@ import { ExerciseDialogComponent } from '../../dialogs/exercise-dialog/exercise-
  *   [topic]="topic"
  *   [isTutor]="false"
  *   [bookmarkedExerciseIds]="bookmarkSet"
+ *   [completedExerciseIds]="completedSet"
  *   (bookmarkToggled)="handleBookmarkChange($event)">
  * </app-topic-card>
  * ```
@@ -53,6 +54,15 @@ export class TopicCardComponent implements OnInit {
     @Input() bookmarkedExerciseIds: Set<number> = new Set();
 
     /**
+     * Set of exercise IDs that are currently completed by the user.
+     * Used for efficient O(1) completion status lookups across exercise cards within this topic.
+     * Passed down from parent components for completion state synchronization.
+     * @type {Set<number>}
+     * @default new Set()
+     */
+    @Input() completedExerciseIds: Set<number> = new Set();
+
+    /**
      * Event emitter for topic edit operations triggered by tutors.
      * Emits the complete topic object to parent component for editing.
      * @type {EventEmitter<Topic>}
@@ -72,6 +82,13 @@ export class TopicCardComponent implements OnInit {
      * @type {EventEmitter<{exerciseId: number; isBookmarked: boolean}>}
      */
     @Output() bookmarkToggled = new EventEmitter<{ exerciseId: number; isBookmarked: boolean }>();
+
+    /**
+     * Event emitter for exercise completion events from child exercise components.
+     * Forwards exercise completion events up the component hierarchy for centralized state management.
+     * @type {EventEmitter<number>}
+     */
+    @Output() exerciseCompleted = new EventEmitter<number>();
 
     /**
      * Array of exercises belonging to this topic, loaded from the backend.
@@ -154,26 +171,36 @@ export class TopicCardComponent implements OnInit {
      * Handles dialog result and triggers exercise reload with user feedback on success/failure.
      */
     openNewExerciseDialog(): void {
+        const dialogData = {
+            topicId: this.topic.id,
+            order: this.exercises.length,
+        };
+        console.log('=== DEBUG: Opening exercise dialog ===');
+        console.log('Topic ID:', this.topic.id);
+        console.log('Dialog data:', dialogData);
+
         const dialogRef = this.dialog.open(ExerciseDialogComponent, {
             width: '800px',
-            data: {
-                topicId: this.topic.id,
-                order: this.exercises.length,
-            },
+            data: dialogData,
         });
 
         dialogRef.afterClosed().subscribe((result) => {
+            console.log('=== DEBUG: Dialog closed ===');
+            console.log('Result:', result);
             if (result) {
-                // Add topic ID to the exercise data for backend association
-                const exerciseData = { ...result, topicId: this.topic.id };
-                this.exercisesService.createExercise(exerciseData).subscribe({
+                console.log('=== DEBUG: Creating exercise ===');
+                console.log('Exercise data to send:', result);
+                this.exercisesService.createExercise(result).subscribe({
                     next: () => {
+                        console.log('=== DEBUG: Exercise created successfully ===');
                         this.loadExercises();
                         this.snackBar.open('Exercise created successfully', 'Close', {
                             duration: 3000,
                         });
                     },
                     error: (error) => {
+                        console.log('=== DEBUG: Error creating exercise ===');
+                        console.error('Error details:', error);
                         console.error('Error creating exercise:', error);
                         this.snackBar.open('Failed to create exercise', 'Close', {
                             duration: 3000,
@@ -251,6 +278,17 @@ export class TopicCardComponent implements OnInit {
     }
 
     /**
+     * Checks if a specific exercise is completed by the current user.
+     * Provides efficient O(1) lookup using Set data structure from parent component.
+     * Used by exercise cards to determine completion display state.
+     * @param {number} exerciseId - The unique identifier of the exercise to check
+     * @returns {boolean} True if the exercise is completed, false otherwise
+     */
+    isExerciseCompleted(exerciseId: number): boolean {
+        return this.completedExerciseIds.has(exerciseId);
+    }
+
+    /**
      * Handles bookmark toggle events from child exercise card components.
      * Forwards the bookmark event to the parent chapter component for centralized state management.
      * Maintains the event flow for real-time bookmark synchronization across the component hierarchy.
@@ -260,5 +298,32 @@ export class TopicCardComponent implements OnInit {
      */
     onBookmarkToggled(event: { exerciseId: number; isBookmarked: boolean }): void {
         this.bookmarkToggled.emit(event);
+    }
+
+    /**
+     * Handles exercise completion events from child exercise card components.
+     * Forwards the exercise completion event to the parent chapter component for centralized state management.
+     * Maintains the event flow for real-time completion synchronization across the component hierarchy.
+     * @param {number} exerciseId - The ID of the completed exercise
+     */
+    onExerciseCompleted(exerciseId: number): void {
+        this.exerciseCompleted.emit(exerciseId);
+    }
+
+    getCompletedCount(): number {
+        return this.exercises.filter(
+            (ex) => this.isExerciseCompleted(ex.id) || this.isLocallyCompleted(ex.id),
+        ).length;
+    }
+
+    isLocallyCompleted(exerciseId: number): boolean {
+        const completed = localStorage.getItem('completedExercises');
+        if (!completed) return false;
+        try {
+            const arr = JSON.parse(completed);
+            return Array.isArray(arr) && arr.includes(exerciseId);
+        } catch {
+            return false;
+        }
     }
 }

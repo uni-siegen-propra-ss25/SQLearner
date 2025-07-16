@@ -11,7 +11,9 @@ import { ExerciseCardComponent } from './components/exercise-card/exercise-card.
 import { ChapterDialogComponent } from './dialogs/chapter-dialog/chapter-dialog.component';
 import { TopicDialogComponent } from './dialogs/topic-dialog/topic-dialog.component';
 import { ExerciseDialogComponent } from './dialogs/exercise-dialog/exercise-dialog.component';
+import { ExerciseAIGenerationDialogComponent } from './dialogs/exercise-dialog/exercise-ai-generation-dialog.component';
 import { ExercisesModule } from '../exercises/exercises.module';
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
     declarations: [
@@ -22,6 +24,7 @@ import { ExercisesModule } from '../exercises/exercises.module';
         ChapterDialogComponent,
         TopicDialogComponent,
         ExerciseDialogComponent,
+        ExerciseAIGenerationDialogComponent,
     ],
     imports: [
         CommonModule,
@@ -30,6 +33,7 @@ import { ExercisesModule } from '../exercises/exercises.module';
         DragDropModule,
         MaterialModule,
         ExercisesModule,
+        TranslateModule,
     ],
 })
 export class RoadmapModule {}

@@ -14,8 +14,15 @@ import { RouterModule } from '@angular/router';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { RoadmapModule } from './features/roadmap/roadmap.module';
 import { ExercisesModule } from './features/exercises/exercises.module';
-import { ChatModule } from './features/chat/chat.module';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { HttpClient } from '@angular/common/http';
+
+export function HttpLoaderFactory(http: HttpClient) {
+    return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+}
 
 @NgModule({
     declarations: [AppComponent],
@@ -31,8 +38,16 @@ import { FormsModule } from '@angular/forms';
         DragDropModule,
         RoadmapModule,
         ExercisesModule,
-        ChatModule,
         FormsModule,
+        CommonModule,
+        TranslateModule.forRoot({
+            defaultLanguage: 'de',
+            loader: {
+                provide: TranslateLoader,
+                useFactory: HttpLoaderFactory,
+                deps: [HttpClient],
+            },
+        }),
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },

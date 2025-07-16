@@ -1,6 +1,20 @@
 <div class="choice-exercise">
   <mat-card-content>
-    <h2 class="exercise-title">{{ exercise.title }}</h2>
+    <div class="exercise-header">
+      <h2 class="exercise-title">
+        {{ exercise.title }}
+
+        <!-- Icon shown if the answer is correct -->
+        <mat-icon
+          *ngIf="isCorrectAnswer"
+          class="completed-icon"
+          matTooltip="Du hast diese Aufgabe bereits gelöst!"
+          matTooltipPosition="above"
+        >
+          check_circle
+        </mat-icon>
+      </h2>
+    </div>
     <p class="exercise-description">{{ exercise.description }}</p>
 
     <div class="options-container">
@@ -11,55 +25,46 @@
         required
         aria-label="Select an answer option"
       >
-        <div
+        <label
           *ngFor="let option of exercise.answers"
-          class="option"
-          (click)="option.id && (selectedOptions[0] = option.id)"
+          class="option clickable-option"
+          [for]="'single-choice-' + option.id"
         >
-          <mat-radio-button [value]="option.id">
+          <mat-radio-button [id]="'single-choice-' + option.id" [value]="option.id">
             {{ option.text }}
           </mat-radio-button>
-        </div>
-      </mat-radio-group>
-
-      <!-- Multiple Choice -->
+        </label> </mat-radio-group
+      ><!-- Multiple Choice -->
       <div *ngIf="exercise.type === ExerciseType.MULTIPLE_CHOICE" class="multiple-choice">
-        <div
+        <label
           *ngFor="let option of exercise.answers"
-          class="option"
-          (click)="option.id && toggleOption(option.id)"
+          class="option clickable-option"
+          [for]="'multiple-choice-' + option.id"
         >
           <mat-checkbox
+            [id]="'multiple-choice-' + option.id"
             [checked]="selectedOptions.includes(option.id!)"
-            (change)="toggleOption(option.id!)"
+            (change)="option.id && toggleOption(option.id!)"
           >
             {{ option.text }}
           </mat-checkbox>
-        </div>
+        </label>
       </div>
     </div>
-
     <div class="actions">
       <button
         mat-flat-button
         color="primary"
-        [disabled]="selectedOptions.length === 0 || isSubmitting"
+        [disabled]="selectedOptions.length === 0 || isSubmitting || isCorrectAnswer"
         (click)="submitAnswer()"
       >
-        <mat-icon>{{ isSubmitting ? 'hourglass_empty' : 'check' }}</mat-icon>
-        {{ isSubmitting ? 'Submitting...' : 'Submit Answer' }}
+        <mat-icon>{{
+          isSubmitting ? 'hourglass_empty' : isCorrectAnswer ? 'check_circle' : 'check'
+        }}</mat-icon>
+        <span *ngIf="!isSubmitting && !isCorrectAnswer">Submit Answer</span>
+        <span *ngIf="isSubmitting">Submitting...</span>
+        <span *ngIf="isCorrectAnswer">Correct Answer!</span>
       </button>
     </div>
-
-    <!-- Feedback Section -->
-    <mat-expansion-panel *ngIf="showFeedback" class="feedback-section">
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          <mat-icon>chat</mat-icon>
-          AI Feedback
-        </mat-panel-title>
-      </mat-expansion-panel-header>
-      <p>{{ feedback || 'Loading feedback...' }}</p>
-    </mat-expansion-panel>
   </mat-card-content>
 </div>

@@ -11,7 +11,7 @@ export interface Database {
 export interface CreateDatabaseDto {
     name: string;
     description: string;
-    schemaSql: string;
+    schemaSql?: string;
 }
 
 export interface UpdateDatabaseDto {
