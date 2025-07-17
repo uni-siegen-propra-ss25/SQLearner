@@ -3,6 +3,8 @@ import { User } from '@prisma/client';
 import * as Docker from 'dockerode';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { Client } from 'pg';
+import { Controller, Post, Body, Param, NotFoundException } from '@nestjs/common';
+import { ContainerStatus } from '@prisma/client';
 
 /**
  * Service responsible for managing Docker containers for the SQL learning system.
@@ -392,5 +394,26 @@ export class DockerService implements OnModuleInit {
                 }
             });
         });
+    }
+}
+
+@Controller('docker')
+export class DockerController {
+    constructor(
+        private readonly dockerService: DockerService,
+        private readonly prisma: PrismaService,
+    ) {}
+
+    @Post('end-session/:containerId')
+    async endSession(@Param('containerId') containerId: string) {
+        const session = await this.prisma.dbSession.findFirst({ where: { containerId } });
+        if (!session) throw new NotFoundException('Session not found');
+        if (!session.endedAt || session.status === ContainerStatus.RUNNING) {
+            await this.prisma.dbSession.updateMany({
+                where: { containerId },
+                data: { endedAt: new Date(), status: ContainerStatus.FINISHED },
+            });
+        }
+        return { success: true };
     }
 }

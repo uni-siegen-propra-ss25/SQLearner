@@ -253,6 +253,7 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
                 });
             }
         });
+        window.addEventListener('beforeunload', this.handleBeforeUnload);
     }
 
     /**
@@ -271,6 +272,19 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
         }
         // Always unset the global window property on destroy
         (window as any)["containerInitializing"] = false;
+        window.removeEventListener('beforeunload', this.handleBeforeUnload);
+        this.endContainerSession();
+    }
+
+    handleBeforeUnload = (event: BeforeUnloadEvent) => {
+        this.endContainerSession();
+    };
+
+    private endContainerSession() {
+        if (this.containerId) {
+            // Fire-and-forget запрос на завершение сессии
+            fetch(`/api/docker/end-session/${this.containerId}`, { method: 'POST', credentials: 'include' });
+        }
     }
 
     /**
