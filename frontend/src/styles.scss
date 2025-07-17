@@ -76,3 +76,71 @@ mat-card-content,
 .mat-mdc-card-content {
   color: var(--text-color) !important;
 }
+
+:host-context(.dark-theme) ::ng-deep .mat-select-panel,
+:host-context(.dark-theme) ::ng-deep .mat-option {
+  background: #23272b !important;
+  color: #fff !important;
+}
+:host-context(.dark-theme) ::ng-deep .mat-option.mat-selected,
+:host-context(.dark-theme) ::ng-deep .mat-option.mat-active,
+:host-context(.dark-theme) ::ng-deep .mat-option.mat-option-active {
+  background: #23272b !important;
+  color: #fff !important;
+}
+:host-context(.dark-theme) ::ng-deep .cdk-overlay-pane {
+  color: #fff !important;
+}
+:host-context(.dark-theme) ::ng-deep .mat-select-arrow,
+:host-context(.dark-theme) ::ng-deep .mat-select-placeholder,
+:host-context(.dark-theme) ::ng-deep .mat-select-value,
+:host-context(.dark-theme) ::ng-deep .mat-select-trigger {
+  color: #fff !important;
+}
+
+:host-context(.dark-theme) ::ng-deep .mat-dialog-container,
+:host-context(.dark-theme) ::ng-deep .mat-dialog-container *,
+:host-context(.dark-theme) ::ng-deep .mat-dialog-container::before,
+:host-context(.dark-theme) ::ng-deep .mat-dialog-container::after {
+  background: #23272b !important;
+  color: #fff !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+:host-context(.dark-theme) ::ng-deep .mat-dialog-title,
+:host-context(.dark-theme) ::ng-deep h2[mat-dialog-title],
+:host-context(.dark-theme) ::ng-deep .mat-dialog-title *,
+:host-context(.dark-theme) ::ng-deep h2[mat-dialog-title] *,
+:host-context(.dark-theme) ::ng-deep .mat-dialog-title::before,
+:host-context(.dark-theme) ::ng-deep .mat-dialog-title::after,
+:host-context(.dark-theme) ::ng-deep h2[mat-dialog-title]::before,
+:host-context(.dark-theme) ::ng-deep h2[mat-dialog-title]::after {
+  background: #23272b !important;
+  color: #fff !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+:host-context(.dark-theme) ::ng-deep .mat-mdc-dialog-surface,
+:host-context(.dark-theme) ::ng-deep .mat-mdc-dialog-container,
+:host-context(.dark-theme) ::ng-deep .mat-dialog-container,
+:host-context(.dark-theme) ::ng-deep mat-dialog-content,
+:host-context(.dark-theme) ::ng-deep mat-form-field,
+:host-context(.dark-theme) ::ng-deep mat-form-field .mat-form-field-flex,
+:host-context(.dark-theme) ::ng-deep mat-form-field .mat-form-field-infix,
+:host-context(.dark-theme) ::ng-deep mat-form-field .mat-input-element,
+:host-context(.dark-theme) ::ng-deep mat-form-field label,
+:host-context(.dark-theme) ::ng-deep mat-label,
+:host-context(.dark-theme) ::ng-deep input,
+:host-context(.dark-theme) ::ng-deep textarea,
+:host-context(.dark-theme) ::ng-deep mat-dialog-actions {
+  background: #23272b !important;
+  color: #fff !important;
+  border-color: #fff !important;
+}
+:host-context(.dark-theme) ::ng-deep .mat-form-field-label,
+:host-context(.dark-theme) ::ng-deep .mat-form-field-label span,
+:host-context(.dark-theme) ::ng-deep .mat-form-field-label * {
+  color: #fff !important;
+}

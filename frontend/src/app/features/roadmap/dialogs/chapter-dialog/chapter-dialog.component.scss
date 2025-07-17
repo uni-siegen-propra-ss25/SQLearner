@@ -11,3 +11,74 @@ mat-dialog-content {
 textarea {
   min-height: 100px;
 }
+
+:host-context(.dark-theme) ::ng-deep {
+  mat-dialog-container,
+  mat-dialog-content,
+  mat-dialog-title,
+  .mat-dialog-title,
+  mat-dialog-actions,
+  .mat-dialog-actions {
+    background: #23272b !important;
+    color: #fff !important;
+  }
+  mat-form-field,
+  mat-form-field .mat-form-field-flex,
+  mat-form-field .mat-form-field-infix,
+  mat-form-field .mat-input-element,
+  mat-form-field label,
+  mat-label,
+  input,
+  textarea {
+    background: #23272b !important;
+    color: #fff !important;
+    border-color: #fff !important;
+  }
+  .mat-form-field-label,
+  .mat-form-field-label span,
+  .mat-form-field-label * {
+    color: #fff !important;
+  }
+  button, .mat-button, .mat-raised-button, .mat-flat-button, .mat-stroked-button {
+    color: #fff !important;
+  }
+  .mat-dialog-title::after,
+  h2[mat-dialog-title]::after,
+  .mat-dialog-title + hr,
+  h2[mat-dialog-title] + hr,
+  .mat-divider,
+  hr {
+    background: #23272b !important;
+    border-color: #23272b !important;
+    color: #23272b !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+  }
+}
+
+:host-context(.dark-theme) ::ng-deep h2[mat-dialog-title]::after,
+:host-context(.dark-theme) ::ng-deep h2[mat-dialog-title] + hr,
+:host-context(.dark-theme) ::ng-deep .mat-dialog-title::after,
+:host-context(.dark-theme) ::ng-deep .mat-dialog-title + hr,
+:host-context(.dark-theme) ::ng-deep hr {
+  background: #23272b !important;
+  border-color: #23272b !important;
+  color: #23272b !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: 0 !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  display: none !important;
+}
+
+:host-context(.dark-theme) ::ng-deep .mat-dialog-container,
+:host-context(.dark-theme) ::ng-deep .mat-dialog-title,
+:host-context(.dark-theme) ::ng-deep h2[mat-dialog-title],
+:host-context(.dark-theme) ::ng-deep .mat-dialog-container > * {
+  background: #23272b !important;
+  color: #fff !important;
+}

@@ -92,3 +92,19 @@
     }
   }
 }
+
+:host-context(.dark-theme) ::ng-deep {
+  input,
+  label,
+  .auth-field,
+  .auth-title,
+  .auth-subtitle,
+  .auth-error,
+  .mat-input-element,
+  .mat-form-field-label,
+  .mat-form-field-infix {
+    color: #fff !important;
+    fill: #fff !important;
+    border-color: #fff !important;
+  }
+}

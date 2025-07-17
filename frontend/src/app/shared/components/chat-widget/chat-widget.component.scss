@@ -880,6 +880,125 @@
     }
 }
 
+/* Dark theme support */
+:host-context(.dark-theme) {
+  .chat-widget {
+    background: var(--surface-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+  }
+  .widget-header {
+    background: #23272b !important;
+    color: var(--text-color) !important;
+    border-bottom-color: var(--border-color) !important;
+  }
+  .widget-title, .widget-title mat-icon {
+    color: var(--text-color) !important;
+  }
+  .thread-title, .thread-description, .thread-meta, .stat-label, .author-name, .message-content, .timestamp, .thread-list-actions, .thread-header, .thread-details, .thread-description, .thread-meta, .creator-info, .role-badge, .no-answers, .no-threads, .answers-title {
+    color: var(--text-color) !important;
+  }
+  .chat-content, .chat-messages, .chat-input, .thread-item, .thread-stats, .stat, .thread-content, .thread-list-actions, .thread-header, .thread-info, .message-bubble, .thread-description-section, .answers-section, .answer-input, .thread-resolved-notice, .no-answers, .no-threads {
+    background: var(--surface-color) !important;
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+  }
+  .message-bubble.from-student, .message-bubble.from-tutor, .message-bubble.from-admin {
+    background: #23272b !important;
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+  }
+}
+
+/* Dark theme support for form fields */
+:host-context(.dark-theme) {
+  .chat-widget {
+    // ... existing dark theme ...
+  }
+  ::ng-deep .mat-mdc-form-field-flex, ::ng-deep .mat-mdc-text-field-wrapper, ::ng-deep .mat-mdc-form-field-infix {
+    background: #23272b !important;
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+  }
+  ::ng-deep input.mat-input-element, ::ng-deep textarea.mat-input-element {
+    background: #23272b !important;
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+  }
+  ::ng-deep .mat-mdc-form-field-label {
+    color: var(--text-color) !important;
+    opacity: 0.8 !important;
+  }
+  ::ng-deep .mat-mdc-form-field-outline {
+    color: var(--border-color) !important;
+    border-color: var(--border-color) !important;
+  }
+  ::ng-deep .mat-mdc-form-field-subscript-wrapper,
+  ::ng-deep .mat-mdc-form-field-hint-wrapper,
+  ::ng-deep .mat-mdc-form-field-error {
+    color: #ffb4b4 !important;
+  }
+  ::ng-deep input::placeholder, ::ng-deep textarea::placeholder {
+    color: #b0b0b0 !important;
+    opacity: 1 !important;
+  }
+}
+
+:host-context(.dark-theme) {
+  .create-thread-form ::ng-deep mat-card,
+  .create-thread-form ::ng-deep mat-card-header,
+  .create-thread-form ::ng-deep mat-card-content,
+  .create-thread-form ::ng-deep mat-card-actions {
+    background: #181a1b !important;
+    color: #fff !important;
+    border-color: var(--border-color) !important;
+  }
+  .create-thread-form ::ng-deep mat-card-title,
+  .create-thread-form ::ng-deep label,
+  .create-thread-form ::ng-deep .mat-mdc-form-field-label,
+  .create-thread-form ::ng-deep .mat-mdc-button,
+  .create-thread-form ::ng-deep .mat-mdc-raised-button,
+  .create-thread-form ::ng-deep .mat-mdc-stroked-button {
+    color: #fff !important;
+  }
+  .create-thread-form ::ng-deep input,
+  .create-thread-form ::ng-deep textarea {
+    background: #23272b !important;
+    color: #fff !important;
+    border-color: var(--border-color) !important;
+  }
+  .create-thread-form ::ng-deep input::placeholder,
+  .create-thread-form ::ng-deep textarea::placeholder {
+    color: #b0b0b0 !important;
+    opacity: 1 !important;
+  }
+  .create-thread-form ::ng-deep .mat-mdc-form-field-outline {
+    color: var(--border-color) !important;
+    border-color: var(--border-color) !important;
+  }
+  .create-thread-form ::ng-deep .mat-mdc-form-field-subscript-wrapper,
+  .create-thread-form ::ng-deep .mat-mdc-form-field-hint-wrapper,
+  .create-thread-form ::ng-deep .mat-mdc-form-field-error {
+    color: #ffb4b4 !important;
+  }
+  .dark-btn,
+  .mat-mdc-stroked-button,
+  .mat-mdc-button,
+  .mat-mdc-raised-button {
+    background: #23272b !important;
+    color: #fff !important;
+    border-color: var(--border-color) !important;
+  }
+  .dark-btn:hover,
+  .dark-btn:focus,
+  .dark-btn:active {
+    background: #181a1b !important;
+    color: #fff !important;
+    border-color: var(--border-color) !important;
+    box-shadow: none !important;
+  }
+}
+
 // Responsive design
 @media (max-width: 768px) {
     .chat-widget {

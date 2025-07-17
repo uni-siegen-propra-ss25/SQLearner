@@ -212,6 +212,49 @@
     }
 }
 
+/* Dark theme support */
+:host-context(.dark-theme) {
+  .hints-widget {
+    background: var(--surface-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+  }
+  .widget-header .widget-title {
+    color: var(--text-color);
+  }
+  .hint-input {
+    background: #23272b;
+    color: var(--text-color);
+    border-color: var(--border-color);
+  }
+  .hints-container .hint-item {
+    background: var(--surface-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+  }
+  .item-title, .item-description, .item-meta, .hint-author {
+    color: var(--text-color);
+  }
+}
+
+:host-context(.dark-theme) ::ng-deep .mat-select-panel,
+:host-context(.dark-theme) ::ng-deep .mat-option,
+:host-context(.dark-theme) ::ng-deep .mat-option.mat-selected,
+:host-context(.dark-theme) ::ng-deep .mat-option.mat-active,
+:host-context(.dark-theme) ::ng-deep .mat-option.mat-option-active,
+:host-context(.dark-theme) ::ng-deep .mat-option:hover,
+:host-context(.dark-theme) ::ng-deep .mat-option[aria-selected='true'],
+:host-context(.dark-theme) ::ng-deep .cdk-overlay-pane {
+  background: #23272b !important;
+  color: #fff !important;
+}
+:host-context(.dark-theme) ::ng-deep .mat-select-value,
+:host-context(.dark-theme) ::ng-deep .mat-select-placeholder,
+:host-context(.dark-theme) ::ng-deep .mat-select-arrow,
+:host-context(.dark-theme) ::ng-deep .mat-select-trigger {
+  color: #fff !important;
+}
+
 // Responsive design
 @media (max-width: 768px) {
     .hints-widget {

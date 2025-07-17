@@ -201,44 +201,32 @@ mat-card-content {
 
 // Dark theme adjustments
 :host-context(.dark-theme) {
+  .exercise-title,
+  .exercise-description,
+  .metadata-item,
+  .exercise-metadata,
+  .badges,
+  .type-badge,
+  .difficulty-badge,
+  .mat-icon, mat-icon,
+  .mat-card-subtitle,
+  .mat-hint,
+  .mat-caption,
+  .mat-secondary-text,
+  .exercise-label,
+  .exercise-badge,
+  .exercise-date,
+  .exercise-options,
+  .exercise-type,
+  .exercise-difficulty,
+  .exercise-footer,
+  .exercise-bookmark {
+    color: #fff !important;
+    fill: #fff !important;
+  }
   .exercise-card {
-    background-color: rgba(255, 255, 255, 0.05); // Dark background
-    border-color: rgba(255, 255, 255, 0.1); // Light border
-
-    &:hover {
-      border-color: rgba(255, 255, 255, 0.15); // Lighter border
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); // Stronger shadow
-    }
-  }
-
-  // Dark theme text colors
-  mat-card-title {
-    color: rgba(255, 255, 255, 0.87); // Light text
-  }
-
-  .type-badge {
-    background-color: rgba(255, 255, 255, 0.1); // Light background
-    color: rgba(255, 255, 255, 0.7); // Light text
-  }
-
-  .exercise-description {
-    color: rgba(255, 255, 255, 0.7); // Light text
-  }
-
-  .exercise-metadata {
-    border-top-color: rgba(255, 255, 255, 0.1); // Light border
-  }
-
-  .metadata-item {
-    color: rgba(255, 255, 255, 0.6); // Light text
-  }
-
-  .drag-handle {
-    color: rgba(255, 255, 255, 0.3); // Light color
-
-    &:hover {
-      color: rgba(255, 255, 255, 0.6); // Lighter on hover
-    }
+    background-color: #23272b !important;
+    border-color: rgba(255,255,255,0.08) !important;
   }
 }
 

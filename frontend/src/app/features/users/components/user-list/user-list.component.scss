@@ -219,3 +219,93 @@ $color-text-light: rgba(0, 0, 0, 0.6);
     }
   }
 }
+
+:host-context(.dark-theme) {
+  .user-list-container {
+    background: #181a1b !important;
+    color: #fff !important;
+    
+    mat-card {
+      background: #23272b !important;
+      color: #fff !important;
+    }
+    .user-table {
+      background: #23272b !important;
+      color: #fff !important;
+      .mat-mdc-header-cell {
+        background: #23272b !important;
+        color: #fff !important;
+        border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+      }
+      .mat-mdc-cell {
+        background: #23272b !important;
+        color: #fff !important;
+        border-bottom: 1px solid rgba(255,255,255,0.04) !important;
+      }
+      .mat-mdc-row {
+        background: #23272b !important;
+        color: #fff !important;
+        &:hover {
+          background: #202225 !important;
+        }
+      }
+      .mat-column-name .full-name {
+        color: #fff !important;
+      }
+      .mat-column-progress .progress-value {
+        color: #fff !important;
+      }
+      .mat-column-matriculationNumber {
+        color: #fff !important;
+        .no-value {
+          color: #b0b0b0 !important;
+        }
+      }
+      .mat-column-role .role-badge {
+        background-color: #23272b !important;
+        color: #fff !important;
+        &.admin {
+          background-color: #1976d2 !important;
+          color: #fff !important;
+        }
+        &.tutor {
+          background-color: #9c27b0 !important;
+          color: #fff !important;
+        }
+        &.student {
+          background-color: #2e7d32 !important;
+          color: #fff !important;
+        }
+      }
+      .actions-cell {
+        color: #fff !important;
+        .action-buttons button {
+          background-color: #23272b !important;
+          color: #fff !important;
+          mat-icon {
+            color: #fff !important;
+          }
+          &[color='primary'] {
+            background-color: #1976d2 !important;
+            color: #fff !important;
+          }
+          &[color='warn'] {
+            background-color: #dc3545 !important;
+            color: #fff !important;
+          }
+        }
+      }
+    }
+    .no-data {
+      background: #23272b !important;
+      color: #fff !important;
+      mat-icon {
+        color: #fff !important;
+        opacity: 0.8 !important;
+      }
+    }
+    .header h1 {
+      color: #fff !important;
+    }
+  }
+}

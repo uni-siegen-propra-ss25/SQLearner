@@ -133,6 +133,28 @@
     }
 }
 
+/* Dark theme support */
+:host-context(.dark-theme) {
+  .todo-widget {
+    background: var(--surface-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+  }
+  .widget-header .widget-title {
+    color: var(--text-color);
+  }
+  .todo-input {
+    background: #23272b;
+    color: var(--text-color);
+    border-color: var(--border-color);
+  }
+  .todo-list .todo-item {
+    background: var(--surface-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+  }
+}
+
 // Responsive design
 @media (max-width: 768px) {
     .todo-widget {

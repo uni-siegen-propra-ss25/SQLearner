@@ -1,4 +1,4 @@
-<mat-sidenav-container class="app-container">
+<mat-sidenav-container class="app-container" [class.dark-theme]="themeIsDark">
   <mat-sidenav fixedInViewport opened mode="side" class="sidenav">
     <app-navigation-rail
       [items]="currentUserNavigationItems"
@@ -7,6 +7,8 @@
       (itemSelected)="onNavigationItemSelected($event)"
       (languageChanged)="onLanguageChanged($event)"
       (logStatusChanged)="onLogStatusChanged()"
+      [isDarkTheme]="themeIsDark"
+      (themeChanged)="onThemeChanged($event)"
     >
     </app-navigation-rail>
   </mat-sidenav>

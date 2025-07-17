@@ -109,3 +109,55 @@ textarea {
     }
   }
 }
+
+:host-context(.dark-theme) ::ng-deep .cdk-global-overlay-wrapper,
+:host-context(.dark-theme) ::ng-deep .cdk-overlay-container,
+:host-context(.dark-theme) ::ng-deep .cdk-overlay-pane,
+:host-context(.dark-theme) ::ng-deep .mat-mdc-dialog-surface,
+:host-context(.dark-theme) ::ng-deep .mat-mdc-dialog-container,
+:host-context(.dark-theme) ::ng-deep .mat-dialog-container,
+:host-context(.dark-theme) ::ng-deep .cdk-global-overlay-wrapper *,
+:host-context(.dark-theme) ::ng-deep .cdk-overlay-container *,
+:host-context(.dark-theme) ::ng-deep .cdk-overlay-pane *,
+:host-context(.dark-theme) ::ng-deep .mat-mdc-dialog-surface *,
+:host-context(.dark-theme) ::ng-deep .mat-mdc-dialog-container *,
+:host-context(.dark-theme) ::ng-deep .mat-dialog-container * {
+  background: #23272b !important;
+  color: #fff !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+:host-context(.dark-theme) ::ng-deep mat-dialog-content,
+:host-context(.dark-theme) ::ng-deep mat-dialog-title,
+:host-context(.dark-theme) ::ng-deep mat-dialog-actions,
+:host-context(.dark-theme) ::ng-deep mat-form-field,
+:host-context(.dark-theme) ::ng-deep mat-form-field .mat-form-field-flex,
+:host-context(.dark-theme) ::ng-deep mat-form-field .mat-form-field-infix,
+:host-context(.dark-theme) ::ng-deep mat-form-field .mat-input-element,
+:host-context(.dark-theme) ::ng-deep mat-form-field label,
+:host-context(.dark-theme) ::ng-deep mat-label,
+:host-context(.dark-theme) ::ng-deep input,
+:host-context(.dark-theme) ::ng-deep textarea {
+  background: #23272b !important;
+  color: #fff !important;
+  border-color: #fff !important;
+}
+:host-context(.dark-theme) ::ng-deep .mat-form-field-label,
+:host-context(.dark-theme) ::ng-deep .mat-form-field-label span,
+:host-context(.dark-theme) ::ng-deep .mat-form-field-label * {
+  color: #fff !important;
+}
+
+:host-context(.dark-theme) ::ng-deep .mat-mdc-dialog-surface,
+:host-context(.dark-theme) ::ng-deep .mat-mdc-dialog-container,
+:host-context(.dark-theme) ::ng-deep .mat-dialog-container,
+:host-context(.dark-theme) ::ng-deep h2[mat-dialog-title],
+:host-context(.dark-theme) ::ng-deep .mat-dialog-title,
+:host-context(.dark-theme) ::ng-deep mat-dialog-actions,
+:host-context(.dark-theme) ::ng-deep .ai-generate-row {
+  background: #23272b !important;
+  color: #fff !important;
+  box-shadow: none !important;
+  border: none !important;
+}
