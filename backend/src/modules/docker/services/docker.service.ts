@@ -32,19 +32,33 @@ export class DockerService implements OnModuleInit {
         try {
             const containers = await this.docker.listContainers({ all: true });
             const now = Date.now();
+
+            // Get all sessions with endedAt != null OR status not RUNNING
+            const staleSessions = await this.prisma.dbSession.findMany({
+                where: {
+                    OR: [
+                        { endedAt: { not: null } },
+                        { status: { not: 'RUNNING' } },
+                    ],
+                },
+                select: { containerId: true },
+            });
+            const staleContainerIds = new Set(staleSessions.map(s => s.containerId));
+
             for (const info of containers) {
-                // Only target containers created by this app (by name prefix)
                 if (info.Names.some(name => name.includes('exercise_db_'))) {
-                    // Created is in seconds since epoch
                     const createdMs = (info.Created || 0) * 1000;
-                    if (now - createdMs > 60_000) { // older than 1 minute
-                        try {
-                            const container = this.docker.getContainer(info.Id);
-                            await container.stop().catch(() => {});
-                            await container.remove({ force: true });
-                            console.log(`[DockerService] Cleaned up stale container: ${info.Id} (${info.Names[0]})`);
-                        } catch (err) {
-                            console.error(`[DockerService] Failed to remove stale container: ${info.Id}`, err);
+                    if (now - createdMs > 60_000) {
+                        // Delete only if the container is marked as inactive in the database
+                        if (staleContainerIds.has(info.Id)) {
+                            try {
+                                const container = this.docker.getContainer(info.Id);
+                                await container.stop().catch(() => {});
+                                await container.remove({ force: true });
+                                console.log(`[DockerService] Cleaned up stale container: ${info.Id} (${info.Names[0]})`);
+                            } catch (err) {
+                                console.error(`[DockerService] Failed to remove stale container: ${info.Id}`, err);
+                            }
                         }
                     }
                 }
