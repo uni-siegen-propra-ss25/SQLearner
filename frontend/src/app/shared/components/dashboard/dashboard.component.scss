@@ -211,3 +211,34 @@
         gap: 0.5rem;
     }
 }
+
+/* Dark theme support */
+:host-context(.dark-theme) {
+  .dashboard-container,
+  .dashboard-header {
+    background: var(--background-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+  }
+
+  .stats-widget {
+    background: var(--surface-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+
+  .stats-widget .widget-header .widget-title {
+    color: var(--text-color);
+  }
+
+  .stat-item {
+    background: #23272b;
+    color: var(--text-color);
+    border-color: var(--border-color);
+  }
+
+  .stat-item .stat-label {
+    color: rgba(255,255,255,0.7);
+  }
+}

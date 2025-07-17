@@ -250,3 +250,36 @@
     50% { opacity: 0.5; }
   }
 }
+
+:host-context(.dark-theme) ::ng-deep {
+  .exercise-title,
+  .exercise-description,
+  .mat-form-field-label,
+  .mat-form-field-infix,
+  .mat-input-element,
+  .mat-hint,
+  .mat-error,
+  .mat-button,
+  .mat-raised-button,
+  .mat-flat-button,
+  .mat-stroked-button,
+  .mat-icon, mat-icon,
+  .view-container h3,
+  .schema-content,
+  .results-section,
+  .table-stats,
+  .empty-state,
+  .feedback-content {
+    color: #fff !important;
+    fill: #fff !important;
+    border-color: #fff !important;
+    background-color: transparent !important;
+  }
+  .schema-content {
+    background: rgba(255,255,255,0.05) !important;
+  }
+  .empty-state mat-icon {
+    color: #fff !important;
+    opacity: 0.8 !important;
+  }
+}

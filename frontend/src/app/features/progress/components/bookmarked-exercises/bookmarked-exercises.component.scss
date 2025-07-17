@@ -32,6 +32,18 @@
   }
 }
 
+:host-context(.dark-theme) {
+  .no-bookmarks {
+    color: var(--text-color) !important;
+    p, .hint {
+      color: var(--text-color) !important;
+    }
+    mat-icon {
+      color: var(--text-color) !important;
+    }
+  }
+}
+
 /* Scrollable list container for bookmark cards */
 .bookmarks-list {
   display: flex;

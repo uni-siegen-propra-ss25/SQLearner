@@ -90,3 +90,49 @@ mat-card-actions {
     margin-left: 1rem;
   }
 }
+
+:host-context(.dark-theme) {
+  .profile-dialog-container {
+    background: #181a1b !important;
+  }
+  .profile-card {
+    background: #23272b !important;
+    color: #fff !important;
+  }
+  .profile-avatar {
+    mat-icon {
+      color: #fff !important;
+    }
+  }
+  .profile-info-row {
+    background: #26292c !important;
+    color: #fff !important;
+    span, mat-icon {
+      color: #fff !important;
+    }
+    &:hover {
+      background: #202225 !important;
+    }
+  }
+  mat-card-title, mat-card-subtitle, mat-card-content, mat-card-header, span, mat-icon {
+    color: #fff !important;
+  }
+  mat-card-actions {
+    border-top: 1px solid var(--border-color, #444) !important;
+    button {
+      background: #23272b !important;
+      color: #fff !important;
+      border-color: var(--border-color, #444) !important;
+    }
+    button[color="warn"] {
+      color: #ff6b6b !important;
+    }
+    button[color="primary"] {
+      color: #64b5f6 !important;
+    }
+    button:hover, button:focus {
+      background: #181a1b !important;
+      color: #fff !important;
+    }
+  }
+}

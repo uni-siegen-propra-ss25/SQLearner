@@ -17,16 +17,16 @@ export class DockerService implements OnModuleInit {
     }
 
     /**
-     * On module init, start a simple interval to clean up stale containers every minute.
+     * On module init, start a simple interval to clean up stale containers every 5 minutes.
      */
     onModuleInit() {
         setInterval(() => {
             this.cleanupStaleContainers();
-        }, 60_000); // every 60 seconds
+        }, 300_000); // every 5 minutes
     }
 
     /**
-     * Finds and removes containers older than 1 minute with the 'exercise_db_' prefix.
+     * Finds and removes containers older than 5 minute with the 'exercise_db_' prefix.
      */
     private async cleanupStaleContainers() {
         try {

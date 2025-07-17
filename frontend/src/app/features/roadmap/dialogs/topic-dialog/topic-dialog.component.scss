@@ -11,3 +11,28 @@ mat-dialog-content {
 textarea {
   min-height: 100px;
 }
+
+.mat-dialog-container,
+.mat-dialog-container *,
+.mat-mdc-dialog-surface,
+.mat-mdc-dialog-surface * {
+  /* Entfernt: keine globale Weiß-Overrides mehr */
+}
+
+:host-context(.dark-theme) ::ng-deep .cdk-global-overlay-wrapper,
+:host-context(.dark-theme) ::ng-deep .cdk-overlay-container,
+:host-context(.dark-theme) ::ng-deep .cdk-overlay-pane,
+:host-context(.dark-theme) ::ng-deep .mat-mdc-dialog-surface,
+:host-context(.dark-theme) ::ng-deep .mat-mdc-dialog-container,
+:host-context(.dark-theme) ::ng-deep .mat-dialog-container,
+:host-context(.dark-theme) ::ng-deep .cdk-global-overlay-wrapper *,
+:host-context(.dark-theme) ::ng-deep .cdk-overlay-container *,
+:host-context(.dark-theme) ::ng-deep .cdk-overlay-pane *,
+:host-context(.dark-theme) ::ng-deep .mat-mdc-dialog-surface *,
+:host-context(.dark-theme) ::ng-deep .mat-mdc-dialog-container *,
+:host-context(.dark-theme) ::ng-deep .mat-dialog-container * {
+  background: #23272b !important;
+  color: #fff !important;
+  box-shadow: none !important;
+  border: none !important;
+}

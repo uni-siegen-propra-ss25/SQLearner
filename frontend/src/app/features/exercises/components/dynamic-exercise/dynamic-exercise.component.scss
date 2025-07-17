@@ -89,3 +89,20 @@
 mat-card {
   border-radius: 12px;
 }
+
+:host-context(.dark-theme) ::ng-deep {
+  .type-badge,
+  .type-badge mat-icon {
+    color: #fff !important;
+    fill: #fff !important;
+  }
+  .actions button,
+  .actions button span,
+  .actions button[disabled],
+  .actions button[disabled] span,
+  .actions button mat-icon {
+    color: #fff !important;
+    fill: #fff !important;
+    opacity: 1 !important;
+  }
+}

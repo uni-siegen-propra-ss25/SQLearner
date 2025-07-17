@@ -250,3 +250,48 @@
         }
     }
 }
+
+/* Dark theme support */
+:host-context(.dark-theme) {
+  .welcome-container,
+  .hero-section,
+  .welcome-content,
+  .info-section,
+  .feature-section {
+    background: var(--background-color);
+    color: var(--text-color);
+  }
+
+  .feature-card,
+  .step {
+    background: var(--surface-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+
+  .feature-card h3,
+  .step h3,
+  .info-section h2,
+  .feature-section h2,
+  .cta-section h2 {
+    color: var(--text-color);
+  }
+
+  .feature-card p,
+  .step p,
+  .hero-subtitle,
+  .cta-section p {
+    color: rgba(255,255,255,0.7);
+  }
+
+  .cta-section {
+    background: linear-gradient(135deg, #23272b 0%, #181a1b 100%);
+    color: var(--text-color);
+  }
+
+  .step-number {
+    background: var(--primary-color);
+    color: #fff;
+  }
+}

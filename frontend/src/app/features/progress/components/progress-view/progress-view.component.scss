@@ -110,3 +110,31 @@
 .bar.wrong {
   background-color: #e57373; /* Red for incorrect answers */
 }
+
+:host-context(.dark-theme) {
+  .header h1,
+  .header p,
+  h3,
+  p,
+  .no-data,
+  .loading-container,
+  .error-container,
+  .total-progress h3,
+  .total-progress p,
+  mat-card-title,
+  mat-card-content,
+  mat-card-header,
+  .mat-card-title,
+  .mat-card-content {
+    color: var(--text-color) !important;
+  }
+  .progress-card,
+  .bookmarks-card {
+    background: #23272b !important;
+    color: var(--text-color) !important;
+  }
+  .no-data {
+    background: #181a1b !important;
+    color: var(--text-color) !important;
+  }
+}

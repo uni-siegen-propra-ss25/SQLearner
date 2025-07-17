@@ -19,7 +19,7 @@
         <!-- Thread Selection Header -->
         <div class="thread-header">
             <div class="thread-controls">
-                <button mat-stroked-button (click)="showCreateThreadForm()" class="create-thread-btn">
+                <button mat-stroked-button (click)="showCreateThreadForm()" class="create-thread-btn dark-btn">
                     <mat-icon>add</mat-icon>
                     {{ 'DASHBOARD.NEW_QUESTION' | translate }}
                 </button>
@@ -35,13 +35,12 @@
                 <mat-card-content>
                     <mat-form-field appearance="outline" class="full-width">
                         <mat-label>{{ 'DASHBOARD.TITLE' | translate }}</mat-label>
-                        <input matInput [(ngModel)]="newThreadTitle" placeholder="{{ 'DASHBOARD.TITLE_PLACEHOLDER' | translate }}">
+                        <input matInput [(ngModel)]="newThreadTitle">
                     </mat-form-field>
                     
                     <mat-form-field appearance="outline" class="full-width">
                         <mat-label>{{ 'DASHBOARD.DESCRIPTION' | translate }}</mat-label>
-                        <textarea matInput [(ngModel)]="newThreadDescription" 
-                                  rows="3" placeholder="{{ 'DASHBOARD.DESCRIPTION_PLACEHOLDER' | translate }}"></textarea>
+                        <textarea matInput [(ngModel)]="newThreadDescription" rows="3"></textarea>
                     </mat-form-field>
                 </mat-card-content>
                 <mat-card-actions>

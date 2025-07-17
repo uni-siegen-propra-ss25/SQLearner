@@ -114,10 +114,134 @@
 
 // Dark theme adjustments
 :host-context(.dark-theme) {
-  ::ng-deep {
-    .mat-raised-button.mat-primary {
-      background-color: var(--md-sys-color-primary);
-      color: var(--md-sys-color-on-primary);
-    }
+  .roadmap-container,
+  .roadmap-header h1,
+  .chapters-container,
+  .empty-state,
+  .empty-state p,
+  .add-chapter-container,
+  .mat-panel-title,
+  .mat-panel-description,
+  .mat-panel-title *,
+  .mat-panel-description *,
+  .mat-expansion-panel-header,
+  .mat-expansion-panel-header-title,
+  .mat-expansion-panel-header-description,
+  .chapter-title,
+  .chapter-description,
+  .topic-title,
+  .topic-description,
+  .exercise-title,
+  .exercise-description,
+  .exercise-metadata,
+  .metadata-item,
+  .badges,
+  .difficulty-badge,
+  .type-badge,
+  .exercise-card,
+  .chapter-panel,
+  .topic-panel,
+  .exercise-header,
+  .exercise-label,
+  .exercise-badge,
+  .exercise-date,
+  .exercise-options,
+  .exercise-icon,
+  .exercise-type,
+  .exercise-difficulty,
+  .exercise-footer,
+  .exercise-bookmark,
+  .mat-card-subtitle,
+  .mat-hint,
+  .mat-caption,
+  .mat-secondary-text,
+  .mat-body-1,
+  .mat-body-2,
+  .mat-subheading-2,
+  .mat-label,
+  .mat-list-item-content,
+  .mat-list-text,
+  .mat-list-item-title,
+  .mat-list-item-subtitle,
+  .mat-list-item-secondary,
+  .mat-list-item-content,
+  .mat-list-item,
+  .mat-list,
+  .mat-typography,
+  .mat-card-content,
+  .mat-card-title,
+  .mat-card-subtitle {
+    color: #fff !important;
+    fill: #fff !important;
+  }
+  .exercise-card,
+  .chapter-panel,
+  .topic-panel {
+    background: #23272b !important;
+    border-color: rgba(255,255,255,0.08) !important;
+  }
+  .progress-bar, .topic-progress-bar {
+    background: #1976d2 !important;
+  }
+  .badges .difficulty-badge,
+  .badges .type-badge {
+    background: #23272b !important;
+    color: #fff !important;
+  }
+  .mat-icon, mat-icon {
+    color: #fff !important;
+    fill: #fff !important;
+  }
+  .mat-expansion-panel-header {
+    background: transparent !important;
+  }
+  .mat-expansion-panel {
+    background: #23272b !important;
+    border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+  }
+  .empty-state mat-icon {
+    color: #fff !important;
+    opacity: 0.8 !important;
+  }
+}
+
+:host-context(.dark-theme) ::ng-deep {
+  .mat-body-1,
+  .mat-body-2,
+  .mat-caption,
+  .mat-subheading-2,
+  .mat-secondary-text,
+  .mat-hint,
+  .mat-label,
+  .mat-list-item-content,
+  .mat-list-text,
+  .mat-list-item-title,
+  .mat-list-item-subtitle,
+  .mat-list-item-secondary,
+  .mat-list-item-content,
+  .mat-list-item,
+  .mat-list,
+  .mat-typography,
+  .mat-card-content,
+  .mat-card-title,
+  .mat-card-subtitle,
+  .mat-expansion-panel-header-title,
+  .mat-expansion-panel-header-description,
+  .mat-panel-title,
+  .mat-panel-description,
+  .chapter-title,
+  .chapter-description,
+  .topic-title,
+  .topic-description,
+  .exercise-title,
+  .exercise-description,
+  .metadata-item,
+  .exercise-metadata,
+  .badges,
+  .type-badge,
+  .difficulty-badge,
+  .mat-icon, mat-icon {
+    color: #fff !important;
+    fill: #fff !important;
   }
 }

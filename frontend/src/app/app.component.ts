@@ -17,6 +17,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     currentUserRole: Role | null = null;
     private userSubscription: Subscription | null = null;
+    themeIsDark = false;
 
     private readonly studentItems: NavigationItem[] = [
         { icon: 'timeline', label: 'ROADMAP', route: '/roadmap', requiredRoles: [Role.STUDENT] },
@@ -64,6 +65,9 @@ export class AppComponent implements OnInit, OnDestroy {
         const savedLang = localStorage.getItem('language') || 'de';
         this.translate.setDefaultLang('de');
         this.translate.use(savedLang);
+        // Initialize theme from localStorage
+        this.themeIsDark = localStorage.getItem('theme') === 'dark';
+        this.applyThemeClass();
     }
 
     ngOnInit(): void {
@@ -71,6 +75,7 @@ export class AppComponent implements OnInit, OnDestroy {
         this.userSubscription = this.authService.user$.subscribe((user) => {
             this.currentUserRole = user?.role || null;
         });
+        this.applyThemeClass();
     }
 
     ngOnDestroy(): void {
@@ -113,5 +118,20 @@ export class AppComponent implements OnInit, OnDestroy {
 
     async onLogStatusChanged(): Promise<void> {
         this.authService.logout();
+    }
+
+    onThemeChanged(isDark: boolean): void {
+        this.themeIsDark = isDark;
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        this.applyThemeClass();
+    }
+
+    private applyThemeClass(): void {
+        const body = document.body;
+        if (this.themeIsDark) {
+            body.classList.add('dark-theme');
+        } else {
+            body.classList.remove('dark-theme');
+        }
     }
 }

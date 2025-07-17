@@ -559,20 +559,6 @@ export class SqlEditorComponent implements OnInit, OnDestroy, OnChanges {
         const lines = sql.split('\n');
         const lastLine = lines[lines.length - 1];
 
-        // Check for multiple SELECT statements
-        const selectCount = (lowerSql.match(/\bselect\b/gi) || []).length;
-        if (selectCount > 1) {
-            errors.push({
-                message:
-                    'Mehrere SELECT-Statements sind nicht erlaubt. Bitte nur eine Abfrage pro Ausführung.',
-                startLineNumber: 1,
-                startColumn: 1,
-                endLineNumber: lines.length,
-                endColumn: lastLine.length,
-                severity: monaco.MarkerSeverity.Error,
-            });
-            return errors;
-        }
 
         // Basic structure validation
         if (!lowerSql.startsWith('select')) {
