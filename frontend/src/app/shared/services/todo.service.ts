@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from 'environments/environment';
 
 /**
  * Data model representing a Todo item.
@@ -45,7 +46,7 @@ export interface UpdateTodoDto {
  * Handles retrieving, creating, updating, and deleting todos.
  */
 export class TodoService {
-    private apiUrl = 'http://localhost:3000/api/todos';
+    private apiUrl = environment.apiUrl;
 
     constructor(private http: HttpClient) {}
 
@@ -54,7 +55,7 @@ export class TodoService {
      * @returns Observable of an array of Todo items.
      */
     getTodos(): Observable<Todo[]> {
-        return this.http.get<Todo[]>(this.apiUrl);
+        return this.http.get<Todo[]>(`${this.apiUrl}/todos`);
     }
 
     /**
@@ -63,7 +64,7 @@ export class TodoService {
      * @returns Observable of the Todo.
      */
     getTodo(id: number): Observable<Todo> {
-        return this.http.get<Todo>(`${this.apiUrl}/${id}`);
+        return this.http.get<Todo>(`${this.apiUrl}/todos/${id}`);
     }
 
     /**
@@ -72,7 +73,7 @@ export class TodoService {
      * @returns Observable of the created Todo.
      */
     addTodo(todo: CreateTodoDto): Observable<Todo> {
-        return this.http.post<Todo>(this.apiUrl, todo);
+        return this.http.post<Todo>(`${this.apiUrl}/todos`, todo);
     }
 
     /**
@@ -82,7 +83,7 @@ export class TodoService {
      * @returns Observable of the updated Todo.
      */
     updateTodo(id: number, todo: UpdateTodoDto): Observable<Todo> {
-        return this.http.patch<Todo>(`${this.apiUrl}/${id}`, todo);
+        return this.http.patch<Todo>(`${this.apiUrl}/todos/${id}`, todo);
     }
 
     /**
@@ -91,7 +92,7 @@ export class TodoService {
      * @returns Observable of the updated Todo.
      */
     toggleTodo(id: number): Observable<Todo> {
-        return this.http.patch<Todo>(`${this.apiUrl}/${id}/toggle`, {});
+        return this.http.patch<Todo>(`${this.apiUrl}/todos/${id}/toggle`, {});
     }
 
     /**
@@ -100,6 +101,6 @@ export class TodoService {
      * @returns Observable<void>
      */
     deleteTodo(id: number): Observable<void> {
-        return this.http.delete<void>(`${this.apiUrl}/${id}`);
+        return this.http.delete<void>(`${this.apiUrl}/todos/${id}`);
     }
 }

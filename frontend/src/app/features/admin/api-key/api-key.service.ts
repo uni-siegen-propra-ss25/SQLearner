@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from 'environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ApiKeyService {
-    private readonly baseUrl = '/api/settings/api-key';
+    private readonly baseUrl =  environment.apiUrl;
 
     constructor(private http: HttpClient) {}
 
@@ -13,6 +14,6 @@ export class ApiKeyService {
     }
 
     setApiKey(apiKey: string): Observable<any> {
-        return this.http.post(this.baseUrl, { apiKey });
+        return this.http.post(`${this.baseUrl}/settings/api-key`, { apiKey });
     }
 }

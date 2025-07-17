@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from 'environments/environment';
 
 export enum Role {
     STUDENT = 'STUDENT',
@@ -49,7 +50,7 @@ export interface UpdateHintDto {
  * Handles retrieving, creating, updating, and deleting hints.
  */
 export class HintService {
-    private apiUrl = 'http://localhost:3000/api/hints';
+    private apiUrl = environment.apiUrl;
 
     constructor(private http: HttpClient) {}
 
@@ -58,7 +59,7 @@ export class HintService {
      * @returns Observable of an array of Hint items.
      */
     getHints(): Observable<Hint[]> {
-        return this.http.get<Hint[]>(this.apiUrl);
+        return this.http.get<Hint[]>(`${this.apiUrl}/hints`);
     }
 
     /**
@@ -84,7 +85,7 @@ export class HintService {
      * @returns Observable of the created Hint.
      */
     createHint(hint: CreateHintDto): Observable<Hint> {
-        return this.http.post<Hint>(this.apiUrl, hint);
+        return this.http.post<Hint>(`${this.apiUrl}/hints`, hint);
     }
 
     /**

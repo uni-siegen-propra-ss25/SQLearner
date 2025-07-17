@@ -3,6 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Database } from 'app/features/database/models/database.model';
 import { HttpClient } from '@angular/common/http';
+import { environment } from 'environments/environment';
 
 @Component({
     selector: 'app-exercise-ai-generation-dialog',
@@ -10,6 +11,8 @@ import { HttpClient } from '@angular/common/http';
     styleUrls: ['./exercise-ai-generation-dialog.component.scss'],
 })
 export class ExerciseAIGenerationDialogComponent {
+    private readonly baseUrl = environment.apiUrl;
+    
     generationForm: FormGroup;
     isLoading = false;
     error: string | null = null;
@@ -69,7 +72,7 @@ export class ExerciseAIGenerationDialogComponent {
                 title: string;
                 description: string;
                 solution: string;
-            }>('/api/exercises/generate', payload)
+            }>(`${this.baseUrl}/exercises/generate`, payload)
             .subscribe({
                 next: (res) => {
                     this.isLoading = false;
