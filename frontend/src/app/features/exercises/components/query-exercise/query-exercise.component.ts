@@ -282,8 +282,12 @@ export class QueryExerciseComponent implements OnInit, OnDestroy {
 
     private endContainerSession() {
         if (this.containerId) {
-            // Fire-and-forget запрос на завершение сессии
-            fetch(`/api/docker/end-session/${this.containerId}`, { method: 'POST', credentials: 'include' });
+            const url = `/api/docker/end-session/${this.containerId}`;
+            if (navigator.sendBeacon) {
+                navigator.sendBeacon(url);
+            } else {
+                fetch(url, { method: 'POST', credentials: 'include' });
+            }
         }
     }
 
